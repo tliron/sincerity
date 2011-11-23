@@ -1,9 +1,9 @@
 package com.threecrickets.sincerity;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
@@ -112,14 +112,14 @@ public class Artifacts
 			}
 		}
 
-		FileWriter writer = new FileWriter( file );
+		FileOutputStream stream = new FileOutputStream( file );
 		try
 		{
-			properties.store( writer, "Managed by Sincerity" );
+			properties.store( stream, "Managed by Sincerity" );
 		}
 		finally
 		{
-			writer.close();
+			stream.close();
 		}
 	}
 
@@ -137,14 +137,14 @@ public class Artifacts
 			properties = new Properties();
 			try
 			{
-				FileReader reader = new FileReader( file );
+				FileInputStream stream = new FileInputStream( file );
 				try
 				{
-					properties.load( reader );
+					properties.load( stream );
 				}
 				finally
 				{
-					reader.close();
+					stream.close();
 				}
 			}
 			catch( FileNotFoundException x )

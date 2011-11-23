@@ -1,0 +1,10 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+/Depot/Projects/com.threecrickets.sincerity/bin) \
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dsincerity.container="$CONTAINER") \
+"$RUN/jvm" com.threecrickets.sincerity.Sincerity "$@"

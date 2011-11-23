@@ -116,6 +116,7 @@ public class Container implements IvyListener, TransferListener
 		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( ivy.getSettings().getDefaultResolutionCacheBasedir() ) );
 
 		File configuration = new File( root, "configuration/sincerity" );
+		configuration.mkdirs();
 		repositories = new Repositories( new File( configuration, "repositories.conf" ), ivy );
 		dependencies = new Dependencies( new File( configuration, "dependencies.conf" ), new File( configuration, "artifacts.conf" ), this );
 

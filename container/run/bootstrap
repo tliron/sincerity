@@ -1,0 +1,8 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+cd "$CONTAINER"
+"$RUN/sincerity-default" \
+bootstrap "$@"

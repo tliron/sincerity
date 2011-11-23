@@ -17,40 +17,34 @@ import org.apache.ivy.plugins.repository.Resource;
 
 public class PyPiModuleDescriptorParser implements ModuleDescriptorParser
 {
-	@Override
 	public ModuleDescriptor parseDescriptor( ParserSettings ivySettings, URL descriptorURL, boolean validate ) throws ParseException, IOException
 	{
 		System.out.println( "parseDescriptor " + descriptorURL );
 		return null;
 	}
 
-	@Override
 	public ModuleDescriptor parseDescriptor( ParserSettings ivySettings, URL descriptorURL, Resource res, boolean validate ) throws ParseException, IOException
 	{
 		System.out.println( "parseDescriptor " + res );
 		return null;
 	}
 
-	@Override
 	public void toIvyFile( InputStream is, Resource res, File destFile, ModuleDescriptor md ) throws ParseException, IOException
 	{
 		System.out.println( "toIvyFile " + res );
 	}
 
-	@Override
 	public boolean accept( Resource res )
 	{
 		System.out.println( "accept? " + res );
 		return res.getName().equals( "python" );
 	}
 
-	@Override
 	public String getType()
 	{
 		return "python";
 	}
 
-	@Override
 	public Artifact getMetadataArtifact( ModuleRevisionId mrid, Resource res )
 	{
 		System.out.println( "getMetadataArtifact " + res );

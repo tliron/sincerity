@@ -133,7 +133,9 @@ public class FileUtil
 		}
 		catch( NoSuchAlgorithmException x )
 		{
-			throw new IOException( x );
+			IOException io = new IOException();
+			io.initCause( x );
+			throw io;
 		}
 		finally
 		{

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+
+"$RUN/sincerity-default" \
+use public maven clojars 'http://clojars.org/repo' : \
+add org.clojure clojure 1.3.0 : \
+bootstrap clojure.main "$@"

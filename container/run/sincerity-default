@@ -1,0 +1,11 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+
+"$RUN/sincerity" \
+use public maven threecrickets 'http://localhost:8081/nexus/content/repositories/sincerity' : \
+use public maven restlet 'http://maven.restlet.org' : \
+use public maven maven-central 'http://localhost:8081/nexus/content/repositories/central/' : \
+"$@"
+
+ #use public maven maven-central 'http://repo1.maven.org/maven2/' : \

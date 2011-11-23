@@ -1,0 +1,20 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dcatalina.home="$CONTAINER/catalina" \
+-Dcatalina.base="$CONTAINER/configuration/tomcat" \
+-Dcatalina.config="file://$CONTAINER/configuration/tomcat/catalina.properties") \
+"$RUN/sincerity-default" \
+add org.apache.tomcat tomcat-catalina-ha 7.0.22 : \
+bootstrap org.apache.catalina.startup.Bootstrap "$@" 
+
+#add org.apache.tomcat.embed tomcat-embed-core 7.0.22 : \
+#add org.apache.tomcat tomcat-catalina 7.0.22 : \
+#add org.apache.tomcat tomcat-util 7.0.22 : \
+#add org.apache.tomcat tomcat-juli 7.0.22 : \
+#add org.apache.tomcat tomcat-dbcp 7.0.22 : \
+#add org.apache.tomcat tomcat-jasper 7.0.22 : \
+#add org.apache.tomcat tomcat-coyote 7.0.22 : \

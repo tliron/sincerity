@@ -1,0 +1,31 @@
+#!/bin/bash
+
+function join()
+{
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+LIBRARIES_PYTHON="$CONTAINER/libraries/python"
+PYTHON_HOME="/Depot/Projects/Collaborative/Prudence/libraries/jython/lib"
+PYTHON_CACHE="$CONTAINER/cache/python" # Notes: Must be absolute or relative to PYTHON_HOME; Jython will add a "packages" subdirectory to it
+PYTHON_EXECUTABLE="$RUN/python"
+
+EGGS=$(join ':' "$LIBRARIES_PYTHON"/*.egg)
+if [ -n "$EGGS" ]; then
+	LIBRARIES_PYTHON="$LIBRARIES_PYTHON:$EGGS"
+fi
+
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dpython.home="$PYTHON_HOME" \
+-Dpython.cachedir="$PYTHON_CACHE" \
+-Dpython.executable="$PYTHON_EXECUTABLE" \
+-Dpython.path="$LIBRARIES_PYTHON") \
+"$RUN/sincerity-default" \
+use public pypi pypi 'http://pypi.python.org/simple' : \
+add org.python jython-standalone 2.5.2 : \
+bootstrap org.python.util.jython "$@"

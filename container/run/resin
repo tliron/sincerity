@@ -1,0 +1,22 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+# We need to resolve separately, because we need to start Resin with java.util.logging.manager set
+
+"$RUN/sincerity-default" \
+use public maven caucho 'http://caucho.com/m2' : \
+add com.caucho resin 4.0.20 : \
+resolve
+
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dresin.home="$CONTAINER/resin" \
+-Djava.util.logging.manager=com.caucho.log.LogManagerImpl) \
+"$RUN/sincerity-default" \
+bootstrap com.caucho.server.resin.Resin \
+-data-directory "$CONTAINER/cache/resin" \
+-root-directory "$CONTAINER" \
+-conf "configuration/resin/resin.conf" \
+-log-directory "logs" \
+"$@"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+
+"$RUN/sincerity-default" \
+add com.threecrickets.prudence prudence-flavor-clojure : \
+resolve
+
+"$RUN/scripturian" instance "$@"

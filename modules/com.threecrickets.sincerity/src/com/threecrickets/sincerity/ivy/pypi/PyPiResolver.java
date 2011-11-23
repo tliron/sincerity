@@ -172,7 +172,6 @@ public class PyPiResolver extends BasicResolver
 		return revisionEntries;
 	}
 
-	@Override
 	public void publish( Artifact artifact, File src, boolean overwrite ) throws IOException
 	{
 		System.out.println( "publish " + artifact );
@@ -192,7 +191,6 @@ public class PyPiResolver extends BasicResolver
 		return null;
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
 	public ResolvedResource findIvyFileRef( DependencyDescriptor dependencyDescriptor, ResolveData resolveData )
 	{
@@ -421,7 +419,7 @@ public class PyPiResolver extends BasicResolver
 		if( !getOrganisation().equals( id.getOrganisation() ) )
 			return null;
 
-		//System.out.println( "findArtifactRef " + artifact );
+		// System.out.println( "findArtifactRef " + artifact );
 
 		// We might already have it archived
 		if( "python-egg".equals( artifact.getType() ) )
