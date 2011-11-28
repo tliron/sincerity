@@ -1,0 +1,23 @@
+#!/bin/bash
+
+function join()
+{
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
+RUN=/Depot/Projects/Collaborative/Sincerity/container/run
+CONTAINER="$RUN/.."
+
+JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+"$CONTAINER/libraries/jars"/* \
+/Depot/Projects/com.threecrickets.sincerity/bin \
+/Depot/Libraries/ivy/ivy-2.2.0.jar \
+/Depot/Libraries/ivy/lib/\*.jar)
+
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dfile.encoding=UTF-8 \
+-classpath "$(join ":" $JVM_LIBRARIES)")
+
+java $JVM_SWITCHES "$@"
