@@ -61,6 +61,13 @@ find-sincerity-container()
 	done
 }
 
+function join()
+{
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
 #
 # Find Sincerity home
 #
@@ -106,13 +113,26 @@ fi
 echo "Using Sincerity container: $SINCERITY_CONTAINER"
 
 #
+# Libraries
+#
+
+JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+"$SINCERITY_HOME/lib"/*.jar)
+
+#
 # Run Sincerity
 #
 
-RUN="$SINCERITY_CONTAINER/run"
+#JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+#/Depot/Projects/com.threecrickets.sincerity/bin) \
+#JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+#-Dsincerity.container="$CONTAINER") \
+#"$SINCERITY_HOME/jvm" com.threecrickets.sincerity.Sincerity "$@"
 
-JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
-/Depot/Projects/com.threecrickets.sincerity/bin) \
+
 JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
--Dsincerity.container="$CONTAINER") \
-"$RUN/jvm" com.threecrickets.sincerity.Sincerity "$@"
+-Dfile.encoding=UTF-8 \
+-Dsincerity.container="$SINCERITY_CONTAINER" \
+-classpath "$(join ":" $JVM_LIBRARIES)")
+
+java $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"

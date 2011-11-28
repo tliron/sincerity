@@ -5,13 +5,14 @@
 	<property name="resources" value="../modules/com.threecrickets.sincerity/resources" />
 	<property name="lib" value="../libraries" />
 	<property name="deploy" value="../modules/com.threecrickets.sincerity/deploy" />
+	<property name="scripts" value="../modules/scripts/src" />
 	<property name="dist" value="./distribution" />
 	<property name="content" value="${dist}/content" />
 	<property name="tmp" value="./tmp" />
 
 	<target name="compile" description="Compile Sincerity code">
 		<mkdir dir="${tmp}" />
-		<javac srcdir="${src}" destdir="${tmp}" target="1.5" includeAntRuntime="false">
+		<javac srcdir="${src}" destdir="${tmp}" target="1.5" includeAntRuntime="false" debug="true">
 			<classpath>
 				<fileset dir="${lib}/commons-codec/lib" />
 				<fileset dir="${lib}/commons-logging/lib" />
@@ -21,8 +22,8 @@
 				<fileset dir="${lib}/scripturian/lib" />
 			</classpath>
 		</javac>
-		<copy todir="${tmp}/META-INF">
-			<fileset dir="${resources}/META-INF" excludes="**/.svn/" />
+		<copy todir="${tmp}">
+			<fileset dir="${resources}" excludes="**/.svn/" />
 		</copy>
 	</target>
 
@@ -95,11 +96,18 @@
 	<target name="deploy" depends="src, javadoc" description="Fetch deployment">
 		<copy todir="${content}">
 			<fileset dir="${deploy}" excludes="**/.svn/" />
+			<fileset dir="${scripts}" excludes="**/.svn/" />
 		</copy>
+		<chmod perm="ugo+rx">
+			<fileset dir="${content}" includes="sincerity, jvm" />
+		</chmod>
 	</target>
 	
 	<target name="package" depends="libraries, licenses, deploy" description="Create Sincerity zip">
-		<zip destfile="sincerity.zip" basedir="${content}" includes="**/*" />
+		<zip destfile="sincerity.zip" level="9">
+			<zipfileset prefix="sincerity" dir="${content}" excludes="sincerity, jvm" />
+			<zipfileset prefix="sincerity" dir="${content}" filemode="755" includes="sincerity, jvm" />
+		</zip>
 	</target>
 	
 	<target name="build" depends="package" description="Build distribution" />
