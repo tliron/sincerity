@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
+import com.threecrickets.scripturian.LanguageManager;
+import com.threecrickets.scripturian.Scripturian;
 import com.threecrickets.sincerity.Dependencies.Node;
 
 public class Sincerity implements Runnable
@@ -17,10 +19,17 @@ public class Sincerity implements Runnable
 	// Main
 	//
 
-	public static void main( String[] arguments ) throws Exception
+	public static void main( String[] arguments )
 	{
-		Sincerity sincerity = new Sincerity( arguments );
-		sincerity.run();
+		try
+		{
+			Sincerity sincerity = new Sincerity( arguments );
+			sincerity.run();
+		}
+		catch( Throwable x )
+		{
+			x.printStackTrace();
+		}
 	}
 
 	//
@@ -166,9 +175,53 @@ public class Sincerity implements Runnable
 	public void run( String[] statement ) throws Exception
 	{
 		String command = statement[0];
-		if( "resolve".equals( command ) )
+		if( "create".equals( command ) )
 		{
-			container.getDependencies().resolve( overwrite );
+			String template;
+			if( statement.length < 2 )
+				template = "default";
+			else
+				template = statement[1];
+
+			System.out.println( template );
+		}
+		else if( "install".equals( command ) )
+		{
+			container.getDependencies().install( overwrite );
+		}
+		else if( "unpack".equals( command ) )
+		{
+			String name;
+			if( statement.length < 2 )
+				name = null;
+			else
+				name = statement[1];
+
+			if( name == null )
+				container.getDependencies().getPackages().unpack( overwrite );
+			else
+			{
+				Package pack = container.getDependencies().getPackages().get( name );
+				if( pack == null )
+					System.err.println( "Unknown package: " + name );
+				else
+					pack.unpack( overwrite );
+			}
+		}
+		else if( "list".equals( command ) )
+		{
+			ArrayList<ModuleRevisionId> ids = new ArrayList<ModuleRevisionId>();
+			for( Node node : container.getDependencies().getDescriptorTree() )
+				addDependenciesOnce( node, ids );
+
+			for( ModuleRevisionId id : ids )
+				System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
+		}
+		else if( "tree".equals( command ) )
+		{
+			ArrayList<String> indents = new ArrayList<String>();
+			for( Node child : container.getDependencies().getDescriptorTree() )
+				printDependencies( child, indents, false );
 		}
 		else if( "clean".equals( command ) )
 		{
@@ -271,7 +324,7 @@ public class Sincerity implements Runnable
 			if( !container.getRepositories().remove( section, name ) )
 				System.err.println( "Repository was not in use: " + section + ":" + name );
 		}
-		else if( "bootstrap".equals( command ) )
+		else if( "main".equals( command ) )
 		{
 			if( statement.length < 2 )
 			{
@@ -283,57 +336,31 @@ public class Sincerity implements Runnable
 			String[] mainArguments = new String[statement.length - 2];
 			System.arraycopy( statement, 2, mainArguments, 0, mainArguments.length );
 
-			String resolve = properties.get( "resolve" );
-			if( !"false".equals( resolve ) )
-				container.getDependencies().resolve( overwrite );
+			String install = properties.get( "install" );
+			if( !"false".equals( install ) )
+				container.getDependencies().install( overwrite );
 
 			Class<?> mainClass = container.getDependencies().getClassLoader().loadClass( mainClassName );
 			Method mainMethod = mainClass.getMethod( "main", String[].class );
 			mainMethod.invoke( null, (Object) mainArguments );
 		}
-		else if( "unpack".equals( command ) )
+		else if( "execute".equals( command ) )
 		{
-			String name;
 			if( statement.length < 2 )
-				name = null;
-			else
-				name = statement[1];
-
-			if( name == null )
-				container.getDependencies().getPackages().unpack( overwrite );
-			else
 			{
-				Package pack = container.getDependencies().getPackages().get( name );
-				if( pack == null )
-					System.err.println( "Unknown package: " + name );
-				else
-					pack.unpack( overwrite );
+				System.err.println( "'" + command + "' command requires: [uri] ..." );
+				return;
 			}
-		}
-		else if( "list".equals( command ) )
-		{
-			ArrayList<ModuleRevisionId> ids = new ArrayList<ModuleRevisionId>();
-			for( Node node : container.getDependencies().getDescriptorTree() )
-				addDependenciesOnce( node, ids );
 
-			for( ModuleRevisionId id : ids )
-				System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
-		}
-		else if( "tree".equals( command ) )
-		{
-			ArrayList<String> indents = new ArrayList<String>();
-			for( Node child : container.getDependencies().getDescriptorTree() )
-				printDependencies( child, indents, false );
-		}
-		else if( "create".equals( command ) )
-		{
-			String template;
-			if( statement.length < 2 )
-				template = "default";
-			else
-				template = statement[1];
+			String[] executeArguments = new String[statement.length - 1];
+			System.arraycopy( statement, 1, executeArguments, 0, executeArguments.length );
 
-			System.out.println( template );
+			String install = properties.get( "install" );
+			if( !"false".equals( install ) )
+				container.getDependencies().install( overwrite );
+
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( container.getRoot(), "cache" ).getPath() );
+			Scripturian.main( executeArguments );
 		}
 		else
 		{

@@ -25,6 +25,6 @@ public class TestSincerity
 		//container.getDependencies().add( "com.threecrickets", "com.threecrickets.scripturian", "1.0.0" );
 		//container.getDependencies().add( "com.threecrickets.scripturian", "org.mozilla.javascript", "1.7R2" );
 		//container.getDependencies().add( "com.threecrickets.prudence", "flavor-clojure", "1.1.0" );
-		container.getDependencies().resolve(false);
+		container.getDependencies().install(false);
 	}
 }

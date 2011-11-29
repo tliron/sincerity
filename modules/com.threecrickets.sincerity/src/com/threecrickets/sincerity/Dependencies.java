@@ -343,9 +343,9 @@ public class Dependencies
 		save();
 	}
 
-	public void resolve( boolean overwrite ) throws ParseException, IOException
+	public void install( boolean overwrite ) throws ParseException, IOException
 	{
-		message( "Resolving..." );
+		message( "Installing..." );
 
 		ivy.pushContext();
 		lastResolveReport = ivy.resolve( moduleDescriptor, defaultResolveOptions );
@@ -353,7 +353,7 @@ public class Dependencies
 
 		artifacts.update( getArtifacts( true, overwrite ), Artifacts.MODE_UPDATE_ONLY );
 
-		message( "Resolved!" );
+		message( "Installed!" );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

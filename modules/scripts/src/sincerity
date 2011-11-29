@@ -37,6 +37,35 @@ get-parent-path()
 }
 
 #
+# Find Java
+#
+
+if [ -n "$JAVA_HOME" ]; then
+	JAVA="$JAVA_HOME/bin/java"
+	if [ ! -f "$JAVA" ]; then
+		echo "JAVA_HOME does not point to a valid JVM directory" 1>&2
+		exit 1
+	fi
+else
+	OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+	case "$OS" in
+		linux)
+			JAVA=/usr/bin/java
+			;;
+		darwin)
+			JAVA=/System/Library/Frameworks/JavaVM.framework/Home/bin/java
+			;;
+		sunos)
+			JAVA=/usr/jdk/latest/bin/java
+			;;
+	esac
+	if [ ! -f "$JAVA" ]; then
+		echo "Could not find Java: please set JAVA_HOME to a JVM directory" 1>&2
+		exit 1
+	fi
+fi
+
+#
 # Find Sincerity home
 #
 
@@ -61,4 +90,4 @@ JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
 -Dfile.encoding=UTF-8 \
 -classpath "$(join ":" $JVM_LIBRARIES)")
 
-java $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"
+"$JAVA" $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"
