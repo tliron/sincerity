@@ -314,7 +314,7 @@ public class Sincerity implements Runnable
 		{
 			ArrayList<ModuleRevisionId> ids = new ArrayList<ModuleRevisionId>();
 			for( Node node : container.getDependencies().getDescriptorTree() )
-				addDependencies( node, ids );
+				addDependenciesOnce( node, ids );
 
 			for( ModuleRevisionId id : ids )
 				System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
@@ -354,7 +354,7 @@ public class Sincerity implements Runnable
 
 	private final Container container;
 
-	private static void addDependencies( Node node, ArrayList<ModuleRevisionId> ids )
+	private static void addDependenciesOnce( Node node, ArrayList<ModuleRevisionId> ids )
 	{
 		boolean exists = false;
 		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
@@ -371,33 +371,35 @@ public class Sincerity implements Runnable
 			ids.add( id );
 
 		for( Node child : node.children )
-			addDependencies( child, ids );
+			addDependenciesOnce( child, ids );
 	}
 
-	private static void printDependencies( Node node, ArrayList<String> indents, boolean seal )
+	private static void printDependencies( Node node, ArrayList<String> patterns, boolean seal )
 	{
-		int originalSize = indents.size();
+		int size = patterns.size();
 		if( seal )
-			indents.set( originalSize - 1, originalSize == 0 ? " \\" : "   \\" );
-		for( String indent : indents )
-			System.out.print( indent );
-		if( seal )
-			indents.set( originalSize - 1, originalSize == 0 ? "  " : "    " );
-		if( originalSize != 0 )
+			patterns.set( size - 1, size < 2 ? " \\" : "   \\" );
+		for( String pattern : patterns )
+			System.out.print( pattern );
+		if( size > 0 )
 			System.out.print( "--" );
+		if( seal )
+			patterns.set( size - 1, size < 2 ? "  " : "    " );
 
 		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
 		System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
 
-		indents.add( originalSize == 0 ? " |" : "   |" );
-
-		for( Iterator<Node> i = node.children.iterator(); i.hasNext(); )
+		if( !node.children.isEmpty() )
 		{
-			Node child = i.next();
-			printDependencies( child, indents, !i.hasNext() );
-		}
+			patterns.add( size == 0 ? " |" : "   |" );
 
-		if( originalSize == indents.size() - 1 )
-			indents.remove( originalSize );
+			for( Iterator<Node> i = node.children.iterator(); i.hasNext(); )
+			{
+				Node child = i.next();
+				printDependencies( child, patterns, !i.hasNext() );
+			}
+
+			patterns.remove( patterns.size() - 1 );
+		}
 	}
 }
