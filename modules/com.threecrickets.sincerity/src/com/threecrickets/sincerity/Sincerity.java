@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
@@ -140,6 +141,12 @@ public class Sincerity implements Runnable
 		}
 		else if( "add".equals( command ) )
 		{
+			if( statement.length < 3 )
+			{
+				System.err.println( "'" + command + "' command requires: [group] [name] [[version]]" );
+				return;
+			}
+
 			String organisation = statement[1];
 			String name = statement[2];
 			String revision;
@@ -153,6 +160,12 @@ public class Sincerity implements Runnable
 		}
 		else if( "remove".equals( command ) )
 		{
+			if( statement.length < 4 )
+			{
+				System.err.println( "'" + command + "' command requires: [group] [name] [version]" );
+				return;
+			}
+
 			String organisation = statement[1];
 			String name = statement[2];
 			String revision = statement[3];
@@ -162,11 +175,24 @@ public class Sincerity implements Runnable
 		}
 		else if( "use".equals( command ) )
 		{
+			if( statement.length < 4 )
+			{
+				System.err.println( "'" + command + "' command requires: [section] [type] [name] ..." );
+				return;
+			}
+
+			String section = statement[1];
 			String type = statement[2];
+			String name = statement[3];
+
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
-				String section = statement[1];
-				String name = statement[3];
+				if( statement.length < 5 )
+				{
+					System.err.println( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
+					return;
+				}
+
 				String url = statement[4];
 
 				if( !container.getRepositories().addIbiblio( section, name, url ) )
@@ -174,8 +200,12 @@ public class Sincerity implements Runnable
 			}
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
-				String section = statement[1];
-				String name = statement[3];
+				if( statement.length < 5 )
+				{
+					System.err.println( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
+					return;
+				}
+
 				String url = statement[4];
 
 				if( !container.getRepositories().addPyPi( section, name, url ) )
@@ -186,6 +216,12 @@ public class Sincerity implements Runnable
 		}
 		else if( "unuse".equals( command ) )
 		{
+			if( statement.length < 3 )
+			{
+				System.err.println( "'" + command + "' command requires: [section] [name]" );
+				return;
+			}
+
 			String section = statement[1];
 			String name = statement[2];
 
@@ -194,6 +230,12 @@ public class Sincerity implements Runnable
 		}
 		else if( "bootstrap".equals( command ) )
 		{
+			if( statement.length < 2 )
+			{
+				System.err.println( "'" + command + "' command requires: [main class name] ..." );
+				return;
+			}
+
 			String mainClassName = statement[1];
 			String[] mainArguments = new String[statement.length - 2];
 			System.arraycopy( statement, 2, mainArguments, 0, mainArguments.length );
@@ -227,8 +269,28 @@ public class Sincerity implements Runnable
 		}
 		else if( "list".equals( command ) )
 		{
+			ArrayList<ModuleRevisionId> ids = new ArrayList<ModuleRevisionId>();
 			for( Node node : container.getDependencies().getDescriptorTree() )
-				printDependencies( node, 0 );
+				addDependencies( node, ids );
+
+			for( ModuleRevisionId id : ids )
+				System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
+		}
+		else if( "tree".equals( command ) )
+		{
+			ArrayList<String> indents = new ArrayList<String>();
+			for( Node child : container.getDependencies().getDescriptorTree() )
+				printDependencies( child, indents, false );
+		}
+		else if( "create".equals( command ) )
+		{
+			String template;
+			if( statement.length < 2 )
+				template = "default";
+			else
+				template = statement[1];
+
+			System.out.println( template );
 		}
 		else
 		{
@@ -249,13 +311,50 @@ public class Sincerity implements Runnable
 
 	private final Container container;
 
-	private static void printDependencies( Node node, int indent )
+	private static void addDependencies( Node node, ArrayList<ModuleRevisionId> ids )
 	{
-		for( int i = 0; i < indent; i++ )
-			System.out.print( "    " );
+		boolean exists = false;
+		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
+		for( ModuleRevisionId foundId : ids )
+		{
+			if( id.equals( foundId ) )
+			{
+				exists = true;
+				break;
+			}
+		}
+
+		if( !exists )
+			ids.add( id );
+
+		for( Node child : node.children )
+			addDependencies( child, ids );
+	}
+
+	private static void printDependencies( Node node, ArrayList<String> indents, boolean seal )
+	{
+		int originalSize = indents.size();
+		if( seal )
+			indents.set( originalSize - 1, originalSize == 0 ? " \\" : "   \\" );
+		for( String indent : indents )
+			System.out.print( indent );
+		if( seal )
+			indents.set( originalSize - 1, originalSize == 0 ? "  " : "    " );
+		if( originalSize != 0 )
+			System.out.print( "--" );
+
 		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
 		System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
-		for( Node child : node.children )
-			printDependencies( child, indent + 1 );
+
+		indents.add( originalSize == 0 ? " |" : "   |" );
+
+		for( Iterator<Node> i = node.children.iterator(); i.hasNext(); )
+		{
+			Node child = i.next();
+			printDependencies( child, indents, !i.hasNext() );
+		}
+
+		if( originalSize == indents.size() - 1 )
+			indents.remove( originalSize );
 	}
 }
