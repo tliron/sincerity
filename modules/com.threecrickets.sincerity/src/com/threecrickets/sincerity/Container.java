@@ -80,6 +80,12 @@ import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
 public class Container implements IvyListener, TransferListener
 {
 	//
+	// Constants
+	//
+
+	public static final String SINCERITY_DIR_NAME = ".sincerity";
+
+	//
 	// Construction
 	//
 
@@ -90,9 +96,6 @@ public class Container implements IvyListener, TransferListener
 
 	public Container( File root, int debugLevel ) throws ParseException, IOException
 	{
-		if( root == null )
-			root = new File( System.getProperty( "sincerity.container" ) != null ? System.getProperty( "sincerity.container" ) : "container" );
-
 		this.root = root;
 
 		root.mkdirs();

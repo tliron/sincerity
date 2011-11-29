@@ -7,9 +7,12 @@ set -e
 
 SINCERITY_DIRNAME=${SINCERITY_DIRNAME:-.sincerity}
 
-#
-# Utility functions
-#
+function join()
+{
+	local IFS="$1"
+	shift
+	echo "$*"
+}
 
 get-parent-path()
 {
@@ -33,41 +36,6 @@ get-parent-path()
 	fi
 }
 
-find-sincerity-container()
-{
-	# Finds the Sincerity container, going up the filesystem tree
-
-	local CONTAINER=$1
-	local SINCERITY_DIR
-	
-	# TODO: test for endless link loops
-	
-	if [ ! -d "$CONTAINER" ]; then
-		# Make sure we start at a directory
-		CONTAINER=$(get-parent-path "$CONTAINER")
-	fi
-	
-	while :; do
-		SINCERITY_DIR="$CONTAINER/$SINCERITY_DIRNAME"
-		if [ "$CONTAINER" == / ]; then
-			# Hit root!
-			return
-		fi
-		if [ -d "$SINCERITY_DIR" ]; then
-			echo "$CONTAINER"
-			return
-		fi
-		CONTAINER=$(get-parent-path "$CONTAINER")
-	done
-}
-
-function join()
-{
-	local IFS="$1"
-	shift
-	echo "$*"
-}
-
 #
 # Find Sincerity home
 #
@@ -77,40 +45,6 @@ if [ -z "$SINCERITY_HOME" ]; then
 fi
 
 echo "Sincerity home: $SINCERITY_HOME"
-
-#
-# Find Sincerity container root in this order:
-#
-#  1. --container= switch
-#  2. SINCERITY_CONTAINER environment variable
-#  3. Search from current path
-#
-
-for ARG in $@; do
-	if [ "${ARG:0:12}" == '--container=' ]; then
-		SINCERITY_CONTAINER="${ARG:12}"
-		break
-	fi
-done
-if [ -n "$SINCERITY_CONTAINER" ]; then
-	if [ ! -d "$SINCERITY_CONTAINER" ]; then
-		echo "Sincerity container does not exist: $SINCERITY_CONTAINER" 1>&2
-		exit 1
-	fi
-	if [ ! -d "$SINCERITY_CONTAINER/$SINCERITY_DIRNAME" ]; then
-		echo "Not a Sincerity container: $SINCERITY_CONTAINER" 1>&2
-		exit 1
-	fi
-fi
-if [ -z "$SINCERITY_CONTAINER" ]; then
-	SINCERITY_CONTAINER=$(find-sincerity-container "$PWD")
-	if [ -z "$SINCERITY_CONTAINER" ]; then
-		echo "Not inside a Sincerity container" 1>&2
-		exit 1
-	fi
-fi
-
-echo "Using Sincerity container: $SINCERITY_CONTAINER"
 
 #
 # Libraries
@@ -123,16 +57,8 @@ JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
 # Run Sincerity
 #
 
-#JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
-#/Depot/Projects/com.threecrickets.sincerity/bin) \
-#JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
-#-Dsincerity.container="$CONTAINER") \
-#"$SINCERITY_HOME/jvm" com.threecrickets.sincerity.Sincerity "$@"
-
-
 JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
 -Dfile.encoding=UTF-8 \
--Dsincerity.container="$SINCERITY_CONTAINER" \
 -classpath "$(join ":" $JVM_LIBRARIES)")
 
 java $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"

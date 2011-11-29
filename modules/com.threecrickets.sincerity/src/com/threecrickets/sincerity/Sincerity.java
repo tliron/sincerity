@@ -73,10 +73,50 @@ public class Sincerity implements Runnable
 				properties.put( split[0], split[1] );
 		}
 
-		String root = properties.get( "root" );
-		File rootFile = null;
-		if( root != null )
-			rootFile = new File( root ).getCanonicalFile();
+		// Look for container in this order:
+		//
+		// 1. --container switch
+		// 2. sincerity.container JVM property
+		// 3. SINCERITY_CONTAINER environment variable
+		// 4. Search up filesystem tree from current path
+
+		String container = properties.get( "container" );
+		if( container == null )
+		{
+			container = System.getProperty( "sincerity.container" );
+			if( container == null )
+				container = System.getenv( "SINCERITY_CONTAINER" );
+		}
+
+		File containerRootDir = null;
+		if( container != null )
+		{
+			containerRootDir = new File( container ).getCanonicalFile();
+			if( !containerRootDir.exists() )
+				throw new Exception( "Specified root path for the Sincerity container does not point anywhere: " + containerRootDir );
+			if( !containerRootDir.isDirectory() )
+				throw new Exception( "Specified root path for the Sincerity container does not point to a directory: " + containerRootDir );
+			File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR_NAME );
+			if( !sincerityDir.isDirectory() )
+				throw new Exception( "Specified root path for the Sincerity container does not point to a valid container: " + containerRootDir );
+		}
+		else
+		{
+			File currentDir = new File( "." ).getCanonicalFile();
+			containerRootDir = currentDir;
+			while( true )
+			{
+				File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR_NAME );
+				if( sincerityDir.isDirectory() )
+				{
+					// Found it!
+					break;
+				}
+				containerRootDir = containerRootDir.getParentFile().getCanonicalFile();
+				if( containerRootDir == null )
+					throw new Exception( "Could not find a Sincerity container for the current directory: " + currentDir );
+			}
+		}
 
 		String debug = properties.get( "debug" );
 		int debugLevel = 1;
@@ -88,12 +128,15 @@ public class Sincerity implements Runnable
 			}
 			catch( Exception x )
 			{
+				throw new Exception( "'--debug' value must be a number" );
 			}
 		}
 
-		container = new Container( rootFile, debugLevel );
-
 		overwrite = "true".equals( properties.get( "overwrite" ) );
+
+		this.container = new Container( containerRootDir, debugLevel );
+
+		System.out.println( "Using Sincerity container at: " + containerRootDir );
 	}
 
 	//
