@@ -1,17 +1,18 @@
 package com.threecrickets.sincerity;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.ivy.Ivy;
+import org.apache.ivy.core.module.descriptor.Configuration;
+import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.License;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -26,23 +27,25 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	// Construction
 	//
 
-	public ResolvedDependencies( File reportFile, Ivy ivy ) throws ParserConfigurationException, SAXException, IOException
+	public ResolvedDependencies( Dependencies dependencies ) throws ParserConfigurationException, SAXException, IOException
 	{
+		this.dependencies = dependencies;
+
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		Document document = documentBuilder.parse( reportFile );
+		Document document = documentBuilder.parse( dependencies.getResolutionReport() );
 
 		ArrayList<ResolvedDependency> resolvedDependencys = new ArrayList<ResolvedDependency>();
 
-		ivy.pushContext();
+		dependencies.getContainer().getIvy().pushContext();
+
 		Element root = document.getDocumentElement();
 		if( "ivy-report".equals( root.getTagName() ) )
 		{
 			NodeList dependenciesList = root.getElementsByTagName( "dependencies" );
 			if( dependenciesList.getLength() > 0 )
 			{
-				Element dependencies = (Element) dependenciesList.item( 0 );
-				NodeList moduleList = dependencies.getElementsByTagName( "module" );
+				NodeList moduleList = ( (Element) dependenciesList.item( 0 ) ).getElementsByTagName( "module" );
 				for( int moduleLength = moduleList.getLength(), moduleIndex = 0; moduleIndex < moduleLength; moduleIndex++ )
 				{
 					Element module = (Element) moduleList.item( moduleIndex );
@@ -61,7 +64,8 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 						// revision.getAttribute( "default" ) );
 
 						ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, moduleName, branch, revisionName );
-						DefaultModuleDescriptor moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id );
+						DefaultModuleDescriptor moduleDescriptor = new DefaultModuleDescriptor( id, "release", null );
+						moduleDescriptor.addConfiguration( new Configuration( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) );
 						moduleDescriptor.setHomePage( homePage );
 
 						ResolvedDependency resolvedDependency = new ResolvedDependency( moduleDescriptor, evicted );
@@ -89,11 +93,33 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 							Caller theCaller = new Caller( callerOrganisation, callerName, callerRev );
 							resolvedDependency.callers.add( theCaller );
 						}
+
+						NodeList artifactsList = revision.getElementsByTagName( "artifacts" );
+						if( artifactsList.getLength() > 0 )
+						{
+							NodeList artifactList = ( (Element) artifactsList.item( 0 ) ).getElementsByTagName( "artifact" );
+							for( int artifactLength = artifactList.getLength(), artifactIndex = 0; artifactIndex < artifactLength; artifactIndex++ )
+							{
+								Element artifact = (Element) artifactList.item( artifactIndex );
+								String artifactName = artifact.getAttribute( "name" );
+								String artifactType = artifact.getAttribute( "type" );
+								String artifactExt = artifact.getAttribute( "ext" );
+								String artifactSize = artifact.getAttribute( "size" );
+								String artifactLocation = artifact.getAttribute( "location" );
+
+								HashMap<String, Object> attributes = new HashMap<String, Object>();
+								attributes.put( "size", artifactSize );
+								attributes.put( "location", artifactLocation );
+								DefaultArtifact theArtifact = new DefaultArtifact( id, null, artifactName, artifactType, artifactExt, attributes );
+								moduleDescriptor.addArtifact( "default", theArtifact );
+							}
+						}
 					}
 				}
 			}
 		}
-		ivy.popContext();
+
+		dependencies.getContainer().getIvy().popContext();
 
 		// Build tree
 		for( ResolvedDependency resolvedDependency : resolvedDependencys )
@@ -133,6 +159,48 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 		return installedDependencies;
 	}
 
+	public void printArtifacts( Writer writer )
+	{
+		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
+		String root = dependencies.getContainer().getRoot().getPath();
+		int rootLength = root.length();
+		for( ResolvedDependency resolvedDependency : getInstalledDependencies() )
+		{
+			printWriter.println( resolvedDependency );
+			org.apache.ivy.core.module.descriptor.Artifact[] artifacts = resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION );
+			for( int length = artifacts.length, i = 0; i < length; i++ )
+			{
+				org.apache.ivy.core.module.descriptor.Artifact artifact = artifacts[i];
+				String location = artifact.getId().getAttribute( "location" );
+				String size = artifact.getId().getAttribute( "size" );
+				printWriter.print( i == length - 1 ? " \u2514\u2500\u2500" : " \u251C\u2500\u2500" );
+				printWriter.print( artifact.getType() );
+				printWriter.print( ": " );
+				if( location != null )
+				{
+					if( location.startsWith( root ) )
+						location = location.substring( rootLength + 1 );
+					printWriter.print( location );
+				}
+				else
+				{
+					// Could not find a location for it?
+					printWriter.print( artifact.getName() );
+					printWriter.print( '.' );
+					printWriter.print( artifact.getExt() );
+					printWriter.print( '?' );
+				}
+				if( size != null )
+				{
+					printWriter.print( " (" );
+					printWriter.print( size );
+					printWriter.print( " bytes)" );
+				}
+				printWriter.println();
+			}
+		}
+	}
+
 	public void printTree( Writer writer )
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
@@ -164,6 +232,8 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	// Private
 
 	private static final long serialVersionUID = 1L;
+
+	private final Dependencies dependencies;
 
 	private static void addInstalledDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
 	{

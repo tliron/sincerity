@@ -78,6 +78,11 @@ public class Dependencies
 	// Attributes
 	//
 
+	public Container getContainer()
+	{
+		return container;
+	}
+
 	public Packages getPackages() throws ParseException, MalformedURLException, IOException
 	{
 		return new Packages( container.getRoot(), getClassLoader() );
@@ -105,7 +110,9 @@ public class Dependencies
 
 	public ResolvedDependencies getResolvedDependencies() throws ParserConfigurationException, SAXException, IOException
 	{
-		return new ResolvedDependencies( getResolutionReport(), ivy );
+		if( resolvedDependencies == null )
+			resolvedDependencies = new ResolvedDependencies( this );
+		return resolvedDependencies;
 	}
 
 	public Set<Artifact> getArtifacts() throws ParseException, MalformedURLException, IOException
@@ -160,6 +167,15 @@ public class Dependencies
 		}
 		else
 			return Dependencies.class.getClassLoader();
+	}
+
+	public File getResolutionReport()
+	{
+		ivy.pushContext();
+		ResolutionCacheManager resolutionCache = ivy.getResolutionCacheManager();
+		ivy.popContext();
+		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
+		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
 	}
 
 	//
@@ -224,17 +240,20 @@ public class Dependencies
 		save();
 	}
 
+	public void resolve() throws ParseException, IOException
+	{
+		ivy.pushContext();
+		lastResolveReport = ivy.resolve( moduleDescriptor, defaultResolveOptions );
+		ivy.popContext();
+	}
+
 	public void install( boolean overwrite ) throws ParseException, IOException
 	{
-		message( "Installing..." );
-
 		ivy.pushContext();
 		lastResolveReport = ivy.resolve( moduleDescriptor, defaultResolveOptions );
 		ivy.popContext();
 
 		artifacts.update( getArtifacts( true, overwrite ), Artifacts.MODE_UPDATE_ONLY );
-
-		message( "Installed!" );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -254,23 +273,11 @@ public class Dependencies
 
 	private ResolveReport lastResolveReport;
 
-	private void message( String message )
-	{
-		System.out.println( message );
-	}
+	private ResolvedDependencies resolvedDependencies;
 
 	private void save() throws IOException
 	{
 		XmlModuleDescriptorWriter.write( moduleDescriptor, XmlUtil.COMMENT_FULL, ivyFile );
-	}
-
-	private File getResolutionReport()
-	{
-		ivy.pushContext();
-		ResolutionCacheManager resolutionCache = ivy.getResolutionCacheManager();
-		ivy.popContext();
-		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
-		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
 	}
 
 	private XmlReportParser getParsedResolutionReport() throws ParseException

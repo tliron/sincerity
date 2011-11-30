@@ -183,8 +183,13 @@ public class Sincerity implements Runnable
 
 			System.out.println( template );
 		}
+		else if( "resolve".equals( command ) )
+		{
+			container.getDependencies().resolve();
+		}
 		else if( "install".equals( command ) )
 		{
+			container.getDependencies().resolve();
 			container.getDependencies().install( overwrite );
 		}
 		else if( "unpack".equals( command ) )
@@ -205,14 +210,13 @@ public class Sincerity implements Runnable
 				pack.unpack( overwrite );
 			}
 		}
-		else if( "list".equals( command ) )
-		{
-			for( ResolvedDependency resolvedDependency : container.getDependencies().getResolvedDependencies().getInstalledDependencies() )
-				System.out.println( resolvedDependency );
-		}
-		else if( "tree".equals( command ) )
+		else if( "dependencies".equals( command ) )
 		{
 			container.getDependencies().getResolvedDependencies().printTree( new OutputStreamWriter( System.out ) );
+		}
+		else if( "artifacts".equals( command ) )
+		{
+			container.getDependencies().getResolvedDependencies().printArtifacts( new OutputStreamWriter( System.out ) );
 		}
 		else if( "clean".equals( command ) )
 		{
