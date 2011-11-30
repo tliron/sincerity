@@ -191,20 +191,34 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	private static void printTree( PrintWriter writer, ResolvedDependency resolvedDependency, ArrayList<String> patterns, boolean seal )
 	{
 		int size = patterns.size();
-		if( seal )
-			patterns.set( size - 1, size < 2 ? " \\" : "   \\" );
-		for( String pattern : patterns )
-			System.out.print( pattern );
+
 		if( size > 0 )
-			System.out.print( "--" );
-		if( seal )
-			patterns.set( size - 1, size < 2 ? "  " : "    " );
+		{
+			for( Iterator<String> i = patterns.iterator(); i.hasNext(); )
+			{
+				String pattern = i.next();
+				if( !i.hasNext() )
+				{
+					// Last pattern depends on whether we are sealing
+					if( seal )
+						pattern = size < 2 ? " \u2514" : "   \u2514";
+					else
+						pattern = size < 2 ? " \u251C" : "   \u251C";
+				}
+				System.out.print( pattern );
+			}
+
+			System.out.print( "\u2500\u2500" );
+			if( seal )
+				// Erase the pattern after it was sealed
+				patterns.set( size - 1, size < 2 ? "  " : "    " );
+		}
 
 		writer.println( resolvedDependency );
 
 		if( !resolvedDependency.children.isEmpty() )
 		{
-			patterns.add( size == 0 ? " |" : "   |" );
+			patterns.add( size == 0 ? " \u2502" : "   \u2502" );
 
 			for( Iterator<ResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
 			{
