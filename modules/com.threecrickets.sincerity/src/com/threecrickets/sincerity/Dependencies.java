@@ -13,8 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.ivy.Ivy;
@@ -23,8 +21,6 @@ import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
-import org.apache.ivy.core.module.descriptor.License;
-import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.report.ResolveReport;
@@ -34,38 +30,12 @@ import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.internal.XmlUtil;
 
 public class Dependencies
 {
-	//
-	// Classes
-	//
-
-	public static class Node
-	{
-		public final ModuleDescriptor descriptor;
-
-		public final ArrayList<Node> children = new ArrayList<Node>();
-
-		// //////////////////////////////////////////////////////////////////////////
-		// Private
-
-		private Node( ModuleDescriptor descriptor )
-		{
-			this.descriptor = descriptor;
-		}
-
-		private boolean isRoot = true;
-
-		private final ArrayList<Caller> callers = new ArrayList<Caller>();
-	}
-
 	//
 	// Construction
 	//
@@ -133,98 +103,9 @@ public class Dependencies
 		return moduleDescriptor.getDependencies();
 	}
 
-	public List<Node> getDescriptorTree() throws ParserConfigurationException, SAXException, IOException
+	public ResolvedDependencies getResolvedDependencies() throws ParserConfigurationException, SAXException, IOException
 	{
-		ArrayList<Node> nodes = new ArrayList<Node>();
-
-		ivy.pushContext();
-		Document document = getResolutionReportDocument();
-		Element root = document.getDocumentElement();
-		if( "ivy-report".equals( root.getTagName() ) )
-		{
-			NodeList dependenciesList = root.getElementsByTagName( "dependencies" );
-			if( dependenciesList.getLength() > 0 )
-			{
-				Element dependencies = (Element) dependenciesList.item( 0 );
-				NodeList moduleList = dependencies.getElementsByTagName( "module" );
-				for( int moduleLength = moduleList.getLength(), moduleIndex = 0; moduleIndex < moduleLength; moduleIndex++ )
-				{
-					Element module = (Element) moduleList.item( moduleIndex );
-					String organisation = module.getAttribute( "organisation" );
-					String moduleName = module.getAttribute( "name" );
-
-					NodeList revisionList = module.getElementsByTagName( "revision" );
-					for( int revisionLength = revisionList.getLength(), revisionIndex = 0; revisionIndex < revisionLength; revisionIndex++ )
-					{
-						Element revision = (Element) revisionList.item( revisionIndex );
-						String revisionName = revision.getAttribute( "name" );
-						String branch = revision.getAttribute( "branch" );
-						String homePage = revision.getAttribute( "homepage" );
-						// boolean isDefault = Boolean.valueOf(
-						// revision.getAttribute( "default" ) );
-
-						ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, moduleName, branch, revisionName );
-						DefaultModuleDescriptor moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id );
-						moduleDescriptor.setHomePage( homePage );
-
-						Node node = new Node( moduleDescriptor );
-						nodes.add( node );
-
-						NodeList licenseList = revision.getElementsByTagName( "license" );
-						for( int licenseLength = licenseList.getLength(), licenseIndex = 0; licenseIndex < licenseLength; licenseIndex++ )
-						{
-							Element license = (Element) licenseList.item( licenseIndex );
-							String licenseName = license.getAttribute( "name" );
-							String url = license.getAttribute( "url" );
-
-							License theLicense = new License( licenseName, url );
-							moduleDescriptor.addLicense( theLicense );
-						}
-
-						NodeList callerList = revision.getElementsByTagName( "caller" );
-						for( int callerLength = callerList.getLength(), callerIndex = 0; callerIndex < callerLength; callerIndex++ )
-						{
-							Element caller = (Element) callerList.item( callerIndex );
-							String callerOrganisation = caller.getAttribute( "organisation" );
-							String callerName = caller.getAttribute( "name" );
-							String callerRev = caller.getAttribute( "callerrev" );
-
-							Caller theCaller = new Caller( callerOrganisation, callerName, callerRev );
-							node.callers.add( theCaller );
-						}
-					}
-				}
-			}
-		}
-		ivy.popContext();
-
-		// Build node tree
-		for( Node node : nodes )
-		{
-			for( Caller caller : node.callers )
-			{
-				for( Node parentNode : nodes )
-				{
-					ModuleRevisionId parentId = parentNode.descriptor.getModuleRevisionId();
-					if( caller.organisation.equals( parentId.getOrganisation() ) && caller.name.equals( parentId.getName() ) && caller.revision.equals( parentId.getRevision() ) )
-					{
-						parentNode.children.add( node );
-						node.isRoot = false;
-						break;
-					}
-				}
-			}
-		}
-
-		// Gather root nodes
-		ArrayList<Node> rootNodes = new ArrayList<Node>();
-		for( Node node : nodes )
-		{
-			if( node.isRoot )
-				rootNodes.add( node );
-		}
-
-		return rootNodes;
+		return new ResolvedDependencies( getResolutionReport(), ivy );
 	}
 
 	public Set<Artifact> getArtifacts() throws ParseException, MalformedURLException, IOException
@@ -404,18 +285,6 @@ public class Dependencies
 		return null;
 	}
 
-	private Document getResolutionReportDocument() throws ParserConfigurationException, SAXException, IOException
-	{
-		File reportFile = getResolutionReport();
-		if( reportFile.exists() )
-		{
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-			return documentBuilder.parse( reportFile );
-		}
-		return null;
-	}
-
 	/**
 	 * Valid from last {@link #resolve()}.
 	 * 
@@ -429,21 +298,5 @@ public class Dependencies
 		if( parser != null )
 			artifacts.addAll( Arrays.asList( parser.getArtifactReports() ) );
 		return artifacts;
-	}
-
-	private static class Caller
-	{
-		private Caller( String organisation, String name, String revision )
-		{
-			this.organisation = organisation;
-			this.name = name;
-			this.revision = revision;
-		}
-
-		private final String organisation;
-
-		private final String name;
-
-		private final String revision;
 	}
 }

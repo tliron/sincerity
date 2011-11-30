@@ -1,17 +1,13 @@
 package com.threecrickets.sincerity;
 
 import java.io.File;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-
-import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import com.threecrickets.scripturian.LanguageManager;
-import com.threecrickets.scripturian.Scripturian;
-import com.threecrickets.sincerity.Dependencies.Node;
 
 public class Sincerity implements Runnable
 {
@@ -82,12 +78,14 @@ public class Sincerity implements Runnable
 				properties.put( split[0], split[1] );
 		}
 
+		//
 		// Look for container in this order:
 		//
-		// 1. --container switch
-		// 2. sincerity.container JVM property
-		// 3. SINCERITY_CONTAINER environment variable
+		// 1. '--container=' switch
+		// 2. 'sincerity.container' JVM property
+		// 3. 'SINCERITY_CONTAINER' environment variable
 		// 4. Search up filesystem tree from current path
+		//
 
 		String container = properties.get( "container" );
 		if( container == null )
@@ -203,25 +201,18 @@ public class Sincerity implements Runnable
 			{
 				Package pack = container.getDependencies().getPackages().get( name );
 				if( pack == null )
-					System.err.println( "Unknown package: " + name );
-				else
-					pack.unpack( overwrite );
+					throw new Exception( "Unknown package: " + name );
+				pack.unpack( overwrite );
 			}
 		}
 		else if( "list".equals( command ) )
 		{
-			ArrayList<ModuleRevisionId> ids = new ArrayList<ModuleRevisionId>();
-			for( Node node : container.getDependencies().getDescriptorTree() )
-				addDependenciesOnce( node, ids );
-
-			for( ModuleRevisionId id : ids )
-				System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
+			for( ResolvedDependency resolvedDependency : container.getDependencies().getResolvedDependencies().getInstalledDependencies() )
+				System.out.println( resolvedDependency );
 		}
 		else if( "tree".equals( command ) )
 		{
-			ArrayList<String> indents = new ArrayList<String>();
-			for( Node child : container.getDependencies().getDescriptorTree() )
-				printDependencies( child, indents, false );
+			container.getDependencies().getResolvedDependencies().printTree( new OutputStreamWriter( System.out ) );
 		}
 		else if( "clean".equals( command ) )
 		{
@@ -238,10 +229,7 @@ public class Sincerity implements Runnable
 		else if( "add".equals( command ) )
 		{
 			if( statement.length < 3 )
-			{
-				System.err.println( "'" + command + "' command requires: [group] [name] [[version]]" );
-				return;
-			}
+				throw new Exception( "'" + command + "' command requires: [group] [name] [[version]]" );
 
 			String organisation = statement[1];
 			String name = statement[2];
@@ -257,10 +245,7 @@ public class Sincerity implements Runnable
 		else if( "remove".equals( command ) )
 		{
 			if( statement.length < 4 )
-			{
-				System.err.println( "'" + command + "' command requires: [group] [name] [version]" );
-				return;
-			}
+				throw new Exception( "'" + command + "' command requires: [group] [name] [version]" );
 
 			String organisation = statement[1];
 			String name = statement[2];
@@ -272,10 +257,7 @@ public class Sincerity implements Runnable
 		else if( "use".equals( command ) )
 		{
 			if( statement.length < 4 )
-			{
-				System.err.println( "'" + command + "' command requires: [section] [type] [name] ..." );
-				return;
-			}
+				throw new Exception( "'" + command + "' command requires: [section] [type] [name] ..." );
 
 			String section = statement[1];
 			String type = statement[2];
@@ -284,10 +266,7 @@ public class Sincerity implements Runnable
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
 				if( statement.length < 5 )
-				{
-					System.err.println( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
-					return;
-				}
+					throw new Exception( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
 
 				String url = statement[4];
 
@@ -297,10 +276,7 @@ public class Sincerity implements Runnable
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
 				if( statement.length < 5 )
-				{
-					System.err.println( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
-					return;
-				}
+					throw new Exception( "'" + command + " [section] " + type + " [name]' command also requires: [url]" );
 
 				String url = statement[4];
 
@@ -313,10 +289,7 @@ public class Sincerity implements Runnable
 		else if( "unuse".equals( command ) )
 		{
 			if( statement.length < 3 )
-			{
-				System.err.println( "'" + command + "' command requires: [section] [name]" );
-				return;
-			}
+				throw new Exception( "'" + command + "' command requires: [section] [name]" );
 
 			String section = statement[1];
 			String name = statement[2];
@@ -327,22 +300,13 @@ public class Sincerity implements Runnable
 		else if( "main".equals( command ) )
 		{
 			if( statement.length < 2 )
-			{
-				System.err.println( "'" + command + "' command requires: [main class name] ..." );
-				return;
-			}
+				throw new Exception( "'" + command + "' command requires: [main class name] ..." );
 
 			String mainClassName = statement[1];
 			String[] mainArguments = new String[statement.length - 2];
 			System.arraycopy( statement, 2, mainArguments, 0, mainArguments.length );
 
-			String install = properties.get( "install" );
-			if( !"false".equals( install ) )
-				container.getDependencies().install( overwrite );
-
-			Class<?> mainClass = container.getDependencies().getClassLoader().loadClass( mainClassName );
-			Method mainMethod = mainClass.getMethod( "main", String[].class );
-			mainMethod.invoke( null, (Object) mainArguments );
+			main( mainClassName, mainArguments );
 		}
 		else if( "execute".equals( command ) )
 		{
@@ -355,17 +319,11 @@ public class Sincerity implements Runnable
 			String[] executeArguments = new String[statement.length - 1];
 			System.arraycopy( statement, 1, executeArguments, 0, executeArguments.length );
 
-			String install = properties.get( "install" );
-			if( !"false".equals( install ) )
-				container.getDependencies().install( overwrite );
-
 			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( container.getRoot(), "cache" ).getPath() );
-			Scripturian.main( executeArguments );
+			main( "com.threecrickets.scripturian.Scripturian", executeArguments );
 		}
 		else
-		{
-			System.err.println( "Unknown command: " + command );
-		}
+			throw new Exception( "Unknown command: " + command );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -381,52 +339,10 @@ public class Sincerity implements Runnable
 
 	private final Container container;
 
-	private static void addDependenciesOnce( Node node, ArrayList<ModuleRevisionId> ids )
+	private void main( String className, String[] arguments ) throws Exception
 	{
-		boolean exists = false;
-		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
-		for( ModuleRevisionId foundId : ids )
-		{
-			if( id.equals( foundId ) )
-			{
-				exists = true;
-				break;
-			}
-		}
-
-		if( !exists )
-			ids.add( id );
-
-		for( Node child : node.children )
-			addDependenciesOnce( child, ids );
-	}
-
-	private static void printDependencies( Node node, ArrayList<String> patterns, boolean seal )
-	{
-		int size = patterns.size();
-		if( seal )
-			patterns.set( size - 1, size < 2 ? " \\" : "   \\" );
-		for( String pattern : patterns )
-			System.out.print( pattern );
-		if( size > 0 )
-			System.out.print( "--" );
-		if( seal )
-			patterns.set( size - 1, size < 2 ? "  " : "    " );
-
-		ModuleRevisionId id = node.descriptor.getModuleRevisionId();
-		System.out.println( id.getOrganisation() + " " + id.getName() + " " + id.getRevision() );
-
-		if( !node.children.isEmpty() )
-		{
-			patterns.add( size == 0 ? " |" : "   |" );
-
-			for( Iterator<Node> i = node.children.iterator(); i.hasNext(); )
-			{
-				Node child = i.next();
-				printDependencies( child, patterns, !i.hasNext() );
-			}
-
-			patterns.remove( patterns.size() - 1 );
-		}
+		Class<?> theClass = container.getDependencies().getClassLoader().loadClass( className );
+		Method mainMethod = theClass.getMethod( "main", String[].class );
+		mainMethod.invoke( null, (Object) arguments );
 	}
 }
