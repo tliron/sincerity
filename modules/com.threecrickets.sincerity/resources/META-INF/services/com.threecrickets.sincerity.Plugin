@@ -1,0 +1,7 @@
+com.threecrickets.sincerity.plugin.ArtifactsPlugin
+com.threecrickets.sincerity.plugin.ContainerPlugin
+com.threecrickets.sincerity.plugin.DependenciesPlugin
+com.threecrickets.sincerity.plugin.HelpPlugin
+com.threecrickets.sincerity.plugin.MainPlugin
+com.threecrickets.sincerity.plugin.RepositoriesPlugin
+com.threecrickets.sincerity.plugin.ScripturianPlugin
