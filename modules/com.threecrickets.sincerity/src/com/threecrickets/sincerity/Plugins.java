@@ -26,10 +26,11 @@ public class Plugins extends HashMap<String, Plugin>
 		// Scripturian plugins
 		File pluginsDir = new File( container.getRoot(), "plugins" );
 
+		System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( container.getRoot(), "cache" ).getPath() );
 		ParsingContext parsingContext = new ParsingContext();
 		parsingContext.setLanguageManager( new LanguageManager() );
 		parsingContext.setDocumentSource( new DocumentFileSource<Executable>( pluginsDir, "default", "js", 1000 ) );
-		// parsingContext.setPrepare( true );
+		parsingContext.setPrepare( true );
 
 		for( String pluginFile : pluginsDir.list() )
 		{
