@@ -26,7 +26,7 @@ public class HelpPlugin implements Plugin
 	{
 		if( "help".equals( command ) )
 		{
-			for( Plugin plugin : sincerity.getPlugins() )
+			for( Plugin plugin : sincerity.getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
 					System.out.println( plugin.getName() + ":" + pluginCommand );
 		}

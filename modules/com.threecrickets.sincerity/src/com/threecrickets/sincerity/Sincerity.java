@@ -3,12 +3,9 @@ package com.threecrickets.sincerity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
-import com.threecrickets.scripturian.internal.ServiceLoader;
 
 public class Sincerity implements Runnable
 {
@@ -78,10 +75,6 @@ public class Sincerity implements Runnable
 			if( split.length == 2 )
 				properties.put( split[0], split[1] );
 		}
-
-		// Plugins
-		for( Plugin plugin : ServiceLoader.load( Plugin.class ) )
-			plugins.put( plugin.getName(), plugin );
 	}
 
 	//
@@ -93,9 +86,11 @@ public class Sincerity implements Runnable
 		return properties;
 	}
 
-	public Collection<Plugin> getPlugins()
+	public Plugins getPlugins() throws Exception
 	{
-		return plugins.values();
+		if( plugins == null )
+			plugins = new Plugins( getContainer() );
+		return plugins;
 	}
 
 	public Container getContainer() throws Exception
@@ -218,7 +213,7 @@ public class Sincerity implements Runnable
 			run( split[0], split[1], arguments );
 		else
 		{
-			for( Plugin plugin : plugins.values() )
+			for( Plugin plugin : getPlugins().values() )
 			{
 				if( Arrays.asList( plugin.getCommands() ).contains( command ) )
 				{
@@ -233,7 +228,7 @@ public class Sincerity implements Runnable
 
 	public void run( String plugin, String command, String[] arguments ) throws Exception
 	{
-		Plugin thePlugin = plugins.get( plugin );
+		Plugin thePlugin = getPlugins().get( plugin );
 		if( thePlugin == null )
 			throw new Exception( "Unknown plugin: " + plugin );
 		thePlugin.run( command, arguments, this );
@@ -248,9 +243,9 @@ public class Sincerity implements Runnable
 
 	private final ArrayList<ArrayList<String>> statements = new ArrayList<ArrayList<String>>();
 
-	private final HashMap<String, Plugin> plugins = new HashMap<String, Plugin>();
-
 	private String containerLocation;
 
 	private Container container;
+
+	private Plugins plugins;
 }

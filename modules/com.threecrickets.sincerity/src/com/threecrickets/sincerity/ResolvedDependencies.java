@@ -29,6 +29,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 
 	public ResolvedDependencies( Dependencies dependencies ) throws ParserConfigurationException, SAXException, IOException
 	{
+		super();
 		this.dependencies = dependencies;
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
