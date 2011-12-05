@@ -158,15 +158,21 @@ public class Dependencies
 
 	public ClassLoader getClassLoader() throws MalformedURLException, ParseException
 	{
+		Set<URL> urls = new HashSet<URL>();
+		File classesFile = new File( container.getRoot(), "libraries/classes/" );
+		if( classesFile.isDirectory() )
+			urls.add( classesFile.getAbsoluteFile().toURI().toURL() );
 		if( lastResolveReport != null )
-		{
-			Set<URL> urls = getJarUrls();
-			ClassLoader classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Dependencies.class.getClassLoader() );
-			Thread.currentThread().setContextClassLoader( classLoader );
-			return classLoader;
-		}
+			urls.addAll( getJarUrls() );
+		ClassLoader classLoader;
+		if( urls.isEmpty() )
+			classLoader = Dependencies.class.getClassLoader();
 		else
-			return Dependencies.class.getClassLoader();
+		{
+			classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Dependencies.class.getClassLoader() );
+			Thread.currentThread().setContextClassLoader( classLoader );
+		}
+		return classLoader;
 	}
 
 	public File getResolutionReport()

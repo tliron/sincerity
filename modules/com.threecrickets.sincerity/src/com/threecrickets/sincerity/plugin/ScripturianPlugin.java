@@ -35,7 +35,7 @@ public class ScripturianPlugin implements Plugin
 				return;
 			}
 
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( sincerity.getContainer().getRoot(), "cache" ).getPath() );
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( sincerity.getContainer().getRoot(), "cache" ).getAbsolutePath() );
 			MainPlugin.main( sincerity, "com.threecrickets.scripturian.Scripturian", arguments );
 		}
 		else

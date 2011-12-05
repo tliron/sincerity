@@ -14,15 +14,9 @@
 		<mkdir dir="${tmp}" />
 		<javac srcdir="${src}" destdir="${tmp}" target="1.5" includeAntRuntime="false" debug="true">
 			<classpath>
-				<fileset dir="${lib}/commons-codec/lib" />
-				<fileset dir="${lib}/commons-httpclient/lib" />
-				<fileset dir="${lib}/commons-logging/lib" />
 				<fileset dir="${lib}/commons-vfs/lib" />
 				<fileset dir="${lib}/ivy/lib" />
-				<fileset dir="${lib}/jsch/lib" />
 				<fileset dir="${lib}/jsoup/lib" />
-				<fileset dir="${lib}/oro/lib" />
-				<fileset dir="${lib}/rhino/lib" />
 				<fileset dir="${lib}/scripturian/lib" />
 			</classpath>
 		</javac>
@@ -98,9 +92,9 @@
 	
 	<target name="libraries" depends="jar" description="Fetch libraries">
 		<copy todir="${content}/lib">
-			<fileset dir="${lib}/commons-codec/lib" excludes="**/.svn/" />
+			<!--<fileset dir="${lib}/commons-codec/lib" excludes="**/.svn/" />-->
 			<fileset dir="${lib}/commons-httpclient/lib" excludes="**/.svn/" />
-			<fileset dir="${lib}/commons-logging/lib" excludes="**/.svn/" />
+			<!--<fileset dir="${lib}/commons-logging/lib" excludes="**/.svn/" />-->
 			<fileset dir="${lib}/commons-vfs/lib" excludes="**/.svn/" />
 			<fileset dir="${lib}/ivy/lib" excludes="**/.svn/" />
 			<fileset dir="${lib}/jsch/lib" excludes="**/.svn/" />

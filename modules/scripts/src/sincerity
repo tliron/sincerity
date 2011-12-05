@@ -80,7 +80,8 @@ echo "Sincerity home: $SINCERITY_HOME"
 #
 
 JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
-"$SINCERITY_HOME/lib"/*.jar)
+"$SINCERITY_HOME/lib"/*.jar \
+"$JAVA_HOME/lib/tools.jar")
 
 #
 # Run Sincerity
