@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity</groupId>
+	<groupId>com.threecrickets.sincerity.parent</groupId>
 	<artifactId>sincerity</artifactId>
 	<version>1.1.0</version>
 	<packaging>pom</packaging>
@@ -55,135 +55,8 @@
 	</distributionManagement>
 
 	<modules>
-		<module>plugin-logging</module>
-		<module>../../libraries/commons-httpclient/maven</module>
-		<module>../../libraries/commons-vfs/maven</module>
-		<module>../../libraries/ivy/maven</module>
-		<module>../../libraries/jsoup/maven</module>
-		<module>../../libraries/oro/maven</module>
-		<!-- <module>../../libraries/rhino/maven</module> -->
-		<module>../../libraries/scripturian/maven</module>
+		<module>sincerity</module>
+		<module>logging</module>
 	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.ivy</groupId>
-			<artifactId>ivy</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-vfs</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.scripturian</groupId>
-			<artifactId>scripturian</artifactId>
-			<version>1.0.0-R310</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mozilla</groupId>
-			<artifactId>rhino</artifactId>
-			<version>1.7R3</version>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<directory>tmp</directory>
-
-		<plugins>
-			<!-- Delegate to the Ant build script -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<phase>generate-resources</phase>
-						<configuration>
-							<tasks>
-								<ant dir=".." antfile="build.xml" target="build" />
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>com.sun</groupId>
-						<artifactId>tools</artifactId>
-						<version>1.5.0</version>
-						<scope>system</scope>
-						<systemPath>${java.home}/../lib/tools.jar</systemPath>
-					</dependency>
-				</dependencies>
-			</plugin>
-
-			<!-- jar artifact -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<type>jar</type>
-									<file>../distribution/content/lib/com.threecrickets.sincerity.jar</file>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
-				<executions>
-					<!-- javadoc artifact -->
-					<execution>
-						<id>javadoc</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classifier>javadoc</classifier>
-							<classesDirectory>../distribution/content/api</classesDirectory>
-						</configuration>
-					</execution>
-
-					<!-- sources artifact -->
-					<execution>
-						<id>source</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classifier>sources</classifier>
-							<classesDirectory>../distribution/content/src</classesDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-	</build>
 
 </project>

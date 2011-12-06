@@ -19,8 +19,10 @@ public class Plugins extends HashMap<String, Plugin>
 	{
 		super();
 
+		classLoader = container.getDependencies().getClassLoader();
+
 		// JVM plugins
-		for( Plugin plugin : ServiceLoader.load( Plugin.class, container.getDependencies().getClassLoader() ) )
+		for( Plugin plugin : ServiceLoader.load( Plugin.class, classLoader ) )
 			put( plugin.getName(), plugin );
 
 		// Scripturian plugins
@@ -46,8 +48,19 @@ public class Plugins extends HashMap<String, Plugin>
 		}
 	}
 
+	//
+	// Attributes
+	//
+
+	public ClassLoader getClassLoader()
+	{
+		return classLoader;
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final long serialVersionUID = 1L;
+
+	private final ClassLoader classLoader;
 }

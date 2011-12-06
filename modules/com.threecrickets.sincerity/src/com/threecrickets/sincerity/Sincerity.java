@@ -89,8 +89,15 @@ public class Sincerity implements Runnable
 
 	public Plugins getPlugins() throws Exception
 	{
+		if( plugins != null )
+		{
+			if( plugins.getClassLoader() != getContainer().getDependencies().getClassLoader() )
+				plugins = null;
+		}
+
 		if( plugins == null )
 			plugins = new Plugins( getContainer() );
+
 		return plugins;
 	}
 
@@ -172,6 +179,7 @@ public class Sincerity implements Runnable
 		container = null;
 	}
 
+	//
 	// Runnable
 	//
 

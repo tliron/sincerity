@@ -197,6 +197,14 @@ public class Dependencies
 	// Operations
 	//
 
+	public void reset() throws IOException
+	{
+		ivy.pushContext();
+		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+		ivy.popContext();
+		save();
+	}
+
 	public boolean add( String organisation, String name, String revision ) throws ParseException, IOException
 	{
 		ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, name, revision );
@@ -240,27 +248,21 @@ public class Dependencies
 	public void clean() throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
+		classLoader = null;
 	}
 
 	public void prune() throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
-	}
-
-	public void reset() throws IOException
-	{
-		ivy.pushContext();
-		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
-		ivy.popContext();
-		save();
+		classLoader = null;
 	}
 
 	public void install( boolean overwrite ) throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
 		ivy.pushContext();
 		ivy.resolve( moduleDescriptor, defaultResolveOptions );
-		classLoader = null;
 		ivy.popContext();
+		classLoader = null;
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_UPDATE_ONLY );
 	}
 

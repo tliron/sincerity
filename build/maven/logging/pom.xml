@@ -42,8 +42,8 @@
 
 	<mailingLists>
 		<mailingList>
-			<name>The Sincerity Community</name>
-			<archive>https://groups.google.com/forum/#!forum/sincerity-community</archive>
+			<name>The Prudence Community</name>
+			<archive>https://groups.google.com/forum/#!forum/prudence-community</archive>
 		</mailingList>
 	</mailingLists>
 
@@ -71,34 +71,29 @@
 		<directory>../tmp</directory>
 
 		<plugins>
+			<!-- jar artifact -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
-					<!-- jar artifact -->
 					<execution>
 						<id>jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>attach-artifact</goal>
 						</goals>
 						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestFile>MANIFEST.MF</manifestFile>
-								<!-- <manifestEntries> <Package-Name>prudence-flavor-clojure</Package-Name> 
-									<Package-Contents> defaults/application/application.clj,defaults/application/default.clj,defaults/application/routing.clj,defaults/application/settings.clj 
-									</Package-Contents> </manifestEntries> -->
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
+							<artifacts>
+								<artifact>
+									<type>jar</type>
+									<file>../../distribution/logging/lib/com.threecrickets.sincerity.plugin.logging.jar</file>
+								</artifact>
+							</artifacts>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
 	</build>
 

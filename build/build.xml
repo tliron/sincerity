@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <project name="Sincerity" default="build">
 	
-	<property name="src" value="../modules/com.threecrickets.sincerity/src" />
-	<property name="resources" value="../modules/com.threecrickets.sincerity/resources" />
+	<property name="main-src" value="../modules/com.threecrickets.sincerity/src" />
+	<property name="main-resources" value="../modules/com.threecrickets.sincerity/resources" />
+	<property name="logging-src" value="../modules/com.threecrickets.sincerity.plugin.logging/src" />
+	<property name="logging-resources" value="../modules/com.threecrickets.sincerity.plugin.logging/resources" />
 	<property name="lib" value="../libraries" />
 	<property name="deploy" value="../modules/com.threecrickets.sincerity/deploy" />
 	<property name="scripts" value="../modules/scripts/src" />
@@ -11,8 +13,8 @@
 	<property name="tmp" value="./tmp" />
 
 	<target name="compile" description="Compile Sincerity code">
-		<mkdir dir="${tmp}" />
-		<javac srcdir="${src}" destdir="${tmp}" target="1.5" includeAntRuntime="false" debug="true">
+		<mkdir dir="${tmp}/main" />
+		<javac srcdir="${main-src}" destdir="${tmp}/main" target="1.5" includeAntRuntime="false" debug="true">
 			<classpath>
 				<fileset dir="${lib}/commons-vfs/lib" />
 				<fileset dir="${lib}/ivy/lib" />
@@ -20,8 +22,20 @@
 				<fileset dir="${lib}/scripturian/lib" />
 			</classpath>
 		</javac>
-		<copy todir="${tmp}">
-			<fileset dir="${resources}" excludes="**/.svn/" />
+		<copy todir="${tmp}/main">
+			<fileset dir="${main-resources}" excludes="**/.svn/" />
+		</copy>
+
+		<mkdir dir="${tmp}/logging" />
+		<javac srcdir="${logging-src}" destdir="${tmp}/logging" target="1.5" includeAntRuntime="false" debug="true">
+			<classpath>
+				<file file="${tmp}/main" />
+				<fileset dir="${lib}/log4j/lib" />
+				<fileset dir="${lib}/slf4j/lib" />
+			</classpath>
+		</javac>
+		<copy todir="${tmp}/logging">
+			<fileset dir="${logging-resources}" excludes="**/.svn/" />
 		</copy>
 	</target>
 
@@ -31,7 +45,7 @@
 	</target>
 
 	<target name="javadoc-unless" description="Create Sincerity API docs" unless="javadoc-present">
-		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${content}/doc/api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.5" sourcepath="${src}" splitindex="true" use="true" version="true" windowtitle="Sincerity 1.0" doctitle="Scipturian 1.0"  verbose="true">
+		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${content}/doc/api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.5" sourcepath="${main-src}" splitindex="true" use="true" version="true" windowtitle="Sincerity 1.0" doctitle="Scipturian 1.0"  verbose="true">
 			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
 			<link href="http://download.oracle.com/javase/6/docs/api/" />
 			<classpath>
@@ -54,7 +68,8 @@
 	
 	<target name="jar" depends="compile" description="Create Sincerity jar">
 		<mkdir dir="${content}/lib" />
-		<jar destfile="${content}/lib/com.threecrickets.sincerity.jar" basedir="${tmp}" />
+		<jar destfile="${content}/lib/com.threecrickets.sincerity.jar" basedir="${tmp}/main" />
+		<jar destfile="${dist}/logging/lib/com.threecrickets.sincerity.plugin.logging.jar" basedir="${tmp}/logging" />
 	</target>
 	
 	<target name="licenses" description="Fetch licences">
@@ -107,11 +122,11 @@
 	
 	<target name="src" description="Fetch Sincerity source">
 		<copy todir="${content}/src">
-			<fileset dir="${src}" excludes="**/.svn/" />
+			<fileset dir="${main-src}" excludes="**/.svn/" />
 		</copy>
 	</target>
 
-	<target name="deploy" depends="src, javadoc" description="Fetch deployment">
+	<target name="deploy" depends="src, javadoc, libraries" description="Fetch deployment">
 		<copy todir="${content}">
 			<fileset dir="${deploy}" excludes="**/.svn/" />
 			<fileset dir="${scripts}" excludes="**/.svn/" />
