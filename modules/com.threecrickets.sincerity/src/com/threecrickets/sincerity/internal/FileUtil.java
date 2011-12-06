@@ -2,6 +2,7 @@ package com.threecrickets.sincerity.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -114,9 +115,16 @@ public class FileUtil
 
 	public static boolean isSameContent( URL url, File file ) throws IOException
 	{
-		byte[] urlDigest = FileUtil.getDigest( url.openStream() );
-		byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
-		return Arrays.equals( urlDigest, fileDigest );
+		try
+		{
+			byte[] urlDigest = FileUtil.getDigest( url.openStream() );
+			byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
+			return Arrays.equals( urlDigest, fileDigest );
+		}
+		catch( FileNotFoundException x )
+		{
+			return false;
+		}
 	}
 
 	public static byte[] getDigest( InputStream stream ) throws IOException

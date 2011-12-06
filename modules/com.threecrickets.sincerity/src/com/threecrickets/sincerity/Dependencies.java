@@ -23,7 +23,6 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
-import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
@@ -43,7 +42,7 @@ public class Dependencies
 	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws IOException, ParseException
 	{
 		this.ivyFile = ivyFile;
-		this.artifacts = new Artifacts( artifactsFile );
+		this.installedArtifacts = new InstalledArtifacts( artifactsFile );
 		this.container = container;
 		this.ivy = container.getIvy();
 
@@ -83,7 +82,7 @@ public class Dependencies
 		return container;
 	}
 
-	public Packages getPackages() throws ParseException, MalformedURLException, IOException
+	public Packages getPackages() throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
 	{
 		return new Packages( container.getRoot(), getClassLoader() );
 	}
@@ -115,12 +114,46 @@ public class Dependencies
 		return resolvedDependencies;
 	}
 
-	public Set<Artifact> getArtifacts() throws ParseException, MalformedURLException, IOException
+	public ClassLoader getClassLoader() throws MalformedURLException, ParseException, ParserConfigurationException, IOException, SAXException
+	{
+		if( classLoader == null )
+		{
+			Set<URL> urls = new HashSet<URL>();
+
+			// Classes directory
+			File classesFile = new File( container.getRoot(), "libraries/classes/" );
+			if( classesFile.isDirectory() )
+				urls.add( classesFile.getAbsoluteFile().toURI().toURL() );
+
+			// Jar artifacts
+			urls.addAll( getJarUrls() );
+
+			if( urls.isEmpty() )
+				classLoader = Thread.currentThread().getContextClassLoader();
+			else
+				classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Thread.currentThread().getContextClassLoader() );
+
+			Thread.currentThread().setContextClassLoader( classLoader );
+		}
+
+		return classLoader;
+	}
+
+	public File getResolutionReport()
+	{
+		ivy.pushContext();
+		ResolutionCacheManager resolutionCache = ivy.getResolutionCacheManager();
+		ivy.popContext();
+		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
+		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
+	}
+
+	public Set<Artifact> getArtifacts() throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
 	{
 		return getArtifacts( false, false );
 	}
 
-	public Set<Artifact> getArtifacts( boolean unpack, boolean overwrite ) throws ParseException, MalformedURLException, IOException
+	public Set<Artifact> getArtifacts( boolean unpack, boolean overwrite ) throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
 
@@ -135,7 +168,7 @@ public class Dependencies
 		{
 			for( Artifact artifact : pack )
 			{
-				if( unpack && !this.artifacts.isPresent( artifact ) )
+				if( unpack && !installedArtifacts.isPresent( artifact ) )
 					artifact.unpack( overwrite );
 
 				artifacts.add( artifact );
@@ -150,38 +183,14 @@ public class Dependencies
 		HashSet<URL> urls = new HashSet<URL>();
 		for( ArtifactDownloadReport artifact : getDownloadReports() )
 		{
-			if( "jar".equals( artifact.getType() ) && ( artifact.getLocalFile() != null ) )
-				urls.add( artifact.getLocalFile().getAbsoluteFile().toURI().toURL() );
+			if( "jar".equals( artifact.getType() ) )
+			{
+				File file = artifact.getLocalFile();
+				if( file != null )
+					urls.add( file.getAbsoluteFile().toURI().toURL() );
+			}
 		}
 		return urls;
-	}
-
-	public ClassLoader getClassLoader() throws MalformedURLException, ParseException
-	{
-		Set<URL> urls = new HashSet<URL>();
-		File classesFile = new File( container.getRoot(), "libraries/classes/" );
-		if( classesFile.isDirectory() )
-			urls.add( classesFile.getAbsoluteFile().toURI().toURL() );
-		if( lastResolveReport != null )
-			urls.addAll( getJarUrls() );
-		ClassLoader classLoader;
-		if( urls.isEmpty() )
-			classLoader = Dependencies.class.getClassLoader();
-		else
-		{
-			classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Dependencies.class.getClassLoader() );
-			Thread.currentThread().setContextClassLoader( classLoader );
-		}
-		return classLoader;
-	}
-
-	public File getResolutionReport()
-	{
-		ivy.pushContext();
-		ResolutionCacheManager resolutionCache = ivy.getResolutionCacheManager();
-		ivy.popContext();
-		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
-		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
 	}
 
 	//
@@ -228,14 +237,14 @@ public class Dependencies
 		return true;
 	}
 
-	public void clean() throws ParseException, IOException
+	public void clean() throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
-		artifacts.update( getArtifacts(), Artifacts.MODE_CLEAN );
+		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
 	}
 
-	public void prune() throws ParseException, IOException
+	public void prune() throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
-		artifacts.update( getArtifacts(), Artifacts.MODE_PRUNE );
+		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
 	}
 
 	public void reset() throws IOException
@@ -246,20 +255,13 @@ public class Dependencies
 		save();
 	}
 
-	public void resolve() throws ParseException, IOException
+	public void install( boolean overwrite ) throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
 		ivy.pushContext();
-		lastResolveReport = ivy.resolve( moduleDescriptor, defaultResolveOptions );
+		ivy.resolve( moduleDescriptor, defaultResolveOptions );
+		classLoader = null;
 		ivy.popContext();
-	}
-
-	public void install( boolean overwrite ) throws ParseException, IOException
-	{
-		ivy.pushContext();
-		lastResolveReport = ivy.resolve( moduleDescriptor, defaultResolveOptions );
-		ivy.popContext();
-
-		artifacts.update( getArtifacts( true, overwrite ), Artifacts.MODE_UPDATE_ONLY );
+		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_UPDATE_ONLY );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -267,7 +269,7 @@ public class Dependencies
 
 	private final File ivyFile;
 
-	private final Artifacts artifacts;
+	private final InstalledArtifacts installedArtifacts;
 
 	private final Container container;
 
@@ -277,9 +279,9 @@ public class Dependencies
 
 	private DefaultModuleDescriptor moduleDescriptor;
 
-	private ResolveReport lastResolveReport;
-
 	private ResolvedDependencies resolvedDependencies;
+
+	private ClassLoader classLoader;
 
 	private void save() throws IOException
 	{
@@ -299,7 +301,7 @@ public class Dependencies
 	}
 
 	/**
-	 * Valid from last {@link #resolve()}.
+	 * Valid from last {@link #install()}.
 	 * 
 	 * @return
 	 * @throws ParseException

@@ -10,7 +10,7 @@ import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Properties;
 
-public class Artifacts
+public class InstalledArtifacts
 {
 	//
 	// Constants
@@ -26,7 +26,7 @@ public class Artifacts
 	// Construction
 	//
 
-	public Artifacts( File file )
+	public InstalledArtifacts( File file )
 	{
 		this.file = file;
 	}

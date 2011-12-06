@@ -15,9 +15,10 @@ public class ScripturianPlugin implements Plugin
 	// Construction
 	//
 
-	public ScripturianPlugin( String pluginFile, ParsingContext parsingContext ) throws Exception
+	public ScripturianPlugin( String pluginFile, ParsingContext parsingContext, Container container ) throws Exception
 	{
 		ExecutionContext executionContext = new ExecutionContext();
+		executionContext.getServices().put( "container", container );
 		boolean enterable = false;
 		try
 		{

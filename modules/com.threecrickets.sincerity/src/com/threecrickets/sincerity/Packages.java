@@ -18,11 +18,6 @@ public class Packages extends HashMap<String, Package>
 	// Construction
 	//
 
-	public Packages( File root ) throws IOException
-	{
-		this( root, Packages.class.getClassLoader() );
-	}
-
 	public Packages( File root, ClassLoader classLoader ) throws IOException
 	{
 		Enumeration<URL> resources = classLoader.getResources( "META-INF/MANIFEST.MF" );

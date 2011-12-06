@@ -36,7 +36,7 @@ public class Plugins extends HashMap<String, Plugin>
 		{
 			try
 			{
-				Plugin plugin = new ScripturianPlugin( pluginFile, parsingContext );
+				Plugin plugin = new ScripturianPlugin( pluginFile, parsingContext, container );
 				put( plugin.getName(), plugin );
 			}
 			catch( Exception x )

@@ -22,7 +22,7 @@ public class DependenciesPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"resolve", "dependencies", "resolve", "install", "unpack", "reset", "add", "remove"
+			"dependencies", "install", "unpack", "reset", "add", "remove"
 		};
 	}
 
@@ -30,23 +30,14 @@ public class DependenciesPlugin implements Plugin
 	{
 		Dependencies dependencies = sincerity.getContainer().getDependencies();
 
-		if( "resolve".equals( command ) )
-		{
-			dependencies.resolve();
-		}
-		else if( "dependencies".equals( command ) )
+		if( "dependencies".equals( command ) )
 		{
 			dependencies.getResolvedDependencies().printTree( new OutputStreamWriter( System.out ) );
-		}
-		else if( "resolve".equals( command ) )
-		{
-			dependencies.resolve();
 		}
 		else if( "install".equals( command ) )
 		{
 			boolean overwrite = "true".equals( sincerity.getProperties().get( "overwrite" ) );
 
-			dependencies.resolve();
 			dependencies.install( overwrite );
 		}
 		else if( "unpack".equals( command ) )

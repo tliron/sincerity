@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Sincerity implements Runnable
@@ -213,16 +214,37 @@ public class Sincerity implements Runnable
 			run( split[0], split[1], arguments );
 		else
 		{
+			ArrayList<Plugin> plugins = new ArrayList<Plugin>();
 			for( Plugin plugin : getPlugins().values() )
 			{
 				if( Arrays.asList( plugin.getCommands() ).contains( command ) )
 				{
-					plugin.run( command, arguments, this );
-					return;
+					plugins.add( plugin );
 				}
 			}
 
-			throw new Exception( "Unknown command: " + command );
+			int size = plugins.size();
+			if( size == 1 )
+			{
+				plugins.get( 0 ).run( command, arguments, this );
+				return;
+			}
+			else if( size > 1 )
+			{
+				StringBuilder s = new StringBuilder( "Ambiguous command: " );
+				for( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
+				{
+					Plugin plugin = i.next();
+					s.append( plugin.getName() );
+					s.append( ':' );
+					s.append( command );
+					if( i.hasNext() )
+						s.append( ", " );
+				}
+				throw new Exception( s.toString() );
+			}
+			else
+				throw new Exception( "Unknown command: " + command );
 		}
 	}
 

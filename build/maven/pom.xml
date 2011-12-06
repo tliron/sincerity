@@ -55,6 +55,7 @@
 	</distributionManagement>
 
 	<modules>
+		<module>plugin-logging</module>
 		<module>../../libraries/commons-httpclient/maven</module>
 		<module>../../libraries/commons-vfs/maven</module>
 		<module>../../libraries/ivy/maven</module>

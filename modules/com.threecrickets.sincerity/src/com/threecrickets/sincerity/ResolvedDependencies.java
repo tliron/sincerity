@@ -1,11 +1,17 @@
 package com.threecrickets.sincerity;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -146,6 +152,25 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 			if( resolvedDependency.isRoot )
 				add( resolvedDependency );
 		}
+	}
+
+	//
+	// Attributes
+	//
+
+	public Set<URL> getJarUrls2() throws ParseException, MalformedURLException
+	{
+		HashSet<URL> urls = new HashSet<URL>();
+		for( ResolvedDependency resolvedDependency : getInstalledDependencies() )
+		{
+			for( org.apache.ivy.core.module.descriptor.Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+			{
+				String location = artifact.getId().getAttribute( "location" );
+				if( "jar".equals( artifact.getType() ) && ( location != null ) )
+					urls.add( new File( location ).toURI().toURL() );
+			}
+		}
+		return urls;
 	}
 
 	//
