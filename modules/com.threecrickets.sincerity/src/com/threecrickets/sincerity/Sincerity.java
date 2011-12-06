@@ -96,7 +96,7 @@ public class Sincerity implements Runnable
 		}
 
 		if( plugins == null )
-			plugins = new Plugins( getContainer() );
+			plugins = new Plugins( this );
 
 		return plugins;
 	}

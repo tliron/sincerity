@@ -8,6 +8,7 @@ import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
+import com.threecrickets.sincerity.internal.SincerityExecutionController;
 
 public class ScripturianPlugin implements Plugin
 {
@@ -15,16 +16,15 @@ public class ScripturianPlugin implements Plugin
 	// Construction
 	//
 
-	public ScripturianPlugin( String pluginFile, ParsingContext parsingContext, Container container ) throws Exception
+	public ScripturianPlugin( String pluginFile, ParsingContext parsingContext, Sincerity sincerity ) throws Exception
 	{
 		ExecutionContext executionContext = new ExecutionContext();
-		executionContext.getServices().put( "container", container );
 		boolean enterable = false;
 		try
 		{
 			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( pluginFile, false, parsingContext );
 			Executable executable = documentDescriptor.getDocument();
-			enterable = executable.makeEnterable( ENTERING_KEY, executionContext );
+			enterable = executable.makeEnterable( ENTERING_KEY, executionContext, null, new SincerityExecutionController( sincerity ) );
 			if( enterable )
 				this.executable = executable;
 			else

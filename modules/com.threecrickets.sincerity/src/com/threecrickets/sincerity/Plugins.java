@@ -15,20 +15,20 @@ public class Plugins extends HashMap<String, Plugin>
 	// Construction
 	//
 
-	public Plugins( Container container ) throws Exception
+	public Plugins( Sincerity sincerity ) throws Exception
 	{
 		super();
 
-		classLoader = container.getDependencies().getClassLoader();
+		classLoader = sincerity.getContainer().getDependencies().getClassLoader();
 
 		// JVM plugins
 		for( Plugin plugin : ServiceLoader.load( Plugin.class, classLoader ) )
 			put( plugin.getName(), plugin );
 
 		// Scripturian plugins
-		File pluginsDir = new File( container.getRoot(), "plugins" );
+		File pluginsDir = new File( sincerity.getContainer().getRoot(), "plugins" );
 
-		System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( container.getRoot(), "cache" ).getAbsolutePath() );
+		System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( sincerity.getContainer().getRoot(), "cache" ).getAbsolutePath() );
 		ParsingContext parsingContext = new ParsingContext();
 		parsingContext.setLanguageManager( new LanguageManager() );
 		parsingContext.setDocumentSource( new DocumentFileSource<Executable>( pluginsDir, "default", "js", 1000 ) );
@@ -38,7 +38,7 @@ public class Plugins extends HashMap<String, Plugin>
 		{
 			try
 			{
-				Plugin plugin = new ScripturianPlugin( pluginFile, parsingContext, container );
+				Plugin plugin = new ScripturianPlugin( pluginFile, parsingContext, sincerity );
 				put( plugin.getName(), plugin );
 			}
 			catch( Exception x )

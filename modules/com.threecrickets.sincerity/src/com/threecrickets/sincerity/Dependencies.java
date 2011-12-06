@@ -31,6 +31,7 @@ import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
 public class Dependencies
@@ -134,6 +135,8 @@ public class Dependencies
 				classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Thread.currentThread().getContextClassLoader() );
 
 			Thread.currentThread().setContextClassLoader( classLoader );
+
+			NativeUtil.addNativePath( new File( container.getRoot(), "libraries/native" ) );
 		}
 
 		return classLoader;
@@ -181,6 +184,7 @@ public class Dependencies
 	public Set<URL> getJarUrls() throws ParseException, MalformedURLException
 	{
 		HashSet<URL> urls = new HashSet<URL>();
+
 		for( ArtifactDownloadReport artifact : getDownloadReports() )
 		{
 			if( "jar".equals( artifact.getType() ) )
@@ -190,6 +194,14 @@ public class Dependencies
 					urls.add( file.getAbsoluteFile().toURI().toURL() );
 			}
 		}
+
+		File jarDir = new File( container.getRoot(), "libraries/jars" );
+		for( File file : jarDir.listFiles() )
+		{
+			if( file.getPath().endsWith( ".jar" ) )
+				urls.add( file.getAbsoluteFile().toURI().toURL() );
+		}
+
 		return urls;
 	}
 
@@ -240,6 +252,7 @@ public class Dependencies
 		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
 		for( DependencyDescriptor dependency : dependencies )
 			moduleDescriptor.addDependency( dependency );
+
 		save();
 
 		return true;
