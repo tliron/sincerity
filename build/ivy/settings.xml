@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<ivysettings>
+	<property name="ivy.cache.dir" value="${ivy.settings.dir}/../cache/ivy" override="false" />
+
+	<caches default="default">
+		<cache name="default"
+			dataFilePattern="configuration/[organisation]/[module](/[branch])/[revision]/resolution.conf"
+			ivyPattern="configuration/[organisation]/[module](/[branch])/[revision]/package.conf"
+			artifactPattern="artifacts/[type]/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])">
+		</cache>
+	</caches>
+
+	<settings defaultResolver="threecrickets" />
+	<resolvers>
+		<ibiblio checksums="none" m2compatible="true" name="threecrickets"
+			root="http://localhost:8081/nexus/content/repositories/sincerity" />
+	</resolvers>
+</ivysettings>

@@ -47,13 +47,6 @@
 		</mailingList>
 	</mailingLists>
 
-	<distributionManagement>
-		<repository>
-			<id>sincerity</id>
-			<url>http://localhost:8081/nexus/content/repositories/sincerity/</url>
-		</repository>
-	</distributionManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -68,7 +61,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../tmp</directory>
+		<directory>../../cache/maven</directory>
 
 		<plugins>
 			<!-- jar artifact -->
@@ -87,7 +80,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/logging/lib/com.threecrickets.sincerity.plugin.logging.jar</file>
+									<file>../../distribution/content/lib/com.threecrickets.sincerity.plugin.logging.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>

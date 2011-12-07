@@ -83,7 +83,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../tmp</directory>
+		<directory>../../cache/maven</directory>
 
 		<plugins>
 			<!-- Delegate to the Ant build script -->
