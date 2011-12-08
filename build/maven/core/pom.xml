@@ -124,7 +124,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/lib/com.threecrickets.sincerity.jar</file>
+									<file>../../distribution/content/libraries/jars/com.threecrickets.sincerity/sincerity/0.9/sincerity.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>

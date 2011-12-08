@@ -80,7 +80,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/lib/com.threecrickets.sincerity.plugin.logging.jar</file>
+									<file>../../cache/jars/logging.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>

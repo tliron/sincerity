@@ -13,6 +13,7 @@
 
 	<property name="cache" value="./cache" />
 	<property name="cache.classes" value="${cache}/classes" />
+	<property name="cache.jars" value="${cache}/jars" />
 	
 	<property name="distribution" value="./distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
@@ -60,12 +61,12 @@
 
 	<target name="dependencies-logging" depends="ivy, compile-core" description="Resolve dependencies for logging plugin">
 		<ivy:resolve file="ivy/logging.xml" log="download-only" resolveId="logging" />
-		<ivy:cachepath pathid="dependencies-logging.ivy" type="jar" resolveId="logging" />
+		<ivy:cachepath pathid="dependencies-logging-ivy" type="jar" resolveId="logging" />
 		<path id="dependencies-logging">
-			<path refid="dependencies-logging.ivy" />
+			<path refid="dependencies-logging-ivy" />
 			<file file="${cache.classes}/core" />
 		</path>
-		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="logging" />
+		<!--<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="logging" />-->
 	</target>
 
 	<target name="compile-logging" depends="dependencies-logging" description="Compile Java code for logging">
@@ -79,8 +80,8 @@
 	</target>
 
 	<target name="jar-logging" depends="compile-logging" description="Create logging jar">
-		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/com.threecrickets.sincerity.plugin/logging/${version}/logging.jar" basedir="${cache.classes}/logging" />
+		<mkdir dir="${cache.jars}" />
+		<jar destfile="${cache.jars}/logging.jar" basedir="${cache.classes}/logging" />
 	</target>
 
 	<!-- General -->
