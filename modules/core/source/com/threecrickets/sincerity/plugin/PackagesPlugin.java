@@ -4,6 +4,7 @@ import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class PackagesPlugin implements Plugin
 {
@@ -49,6 +50,6 @@ public class PackagesPlugin implements Plugin
 			}
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 }

@@ -3,6 +3,8 @@ package com.threecrickets.sincerity.plugin;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class RepositoriesPlugin implements Plugin
 {
@@ -30,7 +32,7 @@ public class RepositoriesPlugin implements Plugin
 		if( "attach".equals( command ) )
 		{
 			if( arguments.length < 3 )
-				throw new Exception( "'" + command + "' command requires: [section] [name] [type] ..." );
+				throw new BadArgumentsCommandException( command, "section", "name", "type" );
 
 			String section = arguments[0];
 			String name = arguments[1];
@@ -39,7 +41,7 @@ public class RepositoriesPlugin implements Plugin
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new Exception( "'" + command + " [section] [name] " + type + "' command also requires: [url]" );
+					throw new BadArgumentsCommandException( command + " [section] [name] " + type, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
@@ -49,7 +51,7 @@ public class RepositoriesPlugin implements Plugin
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new Exception( "'" + command + " [section] [name] " + type + "' command also requires: [url]" );
+					throw new BadArgumentsCommandException( command + " [section] [name] " + type, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
@@ -62,7 +64,7 @@ public class RepositoriesPlugin implements Plugin
 		else if( "detach".equals( command ) )
 		{
 			if( arguments.length < 2 )
-				throw new Exception( "'" + command + "' command requires: [section] [name]" );
+				throw new BadArgumentsCommandException( command, "section", "name" );
 
 			String section = arguments[0];
 			String name = arguments[1];
@@ -71,6 +73,6 @@ public class RepositoriesPlugin implements Plugin
 				System.err.println( "Repository was not in use: " + section + ":" + name );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 }

@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
+
+import com.threecrickets.sincerity.exception.AmbiguousCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class Sincerity implements Runnable
 {
@@ -226,9 +228,7 @@ public class Sincerity implements Runnable
 			for( Plugin plugin : getPlugins().values() )
 			{
 				if( Arrays.asList( plugin.getCommands() ).contains( command ) )
-				{
 					plugins.add( plugin );
-				}
 			}
 
 			int size = plugins.size();
@@ -238,21 +238,9 @@ public class Sincerity implements Runnable
 				return;
 			}
 			else if( size > 1 )
-			{
-				StringBuilder s = new StringBuilder( "Ambiguous command: " );
-				for( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
-				{
-					Plugin plugin = i.next();
-					s.append( plugin.getName() );
-					s.append( ':' );
-					s.append( command );
-					if( i.hasNext() )
-						s.append( ", " );
-				}
-				throw new Exception( s.toString() );
-			}
+				throw new AmbiguousCommandException( command, plugins );
 			else
-				throw new Exception( "Unknown command: " + command );
+				throw new UnknownCommandException( command );
 		}
 	}
 
@@ -260,7 +248,7 @@ public class Sincerity implements Runnable
 	{
 		Plugin thePlugin = getPlugins().get( plugin );
 		if( thePlugin == null )
-			throw new Exception( "Unknown plugin: " + plugin );
+			throw new UnknownCommandException( plugin + ":" + command );
 		thePlugin.run( command, arguments, this );
 	}
 

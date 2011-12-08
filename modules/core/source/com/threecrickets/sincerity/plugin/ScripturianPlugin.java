@@ -6,6 +6,8 @@ import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.Main;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.SincerityExecutionController;
 
 public class ScripturianPlugin implements Plugin
@@ -32,10 +34,7 @@ public class ScripturianPlugin implements Plugin
 		if( "execute".equals( command ) )
 		{
 			if( arguments.length < 1 )
-			{
-				System.err.println( "'" + command + "' command requires: [uri] ..." );
-				return;
-			}
+				throw new BadArgumentsCommandException( command, "uri" );
 
 			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( sincerity.getContainer().getRoot(), "cache" ).getAbsolutePath() );
 			Main main = new Main( arguments );
@@ -46,6 +45,6 @@ public class ScripturianPlugin implements Plugin
 			// "com.threecrickets.scripturian.Scripturian", arguments );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 }

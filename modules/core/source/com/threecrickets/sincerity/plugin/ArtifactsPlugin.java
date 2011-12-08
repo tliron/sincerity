@@ -15,6 +15,7 @@ import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class ArtifactsPlugin implements Plugin
 {
@@ -53,7 +54,7 @@ public class ArtifactsPlugin implements Plugin
 			dependencies.prune();
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 
 	//

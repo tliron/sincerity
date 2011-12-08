@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class LoggingPlugin implements Plugin
 {
@@ -34,11 +36,14 @@ public class LoggingPlugin implements Plugin
 		}
 		else if( "log".equals( command ) )
 		{
+			if( arguments.length < 1 )
+				throw new BadArgumentsCommandException( command, "message" );
+
 			initialize( sincerity );
 			Logger.getLogger( "sincerity" ).info( arguments[0] );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 
 	//

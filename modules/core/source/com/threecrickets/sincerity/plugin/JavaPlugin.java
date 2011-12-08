@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class JavaPlugin implements Plugin
 {
@@ -58,7 +59,7 @@ public class JavaPlugin implements Plugin
 			}
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 
 	private static void addSources( File dir, Collection<String> list )

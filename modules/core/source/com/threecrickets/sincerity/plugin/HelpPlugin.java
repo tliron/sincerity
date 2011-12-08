@@ -2,6 +2,7 @@ package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class HelpPlugin implements Plugin
 {
@@ -31,6 +32,6 @@ public class HelpPlugin implements Plugin
 					System.out.println( plugin.getName() + ":" + pluginCommand );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 }

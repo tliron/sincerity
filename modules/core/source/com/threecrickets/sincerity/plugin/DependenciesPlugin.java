@@ -17,6 +17,8 @@ import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class DependenciesPlugin implements Plugin
 {
@@ -83,7 +85,7 @@ public class DependenciesPlugin implements Plugin
 		else if( "add".equals( command ) )
 		{
 			if( arguments.length < 2 )
-				throw new Exception( "'" + command + "' command requires: [group] [name] [[version]]" );
+				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
 
 			String organisation = arguments[0];
 			String name = arguments[1];
@@ -99,7 +101,7 @@ public class DependenciesPlugin implements Plugin
 		else if( "remove".equals( command ) )
 		{
 			if( arguments.length < 3 )
-				throw new Exception( "'" + command + "' command requires: [group] [name] [version]" );
+				throw new BadArgumentsCommandException( command, "group", "name", "version" );
 
 			String organisation = arguments[0];
 			String name = arguments[1];
@@ -109,7 +111,7 @@ public class DependenciesPlugin implements Plugin
 				System.err.println( "Dependency was not in container: " + organisation + ":" + name + ":" + revision );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 
 	//

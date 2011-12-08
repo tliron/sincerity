@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class MainPlugin implements Plugin
 {
@@ -40,7 +42,7 @@ public class MainPlugin implements Plugin
 		if( "main".equals( command ) )
 		{
 			if( arguments.length < 1 )
-				throw new Exception( "'" + command + "' command requires: [main class name] ..." );
+				throw new BadArgumentsCommandException( command, "main class name" );
 
 			String mainClassName = arguments[0];
 			String[] mainArguments = new String[arguments.length - 1];
@@ -49,6 +51,6 @@ public class MainPlugin implements Plugin
 			main( sincerity, mainClassName, mainArguments );
 		}
 		else
-			throw new Exception( "Unknown command: " + command );
+			throw new UnknownCommandException( command );
 	}
 }
