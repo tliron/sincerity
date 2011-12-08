@@ -47,13 +47,6 @@
 		</mailingList>
 	</mailingLists>
 
-	<distributionManagement>
-		<repository>
-			<id>sincerity</id>
-			<url>http://localhost:8081/nexus/content/repositories/sincerity/</url>
-		</repository>
-	</distributionManagement>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.ivy</groupId>

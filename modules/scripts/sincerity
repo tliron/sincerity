@@ -1,0 +1,107 @@
+#!/bin/bash
+set -e
+
+#
+# Constants
+#
+
+SINCERITY_DIRNAME=${SINCERITY_DIRNAME:-.sincerity}
+
+function join()
+{
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
+get-parent-path()
+{
+	# Finds the parent directory, following symlinks
+
+	local THE_PATH=$1
+
+	set +e
+	THE_PATH=$(readlink -f "$THE_PATH" 2> /dev/null)
+	if (( "$?" == 0 )); then
+		set -e
+		dirname "$(readlink -f "$THE_PATH")"
+	else
+		# "readlink -f" works on Linux, but not on Darwin and OpenSolaris
+		set -e
+		local OLD_PWD=$PWD
+		cd "$(dirname "$THE_PATH")"
+		local HERE=$PWD
+		cd "$OLD_PWD"
+		echo "$HERE"
+	fi
+}
+
+get-jars()
+{
+	local THE_PATH=$1
+	local F
+	for F in "$THE_PATH"/*; do
+		if [ -d "$F" ];then
+			get-jars "$F"
+		elif [ -f "$F" ]; then
+			echo $F
+		fi
+	done
+}
+
+#
+# Find Java
+#
+
+if [ -n "$JAVA_HOME" ]; then
+	JAVA="$JAVA_HOME/bin/java"
+	if [ ! -f "$JAVA" ]; then
+		echo "JAVA_HOME does not point to a valid JVM directory" 1>&2
+		exit 1
+	fi
+else
+	OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+	case "$OS" in
+		linux)
+			JAVA=/usr/bin/java
+			;;
+		darwin)
+			JAVA=/System/Library/Frameworks/JavaVM.framework/Home/bin/java
+			;;
+		sunos)
+			JAVA=/usr/jdk/latest/bin/java
+			;;
+	esac
+	if [ ! -f "$JAVA" ]; then
+		echo "Could not find Java: please set JAVA_HOME to a JVM directory" 1>&2
+		exit 1
+	fi
+fi
+
+#
+# Find Sincerity home
+#
+
+if [ -z "$SINCERITY_HOME" ]; then
+	SINCERITY_HOME=$(get-parent-path "$0")
+fi
+
+echo "Sincerity home: $SINCERITY_HOME"
+
+#
+# Libraries
+#
+
+JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+"$(get-jars "$SINCERITY_HOME/libraries/jars")" \
+"$JAVA_HOME/lib/tools.jar")
+
+#
+# Run Sincerity
+#
+
+JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dfile.encoding=UTF-8 \
+-classpath "$(join ":" $JVM_LIBRARIES)")
+
+"$JAVA" $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"
