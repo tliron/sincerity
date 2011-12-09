@@ -2,6 +2,9 @@
 <project name="Sincerity" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property name="version" value="0.9" />
+
+	<property name="jvm.version" value="1.5" />
+	<property name="jvm.docs" value="http://download.oracle.com/javase/1.5.0/docs/api/" />
 	
 	<property name="core.source" value="../components/core/source" />
 	<property name="core.resources" value="../components/core/resources" />
@@ -44,7 +47,7 @@
 
 	<target name="compile-core" depends="dependencies-core" description="Compile Java code for core">
 		<mkdir dir="${cache.classes}/core" />
-		<javac srcdir="${core.source}" destdir="${cache.classes}/core" target="1.5" includeAntRuntime="false" debug="true">
+		<javac srcdir="${core.source}" destdir="${cache.classes}/core" target="${jvm.version}" includeAntRuntime="false" debug="true">
 			<classpath refid="dependencies-core" />
 		</javac>
 		<copy todir="${cache.classes}/core">
@@ -66,12 +69,11 @@
 			<path refid="dependencies-logging-ivy" />
 			<file file="${cache.classes}/core" />
 		</path>
-		<!--<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="logging" />-->
 	</target>
 
 	<target name="compile-logging" depends="dependencies-logging" description="Compile Java code for logging">
 		<mkdir dir="${cache.classes}/logging" />
-		<javac srcdir="${logging.source}" destdir="${cache.classes}/logging" target="1.5" includeAntRuntime="false" debug="true">
+		<javac srcdir="${logging.source}" destdir="${cache.classes}/logging" target="${jvm.version}" includeAntRuntime="false" debug="true">
 			<classpath refid="dependencies-logging" />
 		</javac>
 		<copy todir="${cache.classes}/logging">
@@ -88,12 +90,7 @@
 
 	<target name="compile" depends="compile-core, compile-logging" description="Compile Java code" />
 
-	<target name="dependencies" depends="jar-core, jar-logging, dependencies-core, dependencies-logging" description="Resolve dependencies">
-		<path id="dependencies">
-			<path refid="dependencies-core" />
-			<path refid="dependencies-logging" />
-		</path>
-	</target>
+	<target name="libraries" depends="jar-core, jar-logging, dependencies-core, dependencies-logging" description="Resolve dependencies" />
 
 	<target name="javadoc" description="Create Sincerity API docs">
 		<available file="${distribution.reference}/documentation/api" property="javadoc-present" />
@@ -101,9 +98,8 @@
 	</target>
 
 	<target name="javadoc-unless" depends="dependencies-core" description="Create Sincerity API docs" unless="javadoc-present">
-		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${distribution.reference}/documentation/api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.5" sourcepath="${core.source}" splitindex="true" use="true" version="true" windowtitle="Sincerity 1.0" doctitle="Scipturian 1.0" verbose="true">
-			<link href="http://download.oracle.com/javase/1.5.0/docs/api/" />
-			<link href="http://download.oracle.com/javase/6/docs/api/" />
+		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${distribution.reference}/documentation/api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${jvm.version}" sourcepath="${core.source}" splitindex="true" use="true" version="true" windowtitle="Sincerity ${version}" doctitle="Sincerity ${version}">
+			<link href="${jvm.docs}" />
 			<classpath refid="dependencies-core" />
 			<bottom>
 				<![CDATA[<i>Copyright &#169; 2011 <a target="_top" href="http://threecrickets.com/">Three Crickets LLC</a>.</i>]]>
@@ -120,21 +116,21 @@
 		</copy>
 	</target>
 	
-	<target name="distribution" depends="source, javadoc, dependencies" description="Create deployment">
+	<target name="distribution" depends="libraries, source, javadoc" description="Create distribution">
 		<copy todir="${distribution.content}">
 			<fileset dir="${reference}" excludes="**/.svn/" />
-			<fileset dir="${scripts}" excludes="**/.svn/" />
+			<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
 			<fileset dir="${dependencies}" excludes="**/.svn/" />
 		</copy>
 		<chmod perm="ugo+rx">
-			<fileset dir="${distribution.content}" includes="sincerity, jvm" />
+			<fileset dir="${distribution.content}" includes="sincerity" />
 		</chmod>
 	</target>
 	
 	<target name="package" depends="distribution" description="Create Sincerity zip">
 		<zip destfile="${distribution}/sincerity-${version}.zip" level="9">
-			<zipfileset prefix="sincerity" dir="${distribution.content}" excludes="sincerity, jvm" />
-			<zipfileset prefix="sincerity" dir="${distribution.content}" filemode="755" includes="sincerity, jvm" />
+			<zipfileset prefix="sincerity" dir="${distribution.content}" excludes="sincerity" />
+			<zipfileset prefix="sincerity" dir="${distribution.content}" filemode="755" includes="sincerity" />
 		</zip>
 	</target>
 	
