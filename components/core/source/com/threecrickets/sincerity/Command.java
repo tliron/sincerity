@@ -110,7 +110,6 @@ public class Command
 
 		for( String argument : rawArguments )
 		{
-			System.out.println( "parse: " + argument );
 			if( argument.startsWith( "--" ) )
 			{
 				argument = argument.substring( 2 );
@@ -119,13 +118,15 @@ public class Command
 			}
 			else if( argument.startsWith( "@" ) )
 			{
-				String[] alias = sincerity.getContainer().getAliases().get( argument.substring( 1 ) );
+				argument = argument.substring( 1 );
+				String[] alias = sincerity.getContainer().getAliases().get( argument );
 				if( alias != null )
 				{
 					for( String a : alias )
 						arguments.add( a );
 				}
-				throw new Exception( "Unknown alias: " + argument );
+				else
+					throw new Exception( "Unknown alias: " + argument );
 			}
 			else
 				arguments.add( argument );

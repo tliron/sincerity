@@ -39,7 +39,7 @@ public class AliasesPlugin implements Plugin
 					System.out.print( ' ' );
 					System.out.print( a );
 				}
-
+				System.out.println();
 			}
 		}
 		else

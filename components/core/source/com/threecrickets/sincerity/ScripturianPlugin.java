@@ -99,12 +99,15 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ParsingException x )
 		{
+			throw x;
 		}
 		catch( ExecutionException x )
 		{
+			throw x;
 		}
 		catch( NoSuchMethodException x )
 		{
+			throw x;
 		}
 	}
 

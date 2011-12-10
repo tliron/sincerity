@@ -221,6 +221,21 @@ public class Sincerity implements Runnable
 		}
 	}
 
+	public void run( String name, String... arguments ) throws Exception
+	{
+		boolean isGreedy = false;
+		if( name.endsWith( "!" ) )
+		{
+			isGreedy = true;
+			name = name.substring( 0, name.length() - 1 );
+		}
+
+		Command command = new Command( name, this, !isGreedy );
+		for( String argument : arguments )
+			command.rawArguments.add( argument );
+		run( command );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

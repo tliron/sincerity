@@ -50,34 +50,7 @@
 	<modules>
 		<module>core</module>
 		<module>logging</module>
+		<module>groovy</module>
 	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.ivy</groupId>
-			<artifactId>ivy</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-vfs</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.scripturian</groupId>
-			<artifactId>scripturian</artifactId>
-			<version>1.0.0-R311</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mozilla</groupId>
-			<artifactId>rhino</artifactId>
-			<version>1.7R3</version>
-		</dependency>
-	</dependencies>
 
 </project>

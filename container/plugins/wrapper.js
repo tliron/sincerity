@@ -3,7 +3,7 @@ function getCommands() {
 	return ['start', 'stop', 'console']
 }
 
-function run(command, arguments, sincerity) {
+function run(command) {
 	switch (String(command)) {
 		case 'start':
 			start()

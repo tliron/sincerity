@@ -1,3 +1,4 @@
+com.threecrickets.sincerity.plugin.AliasesPlugin
 com.threecrickets.sincerity.plugin.ArtifactsPlugin
 com.threecrickets.sincerity.plugin.ContainerPlugin
 com.threecrickets.sincerity.plugin.DependenciesPlugin

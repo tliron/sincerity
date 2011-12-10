@@ -9,18 +9,11 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>logging</baseDirectory>
+	<baseDirectory>groovy</baseDirectory>
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../modules/com.threecrickets.plugin.logging/resources</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>**</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<directory>../../tmp/logging</directory>
+			<directory>../../../components/plugins/groovy</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
