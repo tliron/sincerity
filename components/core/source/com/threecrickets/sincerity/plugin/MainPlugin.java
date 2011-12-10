@@ -38,9 +38,10 @@ public class MainPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		if( "main".equals( command.name ) )
+		String name = command.getName();
+		if( "main".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
@@ -50,7 +51,7 @@ public class MainPlugin implements Plugin
 			String[] mainArguments = new String[arguments.length - 1];
 			System.arraycopy( arguments, 1, mainArguments, 0, mainArguments.length );
 
-			main( sincerity, mainClassName, mainArguments );
+			main( command.getSincerity(), mainClassName, mainArguments );
 		}
 		else
 			throw new UnknownCommandException( command );

@@ -2,7 +2,6 @@ package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
-import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
@@ -25,9 +24,10 @@ public class ContainerPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		if( "create".equals( command.name ) )
+		String name = command.getName();
+		if( "create".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
@@ -42,15 +42,15 @@ public class ContainerPlugin implements Plugin
 
 			System.out.println( template );
 
-			sincerity.setContainer( containerLocation );
+			command.getSincerity().setContainer( containerLocation );
 		}
-		else if( "use".equals( command.name ) )
+		else if( "use".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "container root path" );
 
-			sincerity.setContainer( arguments[0] );
+			command.getSincerity().setContainer( arguments[0] );
 		}
 		else
 			throw new UnknownCommandException( command );

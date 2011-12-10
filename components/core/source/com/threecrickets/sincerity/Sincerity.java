@@ -58,7 +58,7 @@ public class Sincerity implements Runnable
 						isGreedy = true;
 						argument = argument.substring( 0, argument.length() - 1 );
 					}
-					command = new Command( argument, !isGreedy );
+					command = new Command( argument, this, !isGreedy );
 				}
 				else
 					command.rawArguments.add( argument );
@@ -171,7 +171,7 @@ public class Sincerity implements Runnable
 	public void run()
 	{
 		if( commands.isEmpty() )
-			commands.add( new Command( "help", false ) );
+			commands.add( new Command( "help", this, false ) );
 
 		try
 		{
@@ -195,14 +195,14 @@ public class Sincerity implements Runnable
 			Plugin thePlugin = getPlugins().get( command.plugin );
 			if( thePlugin == null )
 				throw new UnknownCommandException( command );
-			thePlugin.run( command, this );
+			thePlugin.run( command );
 		}
 		else
 		{
 			ArrayList<Plugin> plugins = new ArrayList<Plugin>();
 			for( Plugin plugin : getPlugins().values() )
 			{
-				if( Arrays.asList( plugin.getCommands() ).contains( command.name ) )
+				if( Arrays.asList( plugin.getCommands() ).contains( command.getName() ) )
 					plugins.add( plugin );
 			}
 
@@ -211,7 +211,7 @@ public class Sincerity implements Runnable
 			{
 				Plugin plugin = plugins.get( 0 );
 				command.plugin = plugin.getName();
-				plugin.run( command, this );
+				plugin.run( command );
 				return;
 			}
 			else if( size > 1 )

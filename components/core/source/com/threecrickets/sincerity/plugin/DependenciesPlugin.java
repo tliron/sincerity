@@ -17,7 +17,6 @@ import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
-import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
@@ -40,80 +39,86 @@ public class DependenciesPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		Dependencies dependencies = sincerity.getContainer().getDependencies();
-
-		if( "dependencies".equals( command.name ) )
+		String name = command.getName();
+		if( "dependencies".equals( name ) )
 		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printTree( dependencies, new OutputStreamWriter( System.out ) );
 		}
-		else if( "licenses".equals( command.name ) )
+		else if( "licenses".equals( name ) )
 		{
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printLicenses( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "install".equals( command.name ) )
+		else if( "install".equals( name ) )
 		{
 			boolean overwrite = "true".equals( command.getProperties().get( "overwrite" ) );
 
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.install( overwrite );
 		}
-		else if( "unpack".equals( command.name ) )
+		else if( "unpack".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
-			String name;
+			String packageName;
 			if( arguments.length < 1 )
-				name = null;
+				packageName = null;
 			else
-				name = arguments[0];
+				packageName = arguments[0];
 
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
-			if( name == null )
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( packageName == null )
 				dependencies.getPackages().unpack( overwrite );
 			else
 			{
-				Package pack = dependencies.getPackages().get( name );
+				Package pack = dependencies.getPackages().get( packageName );
 				if( pack == null )
-					throw new Exception( "Unknown package: " + name );
+					throw new Exception( "Unknown package: " + packageName );
 				pack.unpack( overwrite );
 			}
 		}
-		else if( "reset".equals( command.name ) )
+		else if( "reset".equals( name ) )
 		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.reset();
 		}
-		else if( "add".equals( command.name ) )
+		else if( "add".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
 
 			String organisation = arguments[0];
-			String name = arguments[1];
+			String dependencyName = arguments[1];
 			String revision;
 			if( arguments.length < 3 )
 				revision = "latest.integration";
 			else
 				revision = arguments[2];
 
-			if( !dependencies.add( organisation, name, revision ) )
-				System.err.println( "Dependency already in container: " + organisation + ":" + name + ":" + revision );
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( !dependencies.add( organisation, dependencyName, revision ) )
+				System.err.println( "Dependency already in container: " + organisation + ":" + dependencyName + ":" + revision );
 		}
-		else if( "remove".equals( command.name ) )
+		else if( "remove".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "group", "name", "version" );
 
 			String organisation = arguments[0];
-			String name = arguments[1];
+			String dependencyName = arguments[1];
 			String revision = arguments[2];
 
-			if( !dependencies.remove( organisation, name, revision ) )
-				System.err.println( "Dependency was not in container: " + organisation + ":" + name + ":" + revision );
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( !dependencies.remove( organisation, dependencyName, revision ) )
+				System.err.println( "Dependency was not in container: " + organisation + ":" + dependencyName + ":" + revision );
 		}
 		else
 			throw new UnknownCommandException( command );

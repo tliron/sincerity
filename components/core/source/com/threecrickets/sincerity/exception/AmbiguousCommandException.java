@@ -29,7 +29,7 @@ public class AmbiguousCommandException extends CommandException
 			Plugin plugin = i.next();
 			s.append( plugin.getName() );
 			s.append( ':' );
-			s.append( command.name );
+			s.append( command.getName() );
 			if( i.hasNext() )
 				s.append( ", " );
 		}

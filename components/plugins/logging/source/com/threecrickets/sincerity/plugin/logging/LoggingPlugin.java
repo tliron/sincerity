@@ -29,19 +29,20 @@ public class LoggingPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		if( "initialize".equals( command ) )
+		String name = command.getName();
+		if( "initialize".equals( name ) )
 		{
-			initialize( sincerity );
+			initialize( command.getSincerity() );
 		}
-		else if( "log".equals( command ) )
+		else if( "log".equals( name ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "message" );
 
-			initialize( sincerity );
+			initialize( command.getSincerity() );
 			Logger.getLogger( "sincerity" ).info( arguments[0] );
 		}
 		else

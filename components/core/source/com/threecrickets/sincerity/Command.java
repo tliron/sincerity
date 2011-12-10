@@ -12,7 +12,7 @@ public class Command
 	// Construction
 	//
 
-	public Command( String name, boolean parse )
+	public Command( String name, Sincerity sincerity, boolean parse )
 	{
 		String[] split = name.split( ":", 2 );
 		if( split.length == 2 )
@@ -23,6 +23,7 @@ public class Command
 		else
 			this.name = name;
 
+		this.sincerity = sincerity;
 		this.parse = parse;
 	}
 
@@ -30,13 +31,17 @@ public class Command
 	// Attributes
 	//
 
-	public final String name;
+	public String getName()
+	{
+		return name;
+	}
 
-	public String plugin;
+	public Sincerity getSincerity()
+	{
+		return sincerity;
+	}
 
-	public final List<String> rawArguments = new ArrayList<String>();
-
-	public String[] getArguments()
+	public String[] getArguments() throws Exception
 	{
 		if( arguments == null && parse )
 			parse();
@@ -45,7 +50,7 @@ public class Command
 		return arguments;
 	}
 
-	public List<String> getSwitches()
+	public List<String> getSwitches() throws Exception
 	{
 		if( switches == null && parse )
 			parse();
@@ -54,7 +59,7 @@ public class Command
 		return switches;
 	}
 
-	public Map<String, String> getProperties()
+	public Map<String, String> getProperties() throws Exception
 	{
 		if( properties == null && parse )
 			parse();
@@ -76,7 +81,18 @@ public class Command
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	protected String plugin;
+
+	protected final List<String> rawArguments = new ArrayList<String>();
+
+	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private final String name;
+
+	private final Sincerity sincerity;
 
 	private final boolean parse;
 
@@ -86,7 +102,7 @@ public class Command
 
 	private Map<String, String> properties;
 
-	private void parse()
+	private void parse() throws Exception
 	{
 		ArrayList<String> arguments = new ArrayList<String>();
 		switches = new ArrayList<String>();
@@ -94,11 +110,22 @@ public class Command
 
 		for( String argument : rawArguments )
 		{
+			System.out.println( "parse: " + argument );
 			if( argument.startsWith( "--" ) )
 			{
 				argument = argument.substring( 2 );
 				if( argument.length() > 0 )
 					switches.add( argument );
+			}
+			else if( argument.startsWith( "@" ) )
+			{
+				String[] alias = sincerity.getContainer().getAliases().get( argument.substring( 1 ) );
+				if( alias != null )
+				{
+					for( String a : alias )
+						arguments.add( a );
+				}
+				throw new Exception( "Unknown alias: " + argument );
 			}
 			else
 				arguments.add( argument );

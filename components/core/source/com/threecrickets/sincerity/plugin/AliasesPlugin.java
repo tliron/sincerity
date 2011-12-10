@@ -1,10 +1,11 @@
 package com.threecrickets.sincerity.plugin;
 
+import com.threecrickets.sincerity.Aliases;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
-public class HelpPlugin implements Plugin
+public class AliasesPlugin implements Plugin
 {
 	//
 	// Plugin
@@ -12,25 +13,34 @@ public class HelpPlugin implements Plugin
 
 	public String getName()
 	{
-		return "help";
+		return "aliases";
 	}
 
 	public String[] getCommands()
 	{
 		return new String[]
 		{
-			"help"
+			"aliases"
 		};
 	}
 
 	public void run( Command command ) throws Exception
 	{
 		String name = command.getName();
-		if( "help".equals( name ) )
+		if( "aliases".equals( name ) )
 		{
-			for( Plugin plugin : command.getSincerity().getPlugins().values() )
-				for( String pluginCommand : plugin.getCommands() )
-					System.out.println( plugin.getName() + ":" + pluginCommand );
+			Aliases aliases = command.getSincerity().getContainer().getAliases();
+			for( String alias : aliases )
+			{
+				System.out.print( alias );
+				System.out.print( " =" );
+				for( String a : aliases.get( alias ) )
+				{
+					System.out.print( ' ' );
+					System.out.print( a );
+				}
+
+			}
 		}
 		else
 			throw new UnknownCommandException( command );

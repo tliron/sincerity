@@ -7,7 +7,6 @@ import java.util.Collection;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
-import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class JavaPlugin implements Plugin
@@ -29,14 +28,15 @@ public class JavaPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		File root = sincerity.getContainer().getRoot();
-		File javaPath = new File( root, "libraries/java" );
-		File classesPath = new File( root, "libraries/classes" );
-
-		if( "compile".equals( command.name ) )
+		String name = command.getName();
+		if( "compile".equals( name ) )
 		{
+			File root = command.getSincerity().getContainer().getRoot();
+			File javaPath = new File( root, "libraries/java" );
+			File classesPath = new File( root, "libraries/classes" );
+
 			if( !javaPath.isDirectory() )
 				return;
 
@@ -44,7 +44,7 @@ public class JavaPlugin implements Plugin
 
 			try
 			{
-				Class<?> javac = sincerity.getContainer().getDependencies().getClassLoader().loadClass( "com.sun.tools.javac.Main" );
+				Class<?> javac = command.getSincerity().getContainer().getDependencies().getClassLoader().loadClass( "com.sun.tools.javac.Main" );
 				Method compileMethod = javac.getMethod( "compile", String[].class );
 
 				ArrayList<String> compileArguments = new ArrayList<String>();

@@ -8,6 +8,7 @@ import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
+import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.SincerityExecutionController;
 
 public class ScripturianPlugin implements Plugin
@@ -16,13 +17,13 @@ public class ScripturianPlugin implements Plugin
 	// Construction
 	//
 
-	public ScripturianPlugin( String pluginFile, ParsingContext parsingContext, Sincerity sincerity ) throws Exception
+	public ScripturianPlugin( String pluginFilename, ParsingContext parsingContext, Sincerity sincerity ) throws Exception
 	{
 		ExecutionContext executionContext = new ExecutionContext();
 		boolean enterable = false;
 		try
 		{
-			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( pluginFile, false, parsingContext );
+			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( pluginFilename, false, parsingContext );
 			Executable executable = documentDescriptor.getDocument();
 			enterable = executable.makeEnterable( ENTERING_KEY, executionContext, null, new SincerityExecutionController( sincerity ) );
 			if( enterable )
@@ -36,7 +37,7 @@ public class ScripturianPlugin implements Plugin
 				executionContext.release();
 		}
 
-		defaultName = pluginFile.split( "\\.(?=[^\\.]+$)", 2 )[0];
+		defaultName = FileUtil.separateExtensionFromFilename( pluginFilename )[0];
 	}
 
 	//
@@ -90,11 +91,11 @@ public class ScripturianPlugin implements Plugin
 		return null;
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
 		try
 		{
-			executable.enter( ENTERING_KEY, "run", command, sincerity );
+			executable.enter( ENTERING_KEY, "run", command );
 		}
 		catch( ParsingException x )
 		{

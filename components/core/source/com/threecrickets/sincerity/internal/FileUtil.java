@@ -151,5 +151,10 @@ public class FileUtil
 		}
 	}
 
+	public static String[] separateExtensionFromFilename( String filename )
+	{
+		return filename.split( "\\.(?=[^\\.]+$)", 2 );
+	}
+
 	public static final int BUFFER_SIZE = 2048;
 }

@@ -15,7 +15,6 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
-import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class ArtifactsPlugin implements Plugin
@@ -37,22 +36,24 @@ public class ArtifactsPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command, Sincerity sincerity ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		Dependencies dependencies = sincerity.getContainer().getDependencies();
-
-		if( "artifacts".equals( command.name ) )
+		String name = command.getName();
+		if( "artifacts".equals( name ) )
 		{
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printArtifacts( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "clean".equals( command.name ) )
+		else if( "clean".equals( name ) )
 		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.clean();
 		}
-		else if( "prune".equals( command.name ) )
+		else if( "prune".equals( name ) )
 		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.prune();
 		}
 		else
