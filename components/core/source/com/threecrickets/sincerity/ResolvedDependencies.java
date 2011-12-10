@@ -36,7 +36,10 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-		Document document = documentBuilder.parse( dependencies.getResolutionReport() );
+		File resolutionReport = dependencies.getResolutionReport();
+		if( !resolutionReport.exists() )
+			return;
+		Document document = documentBuilder.parse( resolutionReport );
 
 		ArrayList<ResolvedDependency> resolvedDependencys = new ArrayList<ResolvedDependency>();
 

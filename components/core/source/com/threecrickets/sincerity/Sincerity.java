@@ -136,7 +136,9 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			String debug = null;
+			String debug = System.getProperty( "sincerity.debug" );
+			if( debug == null )
+				debug = System.getenv( "SINCERITY_DEBUG" );
 			int debugLevel = 1;
 			if( debug != null )
 			{
@@ -146,7 +148,7 @@ public class Sincerity implements Runnable
 				}
 				catch( Exception x )
 				{
-					throw new Exception( "'--debug' value must be a number" );
+					throw new Exception( "Sincerity debug value must be a number" );
 				}
 			}
 
