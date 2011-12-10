@@ -213,6 +213,9 @@ public class Dependencies
 	{
 		ivy.pushContext();
 		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+		File resolutionReport = getResolutionReport();
+		if( resolutionReport.exists() )
+			resolutionReport.delete();
 		ivy.popContext();
 		save();
 	}
