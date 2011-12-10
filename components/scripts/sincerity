@@ -101,6 +101,7 @@ JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
 #
 
 JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
+-Dsincerity.home="$SINCERITY_HOME" \
 -Dfile.encoding=UTF-8 \
 -classpath "$(join ":" $JVM_LIBRARIES)")
 

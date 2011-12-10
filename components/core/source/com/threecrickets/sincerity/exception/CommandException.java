@@ -1,12 +1,14 @@
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.sincerity.Command;
+
 public class CommandException extends Exception
 {
 	//
 	// Construction
 	//
 
-	public CommandException( String command, String message )
+	public CommandException( Command command, String message )
 	{
 		super( message );
 		this.command = command;
@@ -16,7 +18,7 @@ public class CommandException extends Exception
 	// Attributes
 	//
 
-	public String getCommand()
+	public Command getCommand()
 	{
 		return command;
 	}
@@ -26,5 +28,5 @@ public class CommandException extends Exception
 
 	private static final long serialVersionUID = 1L;
 
-	private final String command;
+	private final Command command;
 }

@@ -122,6 +122,7 @@ public class Container implements IvyListener, TransferListener
 		configuration.mkdirs();
 		repositories = new Repositories( new File( configuration, "repositories.conf" ), ivy );
 		dependencies = new Dependencies( new File( configuration, "dependencies.conf" ), new File( configuration, "artifacts.conf" ), this );
+		aliases = new Aliases( new File( configuration, "aliases.conf" ) );
 
 		configure();
 	}
@@ -148,6 +149,11 @@ public class Container implements IvyListener, TransferListener
 	public Dependencies getDependencies()
 	{
 		return dependencies;
+	}
+
+	public Aliases getAliases()
+	{
+		return aliases;
 	}
 
 	public String getRelativePath( File file )
@@ -179,10 +185,8 @@ public class Container implements IvyListener, TransferListener
 			String revision = (String) attributes.get( "revision" );
 			String type = (String) attributes.get( "type" );
 			String origin = (String) attributes.get( "origin" );
-			// message( "Fetching file:\n  type: " + type + "\n  package: " +
-			// organization + ":" + module + ":" + artifact + ":" + revision +
-			// "\n  from: " + origin );
-			String file = (String) attributes.get( "file" );
+			if( name == null )
+				message( "Fetching file:\n  type: " + type + "\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision + "\n  from: " + origin );
 			origins.add( origin );
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
@@ -231,6 +235,8 @@ public class Container implements IvyListener, TransferListener
 	private final Repositories repositories;
 
 	private final Dependencies dependencies;
+
+	private final Aliases aliases;
 
 	private final List<String> origins = new CopyOnWriteArrayList<String>();
 

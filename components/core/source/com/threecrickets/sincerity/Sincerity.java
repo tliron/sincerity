@@ -3,9 +3,7 @@ package com.threecrickets.sincerity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -36,58 +34,43 @@ public class Sincerity implements Runnable
 	public Sincerity( String[] arguments ) throws Exception
 	{
 		// Parse arguments
-		ArrayList<String> statement = null;
-		boolean inBootstrap = false;
+		Command command = null;
+		boolean isGreedy = false;
 		for( String argument : arguments )
 		{
 			if( argument.length() == 0 )
 				continue;
 
-			if( !inBootstrap && ":".equals( argument ) )
+			if( !isGreedy && ":".equals( argument ) )
 			{
-				if( statement != null && !statement.isEmpty() )
+				if( command != null )
 				{
-					statements.add( statement );
-					statement = null;
+					commands.add( command );
+					command = null;
 				}
-			}
-			else if( !inBootstrap && argument.startsWith( "--" ) )
-			{
-				argument = argument.substring( 2 );
-				if( argument.length() > 0 )
-					switches.add( argument );
 			}
 			else
 			{
-				if( statement == null )
+				if( command == null )
 				{
-					statement = new ArrayList<String>();
-					if( "bootstrap".equals( argument ) )
-						inBootstrap = true;
+					if( argument.endsWith( "!" ) )
+					{
+						isGreedy = true;
+						argument = argument.substring( 0, argument.length() - 1 );
+					}
+					command = new Command( argument, !isGreedy );
 				}
-				statement.add( argument );
+				else
+					command.rawArguments.add( argument );
 			}
 		}
-		if( statement != null && !statement.isEmpty() )
-			statements.add( statement );
-
-		// Parse properties
-		for( String theSwitch : switches )
-		{
-			String[] split = theSwitch.split( "=", 2 );
-			if( split.length == 2 )
-				properties.put( split[0], split[1] );
-		}
+		if( command != null )
+			commands.add( command );
 	}
 
 	//
 	// Attributes
 	//
-
-	public Map<String, String> getProperties()
-	{
-		return properties;
-	}
 
 	public Plugins getPlugins() throws Exception
 	{
@@ -153,7 +136,7 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			String debug = properties.get( "debug" );
+			String debug = null;
 			int debugLevel = 1;
 			if( debug != null )
 			{
@@ -187,17 +170,13 @@ public class Sincerity implements Runnable
 
 	public void run()
 	{
-		if( statements.isEmpty() )
-		{
-			ArrayList<String> statement = new ArrayList<String>();
-			statement.add( "help" );
-			statements.add( statement );
-		}
+		if( commands.isEmpty() )
+			commands.add( new Command( "help", false ) );
 
 		try
 		{
-			for( ArrayList<String> statement : statements )
-				run( statement.toArray( new String[statement.size()] ) );
+			for( Command command : commands )
+				run( command );
 		}
 		catch( Exception x )
 		{
@@ -209,32 +188,30 @@ public class Sincerity implements Runnable
 	// Operations
 	//
 
-	public void run( String[] statement ) throws Exception
+	public void run( Command command ) throws Exception
 	{
-		String command = statement[0];
-		String[] arguments = new String[statement.length - 1];
-		System.arraycopy( statement, 1, arguments, 0, arguments.length );
-		run( command, arguments );
-	}
-
-	public void run( String command, String[] arguments ) throws Exception
-	{
-		String[] split = command.split( ":", 2 );
-		if( split.length == 2 )
-			run( split[0], split[1], arguments );
+		if( command.plugin != null )
+		{
+			Plugin thePlugin = getPlugins().get( command.plugin );
+			if( thePlugin == null )
+				throw new UnknownCommandException( command );
+			thePlugin.run( command, this );
+		}
 		else
 		{
 			ArrayList<Plugin> plugins = new ArrayList<Plugin>();
 			for( Plugin plugin : getPlugins().values() )
 			{
-				if( Arrays.asList( plugin.getCommands() ).contains( command ) )
+				if( Arrays.asList( plugin.getCommands() ).contains( command.name ) )
 					plugins.add( plugin );
 			}
 
 			int size = plugins.size();
 			if( size == 1 )
 			{
-				plugins.get( 0 ).run( command, arguments, this );
+				Plugin plugin = plugins.get( 0 );
+				command.plugin = plugin.getName();
+				plugin.run( command, this );
 				return;
 			}
 			else if( size > 1 )
@@ -244,22 +221,10 @@ public class Sincerity implements Runnable
 		}
 	}
 
-	public void run( String plugin, String command, String[] arguments ) throws Exception
-	{
-		Plugin thePlugin = getPlugins().get( plugin );
-		if( thePlugin == null )
-			throw new UnknownCommandException( plugin + ":" + command );
-		thePlugin.run( command, arguments, this );
-	}
-
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final HashSet<String> switches = new HashSet<String>();
-
-	private final HashMap<String, String> properties = new HashMap<String, String>();
-
-	private final ArrayList<ArrayList<String>> statements = new ArrayList<ArrayList<String>>();
+	private final List<Command> commands = new ArrayList<Command>();
 
 	private String containerLocation;
 

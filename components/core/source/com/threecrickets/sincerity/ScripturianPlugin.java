@@ -90,11 +90,11 @@ public class ScripturianPlugin implements Plugin
 		return null;
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		try
 		{
-			executable.enter( ENTERING_KEY, "run", command, arguments, sincerity );
+			executable.enter( ENTERING_KEY, "run", command, sincerity );
 		}
 		catch( ParsingException x )
 		{

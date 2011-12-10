@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
@@ -36,20 +37,21 @@ public class ArtifactsPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		Dependencies dependencies = sincerity.getContainer().getDependencies();
 
-		if( "artifacts".equals( command ) )
+		if( "artifacts".equals( command.name ) )
 		{
-			boolean verbose = arguments.length > 0 && "verbose".equals( arguments[0] );
+			boolean verbose = command.getSwitches().contains( "verbose" );
+
 			printArtifacts( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "clean".equals( command ) )
+		else if( "clean".equals( command.name ) )
 		{
 			dependencies.clean();
 		}
-		else if( "prune".equals( command ) )
+		else if( "prune".equals( command.name ) )
 		{
 			dependencies.prune();
 		}

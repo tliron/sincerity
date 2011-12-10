@@ -2,6 +2,7 @@ package com.threecrickets.sincerity.exception;
 
 import java.util.Iterator;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 
 public class AmbiguousCommandException extends CommandException
@@ -10,7 +11,7 @@ public class AmbiguousCommandException extends CommandException
 	// Construction
 	//
 
-	public AmbiguousCommandException( String command, Iterable<Plugin> plugins )
+	public AmbiguousCommandException( Command command, Iterable<Plugin> plugins )
 	{
 		super( command, createMessage( command, plugins ) );
 	}
@@ -20,7 +21,7 @@ public class AmbiguousCommandException extends CommandException
 
 	private static final long serialVersionUID = 1L;
 
-	private static String createMessage( String command, Iterable<Plugin> plugins )
+	private static String createMessage( Command command, Iterable<Plugin> plugins )
 	{
 		StringBuilder s = new StringBuilder( "Ambiguous command: " );
 		for( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
@@ -28,7 +29,7 @@ public class AmbiguousCommandException extends CommandException
 			Plugin plugin = i.next();
 			s.append( plugin.getName() );
 			s.append( ':' );
-			s.append( command );
+			s.append( command.name );
 			if( i.hasNext() )
 				s.append( ", " );
 		}

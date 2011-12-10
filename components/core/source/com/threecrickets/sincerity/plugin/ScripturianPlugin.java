@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.Main;
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
@@ -29,10 +30,11 @@ public class ScripturianPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
-		if( "execute".equals( command ) )
+		if( "execute".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "uri" );
 

@@ -1,12 +1,14 @@
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.sincerity.Command;
+
 public class BadArgumentsCommandException extends CommandException
 {
 	//
 	// Construction
 	//
 
-	public BadArgumentsCommandException( String command, String... argumentDescriptions )
+	public BadArgumentsCommandException( Command command, String... argumentDescriptions )
 	{
 		super( command, createMessage( command, argumentDescriptions ) );
 	}
@@ -16,7 +18,7 @@ public class BadArgumentsCommandException extends CommandException
 
 	private static final long serialVersionUID = 1L;
 
-	private static String createMessage( String command, String[] argumentDescriptions )
+	private static String createMessage( Command command, String[] argumentDescriptions )
 	{
 		StringBuilder s = new StringBuilder( "Command " );
 		s.append( '"' );

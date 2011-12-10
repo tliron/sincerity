@@ -43,9 +43,9 @@ public class Dependencies
 	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws IOException, ParseException
 	{
 		this.ivyFile = ivyFile;
-		this.installedArtifacts = new InstalledArtifacts( artifactsFile, container );
 		this.container = container;
-		this.ivy = container.getIvy();
+		ivy = container.getIvy();
+		installedArtifacts = new InstalledArtifacts( artifactsFile, container );
 
 		// Module
 		if( ivyFile.exists() )

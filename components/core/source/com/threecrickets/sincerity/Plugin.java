@@ -6,5 +6,5 @@ public interface Plugin
 
 	public String[] getCommands();
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception;
+	public void run( Command command, Sincerity sincerity ) throws Exception;
 }

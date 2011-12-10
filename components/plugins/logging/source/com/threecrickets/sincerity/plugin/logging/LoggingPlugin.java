@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
@@ -28,7 +29,7 @@ public class LoggingPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		if( "initialize".equals( command ) )
 		{
@@ -36,6 +37,7 @@ public class LoggingPlugin implements Plugin
 		}
 		else if( "log".equals( command ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "message" );
 

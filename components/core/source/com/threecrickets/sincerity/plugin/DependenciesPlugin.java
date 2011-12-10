@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.ivy.core.module.descriptor.License;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
@@ -39,34 +40,36 @@ public class DependenciesPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		Dependencies dependencies = sincerity.getContainer().getDependencies();
 
-		if( "dependencies".equals( command ) )
+		if( "dependencies".equals( command.name ) )
 		{
 			printTree( dependencies, new OutputStreamWriter( System.out ) );
 		}
-		else if( "licenses".equals( command ) )
+		else if( "licenses".equals( command.name ) )
 		{
-			boolean verbose = arguments.length > 0 && "verbose".equals( arguments[0] );
+			boolean verbose = command.getSwitches().contains( "verbose" );
+
 			printLicenses( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "install".equals( command ) )
+		else if( "install".equals( command.name ) )
 		{
-			boolean overwrite = "true".equals( sincerity.getProperties().get( "overwrite" ) );
+			boolean overwrite = "true".equals( command.getProperties().get( "overwrite" ) );
 
 			dependencies.install( overwrite );
 		}
-		else if( "unpack".equals( command ) )
+		else if( "unpack".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			String name;
 			if( arguments.length < 1 )
 				name = null;
 			else
 				name = arguments[0];
 
-			boolean overwrite = "true".equals( sincerity.getProperties().get( "overwrite" ) );
+			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			if( name == null )
 				dependencies.getPackages().unpack( overwrite );
@@ -78,12 +81,13 @@ public class DependenciesPlugin implements Plugin
 				pack.unpack( overwrite );
 			}
 		}
-		else if( "reset".equals( command ) )
+		else if( "reset".equals( command.name ) )
 		{
 			dependencies.reset();
 		}
-		else if( "add".equals( command ) )
+		else if( "add".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
 
@@ -98,8 +102,9 @@ public class DependenciesPlugin implements Plugin
 			if( !dependencies.add( organisation, name, revision ) )
 				System.err.println( "Dependency already in container: " + organisation + ":" + name + ":" + revision );
 		}
-		else if( "remove".equals( command ) )
+		else if( "remove".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "group", "name", "version" );
 

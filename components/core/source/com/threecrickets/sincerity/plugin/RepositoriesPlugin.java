@@ -1,5 +1,6 @@
 package com.threecrickets.sincerity.plugin;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Sincerity;
@@ -25,12 +26,13 @@ public class RepositoriesPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		Repositories repositories = sincerity.getContainer().getRepositories();
 
-		if( "attach".equals( command ) )
+		if( "attach".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "section", "name", "type" );
 
@@ -41,7 +43,7 @@ public class RepositoriesPlugin implements Plugin
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new BadArgumentsCommandException( command + " [section] [name] " + type, "section", "name", "type", "url" );
+					throw new BadArgumentsCommandException( command, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
@@ -51,7 +53,7 @@ public class RepositoriesPlugin implements Plugin
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new BadArgumentsCommandException( command + " [section] [name] " + type, "section", "name", "type", "url" );
+					throw new BadArgumentsCommandException( command, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
@@ -61,8 +63,9 @@ public class RepositoriesPlugin implements Plugin
 			else
 				System.err.println( "Unknown repository type: " + type );
 		}
-		else if( "detach".equals( command ) )
+		else if( "detach".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "section", "name" );
 

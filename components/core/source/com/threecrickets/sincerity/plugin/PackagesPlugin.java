@@ -1,5 +1,6 @@
 package com.threecrickets.sincerity.plugin;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin;
@@ -25,19 +26,20 @@ public class PackagesPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
 		Packages packages = sincerity.getContainer().getDependencies().getPackages();
 
-		if( "unpack".equals( command ) )
+		if( "unpack".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			String name;
 			if( arguments.length < 1 )
 				name = null;
 			else
 				name = arguments[0];
 
-			boolean overwrite = "true".equals( sincerity.getProperties().get( "overwrite" ) );
+			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			if( name == null )
 				packages.unpack( overwrite );

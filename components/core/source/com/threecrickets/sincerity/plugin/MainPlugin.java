@@ -2,6 +2,7 @@ package com.threecrickets.sincerity.plugin;
 
 import java.lang.reflect.Method;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
@@ -37,10 +38,11 @@ public class MainPlugin implements Plugin
 		};
 	}
 
-	public void run( String command, String[] arguments, Sincerity sincerity ) throws Exception
+	public void run( Command command, Sincerity sincerity ) throws Exception
 	{
-		if( "main".equals( command ) )
+		if( "main".equals( command.name ) )
 		{
+			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "main class name" );
 
