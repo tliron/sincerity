@@ -195,11 +195,15 @@ public class Dependencies
 			}
 		}
 
+		// TODO: This should be recursive
 		File jarDir = new File( container.getRoot(), "libraries/jars" );
-		for( File file : jarDir.listFiles() )
+		if( jarDir.isDirectory() )
 		{
-			if( file.getPath().endsWith( ".jar" ) )
-				urls.add( file.getAbsoluteFile().toURI().toURL() );
+			for( File file : jarDir.listFiles() )
+			{
+				if( file.getPath().endsWith( ".jar" ) )
+					urls.add( file.getAbsoluteFile().toURI().toURL() );
+			}
 		}
 
 		return urls;

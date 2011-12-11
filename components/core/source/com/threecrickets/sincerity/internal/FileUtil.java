@@ -81,7 +81,8 @@ public class FileUtil
 						children = tar.getChildren();
 					}
 
-					copyRecursive( manager, children, manager.resolveFile( destinationDir.toURI().toString() ) );
+					for( FileObject child : children )
+						copyRecursive( manager, child, manager.resolveFile( destinationDir.toURI().toString() ) );
 
 					return true;
 				}
@@ -99,18 +100,29 @@ public class FileUtil
 		return false;
 	}
 
-	public static final void copyRecursive( FileSystemManager manager, FileObject[] files, FileObject folder ) throws IOException
+	public static final void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
 	{
-		for( FileObject file : files )
+		folder.createFolder();
+		FileType type = file.getType();
+		FileObject target = manager.resolveFile( folder + "/" + file.getName().getBaseName() );
+		if( type == FileType.FILE )
+			org.apache.commons.vfs.FileUtil.copyContent( file, target );
+		else if( type == FileType.FOLDER )
 		{
-			folder.createFolder();
-			FileType type = file.getType();
-			FileObject target = manager.resolveFile( folder + "/" + file.getName().getBaseName() );
-			if( type == FileType.FILE )
-				org.apache.commons.vfs.FileUtil.copyContent( file, target );
-			else if( type == FileType.FOLDER )
-				copyRecursive( manager, file.getChildren(), target );
+			for( FileObject child : file.getChildren() )
+				copyRecursive( manager, child, target );
 		}
+	}
+
+	public static final void copyRecursive( File fromDir, File toDir ) throws IOException
+	{
+		DefaultFileSystemManager manager = new DefaultFileSystemManager();
+		DefaultLocalFileProvider fileProvider = new DefaultLocalFileProvider();
+		manager.addProvider( "file", fileProvider );
+		manager.setDefaultProvider( fileProvider );
+		manager.setFilesCache( new DefaultFilesCache() );
+		manager.init();
+		copyRecursive( manager, manager.resolveFile( fromDir.toURI().toString() ), manager.resolveFile( toDir.toURI().toString() ) );
 	}
 
 	public static boolean isSameContent( URL url, File file ) throws IOException

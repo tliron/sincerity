@@ -1,11 +1,13 @@
 package com.threecrickets.sincerity;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
+import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class Sincerity implements Runnable
@@ -72,6 +74,20 @@ public class Sincerity implements Runnable
 	// Attributes
 	//
 
+	public File getHome() throws IOException
+	{
+		if( sincerityHome == null )
+		{
+			String home = System.getProperty( "sincerity.home" );
+			if( home == null )
+				home = System.getenv( "SINCERITY_HOME" );
+			if( home == null )
+				home = ".";
+			sincerityHome = new File( home ).getCanonicalFile();
+		}
+		return sincerityHome;
+	}
+
 	public Plugins getPlugins() throws Exception
 	{
 		if( plugins != null )
@@ -130,9 +146,10 @@ public class Sincerity implements Runnable
 						// Found it!
 						break;
 					}
-					containerRootDir = containerRootDir.getParentFile().getCanonicalFile();
+					containerRootDir = containerRootDir.getParentFile();
 					if( containerRootDir == null )
-						throw new Exception( "Could not find a Sincerity container for the current directory: " + currentDir );
+						throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
+					containerRootDir = containerRootDir.getCanonicalFile();
 				}
 			}
 
@@ -242,6 +259,8 @@ public class Sincerity implements Runnable
 	// Private
 
 	private final List<Command> commands = new ArrayList<Command>();
+
+	private File sincerityHome;
 
 	private String containerLocation;
 
