@@ -35,39 +35,7 @@ public class Sincerity implements Runnable
 
 	public Sincerity( String[] arguments ) throws Exception
 	{
-		// Parse arguments
-		Command command = null;
-		boolean isGreedy = false;
-		for( String argument : arguments )
-		{
-			if( argument.length() == 0 )
-				continue;
-
-			if( !isGreedy && ":".equals( argument ) )
-			{
-				if( command != null )
-				{
-					commands.add( command );
-					command = null;
-				}
-			}
-			else
-			{
-				if( command == null )
-				{
-					if( argument.endsWith( "!" ) )
-					{
-						isGreedy = true;
-						argument = argument.substring( 0, argument.length() - 1 );
-					}
-					command = new Command( argument, this, !isGreedy );
-				}
-				else
-					command.rawArguments.add( argument );
-			}
-		}
-		if( command != null )
-			commands.add( command );
+		commands = parseCommands( arguments );
 	}
 
 	//
@@ -207,8 +175,62 @@ public class Sincerity implements Runnable
 	// Operations
 	//
 
+	public List<Command> parseCommands( String[] arguments )
+	{
+		ArrayList<Command> commands = new ArrayList<Command>();
+
+		Command command = null;
+		boolean isGreedy = false;
+
+		for( String argument : arguments )
+		{
+			if( argument.length() == 0 )
+				continue;
+
+			if( !isGreedy && ":".equals( argument ) )
+			{
+				if( command != null )
+				{
+					commands.add( command );
+					command = null;
+				}
+			}
+			else
+			{
+				if( command == null )
+				{
+					if( argument.endsWith( "!" ) )
+					{
+						isGreedy = true;
+						argument = argument.substring( 0, argument.length() - 1 );
+					}
+					command = new Command( argument, this, !isGreedy );
+				}
+				else
+					command.rawArguments.add( argument );
+			}
+		}
+
+		if( command != null )
+			commands.add( command );
+
+		return commands;
+	}
+
 	public void run( Command command ) throws Exception
 	{
+		if( command.getName().startsWith( "@" ) )
+		{
+			String[] alias = getContainer().getAliases().get( command.getName().substring( 1 ) );
+			if( alias != null )
+			{
+				List<Command> commands = parseCommands( alias );
+				for( Command c : commands )
+					run( c );
+			}
+			return;
+		}
+
 		if( command.plugin != null )
 		{
 			Plugin thePlugin = getPlugins().get( command.plugin );
@@ -258,7 +280,7 @@ public class Sincerity implements Runnable
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final List<Command> commands = new ArrayList<Command>();
+	private final List<Command> commands;
 
 	private File sincerityHome;
 

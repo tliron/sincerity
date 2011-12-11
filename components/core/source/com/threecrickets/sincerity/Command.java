@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.threecrickets.sincerity.exception.NoContainerException;
+
 public class Command
 {
 	//
@@ -116,20 +118,17 @@ public class Command
 				if( argument.length() > 0 )
 					switches.add( argument );
 			}
-			else if( argument.startsWith( "@" ) )
-			{
-				argument = argument.substring( 1 );
-				String[] alias = sincerity.getContainer().getAliases().get( argument );
-				if( alias != null )
-				{
-					for( String a : alias )
-						arguments.add( a );
-				}
-				else
-					throw new Exception( "Unknown alias: " + argument );
-			}
 			else
-				arguments.add( argument );
+			{
+				try
+				{
+					sincerity.getContainer().getAliases().addArgument( argument, arguments );
+				}
+				catch( NoContainerException x )
+				{
+					arguments.add( argument );
+				}
+			}
 		}
 
 		for( String theSwitch : switches )

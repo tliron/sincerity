@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 public class Aliases implements Iterable<String>
@@ -29,8 +30,29 @@ public class Aliases implements Iterable<String>
 
 		Object value = properties.get( alias );
 		if( value != null )
-			return value.toString().split( " " );
+		{
+			ArrayList<String> arguments = new ArrayList<String>();
+			for( String argument : value.toString().split( " " ) )
+				addArgument( argument, arguments );
+			return arguments.toArray( new String[arguments.size()] );
+		}
+
 		return null;
+	}
+
+	public void addArgument( String argument, List<String> arguments )
+	{
+		if( argument.startsWith( "@" ) )
+		{
+			String[] alias = get( argument.substring( 1 ) );
+			if( alias != null )
+			{
+				for( String a : alias )
+					addArgument( a, arguments );
+			}
+		}
+		else
+			arguments.add( argument );
 	}
 
 	//
