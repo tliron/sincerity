@@ -28,6 +28,11 @@ public class Artifact
 		return file;
 	}
 
+	public String getPath()
+	{
+		return path;
+	}
+
 	public URL getUrl()
 	{
 		return url;

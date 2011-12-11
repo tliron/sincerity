@@ -4,7 +4,7 @@ importClass(java.lang.System, java.io.File)
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getCommands() {
-	return ['python', 'validate']
+	return ['python']
 }
 
 function run(command) {

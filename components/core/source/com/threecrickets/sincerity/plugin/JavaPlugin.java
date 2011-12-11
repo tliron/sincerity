@@ -30,8 +30,8 @@ public class JavaPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "compile".equals( name ) )
+		String commandName = command.getName();
+		if( "compile".equals( commandName ) )
 		{
 			File root = command.getSincerity().getContainer().getRoot();
 			File javaPath = new File( root, "libraries/java" );
@@ -62,6 +62,9 @@ public class JavaPlugin implements Plugin
 		else
 			throw new UnknownCommandException( command );
 	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
 
 	private static void addSources( File dir, Collection<String> list )
 	{

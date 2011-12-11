@@ -35,90 +35,110 @@ public class DependenciesPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"dependencies", "licenses", "install", "unpack", "reset", "add", "remove"
+			"dependencies", "licenses", "install", "unpack", "reset", "add", "revise", "remove"
 		};
 	}
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "dependencies".equals( name ) )
+		String commandName = command.getName();
+		if( "dependencies".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printTree( dependencies, new OutputStreamWriter( System.out ) );
 		}
-		else if( "licenses".equals( name ) )
+		else if( "licenses".equals( commandName ) )
 		{
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printLicenses( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "install".equals( name ) )
+		else if( "install".equals( commandName ) )
 		{
 			boolean overwrite = "true".equals( command.getProperties().get( "overwrite" ) );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.install( overwrite );
 		}
-		else if( "unpack".equals( name ) )
+		else if( "unpack".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
-			String packageName;
+			String name;
 			if( arguments.length < 1 )
-				packageName = null;
+				name = null;
 			else
-				packageName = arguments[0];
+				name = arguments[0];
 
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			if( packageName == null )
+			if( name == null )
 				dependencies.getPackages().unpack( overwrite );
 			else
 			{
-				Package pack = dependencies.getPackages().get( packageName );
+				Package pack = dependencies.getPackages().get( name );
 				if( pack == null )
-					throw new Exception( "Unknown package: " + packageName );
+					throw new Exception( "Unknown package: " + name );
 				pack.unpack( overwrite );
 			}
 		}
-		else if( "reset".equals( name ) )
+		else if( "reset".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.reset();
 		}
-		else if( "add".equals( name ) )
+		else if( "add".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
 
-			String organisation = arguments[0];
-			String dependencyName = arguments[1];
-			String revision;
+			String group = arguments[0];
+			String name = arguments[1];
+			String version;
 			if( arguments.length < 3 )
-				revision = "latest.integration";
+				version = "latest.integration";
 			else
-				revision = arguments[2];
+				version = arguments[2];
+
+			if( "latest".equals( version ) )
+				version = "latest.integration";
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			if( !dependencies.add( organisation, dependencyName, revision ) )
-				System.err.println( "Dependency already in container: " + organisation + ":" + dependencyName + ":" + revision );
+			if( !dependencies.add( group, name, version ) )
+				System.err.println( "Dependency already in container: " + group + ":" + name + ":" + version );
 		}
-		else if( "remove".equals( name ) )
+		else if( "revise".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "group", "name", "version" );
 
-			String organisation = arguments[0];
-			String dependencyName = arguments[1];
-			String revision = arguments[2];
+			String group = arguments[0];
+			String name = arguments[1];
+			String version = arguments[2];
+
+			if( "latest".equals( version ) )
+				version = "latest.integration";
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			if( !dependencies.remove( organisation, dependencyName, revision ) )
-				System.err.println( "Dependency was not in container: " + organisation + ":" + dependencyName + ":" + revision );
+			if( !dependencies.revise( group, name, version ) )
+				System.err.println( "Dependency not revised: " + group + ":" + name + ":" + version );
+
+		}
+		else if( "remove".equals( commandName ) )
+		{
+			String[] arguments = command.getArguments();
+			if( arguments.length < 2 )
+				throw new BadArgumentsCommandException( command, "group", "name" );
+
+			String group = arguments[0];
+			String name = arguments[1];
+
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( !dependencies.remove( group, name ) )
+				System.err.println( "Dependency was not in container: " + group + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

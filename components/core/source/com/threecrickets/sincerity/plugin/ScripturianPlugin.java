@@ -31,8 +31,8 @@ public class ScripturianPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "execute".equals( name ) )
+		String commandName = command.getName();
+		if( "execute".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )

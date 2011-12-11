@@ -27,26 +27,26 @@ public class PackagesPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "unpack".equals( name ) )
+		String commandName = command.getName();
+		if( "unpack".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
-			String packageName;
+			String name;
 			if( arguments.length < 1 )
-				packageName = null;
+				name = null;
 			else
-				packageName = arguments[0];
+				name = arguments[0];
 
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Packages packages = command.getSincerity().getContainer().getDependencies().getPackages();
-			if( packageName == null )
+			if( name == null )
 				packages.unpack( overwrite );
 			else
 			{
-				Package pack = packages.get( packageName );
+				Package pack = packages.get( name );
 				if( pack == null )
-					throw new Exception( "Unknown package: " + packageName );
+					throw new Exception( "Unknown package: " + name );
 				pack.unpack( overwrite );
 			}
 		}

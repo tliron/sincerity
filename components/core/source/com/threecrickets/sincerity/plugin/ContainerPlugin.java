@@ -30,8 +30,8 @@ public class ContainerPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "create".equals( name ) )
+		String commandName = command.getName();
+		if( "create".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
@@ -59,7 +59,7 @@ public class ContainerPlugin implements Plugin
 
 			command.getSincerity().setContainer( containerLocation );
 		}
-		else if( "use".equals( name ) )
+		else if( "use".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )

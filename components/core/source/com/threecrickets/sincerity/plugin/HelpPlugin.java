@@ -25,8 +25,8 @@ public class HelpPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "help".equals( name ) )
+		String commandName = command.getName();
+		if( "help".equals( commandName ) )
 		{
 			for( Plugin plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )

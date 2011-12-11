@@ -40,8 +40,8 @@ public class MainPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "main".equals( name ) )
+		String commandName = command.getName();
+		if( "main".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )

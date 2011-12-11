@@ -26,8 +26,8 @@ public class AliasesPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "aliases".equals( name ) )
+		String commandName = command.getName();
+		if( "aliases".equals( commandName ) )
 		{
 			Aliases aliases = command.getSincerity().getContainer().getAliases();
 			for( String alias : aliases )

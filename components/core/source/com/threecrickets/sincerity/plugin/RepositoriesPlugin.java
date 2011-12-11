@@ -27,54 +27,54 @@ public class RepositoriesPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "attach".equals( name ) )
+		String commandName = command.getName();
+		if( "attach".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "section", "name", "type" );
 
 			String section = arguments[0];
-			String repositoryName = arguments[1];
+			String name = arguments[1];
 			String type = arguments[2];
 
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new BadArgumentsCommandException( command, "section", "repositoryName", "type", "url" );
+					throw new BadArgumentsCommandException( command, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
 				Repositories repositories = command.getSincerity().getContainer().getRepositories();
-				if( !repositories.addMaven( section, repositoryName, url ) )
-					System.err.println( "Repository already in use: " + section + ":" + repositoryName );
+				if( !repositories.addMaven( section, name, url ) )
+					System.err.println( "Repository already in use: " + section + ":" + name );
 			}
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
 				if( arguments.length < 4 )
-					throw new BadArgumentsCommandException( command, "section", "repositoryName", "type", "url" );
+					throw new BadArgumentsCommandException( command, "section", "name", "type", "url" );
 
 				String url = arguments[3];
 
 				Repositories repositories = command.getSincerity().getContainer().getRepositories();
-				if( !repositories.addPyPi( section, repositoryName, url ) )
-					System.err.println( "Repository already in use: " + section + ":" + repositoryName );
+				if( !repositories.addPyPi( section, name, url ) )
+					System.err.println( "Repository already in use: " + section + ":" + name );
 			}
 			else
 				System.err.println( "Unknown repository type: " + type );
 		}
-		else if( "detach".equals( name ) )
+		else if( "detach".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "section", "name" );
 
 			String section = arguments[0];
-			String repositoryName = arguments[1];
+			String name = arguments[1];
 
 			Repositories repositories = command.getSincerity().getContainer().getRepositories();
-			if( !repositories.remove( section, repositoryName ) )
-				System.err.println( "Repository was not in use: " + section + ":" + repositoryName );
+			if( !repositories.remove( section, name ) )
+				System.err.println( "Repository was not in use: " + section + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

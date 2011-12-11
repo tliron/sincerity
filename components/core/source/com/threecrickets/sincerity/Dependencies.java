@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -224,9 +225,9 @@ public class Dependencies
 		save();
 	}
 
-	public boolean add( String organisation, String name, String revision ) throws ParseException, IOException
+	public boolean add( String group, String name, String version ) throws ParseException, IOException
 	{
-		ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, name, revision );
+		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
 		if( has( id ) )
 			return false;
 
@@ -238,14 +239,47 @@ public class Dependencies
 		return true;
 	}
 
-	public boolean remove( String organisation, String name, String revision ) throws ParseException, IOException
+	public boolean revise( String group, String name, String version ) throws ParseException, IOException
 	{
-		ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, name, revision );
+		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
+		boolean changed = false;
+		for( ListIterator<DependencyDescriptor> i = dependencies.listIterator(); i.hasNext(); )
+		{
+			DependencyDescriptor dependency = i.next();
+			ModuleRevisionId id = dependency.getDependencyRevisionId();
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) && !version.equals( id.getRevision() ) )
+			{
+				i.remove();
+				id = ModuleRevisionId.newInstance( id, version );
+				dependency = dependency.clone( id );
+				i.add( dependency );
+				changed = true;
+				break;
+			}
+		}
+
+		if( !changed )
+			return false;
+
+		ivy.pushContext();
+		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+		for( DependencyDescriptor dependency : dependencies )
+			moduleDescriptor.addDependency( dependency );
+		ivy.popContext();
+
+		save();
+
+		return true;
+	}
+
+	public boolean remove( String group, String name ) throws ParseException, IOException
+	{
 		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
 		boolean removed = false;
 		for( Iterator<DependencyDescriptor> i = dependencies.iterator(); i.hasNext(); )
 		{
-			if( id.equals( i.next().getDependencyRevisionId() ) )
+			ModuleRevisionId id = i.next().getDependencyRevisionId();
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) )
 			{
 				i.remove();
 				removed = true;
@@ -256,9 +290,11 @@ public class Dependencies
 		if( !removed )
 			return false;
 
+		ivy.pushContext();
 		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
 		for( DependencyDescriptor dependency : dependencies )
 			moduleDescriptor.addDependency( dependency );
+		ivy.popContext();
 
 		save();
 
@@ -284,7 +320,7 @@ public class Dependencies
 		ivy.resolve( moduleDescriptor, defaultResolveOptions );
 		ivy.popContext();
 		classLoader = null;
-		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_UPDATE_ONLY );
+		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -68,18 +68,18 @@ public class InstalledArtifacts
 			properties.put( path, value );
 		}
 
-		if( mode != MODE_CLEAN )
+		if( ( mode == MODE_UPDATE_ONLY ) || ( mode == MODE_PRUNE ) )
 		{
 			// Mark all existing artifacts as present
 			for( Artifact artifact : artifacts )
 			{
 				URL url = artifact.getUrl();
 				String value = url == null ? "true" : "true," + url;
-				properties.put( artifact.getFile().getPath(), value );
+				properties.put( artifact.getPath(), value );
 			}
 		}
 
-		if( mode != MODE_UPDATE_ONLY )
+		if( ( mode == MODE_CLEAN ) || ( mode == MODE_PRUNE ) )
 		{
 			for( Object key : new HashSet<Object>( properties.keySet() ) )
 			{
@@ -93,13 +93,15 @@ public class InstalledArtifacts
 					properties.remove( path );
 
 					File file = new File( path );
+					if( !file.isAbsolute() )
+						file = new File( container.getRoot(), path );
 					if( !file.exists() )
 						continue;
 
 					if( url != null )
 					{
 						// Keep changed artifacts
-						Artifact artifact = new Artifact( new File( path ), new URL( url ), container );
+						Artifact artifact = new Artifact( file, new URL( url ), container );
 						if( artifact.isDifferent() )
 						{
 							System.out.println( "Keeping changed file: " + path );
@@ -107,7 +109,7 @@ public class InstalledArtifacts
 						}
 					}
 
-					System.out.println( "Deleting: " + container.getRelativePath( path ) );
+					System.out.println( "Deleting: " + path );
 					file.delete();
 				}
 			}

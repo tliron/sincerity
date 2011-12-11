@@ -38,20 +38,20 @@ public class ArtifactsPlugin implements Plugin
 
 	public void run( Command command ) throws Exception
 	{
-		String name = command.getName();
-		if( "artifacts".equals( name ) )
+		String commandName = command.getName();
+		if( "artifacts".equals( commandName ) )
 		{
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printArtifacts( dependencies, new OutputStreamWriter( System.out ), verbose );
 		}
-		else if( "clean".equals( name ) )
+		else if( "clean".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.clean();
 		}
-		else if( "prune".equals( name ) )
+		else if( "prune".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.prune();
