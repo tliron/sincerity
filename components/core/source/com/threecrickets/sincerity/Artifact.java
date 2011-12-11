@@ -14,9 +14,9 @@ public class Artifact
 
 	public Artifact( File file, URL url, Container container )
 	{
-		this.file = file.getAbsoluteFile();
+		this.file = file;
 		this.url = url;
-		this.container = container;
+		path = container.getRelativePath( file );
 	}
 
 	//
@@ -44,7 +44,6 @@ public class Artifact
 
 	public void unpack( boolean overwrite ) throws IOException
 	{
-		String path = container.getRelativePath( file );
 		if( file.exists() )
 		{
 			// TODO: back up in cache if overwriting!!!
@@ -90,5 +89,5 @@ public class Artifact
 
 	private final URL url;
 
-	private final Container container;
+	private final String path;
 }

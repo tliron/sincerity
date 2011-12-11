@@ -51,6 +51,7 @@
 		<module>core</module>
 		<module>logging</module>
 		<module>groovy</module>
+		<module>python</module>
 	</modules>
 
 </project>

@@ -54,7 +54,7 @@ public class Repositories
 	// Operations
 	//
 
-	public boolean addIbiblio( String section, String name, String url )
+	public boolean addMaven( String section, String name, String url )
 	{
 		name = section + ":" + name;
 		if( ivy.getSettings().getResolver( name ) != null )
@@ -68,24 +68,27 @@ public class Repositories
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
-		addResolverToChain( section, resolver );
+		boolean added = addResolverToChain( section, resolver );
 
-		try
+		if( added )
 		{
-			Appender appender = new Appender( "ibiblio" );
-			appender.element.setAttribute( "checksums", "none" );
-			if( url != null )
-				appender.element.setAttribute( "root", url );
-			appender.element.setAttribute( "m2compatible", "true" );
-			appender.element.setAttribute( "name", name );
-			appender.save();
-		}
-		catch( Exception x )
-		{
-			x.printStackTrace();
+			try
+			{
+				Appender appender = new Appender( "ibiblio" );
+				appender.element.setAttribute( "checksums", "none" );
+				if( url != null )
+					appender.element.setAttribute( "root", url );
+				appender.element.setAttribute( "m2compatible", "true" );
+				appender.element.setAttribute( "name", name );
+				appender.save();
+			}
+			catch( Exception x )
+			{
+				x.printStackTrace();
+			}
 		}
 
-		return true;
+		return added;
 	}
 
 	public boolean addPyPi( String section, String name, String url )
@@ -101,23 +104,26 @@ public class Repositories
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
-		addResolverToChain( section, resolver );
+		boolean added = addResolverToChain( section, resolver );
 
-		try
+		if( added )
 		{
-			Appender appender = new Appender( "pypi" );
-			appender.element.setAttribute( "checksums", "none" );
-			if( url != null )
-				appender.element.setAttribute( "root", url );
-			appender.element.setAttribute( "name", name );
-			appender.save();
-		}
-		catch( Exception x )
-		{
-			x.printStackTrace();
+			try
+			{
+				Appender appender = new Appender( "pypi" );
+				appender.element.setAttribute( "checksums", "none" );
+				if( url != null )
+					appender.element.setAttribute( "root", url );
+				appender.element.setAttribute( "name", name );
+				appender.save();
+			}
+			catch( Exception x )
+			{
+				x.printStackTrace();
+			}
 		}
 
-		return true;
+		return added;
 	}
 
 	public boolean remove( String section, String name )

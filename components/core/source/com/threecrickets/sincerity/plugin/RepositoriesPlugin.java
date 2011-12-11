@@ -46,7 +46,7 @@ public class RepositoriesPlugin implements Plugin
 				String url = arguments[3];
 
 				Repositories repositories = command.getSincerity().getContainer().getRepositories();
-				if( !repositories.addIbiblio( section, repositoryName, url ) )
+				if( !repositories.addMaven( section, repositoryName, url ) )
 					System.err.println( "Repository already in use: " + section + ":" + repositoryName );
 			}
 			else if( "pypi".equals( type ) || "python".equals( type ) )

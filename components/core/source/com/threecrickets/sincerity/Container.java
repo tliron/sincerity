@@ -156,9 +156,14 @@ public class Container implements IvyListener, TransferListener
 		return aliases;
 	}
 
+	public File getRelativeFile( File file )
+	{
+		return new File( getRelativePath( file.getPath() ) );
+	}
+
 	public String getRelativePath( File file )
 	{
-		return getRelativePath( file.getPath() );
+		return getRelativePath( file.getAbsolutePath() );
 	}
 
 	public String getRelativePath( String path )
@@ -179,6 +184,8 @@ public class Container implements IvyListener, TransferListener
 		Map<?, ?> attributes = event.getAttributes();
 		if( StartArtifactDownloadEvent.NAME.equals( name ) )
 		{
+			// for (Object o : attributes.keySet())
+			// System.out.println(o + ": " + attributes.get(o));
 			String organization = (String) attributes.get( "organisation" );
 			String module = (String) attributes.get( "module" );
 			String artifact = (String) attributes.get( "artifact" );
@@ -195,7 +202,7 @@ public class Container implements IvyListener, TransferListener
 			if( origins.remove( origin ) )
 			{
 				String file = (String) attributes.get( "file" );
-				message( "Installed artifact: " + getRelativePath( file ) );
+				message( "Installing artifact: " + getRelativePath( file ) );
 			}
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )

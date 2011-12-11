@@ -1,0 +1,6 @@
+#!/bin/bash
+
+HERE=$(dirname "$0")
+ROOT="$HERE/.."
+
+sincerity use "$ROOT" : python:python ${@:1}
