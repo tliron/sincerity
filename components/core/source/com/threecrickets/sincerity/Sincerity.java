@@ -8,10 +8,25 @@ import java.util.List;
 
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class Sincerity implements Runnable
 {
+	//
+	// Static attributes
+	//
+
+	public static Sincerity getCurrent()
+	{
+		return threadLocal.get();
+	}
+
+	public static void setCurrent( Sincerity sincerity )
+	{
+		threadLocal.set( sincerity );
+	}
+
 	//
 	// Main
 	//
@@ -21,11 +36,18 @@ public class Sincerity implements Runnable
 		try
 		{
 			Sincerity sincerity = new Sincerity( arguments );
+			setCurrent( sincerity );
 			sincerity.run();
+		}
+		catch( SincerityException x )
+		{
+			System.err.println( x.getMessage() );
+			System.exit( 1 );
 		}
 		catch( Throwable x )
 		{
 			x.printStackTrace();
+			System.exit( 1 );
 		}
 	}
 
@@ -158,16 +180,22 @@ public class Sincerity implements Runnable
 	public void run()
 	{
 		if( commands.isEmpty() )
-			commands.add( new Command( "help", this, false ) );
+			commands.add( new Command( "help", this ) );
 
 		try
 		{
 			for( Command command : commands )
 				run( command );
 		}
-		catch( Exception x )
+		catch( SincerityException x )
+		{
+			System.err.println( x.getMessage() );
+			System.exit( 1 );
+		}
+		catch( Throwable x )
 		{
 			x.printStackTrace();
+			System.exit( 1 );
 		}
 	}
 
@@ -204,7 +232,7 @@ public class Sincerity implements Runnable
 						isGreedy = true;
 						argument = argument.substring( 0, argument.length() - 1 );
 					}
-					command = new Command( argument, this, !isGreedy );
+					command = new Command( argument, this );
 				}
 				else
 					command.rawArguments.add( argument );
@@ -264,14 +292,10 @@ public class Sincerity implements Runnable
 
 	public void run( String name, String... arguments ) throws Exception
 	{
-		boolean isGreedy = false;
 		if( name.endsWith( "!" ) )
-		{
-			isGreedy = true;
 			name = name.substring( 0, name.length() - 1 );
-		}
 
-		Command command = new Command( name, this, !isGreedy );
+		Command command = new Command( name, this );
 		for( String argument : arguments )
 			command.rawArguments.add( argument );
 		run( command );
@@ -289,4 +313,6 @@ public class Sincerity implements Runnable
 	private Container container;
 
 	private Plugins plugins;
+
+	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
 }

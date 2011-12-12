@@ -49,6 +49,7 @@ public class DependenciesPlugin implements Plugin
 		}
 		else if( "licenses".equals( commandName ) )
 		{
+			command.setParse( true );
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
@@ -56,7 +57,8 @@ public class DependenciesPlugin implements Plugin
 		}
 		else if( "install".equals( commandName ) )
 		{
-			boolean overwrite = "true".equals( command.getProperties().get( "overwrite" ) );
+			command.setParse( true );
+			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.install( overwrite );
@@ -70,6 +72,7 @@ public class DependenciesPlugin implements Plugin
 			else
 				name = arguments[0];
 
+			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();

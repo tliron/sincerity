@@ -2,7 +2,7 @@ package com.threecrickets.sincerity.exception;
 
 import com.threecrickets.sincerity.Command;
 
-public class CommandException extends Exception
+public class CommandException extends SincerityException
 {
 	//
 	// Construction

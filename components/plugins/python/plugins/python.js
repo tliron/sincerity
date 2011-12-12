@@ -16,22 +16,33 @@ function run(command) {
 }
 
 function python(command) {
-	// Notes:
-	//
-	// python.cachedir:   Must be absolute or relative to PYTHON_HOME;
-	//                    Jython will add a "packages" subdirectory to it
-	// python.executable: Used by install
+	// python.cachedir must be absolute or relative to PYTHON_HOME; Jython will add a "packages" subdirectory to it
 	
 	var root = command.sincerity.container.root
-	
 	System.setProperty('python.home', '/Depot/Projects/Collaborative/Prudence/libraries/jython/lib')
 	System.setProperty('python.cachedir', new File(root, 'cache/python').canonicalPath)
-	System.setProperty('python.executable', new File(root, 'programs/python').canonicalPath)
+
+	var sys = org.python.core.Py.systemState
+
+	sys.executable = new org.python.core.PyString(new File(root, 'programs/python').canonicalPath)
+	
+	var eggsDir = new File(root, 'libraries/python')
+	if (eggsDir.exists()) {
+		var files = eggsDir.listFiles()
+		for (var i in files) {
+			var file = files[i]
+			if (file.name.endsWith('.egg')) {
+				sys.path.add(String(file))
+			}
+		}
+	}
 			
 	var mainArguments = [MAIN_CLASS]
 	var arguments = command.arguments
-	for (var length = arguments.length, i = 0; i < length; i++) {
+    sys.argv.clear()
+	for (var i in arguments) {
 		mainArguments.push(arguments[i])
+		sys.argv.add(arguments[i])
 	}
 	command.sincerity.run('main:main', mainArguments)
 }

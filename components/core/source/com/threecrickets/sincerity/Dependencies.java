@@ -123,7 +123,7 @@ public class Dependencies
 			Set<URL> urls = new HashSet<URL>();
 
 			// Classes directory
-			File classesFile = new File( container.getRoot(), "libraries/classes/" );
+			File classesFile = new File( container.getRoot(), "libraries/classes" );
 			if( classesFile.isDirectory() )
 				urls.add( classesFile.getAbsoluteFile().toURI().toURL() );
 
@@ -133,11 +133,14 @@ public class Dependencies
 			if( urls.isEmpty() )
 				classLoader = Thread.currentThread().getContextClassLoader();
 			else
+			{
 				classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Thread.currentThread().getContextClassLoader() );
+				Thread.currentThread().setContextClassLoader( classLoader );
+			}
 
-			Thread.currentThread().setContextClassLoader( classLoader );
-
-			NativeUtil.addNativePath( new File( container.getRoot(), "libraries/native" ) );
+			File nativeDir = new File( container.getRoot(), "libraries/native" );
+			if( nativeDir.isDirectory() )
+				NativeUtil.addNativePath( nativeDir );
 		}
 
 		return classLoader;
@@ -315,11 +318,17 @@ public class Dependencies
 
 	public void install( boolean overwrite ) throws ParseException, IOException, ParserConfigurationException, SAXException
 	{
+		// Make sure class loader is set
+		getClassLoader();
+
 		System.out.println( "Resolving dependencies" );
 		ivy.pushContext();
 		ivy.resolve( moduleDescriptor, defaultResolveOptions );
 		ivy.popContext();
+
+		// Reset class loader
 		classLoader = null;
+
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
 	}
 

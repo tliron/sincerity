@@ -41,6 +41,7 @@ public class ArtifactsPlugin implements Plugin
 		String commandName = command.getName();
 		if( "artifacts".equals( commandName ) )
 		{
+			command.setParse( true );
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();

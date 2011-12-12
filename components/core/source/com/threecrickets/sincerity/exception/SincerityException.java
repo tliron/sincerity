@@ -1,12 +1,12 @@
 package com.threecrickets.sincerity.exception;
 
-public class NoContainerException extends SincerityException
+public class SincerityException extends Exception
 {
 	//
 	// Construction
 	//
 
-	public NoContainerException( String message )
+	public SincerityException( String message )
 	{
 		super( message );
 	}

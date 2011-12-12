@@ -14,7 +14,7 @@ public class Command
 	// Construction
 	//
 
-	public Command( String name, Sincerity sincerity, boolean parse )
+	public Command( String name, Sincerity sincerity )
 	{
 		String[] split = name.split( ":", 2 );
 		if( split.length == 2 )
@@ -26,7 +26,6 @@ public class Command
 			this.name = name;
 
 		this.sincerity = sincerity;
-		this.parse = parse;
 	}
 
 	//
@@ -70,6 +69,16 @@ public class Command
 		return properties;
 	}
 
+	public boolean getParse()
+	{
+		return parse;
+	}
+
+	public void setParse( boolean parse )
+	{
+		this.parse = parse;
+	}
+
 	//
 	// Object
 	//
@@ -96,7 +105,7 @@ public class Command
 
 	private final Sincerity sincerity;
 
-	private final boolean parse;
+	private boolean parse;
 
 	private String[] arguments;
 

@@ -37,6 +37,7 @@ public class PackagesPlugin implements Plugin
 			else
 				name = arguments[0];
 
+			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Packages packages = command.getSincerity().getContainer().getDependencies().getPackages();

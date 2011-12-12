@@ -16,7 +16,7 @@ function run(command) {
 function groovy(command) {
 	var mainArguments = [MAIN_CLASS]
 	var arguments = command.arguments
-	for (var length = arguments.length, i = 0; i < length; i++) {
+	for (var i in arguments) {
 		mainArguments.push(arguments[i])
 	}
 	command.sincerity.run('main:main', mainArguments)

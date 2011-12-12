@@ -48,6 +48,8 @@ import org.apache.ivy.plugins.resolver.BasicResolver;
 import org.apache.ivy.plugins.resolver.util.ResolvedResource;
 import org.apache.ivy.util.Message;
 
+import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.ivy.SincerityRepositoryCacheManager;
 
 public class PyPiResolver extends BasicResolver
@@ -428,7 +430,7 @@ public class PyPiResolver extends BasicResolver
 			File archivedEggFile = getCachedFile( archivedEggArtifact );
 			if( archivedEggFile != null )
 			{
-				System.out.println( "already found: " + archivedEggFile );
+				// System.out.println( "already found: " + archivedEggFile );
 				try
 				{
 					return new ResolvedResource( getRepository().getResource( archivedEggFile.toURI().toURL().toString() ), id.getRevision() );
@@ -439,8 +441,8 @@ public class PyPiResolver extends BasicResolver
 					return null;
 				}
 			}
-			else
-				System.out.println( "not found" );
+			// else
+			// System.out.println( "not found" );
 		}
 
 		PyPi pyPi = getPyPi();
@@ -565,7 +567,7 @@ public class PyPiResolver extends BasicResolver
 				return file;
 
 		// Unpack only we haven't already unpacked into the cache
-		if( unpackedArchiveDir.isDirectory() || com.threecrickets.sincerity.internal.FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir ) )
+		if( unpackedArchiveDir.isDirectory() || FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir ) )
 		{
 			// Find setup.py
 			File setupFile = null;
@@ -591,33 +593,63 @@ public class PyPiResolver extends BasicResolver
 
 			if( setupFile != null )
 			{
-				File setupDir = setupFile.getParentFile();
-				try
+				Sincerity sincerity = Sincerity.getCurrent();
+				if( sincerity != null )
 				{
-					// Create our entry point, converting our function arguments
-					// to system arguments
-					FileWriter writer = new FileWriter( new File( setupDir, "__setup.py" ) );
-					writer.write( "import sys, os\n" );
-					writer.write( "def setup(*args):\n" );
-					writer.write( "  sys.argv = ['setup.py'] + list(str(arg) for arg in args)\n" );
-					writer.write( "  os.chdir('" + setupDir + "')\n" );
-					writer.write( "  import setup\n" );
-					writer.close();
+					try
+					{
+						// Notes:
+						//
+						// 1. setup.py often expects to be in the current
+						// directory
+						//
+						// 2. bdist_egg only works for a setup.py based on
+						// setuptools, not on distutils, but by importing
+						// setuptools we let it install its extensions so
+						// that distutils can use them
 
-					// bdist_egg only works for a setup.py based on setuptools,
-					// not on distutils.
-
-					Python setup = new Python( "__setup.py", setupDir );
-					setup.call( "setup", "bdist_egg", "--dist-dir=" + eggDir.getAbsoluteFile() );
-
-					// Return the built egg
-					if( eggDir.isDirectory() )
-						for( File file : eggDir.listFiles() )
-							return file;
+						sincerity.run( "python:python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
+						sincerity.run( "python:python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+					}
+					catch( Exception x )
+					{
+						x.printStackTrace();
+					}
 				}
-				catch( Exception x )
+				else
 				{
-					x.printStackTrace();
+					File setupDir = setupFile.getParentFile();
+					try
+					{
+						// Create our entry point, converting our function
+						// arguments to system arguments
+
+						FileWriter writer = new FileWriter( new File( setupDir, "__setup.py" ) );
+						writer.write( "import sys, os\n" );
+						writer.write( "def setup(*args):\n" );
+						writer.write( "  sys.argv = ['setup.py'] + list(str(arg) for arg in args)\n" );
+						writer.write( "  os.chdir('" + setupDir + "')\n" );
+						writer.write( "  import setup\n" );
+						writer.close();
+
+						// bdist_egg only works for a setup.py based on
+						// setuptools, not on distutils.
+
+						Python setup = new Python( "__setup.py", setupDir );
+						setup.call( "setup", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+					}
+					catch( Exception x )
+					{
+						x.printStackTrace();
+					}
+				}
+
+				// Return the built egg
+				if( eggDir.isDirectory() )
+				{
+					for( File file : eggDir.listFiles() )
+						if( file.getName().endsWith( ".egg" ) )
+							return file;
 				}
 			}
 		}

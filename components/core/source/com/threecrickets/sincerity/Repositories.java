@@ -46,7 +46,7 @@ public class Repositories
 			String name = resolver.getName();
 			String[] names = name.split( ":", 2 );
 			if( names.length > 1 )
-				addResolverToChain( names[0], resolver );
+				addResolver( names[0], resolver, false );
 		}
 	}
 
@@ -68,7 +68,7 @@ public class Repositories
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
-		boolean added = addResolverToChain( section, resolver );
+		boolean added = addResolver( section, resolver, true );
 
 		if( added )
 		{
@@ -104,7 +104,7 @@ public class Repositories
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
-		boolean added = addResolverToChain( section, resolver );
+		boolean added = addResolver( section, resolver, true );
 
 		if( added )
 		{
@@ -144,12 +144,14 @@ public class Repositories
 
 	private final Ivy ivy;
 
-	private boolean addResolverToChain( String section, DependencyResolver resolver )
+	private boolean addResolver( String section, DependencyResolver resolver, boolean root )
 	{
 		DependencyResolver chain = ivy.getSettings().getResolver( section );
 		if( chain instanceof ChainResolver )
 		{
 			( (ChainResolver) chain ).add( resolver );
+			if( root )
+				ivy.getSettings().addResolver( resolver );
 			return true;
 		}
 
