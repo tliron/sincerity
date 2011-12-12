@@ -22,6 +22,8 @@ function python(command) {
 	System.setProperty('python.home', '/Depot/Projects/Collaborative/Prudence/libraries/jython/lib')
 	System.setProperty('python.cachedir', new File(root, 'cache/python').canonicalPath)
 
+	org.python.core.Options.verbose = org.python.core.Py.WARNING
+
 	var sys = org.python.core.Py.systemState
 
 	sys.executable = new org.python.core.PyString(new File(root, 'programs/python').canonicalPath)
