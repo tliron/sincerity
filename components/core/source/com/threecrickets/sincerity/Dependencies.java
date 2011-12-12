@@ -121,14 +121,8 @@ public class Dependencies
 		if( classLoader == null )
 		{
 			Set<URL> urls = new HashSet<URL>();
-
-			// Classes directory
-			File classesFile = new File( container.getRoot(), "libraries/classes" );
-			if( classesFile.isDirectory() )
-				urls.add( classesFile.getAbsoluteFile().toURI().toURL() );
-
-			// Jar artifacts
-			urls.addAll( getJarUrls() );
+			for( File file : getClasspath() )
+				urls.add( file.toURL() );
 
 			if( urls.isEmpty() )
 				classLoader = Thread.currentThread().getContextClassLoader();
@@ -185,17 +179,23 @@ public class Dependencies
 		return artifacts;
 	}
 
-	public Set<URL> getJarUrls() throws ParseException, MalformedURLException
+	public Set<File> getClasspath() throws ParseException
 	{
-		HashSet<URL> urls = new HashSet<URL>();
+		HashSet<File> files = new HashSet<File>();
 
+		// Classes directory
+		File classesFile = new File( container.getRoot(), "libraries/classes" );
+		if( classesFile.isDirectory() )
+			files.add( classesFile.getAbsoluteFile() );
+
+		// Downloaded artifacts
 		for( ArtifactDownloadReport artifact : getDownloadReports() )
 		{
 			if( "jar".equals( artifact.getType() ) )
 			{
 				File file = artifact.getLocalFile();
 				if( file != null )
-					urls.add( file.getAbsoluteFile().toURI().toURL() );
+					files.add( file.getAbsoluteFile() );
 			}
 		}
 
@@ -206,11 +206,11 @@ public class Dependencies
 			for( File file : jarDir.listFiles() )
 			{
 				if( file.getPath().endsWith( ".jar" ) )
-					urls.add( file.getAbsoluteFile().toURI().toURL() );
+					files.add( file.getAbsoluteFile() );
 			}
 		}
 
-		return urls;
+		return files;
 	}
 
 	//
