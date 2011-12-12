@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>python</artifactId>
+	<artifactId>ruby</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Plugin: Python</name>
-	<description>A Sincerity plugin that simplifies the use of Python in a container.</description>
+	<name>Sincerity Plugin: Ruby</name>
+	<description>A Sincerity plugin that simplifies the use of Ruby in a container.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,43 +49,43 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.python</groupId>
-			<artifactId>jython-standalone</artifactId>
-			<version>2.5.2</version>
+			<groupId>org.jruby</groupId>
+			<artifactId>jruby-standalone</artifactId>
+			<version>1.6.5</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-	<directory>../../cache/maven</directory>
+		<directory>../../cache/maven</directory>
 
-	<plugins>
-		<!-- jar artifact -->
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-assembly-plugin</artifactId>
-			<version>2.2.1</version>
-			<executions>
-				<execution>
-					<id>jar</id>
-					<phase>package</phase>
-					<goals>
-						<goal>single</goal>
-					</goals>
-					<configuration>
-						<appendAssemblyId>false</appendAssemblyId>
-						<archive>
-							<manifestEntries>
-								<Package-Name>python</Package-Name>
-							</manifestEntries>
-						</archive>
-						<descriptors>
-							<descriptor>package.xml</descriptor>
-						</descriptors>
-					</configuration>
-				</execution>
-			</executions>
-		</plugin>
-	</plugins>
+		<plugins>
+			<!-- jar artifact -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifestEntries>
+									<Package-Name>ruby</Package-Name>
+								</manifestEntries>
+							</archive>
+							<descriptors>
+								<descriptor>package.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
 
 </project>

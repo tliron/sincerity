@@ -50,8 +50,13 @@
 	<modules>
 		<module>core</module>
 		<module>logging</module>
+		<module>clojure</module>
 		<module>groovy</module>
+		<module>javascript</module>
+		<module>php</module>
 		<module>python</module>
+		<module>ruby</module>
+		<module>scala</module>
 	</modules>
 
 </project>

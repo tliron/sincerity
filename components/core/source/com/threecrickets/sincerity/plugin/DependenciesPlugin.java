@@ -58,10 +58,24 @@ public class DependenciesPlugin implements Plugin
 		else if( "install".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			dependencies.install( overwrite );
+			String[] arguments = command.getArguments();
+			String name;
+			if( arguments.length < 1 )
+				name = null;
+			else
+				name = arguments[0];
+
+			if( name == null )
+			{
+				boolean overwrite = command.getSwitches().contains( "overwrite" );
+				Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+				dependencies.install( overwrite );
+			}
+			else
+			{
+				command.getSincerity().run( "@install." + name );
+			}
 		}
 		else if( "unpack".equals( commandName ) )
 		{
