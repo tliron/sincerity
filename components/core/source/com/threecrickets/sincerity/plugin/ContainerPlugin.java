@@ -41,7 +41,10 @@ public class ContainerPlugin implements Plugin
 
 			File containerRootDir = new File( containerLocation ).getCanonicalFile();
 			if( containerRootDir.exists() )
-				throw new Exception( "Container root path already exists: " + containerRootDir );
+			{
+				if( new File( containerRootDir, Container.SINCERITY_DIR_NAME ).exists() )
+					throw new Exception( "The path is already a Sincerity container: " + containerRootDir );
+			}
 
 			String template;
 			if( arguments.length < 2 )
@@ -54,7 +57,7 @@ public class ContainerPlugin implements Plugin
 
 			containerRootDir.mkdirs();
 			new File( containerRootDir, Container.SINCERITY_DIR_NAME ).mkdirs();
-			for (File file : templateDir.listFiles() )
+			for( File file : templateDir.listFiles() )
 				FileUtil.copyRecursive( file, containerRootDir );
 
 			command.getSincerity().setContainer( containerLocation );
