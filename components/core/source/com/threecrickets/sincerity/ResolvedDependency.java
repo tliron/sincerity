@@ -39,8 +39,11 @@ public class ResolvedDependency
 			r.append( ':' );
 			r.append( name );
 		}
-		r.append( " v" );
-		r.append( revision );
+		if( !"latest.integration".equals( revision ) )
+		{
+			r.append( " v" );
+			r.append( revision );
+		}
 		if( evicted != null )
 			r.append( ')' );
 		return r.toString();

@@ -15,6 +15,14 @@ import com.threecrickets.sincerity.exception.UnknownShortcutException;
 public class Shortcuts implements Iterable<String>
 {
 	//
+	// Constants
+	//
+
+	public static final String SHORTCUT_PREFIX = "@";
+
+	public static final int SHORTCUT_PREFIX_LENGTH = SHORTCUT_PREFIX.length();
+
+	//
 	// Construction
 	//
 
@@ -43,9 +51,9 @@ public class Shortcuts implements Iterable<String>
 
 	public void addArgument( String argument, List<String> arguments ) throws SincerityException
 	{
-		if( argument.startsWith( "@" ) )
+		if( argument.startsWith( SHORTCUT_PREFIX ) )
 		{
-			String shortcut = argument.substring( 1 );
+			String shortcut = argument.substring( SHORTCUT_PREFIX_LENGTH );
 			String[] items = get( shortcut );
 			if( items == null )
 				throw new UnknownShortcutException( shortcut );

@@ -147,7 +147,7 @@ public class Dependencies
 			{
 				try
 				{
-					urls.add( file.toURL() );
+					urls.add( file.toURI().toURL() );
 				}
 				catch( MalformedURLException x )
 				{

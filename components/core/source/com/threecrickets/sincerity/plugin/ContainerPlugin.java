@@ -44,7 +44,7 @@ public class ContainerPlugin implements Plugin
 			File containerRootDir = new File( containerLocation );
 			if( containerRootDir.exists() )
 			{
-				if( new File( containerRootDir, Container.SINCERITY_DIR_NAME ).exists() )
+				if( new File( containerRootDir, Container.SINCERITY_DIR ).exists() )
 					throw new SincerityException( "The path is already a Sincerity container: " + containerRootDir );
 			}
 
@@ -58,7 +58,7 @@ public class ContainerPlugin implements Plugin
 				throw new SincerityException( "Could not find container template: " + templateDir );
 
 			containerRootDir.mkdirs();
-			new File( containerRootDir, Container.SINCERITY_DIR_NAME ).mkdirs();
+			new File( containerRootDir, Container.SINCERITY_DIR ).mkdirs();
 			for( File file : templateDir.listFiles() )
 			{
 				try

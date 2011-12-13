@@ -4,8 +4,9 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.plugin.gui.Frame;
 
-public class HelpPlugin implements Plugin
+public class GuiPlugin implements Plugin
 {
 	//
 	// Plugin
@@ -13,25 +14,24 @@ public class HelpPlugin implements Plugin
 
 	public String getName()
 	{
-		return "help";
+		return "gui";
 	}
 
 	public String[] getCommands()
 	{
 		return new String[]
 		{
-			"help"
+			"gui"
 		};
 	}
 
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
-		if( "help".equals( commandName ) )
+		if( "gui".equals( commandName ) )
 		{
-			for( Plugin plugin : command.getSincerity().getPlugins().values() )
-				for( String pluginCommand : plugin.getCommands() )
-					System.out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
+			Frame frame = new Frame( command.getSincerity() );
+			frame.setVisible( true );
 		}
 		else
 			throw new UnknownCommandException( command );

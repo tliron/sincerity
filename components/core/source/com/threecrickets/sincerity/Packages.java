@@ -13,9 +13,20 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.exception.UnpackingException;
 
 public class Packages extends HashMap<String, Package>
 {
+	//
+	// Constants
+	//
+
+	public static final String MANIFEST = "META-INF/MANIFEST.MF";
+
+	public static final String PACKAGE_NAME = "Package-Name";
+
+	public static final String PACKAGE_CONTENTS = "Package-Contents";
+
 	//
 	// Construction
 	//
@@ -24,7 +35,7 @@ public class Packages extends HashMap<String, Package>
 	{
 		try
 		{
-			Enumeration<URL> resources = classLoader.getResources( "META-INF/MANIFEST.MF" );
+			Enumeration<URL> resources = classLoader.getResources( MANIFEST );
 			while( resources.hasMoreElements() )
 			{
 				URL resource = resources.nextElement();
@@ -32,14 +43,14 @@ public class Packages extends HashMap<String, Package>
 				try
 				{
 					Attributes manifest = new Manifest( stream ).getMainAttributes();
-					Object packageNameAttribute = manifest.getValue( "Package-Name" );
+					Object packageNameAttribute = manifest.getValue( PACKAGE_NAME );
 					if( packageNameAttribute != null )
 					{
 						String packageName = packageNameAttribute.toString();
 						Package pack = new Package();
 						put( packageName, pack );
 
-						Object packageContentsAttribute = manifest.getValue( "Package-Contents" );
+						Object packageContentsAttribute = manifest.getValue( PACKAGE_CONTENTS );
 						if( packageContentsAttribute != null )
 						{
 							for( String name : packageContentsAttribute.toString().split( "," ) )
@@ -90,7 +101,7 @@ public class Packages extends HashMap<String, Package>
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws SincerityException
+	public void unpack( boolean overwrite ) throws UnpackingException
 	{
 		for( Package pack : values() )
 			pack.unpack( overwrite );

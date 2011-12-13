@@ -14,6 +14,18 @@ import com.threecrickets.sincerity.exception.UnknownCommandException;
 public class Sincerity implements Runnable
 {
 	//
+	// Constants
+	//
+
+	public static final String CONTAINER_PROPERTY = "sincerity.container";
+
+	public static final String CONTAINER_ENV = "SINCERITY_CONTAINER";
+
+	public static final String DEBUG_PROPERTY = "sincerity.debug";
+
+	public static final String DEBUG_ENV = "SINCERITY_DEBUG";
+
+	//
 	// Static attributes
 	//
 
@@ -114,9 +126,9 @@ public class Sincerity implements Runnable
 
 			if( containerLocation == null )
 			{
-				containerLocation = System.getProperty( "sincerity.container" );
+				containerLocation = System.getProperty( CONTAINER_PROPERTY );
 				if( containerLocation == null )
-					containerLocation = System.getenv( "SINCERITY_CONTAINER" );
+					containerLocation = System.getenv( CONTAINER_ENV );
 			}
 
 			File containerRootDir = null;
@@ -135,7 +147,7 @@ public class Sincerity implements Runnable
 					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRootDir );
 				if( !containerRootDir.isDirectory() )
 					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRootDir );
-				File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR_NAME );
+				File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR );
 				if( !sincerityDir.isDirectory() )
 					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRootDir );
 			}
@@ -153,7 +165,7 @@ public class Sincerity implements Runnable
 				containerRootDir = currentDir;
 				while( true )
 				{
-					File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR_NAME );
+					File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR );
 					if( sincerityDir.isDirectory() )
 					{
 						// Found it!
@@ -173,9 +185,9 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			String debug = System.getProperty( "sincerity.debug" );
+			String debug = System.getProperty( DEBUG_PROPERTY );
 			if( debug == null )
-				debug = System.getenv( "SINCERITY_DEBUG" );
+				debug = System.getenv( DEBUG_ENV );
 			int debugLevel = 1;
 			if( debug != null )
 			{
@@ -210,7 +222,7 @@ public class Sincerity implements Runnable
 	public void run()
 	{
 		if( commands.isEmpty() )
-			commands.add( new Command( "help", this ) );
+			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", this ) );
 
 		try
 		{
@@ -245,7 +257,7 @@ public class Sincerity implements Runnable
 			if( argument.length() == 0 )
 				continue;
 
-			if( !isGreedy && ":".equals( argument ) )
+			if( !isGreedy && Command.COMMANDS_SEPARATOR.equals( argument ) )
 			{
 				if( command != null )
 				{
@@ -257,10 +269,10 @@ public class Sincerity implements Runnable
 			{
 				if( command == null )
 				{
-					if( argument.endsWith( "!" ) )
+					if( argument.endsWith( Command.GREEDY_POSTFIX ) )
 					{
 						isGreedy = true;
-						argument = argument.substring( 0, argument.length() - 1 );
+						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
 					}
 					command = new Command( argument, this );
 				}
@@ -277,9 +289,9 @@ public class Sincerity implements Runnable
 
 	public void run( Command command ) throws SincerityException
 	{
-		if( command.getName().startsWith( "@" ) )
+		if( command.getName().startsWith( Shortcuts.SHORTCUT_PREFIX ) )
 		{
-			String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( 1 ) );
+			String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( Shortcuts.SHORTCUT_PREFIX_LENGTH ) );
 			if( shortcut != null )
 			{
 				List<Command> commands = parseCommands( shortcut );
@@ -322,8 +334,8 @@ public class Sincerity implements Runnable
 
 	public void run( String name, String... arguments ) throws SincerityException
 	{
-		if( name.endsWith( "!" ) )
-			name = name.substring( 0, name.length() - 1 );
+		if( name.endsWith( Command.GREEDY_POSTFIX ) )
+			name = name.substring( 0, name.length() - Command.GREEDY_POSTFIX_LENGTH );
 
 		Command command = new Command( name, this );
 		for( String argument : arguments )

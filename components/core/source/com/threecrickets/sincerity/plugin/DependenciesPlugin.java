@@ -13,9 +13,11 @@ import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
+import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.internal.TreeUtil;
 
 public class DependenciesPlugin implements Plugin
 {
@@ -70,7 +72,7 @@ public class DependenciesPlugin implements Plugin
 				dependencies.install( overwrite );
 			}
 			else
-				command.getSincerity().run( "@install." + name );
+				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "install." + name );
 		}
 		else if( "unpack".equals( commandName ) )
 		{
@@ -181,7 +183,7 @@ public class DependenciesPlugin implements Plugin
 			for( int i = 0; i < length; i++ )
 			{
 				License license = licenses[i];
-				printWriter.print( i == length - 1 ? " \u2514\u2500\u2500" : " \u251C\u2500\u2500" );
+				printWriter.print( i == length - 1 ? TreeUtil.LVV : TreeUtil.TVV );
 				printWriter.print( license.getName() );
 				if( verbose )
 				{
@@ -209,14 +211,14 @@ public class DependenciesPlugin implements Plugin
 				{
 					// Last pattern depends on whether we are sealing
 					if( seal )
-						pattern = size < 2 ? " \u2514" : "   \u2514";
+						pattern = size < 2 ? TreeUtil.L : TreeUtil._L;
 					else
-						pattern = size < 2 ? " \u251C" : "   \u251C";
+						pattern = size < 2 ? TreeUtil.T : TreeUtil._T;
 				}
 				System.out.print( pattern );
 			}
 
-			System.out.print( "\u2500\u2500" );
+			System.out.print( TreeUtil.VV );
 			if( seal )
 				// Erase the pattern after it was sealed
 				patterns.set( size - 1, size < 2 ? "  " : "    " );
@@ -226,7 +228,7 @@ public class DependenciesPlugin implements Plugin
 
 		if( !resolvedDependency.children.isEmpty() )
 		{
-			patterns.add( size == 0 ? " \u2502" : "   \u2502" );
+			patterns.add( size == 0 ? TreeUtil.I : TreeUtil._I );
 
 			for( Iterator<ResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
 			{
