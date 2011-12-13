@@ -31,7 +31,7 @@ public class HelpPlugin implements Plugin
 		{
 			for( Plugin plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
-					System.out.println( plugin.getName() + ":" + pluginCommand );
+					System.out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
 		}
 		else
 			throw new UnknownCommandException( command );

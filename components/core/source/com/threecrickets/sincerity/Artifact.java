@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.exception.UnpackingException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
 public class Artifact
@@ -39,7 +39,7 @@ public class Artifact
 		return url;
 	}
 
-	public boolean isDifferent() throws SincerityException
+	public boolean isDifferent() throws UnpackingException
 	{
 		try
 		{
@@ -47,7 +47,7 @@ public class Artifact
 		}
 		catch( IOException x )
 		{
-			throw new SincerityException( "Could not compare artifact " + file + " to " + url, x );
+			throw new UnpackingException( "Could not compare artifact " + file + " to " + url, x );
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Artifact
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws SincerityException
+	public void unpack( boolean overwrite ) throws UnpackingException
 	{
 		if( file.exists() )
 		{
@@ -78,7 +78,7 @@ public class Artifact
 		}
 		catch( IOException x )
 		{
-			throw new SincerityException( "Could not copy artifact from " + url + " to " + file, x );
+			throw new UnpackingException( "Could not copy artifact from " + url + " to " + file, x );
 		}
 	}
 

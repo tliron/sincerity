@@ -1,6 +1,7 @@
 com.threecrickets.sincerity.plugin.ArtifactsPlugin
 com.threecrickets.sincerity.plugin.ContainerPlugin
 com.threecrickets.sincerity.plugin.DependenciesPlugin
+com.threecrickets.sincerity.plugin.GuiPlugin
 com.threecrickets.sincerity.plugin.HelpPlugin
 com.threecrickets.sincerity.plugin.JavaPlugin
 com.threecrickets.sincerity.plugin.MainPlugin

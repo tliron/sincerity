@@ -85,7 +85,17 @@ public class Container implements IvyListener, TransferListener
 	// Constants
 	//
 
-	public static final String SINCERITY_DIR_NAME = ".sincerity";
+	public static final String SINCERITY_DIR = ".sincerity";
+
+	public static final String IVY_CONF = "ivy.conf";
+
+	public static final String REPOSITORIES_CONF = "repositories.conf";
+
+	public static final String DEPENDENCIES_CONF = "dependencies.conf";
+
+	public static final String ARTIFACTS_CONF = "artifacts.conf";
+
+	public static final String SHORTCUTS_CONF = "shortcuts.conf";
 
 	//
 	// Construction
@@ -112,7 +122,7 @@ public class Container implements IvyListener, TransferListener
 		ivy.getEventManager().addTransferListener( this );
 
 		// Load settings
-		URL settings = Container.class.getResource( "ivy.conf" );
+		URL settings = Container.class.getResource( IVY_CONF );
 		ivy.getSettings().setVariable( "ivy.cache.dir", rootPath );
 		ivy.pushContext();
 		try
@@ -135,11 +145,11 @@ public class Container implements IvyListener, TransferListener
 		// Resolution cache manager
 		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( ivy.getSettings().getDefaultResolutionCacheBasedir() ) );
 
-		File configuration = new File( root, "configuration/sincerity" );
+		File configuration = new File( new File( root, "configuration" ), "sincerity" );
 		configuration.mkdirs();
-		repositories = new Repositories( new File( configuration, "repositories.conf" ), ivy );
-		dependencies = new Dependencies( new File( configuration, "dependencies.conf" ), new File( configuration, "artifacts.conf" ), this );
-		shortcuts = new Shortcuts( new File( configuration, "shortcuts.conf" ) );
+		repositories = new Repositories( new File( configuration, REPOSITORIES_CONF ), ivy );
+		dependencies = new Dependencies( new File( configuration, DEPENDENCIES_CONF ), new File( configuration, ARTIFACTS_CONF ), this );
+		shortcuts = new Shortcuts( new File( configuration, SHORTCUTS_CONF ) );
 
 		configure();
 	}

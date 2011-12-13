@@ -12,12 +12,30 @@ import com.threecrickets.sincerity.exception.SincerityException;
 public class Command
 {
 	//
+	// Constants
+	//
+
+	public static final String GREEDY_POSTFIX = "!";
+
+	public static final int GREEDY_POSTFIX_LENGTH = GREEDY_POSTFIX.length();
+
+	public static final String SWITCH_PREFIX = "--";
+
+	public static final int SWITCH_PREFIX_LENGTH = SWITCH_PREFIX.length();
+
+	public static final String PROPERTY_SEPARATOR = "=";
+
+	public static final String COMMANDS_SEPARATOR = ":";
+
+	public static final String PLUGIN_COMMAND_SEPARATOR = ":";
+
+	//
 	// Construction
 	//
 
 	public Command( String name, Sincerity sincerity )
 	{
-		String[] split = name.split( ":", 2 );
+		String[] split = name.split( COMMANDS_SEPARATOR, 2 );
 		if( split.length == 2 )
 		{
 			plugin = split[0];
@@ -89,7 +107,7 @@ public class Command
 	{
 		if( plugin == null )
 			return name;
-		return plugin + ":" + name;
+		return plugin + PLUGIN_COMMAND_SEPARATOR + name;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -122,9 +140,9 @@ public class Command
 
 		for( String argument : rawArguments )
 		{
-			if( argument.startsWith( "--" ) )
+			if( argument.startsWith( SWITCH_PREFIX ) )
 			{
-				argument = argument.substring( 2 );
+				argument = argument.substring( SWITCH_PREFIX_LENGTH );
 				if( argument.length() > 0 )
 					switches.add( argument );
 			}
@@ -143,7 +161,7 @@ public class Command
 
 		for( String theSwitch : switches )
 		{
-			String[] split = theSwitch.split( "=", 2 );
+			String[] split = theSwitch.split( PROPERTY_SEPARATOR, 2 );
 			if( split.length == 2 )
 				properties.put( split[0], split[1] );
 		}

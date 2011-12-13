@@ -13,6 +13,7 @@ import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.internal.TreeUtil;
 
 public class ArtifactsPlugin implements Plugin
 {
@@ -72,13 +73,13 @@ public class ArtifactsPlugin implements Plugin
 			for( int length = artifacts.length, i = 0; i < length; i++ )
 			{
 				org.apache.ivy.core.module.descriptor.Artifact artifact = artifacts[i];
-				printWriter.print( i == length - 1 ? " \u2514\u2500\u2500" : " \u251C\u2500\u2500" );
+				printWriter.print( i == length - 1 ? TreeUtil.LVV : TreeUtil.TVV );
 
 				String location = artifact.getId().getAttribute( "location" );
 				boolean installed = location != null && new File( location ).exists();
 
 				if( !installed )
-					printWriter.print( "(" );
+					printWriter.print( '(' );
 
 				printWriter.print( artifact.getType() );
 
@@ -105,7 +106,7 @@ public class ArtifactsPlugin implements Plugin
 				}
 
 				if( !installed )
-					printWriter.print( ")" );
+					printWriter.print( ')' );
 
 				printWriter.println();
 			}
