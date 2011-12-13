@@ -8,6 +8,7 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class LoggingPlugin implements Plugin
@@ -29,7 +30,7 @@ public class LoggingPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String name = command.getName();
 		if( "initialize".equals( name ) )

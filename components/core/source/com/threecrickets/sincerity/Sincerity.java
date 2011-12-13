@@ -55,7 +55,7 @@ public class Sincerity implements Runnable
 	// Construction
 	//
 
-	public Sincerity( String[] arguments ) throws Exception
+	public Sincerity( String[] arguments ) throws SincerityException
 	{
 		commands = parseCommands( arguments );
 	}
@@ -64,7 +64,7 @@ public class Sincerity implements Runnable
 	// Attributes
 	//
 
-	public File getHome() throws IOException
+	public File getHome() throws SincerityException
 	{
 		if( sincerityHome == null )
 		{
@@ -73,12 +73,19 @@ public class Sincerity implements Runnable
 				home = System.getenv( "SINCERITY_HOME" );
 			if( home == null )
 				home = ".";
-			sincerityHome = new File( home ).getCanonicalFile();
+			try
+			{
+				sincerityHome = new File( home ).getCanonicalFile();
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not determine location of Sincerity home: " + home, x );
+			}
 		}
 		return sincerityHome;
 	}
 
-	public Plugins getPlugins() throws Exception
+	public Plugins getPlugins() throws SincerityException
 	{
 		if( plugins != null )
 		{
@@ -92,7 +99,7 @@ public class Sincerity implements Runnable
 		return plugins;
 	}
 
-	public Container getContainer() throws Exception
+	public Container getContainer() throws SincerityException
 	{
 		if( container == null )
 		{
@@ -115,18 +122,34 @@ public class Sincerity implements Runnable
 			File containerRootDir = null;
 			if( containerLocation != null )
 			{
-				containerRootDir = new File( containerLocation ).getCanonicalFile();
+				try
+				{
+					containerRootDir = new File( containerLocation ).getCanonicalFile();
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not determine location of container: " + containerLocation, x );
+				}
+
 				if( !containerRootDir.exists() )
-					throw new Exception( "Specified root path for the Sincerity container does not point anywhere: " + containerRootDir );
+					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRootDir );
 				if( !containerRootDir.isDirectory() )
-					throw new Exception( "Specified root path for the Sincerity container does not point to a directory: " + containerRootDir );
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRootDir );
 				File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR_NAME );
 				if( !sincerityDir.isDirectory() )
-					throw new Exception( "Specified root path for the Sincerity container does not point to a valid container: " + containerRootDir );
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRootDir );
 			}
 			else
 			{
-				File currentDir = new File( "." ).getCanonicalFile();
+				File currentDir;
+				try
+				{
+					currentDir = new File( "." ).getCanonicalFile();
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not determine location of current directory", x );
+				}
 				containerRootDir = currentDir;
 				while( true )
 				{
@@ -139,7 +162,14 @@ public class Sincerity implements Runnable
 					containerRootDir = containerRootDir.getParentFile();
 					if( containerRootDir == null )
 						throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
-					containerRootDir = containerRootDir.getCanonicalFile();
+					try
+					{
+						containerRootDir = containerRootDir.getCanonicalFile();
+					}
+					catch( IOException x )
+					{
+						throw new SincerityException( "Could not determine location of container: " + containerRootDir, x );
+					}
 				}
 			}
 
@@ -155,7 +185,7 @@ public class Sincerity implements Runnable
 				}
 				catch( Exception x )
 				{
-					throw new Exception( "Sincerity debug value must be a number" );
+					throw new SincerityException( "Sincerity debug value must be a number" );
 				}
 			}
 
@@ -245,14 +275,14 @@ public class Sincerity implements Runnable
 		return commands;
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		if( command.getName().startsWith( "@" ) )
 		{
-			String[] alias = getContainer().getAliases().get( command.getName().substring( 1 ) );
-			if( alias != null )
+			String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( 1 ) );
+			if( shortcut != null )
 			{
-				List<Command> commands = parseCommands( alias );
+				List<Command> commands = parseCommands( shortcut );
 				for( Command c : commands )
 					run( c );
 			}
@@ -290,7 +320,7 @@ public class Sincerity implements Runnable
 		}
 	}
 
-	public void run( String name, String... arguments ) throws Exception
+	public void run( String name, String... arguments ) throws SincerityException
 	{
 		if( name.endsWith( "!" ) )
 			name = name.substring( 0, name.length() - 1 );

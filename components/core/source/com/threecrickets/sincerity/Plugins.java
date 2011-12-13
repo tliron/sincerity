@@ -9,6 +9,7 @@ import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentFileSource;
 import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.NoContainerException;
+import com.threecrickets.sincerity.exception.SincerityException;
 
 public class Plugins extends HashMap<String, Plugin>
 {
@@ -16,7 +17,7 @@ public class Plugins extends HashMap<String, Plugin>
 	// Construction
 	//
 
-	public Plugins( Sincerity sincerity ) throws Exception
+	public Plugins( Sincerity sincerity ) throws SincerityException
 	{
 		super();
 

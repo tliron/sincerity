@@ -4,6 +4,7 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class PackagesPlugin implements Plugin
@@ -25,7 +26,7 @@ public class PackagesPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "unpack".equals( commandName ) )
@@ -47,7 +48,7 @@ public class PackagesPlugin implements Plugin
 			{
 				Package pack = packages.get( name );
 				if( pack == null )
-					throw new Exception( "Unknown package: " + name );
+					throw new SincerityException( "Unknown package: " + name );
 				pack.unpack( overwrite );
 			}
 		}

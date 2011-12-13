@@ -1,20 +1,17 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class ArtifactsPlugin implements Plugin
@@ -36,7 +33,7 @@ public class ArtifactsPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "artifacts".equals( commandName ) )
@@ -65,7 +62,7 @@ public class ArtifactsPlugin implements Plugin
 	// Operations
 	//
 
-	public void printArtifacts( Dependencies dependencies, Writer writer, boolean verbose ) throws IOException, ParserConfigurationException, SAXException
+	public void printArtifacts( Dependencies dependencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getInstalledDependencies() )

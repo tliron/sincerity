@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
 public class Artifact
@@ -38,16 +39,23 @@ public class Artifact
 		return url;
 	}
 
-	public boolean isDifferent() throws IOException
+	public boolean isDifferent() throws SincerityException
 	{
-		return !FileUtil.isSameContent( url, file );
+		try
+		{
+			return !FileUtil.isSameContent( url, file );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not compare artifact " + file + " to " + url, x );
+		}
 	}
 
 	//
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws IOException
+	public void unpack( boolean overwrite ) throws SincerityException
 	{
 		if( file.exists() )
 		{
@@ -64,7 +72,14 @@ public class Artifact
 		else
 			System.out.println( "Installing artifact: " + path );
 
-		org.apache.ivy.util.FileUtil.copy( url, file, null );
+		try
+		{
+			org.apache.ivy.util.FileUtil.copy( url, file, null );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not copy artifact from " + url + " to " + file, x );
+		}
 	}
 
 	//

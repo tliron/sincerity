@@ -1,16 +1,12 @@
 package com.threecrickets.sincerity.plugin;
 
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.ivy.core.module.descriptor.License;
-import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
@@ -18,6 +14,7 @@ import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class DependenciesPlugin implements Plugin
@@ -39,7 +36,7 @@ public class DependenciesPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "dependencies".equals( commandName ) )
@@ -73,9 +70,7 @@ public class DependenciesPlugin implements Plugin
 				dependencies.install( overwrite );
 			}
 			else
-			{
 				command.getSincerity().run( "@install." + name );
-			}
 		}
 		else if( "unpack".equals( commandName ) )
 		{
@@ -96,7 +91,7 @@ public class DependenciesPlugin implements Plugin
 			{
 				Package pack = dependencies.getPackages().get( name );
 				if( pack == null )
-					throw new Exception( "Unknown package: " + name );
+					throw new SincerityException( "Unknown package: " + name );
 				pack.unpack( overwrite );
 			}
 		}
@@ -165,7 +160,7 @@ public class DependenciesPlugin implements Plugin
 	// Operations
 	//
 
-	public void printTree( Dependencies dependencies, Writer writer ) throws ParserConfigurationException, SAXException, IOException
+	public void printTree( Dependencies dependencies, Writer writer ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		ArrayList<String> patterns = new ArrayList<String>();
@@ -173,7 +168,7 @@ public class DependenciesPlugin implements Plugin
 			printTree( printWriter, resolvedDependency, patterns, false );
 	}
 
-	public void printLicenses( Dependencies depenencies, Writer writer, boolean verbose ) throws ParserConfigurationException, SAXException, IOException
+	public void printLicenses( Dependencies depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getInstalledDependencies() )

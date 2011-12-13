@@ -11,6 +11,11 @@ public class SincerityException extends Exception
 		super( message );
 	}
 
+	public SincerityException( String message, Throwable cause )
+	{
+		super( message, cause );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

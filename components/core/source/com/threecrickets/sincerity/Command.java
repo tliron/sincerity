@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.threecrickets.sincerity.exception.NoContainerException;
+import com.threecrickets.sincerity.exception.SincerityException;
 
 public class Command
 {
@@ -42,7 +43,7 @@ public class Command
 		return sincerity;
 	}
 
-	public String[] getArguments() throws Exception
+	public String[] getArguments() throws SincerityException
 	{
 		if( arguments == null && parse )
 			parse();
@@ -51,7 +52,7 @@ public class Command
 		return arguments;
 	}
 
-	public List<String> getSwitches() throws Exception
+	public List<String> getSwitches() throws SincerityException
 	{
 		if( switches == null && parse )
 			parse();
@@ -60,7 +61,7 @@ public class Command
 		return switches;
 	}
 
-	public Map<String, String> getProperties() throws Exception
+	public Map<String, String> getProperties() throws SincerityException
 	{
 		if( properties == null && parse )
 			parse();
@@ -113,7 +114,7 @@ public class Command
 
 	private Map<String, String> properties;
 
-	private void parse() throws Exception
+	private void parse() throws SincerityException
 	{
 		ArrayList<String> arguments = new ArrayList<String>();
 		switches = new ArrayList<String>();
@@ -131,7 +132,7 @@ public class Command
 			{
 				try
 				{
-					sincerity.getContainer().getAliases().addArgument( argument, arguments );
+					sincerity.getContainer().getShortcuts().addArgument( argument, arguments );
 				}
 				catch( NoContainerException x )
 				{

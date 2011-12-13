@@ -7,6 +7,7 @@ import com.threecrickets.scripturian.Main;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.SincerityExecutionController;
 
@@ -29,7 +30,7 @@ public class ScripturianPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "execute".equals( commandName ) )

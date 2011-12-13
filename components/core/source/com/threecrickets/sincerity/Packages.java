@@ -12,68 +12,77 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.threecrickets.sincerity.exception.SincerityException;
+
 public class Packages extends HashMap<String, Package>
 {
 	//
 	// Construction
 	//
 
-	public Packages( File root, ClassLoader classLoader, Container container ) throws IOException
+	public Packages( File root, ClassLoader classLoader, Container container ) throws SincerityException
 	{
-		Enumeration<URL> resources = classLoader.getResources( "META-INF/MANIFEST.MF" );
-		while( resources.hasMoreElements() )
+		try
 		{
-			URL resource = resources.nextElement();
-			InputStream stream = resource.openStream();
-			try
+			Enumeration<URL> resources = classLoader.getResources( "META-INF/MANIFEST.MF" );
+			while( resources.hasMoreElements() )
 			{
-				Attributes manifest = new Manifest( stream ).getMainAttributes();
-				Object packageNameAttribute = manifest.getValue( "Package-Name" );
-				if( packageNameAttribute != null )
+				URL resource = resources.nextElement();
+				InputStream stream = resource.openStream();
+				try
 				{
-					String packageName = packageNameAttribute.toString();
-					Package pack = new Package();
-					put( packageName, pack );
+					Attributes manifest = new Manifest( stream ).getMainAttributes();
+					Object packageNameAttribute = manifest.getValue( "Package-Name" );
+					if( packageNameAttribute != null )
+					{
+						String packageName = packageNameAttribute.toString();
+						Package pack = new Package();
+						put( packageName, pack );
 
-					Object packageContentsAttribute = manifest.getValue( "Package-Contents" );
-					if( packageContentsAttribute != null )
-					{
-						for( String name : packageContentsAttribute.toString().split( "," ) )
+						Object packageContentsAttribute = manifest.getValue( "Package-Contents" );
+						if( packageContentsAttribute != null )
 						{
-							URL url = classLoader.getResource( packageName + "/" + name );
-							if( url == null )
-								System.err.println( "Could not find package content: " + packageName + "/" + name );
-							else
-								pack.add( new Artifact( new File( root, name ), url, container ) );
-						}
-					}
-					else if( "jar".equals( resource.getProtocol() ) )
-					{
-						JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
-						JarFile jarFile = jarConnection.getJarFile();
-						URL urlContext = new URL( "jar:" + jarConnection.getJarFileURL() + "!/" + packageName );
-						String prefix = packageName + "/";
-						int prefixLength = prefix.length();
-						for( Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); )
-						{
-							JarEntry entry = entries.nextElement();
-							if( !entry.isDirectory() )
+							for( String name : packageContentsAttribute.toString().split( "," ) )
 							{
-								String name = entry.getName();
-								if( name.startsWith( prefix ) && name.length() > prefixLength )
+								URL url = classLoader.getResource( packageName + "/" + name );
+								if( url == null )
+									System.err.println( "Could not find package content: " + packageName + "/" + name );
+								else
+									pack.add( new Artifact( new File( root, name ), url, container ) );
+							}
+						}
+						else if( "jar".equals( resource.getProtocol() ) )
+						{
+							JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
+							JarFile jarFile = jarConnection.getJarFile();
+							URL urlContext = new URL( "jar:" + jarConnection.getJarFileURL() + "!/" + packageName );
+							String prefix = packageName + "/";
+							int prefixLength = prefix.length();
+							for( Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements(); )
+							{
+								JarEntry entry = entries.nextElement();
+								if( !entry.isDirectory() )
 								{
-									URL url = new URL( urlContext, name );
-									pack.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, container ) );
+									String name = entry.getName();
+									if( name.startsWith( prefix ) && name.length() > prefixLength )
+									{
+										URL url = new URL( urlContext, name );
+										pack.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, container ) );
+									}
 								}
 							}
 						}
 					}
 				}
+				finally
+				{
+					stream.close();
+				}
 			}
-			finally
-			{
-				stream.close();
-			}
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "I/O error while looking for packages", x );
 		}
 	}
 
@@ -81,7 +90,7 @@ public class Packages extends HashMap<String, Package>
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws IOException
+	public void unpack( boolean overwrite ) throws SincerityException
 	{
 		for( Package pack : values() )
 			pack.unpack( overwrite );

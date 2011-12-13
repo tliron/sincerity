@@ -1,7 +1,8 @@
 package com.threecrickets.sincerity;
 
-import java.io.IOException;
 import java.util.ArrayList;
+
+import com.threecrickets.sincerity.exception.SincerityException;
 
 public class Package extends ArrayList<Artifact>
 {
@@ -9,7 +10,7 @@ public class Package extends ArrayList<Artifact>
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws IOException
+	public void unpack( boolean overwrite ) throws SincerityException
 	{
 		for( Artifact artifact : this )
 			artifact.unpack( overwrite );

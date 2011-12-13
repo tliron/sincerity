@@ -1,13 +1,16 @@
 package com.threecrickets.sincerity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.ExecutionContext;
 import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
+import com.threecrickets.scripturian.exception.DocumentException;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.SincerityExecutionController;
 
@@ -17,7 +20,7 @@ public class ScripturianPlugin implements Plugin
 	// Construction
 	//
 
-	public ScripturianPlugin( String pluginFilename, ParsingContext parsingContext, Sincerity sincerity ) throws Exception
+	public ScripturianPlugin( String pluginFilename, ParsingContext parsingContext, Sincerity sincerity ) throws SincerityException
 	{
 		ExecutionContext executionContext = new ExecutionContext();
 		boolean enterable = false;
@@ -29,7 +32,23 @@ public class ScripturianPlugin implements Plugin
 			if( enterable )
 				this.executable = executable;
 			else
-				throw new Exception();
+				throw new SincerityException( "Tried to reenter Scripturian plugin: " + pluginFilename );
+		}
+		catch( ParsingException x )
+		{
+			throw new SincerityException( "Could not parse source code for Scripturian plugin: " + pluginFilename, x );
+		}
+		catch( DocumentException x )
+		{
+			throw new SincerityException( "Could not read source code for Scripturian plugin: " + pluginFilename, x );
+		}
+		catch( ExecutionException x )
+		{
+			throw new SincerityException( "Error executing Scripturian plugin: " + pluginFilename, x );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not read source code for Scripturian plugin: " + pluginFilename, x );
 		}
 		finally
 		{
@@ -64,7 +83,7 @@ public class ScripturianPlugin implements Plugin
 		return defaultName;
 	}
 
-	public String[] getCommands()
+	public String[] getCommands() throws SincerityException
 	{
 		try
 		{
@@ -81,9 +100,11 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ParsingException x )
 		{
+			throw new SincerityException( "Could not parse source code for Scripturian plugin: " + defaultName, x );
 		}
 		catch( ExecutionException x )
 		{
+			throw new SincerityException( "Error executing Scripturian plugin: " + defaultName, x );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -91,7 +112,7 @@ public class ScripturianPlugin implements Plugin
 		return null;
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		try
 		{
@@ -99,15 +120,15 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ParsingException x )
 		{
-			throw x;
+			throw new SincerityException( "Could not parse source code for Scripturian plugin: " + defaultName, x );
 		}
 		catch( ExecutionException x )
 		{
-			throw x;
+			throw new SincerityException( "Error executing Scripturian plugin: " + defaultName, x );
 		}
 		catch( NoSuchMethodException x )
 		{
-			throw x;
+			throw new SincerityException( "Scripturian plugin does not have a run() entry point: " + defaultName, x );
 		}
 	}
 

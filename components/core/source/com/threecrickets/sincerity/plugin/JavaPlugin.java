@@ -1,12 +1,14 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
 public class JavaPlugin implements Plugin
@@ -28,7 +30,7 @@ public class JavaPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "compile".equals( commandName ) )
@@ -56,7 +58,27 @@ public class JavaPlugin implements Plugin
 			}
 			catch( ClassNotFoundException x )
 			{
-				throw new Exception( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not set?" );
+				throw new SincerityException( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not set?", x );
+			}
+			catch( SecurityException x )
+			{
+				throw new SincerityException( "Could not access to Java compiler", x );
+			}
+			catch( NoSuchMethodException x )
+			{
+				throw new SincerityException( "Java compiler is not executable", x );
+			}
+			catch( IllegalArgumentException x )
+			{
+				throw new SincerityException( "Java compiler error", x );
+			}
+			catch( IllegalAccessException x )
+			{
+				throw new SincerityException( "Could not access to Java compiler", x );
+			}
+			catch( InvocationTargetException x )
+			{
+				throw new SincerityException( "Java compilation error: " + x.getCause().getMessage(), x.getCause() );
 			}
 		}
 		else

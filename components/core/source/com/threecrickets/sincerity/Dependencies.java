@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.LogOptions;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
@@ -30,8 +28,8 @@ import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
-import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
@@ -41,7 +39,7 @@ public class Dependencies
 	// Construction
 	//
 
-	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws IOException, ParseException
+	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws SincerityException
 	{
 		this.ivyFile = ivyFile;
 		this.container = container;
@@ -51,18 +49,42 @@ public class Dependencies
 		// Module
 		if( ivyFile.exists() )
 		{
-			URL ivyUrl = ivyFile.toURI().toURL();
-			URLResource resource = new URLResource( ivyUrl );
-			ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser( resource );
 			ivy.pushContext();
-			moduleDescriptor = (DefaultModuleDescriptor) parser.parseDescriptor( ivy.getSettings(), ivyUrl, true );
-			ivy.popContext();
+			try
+			{
+				URL ivyUrl = ivyFile.toURI().toURL();
+				URLResource resource = new URLResource( ivyUrl );
+				ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser( resource );
+				moduleDescriptor = (DefaultModuleDescriptor) parser.parseDescriptor( ivy.getSettings(), ivyUrl, true );
+			}
+			catch( MalformedURLException x )
+			{
+				throw new RuntimeException( x );
+			}
+			catch( ParseException x )
+			{
+				throw new SincerityException( "Could not parse dependencies configuration: " + ivyFile, x );
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not read dependencies configuration: " + ivyFile, x );
+			}
+			finally
+			{
+				ivy.popContext();
+			}
 		}
 		else
 		{
 			ivy.pushContext();
-			moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( ModuleRevisionId.newInstance( "threecrickets", "sincerity-container", "working" ) );
-			ivy.popContext();
+			try
+			{
+				moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( ModuleRevisionId.newInstance( "threecrickets", "sincerity-container", "working" ) );
+			}
+			finally
+			{
+				ivy.popContext();
+			}
 		}
 
 		// Default resolve options
@@ -84,7 +106,7 @@ public class Dependencies
 		return container;
 	}
 
-	public Packages getPackages() throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
+	public Packages getPackages() throws SincerityException
 	{
 		return new Packages( container.getRoot(), getClassLoader(), container );
 	}
@@ -109,20 +131,29 @@ public class Dependencies
 		return moduleDescriptor.getDependencies();
 	}
 
-	public ResolvedDependencies getResolvedDependencies() throws ParserConfigurationException, SAXException, IOException
+	public ResolvedDependencies getResolvedDependencies() throws SincerityException
 	{
 		if( resolvedDependencies == null )
 			resolvedDependencies = new ResolvedDependencies( this );
 		return resolvedDependencies;
 	}
 
-	public ClassLoader getClassLoader() throws MalformedURLException, ParseException, ParserConfigurationException, IOException, SAXException
+	public ClassLoader getClassLoader() throws SincerityException
 	{
 		if( classLoader == null )
 		{
 			Set<URL> urls = new HashSet<URL>();
 			for( File file : getClasspath() )
-				urls.add( file.toURL() );
+			{
+				try
+				{
+					urls.add( file.toURL() );
+				}
+				catch( MalformedURLException x )
+				{
+					throw new RuntimeException( x );
+				}
+			}
 
 			if( urls.isEmpty() )
 				classLoader = Thread.currentThread().getContextClassLoader();
@@ -143,18 +174,25 @@ public class Dependencies
 	public File getResolutionReport()
 	{
 		ivy.pushContext();
-		ResolutionCacheManager resolutionCache = ivy.getResolutionCacheManager();
-		ivy.popContext();
+		ResolutionCacheManager resolutionCache;
+		try
+		{
+			resolutionCache = ivy.getResolutionCacheManager();
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
 		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
 	}
 
-	public Set<Artifact> getArtifacts() throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
+	public Set<Artifact> getArtifacts() throws SincerityException
 	{
 		return getArtifacts( false, false );
 	}
 
-	public Set<Artifact> getArtifacts( boolean unpack, boolean overwrite ) throws ParseException, MalformedURLException, IOException, ParserConfigurationException, SAXException
+	public Set<Artifact> getArtifacts( boolean unpack, boolean overwrite ) throws SincerityException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
 
@@ -179,7 +217,7 @@ public class Dependencies
 		return artifacts;
 	}
 
-	public Set<File> getClasspath() throws ParseException
+	public Set<File> getClasspath() throws SincerityException
 	{
 		HashSet<File> files = new HashSet<File>();
 
@@ -217,18 +255,24 @@ public class Dependencies
 	// Operations
 	//
 
-	public void reset() throws IOException
+	public void reset() throws SincerityException
 	{
 		ivy.pushContext();
-		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
-		File resolutionReport = getResolutionReport();
-		if( resolutionReport.exists() )
-			resolutionReport.delete();
-		ivy.popContext();
+		try
+		{
+			moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+			File resolutionReport = getResolutionReport();
+			if( resolutionReport.exists() )
+				resolutionReport.delete();
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 		save();
 	}
 
-	public boolean add( String group, String name, String version ) throws ParseException, IOException
+	public boolean add( String group, String name, String version ) throws SincerityException
 	{
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
 		if( has( id ) )
@@ -242,7 +286,7 @@ public class Dependencies
 		return true;
 	}
 
-	public boolean revise( String group, String name, String version ) throws ParseException, IOException
+	public boolean revise( String group, String name, String version ) throws SincerityException
 	{
 		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
 		boolean changed = false;
@@ -265,17 +309,23 @@ public class Dependencies
 			return false;
 
 		ivy.pushContext();
-		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
-		for( DependencyDescriptor dependency : dependencies )
-			moduleDescriptor.addDependency( dependency );
-		ivy.popContext();
+		try
+		{
+			moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+			for( DependencyDescriptor dependency : dependencies )
+				moduleDescriptor.addDependency( dependency );
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 
 		save();
 
 		return true;
 	}
 
-	public boolean remove( String group, String name ) throws ParseException, IOException
+	public boolean remove( String group, String name ) throws SincerityException
 	{
 		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
 		boolean removed = false;
@@ -294,37 +344,57 @@ public class Dependencies
 			return false;
 
 		ivy.pushContext();
-		moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
-		for( DependencyDescriptor dependency : dependencies )
-			moduleDescriptor.addDependency( dependency );
-		ivy.popContext();
+		try
+		{
+			moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( moduleDescriptor.getModuleRevisionId() );
+			for( DependencyDescriptor dependency : dependencies )
+				moduleDescriptor.addDependency( dependency );
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 
 		save();
 
 		return true;
 	}
 
-	public void clean() throws ParseException, IOException, ParserConfigurationException, SAXException
+	public void clean() throws SincerityException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
 		classLoader = null;
 	}
 
-	public void prune() throws ParseException, IOException, ParserConfigurationException, SAXException
+	public void prune() throws SincerityException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
 		classLoader = null;
 	}
 
-	public void install( boolean overwrite ) throws ParseException, IOException, ParserConfigurationException, SAXException
+	public void install( boolean overwrite ) throws SincerityException
 	{
 		// Make sure class loader is set
 		getClassLoader();
 
 		System.out.println( "Resolving dependencies" );
 		ivy.pushContext();
-		ivy.resolve( moduleDescriptor, defaultResolveOptions );
-		ivy.popContext();
+		try
+		{
+			ivy.resolve( moduleDescriptor, defaultResolveOptions );
+		}
+		catch( ParseException x )
+		{
+			throw new SincerityException( "Parsing error while resolving dependencies", x );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "I/O error while resolving dependencies", x );
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 
 		// Reset class loader
 		classLoader = null;
@@ -351,30 +421,38 @@ public class Dependencies
 
 	private ClassLoader classLoader;
 
-	private void save() throws IOException
+	private void save() throws SincerityException
 	{
-		XmlModuleDescriptorWriter.write( moduleDescriptor, XmlUtil.COMMENT_FULL, ivyFile );
+		try
+		{
+			XmlModuleDescriptorWriter.write( moduleDescriptor, XmlUtil.COMMENT_FULL, ivyFile );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not write to dependencies configuration: " + ivyFile, x );
+		}
 	}
 
-	private XmlReportParser getParsedResolutionReport() throws ParseException
+	private XmlReportParser getParsedResolutionReport() throws SincerityException
 	{
 		File reportFile = getResolutionReport();
 		if( reportFile.exists() )
 		{
 			XmlReportParser parser = new XmlReportParser();
-			parser.parse( reportFile );
+			try
+			{
+				parser.parse( reportFile );
+			}
+			catch( ParseException x )
+			{
+				throw new SincerityException( "Could not parse resolution report: " + reportFile, x );
+			}
 			return parser;
 		}
 		return null;
 	}
 
-	/**
-	 * Valid from last {@link #install()}.
-	 * 
-	 * @return
-	 * @throws ParseException
-	 */
-	private Set<ArtifactDownloadReport> getDownloadReports() throws ParseException
+	private Set<ArtifactDownloadReport> getDownloadReports() throws SincerityException
 	{
 		HashSet<ArtifactDownloadReport> artifacts = new HashSet<ArtifactDownloadReport>();
 		XmlReportParser parser = getParsedResolutionReport();

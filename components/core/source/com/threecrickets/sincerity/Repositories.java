@@ -2,6 +2,7 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.text.ParseException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,6 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.XmlUtil;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
@@ -31,13 +33,30 @@ public class Repositories
 	// Construction
 	//
 
-	public Repositories( File ivyFile, Ivy ivy ) throws IOException, ParseException
+	public Repositories( File ivyFile, Ivy ivy ) throws SincerityException
 	{
 		this.ivyFile = ivyFile;
 		this.ivy = ivy;
 
 		if( ivyFile.exists() )
-			new XmlSettingsParser( ivy.getSettings() ).parse( ivyFile.toURI().toURL() );
+		{
+			try
+			{
+				new XmlSettingsParser( ivy.getSettings() ).parse( ivyFile.toURI().toURL() );
+			}
+			catch( MalformedURLException x )
+			{
+				throw new RuntimeException( x );
+			}
+			catch( ParseException x )
+			{
+				throw new SincerityException( "Could not parse repositories configuration", x );
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not read repositories configuration", x );
+			}
+		}
 
 		// Add resolvers to chains
 		for( Object r : ivy.getSettings().getResolvers() )
@@ -54,7 +73,7 @@ public class Repositories
 	// Operations
 	//
 
-	public boolean addMaven( String section, String name, String url )
+	public boolean addMaven( String section, String name, String url ) throws SincerityException
 	{
 		name = section + ":" + name;
 		if( ivy.getSettings().getResolver( name ) != null )
@@ -84,14 +103,14 @@ public class Repositories
 			}
 			catch( Exception x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not append to repositories configuration", x );
 			}
 		}
 
 		return added;
 	}
 
-	public boolean addPyPi( String section, String name, String url )
+	public boolean addPyPi( String section, String name, String url ) throws SincerityException
 	{
 		name = section + ":" + name;
 		if( ivy.getSettings().getResolver( name ) != null )
@@ -119,7 +138,7 @@ public class Repositories
 			}
 			catch( Exception x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not append to repositories configuration", x );
 			}
 		}
 

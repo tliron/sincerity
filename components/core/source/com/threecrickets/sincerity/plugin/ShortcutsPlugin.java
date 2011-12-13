@@ -1,11 +1,12 @@
 package com.threecrickets.sincerity.plugin;
 
-import com.threecrickets.sincerity.Aliases;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
-public class AliasesPlugin implements Plugin
+public class ShortcutsPlugin implements Plugin
 {
 	//
 	// Plugin
@@ -20,24 +21,24 @@ public class AliasesPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"aliases"
+			"shortcuts"
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
-		if( "aliases".equals( commandName ) )
+		if( "shortcuts".equals( commandName ) )
 		{
-			Aliases aliases = command.getSincerity().getContainer().getAliases();
-			for( String alias : aliases )
+			Shortcuts shortcuts = command.getSincerity().getContainer().getShortcuts();
+			for( String shortcut : shortcuts )
 			{
-				System.out.print( alias );
+				System.out.print( shortcut );
 				System.out.print( " =" );
-				for( String a : aliases.get( alias ) )
+				for( String item : shortcuts.get( shortcut ) )
 				{
 					System.out.print( ' ' );
-					System.out.print( a );
+					System.out.print( item );
 				}
 				System.out.println();
 			}

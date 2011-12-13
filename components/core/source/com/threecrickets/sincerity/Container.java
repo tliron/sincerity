@@ -2,6 +2,7 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.apache.ivy.plugins.trigger.Trigger;
 import org.apache.ivy.util.DefaultMessageLogger;
 import org.apache.ivy.util.Message;
 
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
 
 /**
@@ -89,12 +91,12 @@ public class Container implements IvyListener, TransferListener
 	// Construction
 	//
 
-	public Container() throws ParseException, IOException
+	public Container() throws SincerityException
 	{
 		this( null, Message.MSG_WARN );
 	}
 
-	public Container( File root, int debugLevel ) throws ParseException, IOException
+	public Container( File root, int debugLevel ) throws SincerityException
 	{
 		this.root = root;
 
@@ -110,10 +112,25 @@ public class Container implements IvyListener, TransferListener
 		ivy.getEventManager().addTransferListener( this );
 
 		// Load settings
+		URL settings = Container.class.getResource( "ivy.conf" );
 		ivy.getSettings().setVariable( "ivy.cache.dir", rootPath );
 		ivy.pushContext();
-		ivy.getSettings().load( Container.class.getResource( "ivy.conf" ) );
-		ivy.popContext();
+		try
+		{
+			ivy.getSettings().load( settings );
+		}
+		catch( ParseException x )
+		{
+			throw new SincerityException( "Could not parse Ivy settings: " + settings, x );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not read Ivy settings: " + settings, x );
+		}
+		finally
+		{
+			ivy.popContext();
+		}
 
 		// Resolution cache manager
 		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( ivy.getSettings().getDefaultResolutionCacheBasedir() ) );
@@ -122,7 +139,7 @@ public class Container implements IvyListener, TransferListener
 		configuration.mkdirs();
 		repositories = new Repositories( new File( configuration, "repositories.conf" ), ivy );
 		dependencies = new Dependencies( new File( configuration, "dependencies.conf" ), new File( configuration, "artifacts.conf" ), this );
-		aliases = new Aliases( new File( configuration, "aliases.conf" ) );
+		shortcuts = new Shortcuts( new File( configuration, "shortcuts.conf" ) );
 
 		configure();
 	}
@@ -151,9 +168,9 @@ public class Container implements IvyListener, TransferListener
 		return dependencies;
 	}
 
-	public Aliases getAliases()
+	public Shortcuts getShortcuts()
 	{
-		return aliases;
+		return shortcuts;
 	}
 
 	public File getRelativeFile( File file )
@@ -243,7 +260,7 @@ public class Container implements IvyListener, TransferListener
 
 	private final Dependencies dependencies;
 
-	private final Aliases aliases;
+	private final Shortcuts shortcuts;
 
 	private final List<String> origins = new CopyOnWriteArrayList<String>();
 

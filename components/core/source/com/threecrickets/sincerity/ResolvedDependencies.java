@@ -24,108 +24,131 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.exception.SincerityException;
+
 public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 {
 	//
 	// Construction
 	//
 
-	public ResolvedDependencies( Dependencies dependencies ) throws ParserConfigurationException, SAXException, IOException
+	public ResolvedDependencies( Dependencies dependencies ) throws SincerityException
 	{
 		super();
 
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
 		File resolutionReport = dependencies.getResolutionReport();
 		if( !resolutionReport.exists() )
 			return;
-		Document document = documentBuilder.parse( resolutionReport );
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		Document document;
+		try
+		{
+			DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+			document = documentBuilder.parse( resolutionReport );
+		}
+		catch( ParserConfigurationException x )
+		{
+			throw new SincerityException( "Could not parse resolution report: " + resolutionReport, x );
+		}
+		catch( SAXException x )
+		{
+			throw new SincerityException( "Could not parse resolution report: " + resolutionReport, x );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not read resolution report: " + resolutionReport, x );
+		}
 
 		ArrayList<ResolvedDependency> resolvedDependencys = new ArrayList<ResolvedDependency>();
 
 		dependencies.getContainer().getIvy().pushContext();
-
-		Element root = document.getDocumentElement();
-		if( "ivy-report".equals( root.getTagName() ) )
+		try
 		{
-			NodeList dependenciesList = root.getElementsByTagName( "dependencies" );
-			if( dependenciesList.getLength() > 0 )
+			Element root = document.getDocumentElement();
+			if( "ivy-report".equals( root.getTagName() ) )
 			{
-				NodeList moduleList = ( (Element) dependenciesList.item( 0 ) ).getElementsByTagName( "module" );
-				for( int moduleLength = moduleList.getLength(), moduleIndex = 0; moduleIndex < moduleLength; moduleIndex++ )
+				NodeList dependenciesList = root.getElementsByTagName( "dependencies" );
+				if( dependenciesList.getLength() > 0 )
 				{
-					Element module = (Element) moduleList.item( moduleIndex );
-					String organisation = module.getAttribute( "organisation" );
-					String moduleName = module.getAttribute( "name" );
-
-					NodeList revisionList = module.getElementsByTagName( "revision" );
-					for( int revisionLength = revisionList.getLength(), revisionIndex = 0; revisionIndex < revisionLength; revisionIndex++ )
+					NodeList moduleList = ( (Element) dependenciesList.item( 0 ) ).getElementsByTagName( "module" );
+					for( int moduleLength = moduleList.getLength(), moduleIndex = 0; moduleIndex < moduleLength; moduleIndex++ )
 					{
-						Element revision = (Element) revisionList.item( revisionIndex );
-						String revisionName = revision.getAttribute( "name" );
-						String branch = revision.getAttribute( "branch" );
-						String homePage = revision.getAttribute( "homepage" );
-						String evicted = revision.getAttribute( "evicted" );
-						// boolean isDefault = Boolean.valueOf(
-						// revision.getAttribute( "default" ) );
+						Element module = (Element) moduleList.item( moduleIndex );
+						String organisation = module.getAttribute( "organisation" );
+						String moduleName = module.getAttribute( "name" );
 
-						ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, moduleName, branch, revisionName );
-						DefaultModuleDescriptor moduleDescriptor = new DefaultModuleDescriptor( id, "release", null );
-						moduleDescriptor.addConfiguration( new Configuration( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) );
-						moduleDescriptor.setHomePage( homePage );
-
-						ResolvedDependency resolvedDependency = new ResolvedDependency( moduleDescriptor, evicted );
-						resolvedDependencys.add( resolvedDependency );
-
-						NodeList licenseList = revision.getElementsByTagName( "license" );
-						for( int licenseLength = licenseList.getLength(), licenseIndex = 0; licenseIndex < licenseLength; licenseIndex++ )
+						NodeList revisionList = module.getElementsByTagName( "revision" );
+						for( int revisionLength = revisionList.getLength(), revisionIndex = 0; revisionIndex < revisionLength; revisionIndex++ )
 						{
-							Element license = (Element) licenseList.item( licenseIndex );
-							String licenseName = license.getAttribute( "name" );
-							String url = license.getAttribute( "url" );
+							Element revision = (Element) revisionList.item( revisionIndex );
+							String revisionName = revision.getAttribute( "name" );
+							String branch = revision.getAttribute( "branch" );
+							String homePage = revision.getAttribute( "homepage" );
+							String evicted = revision.getAttribute( "evicted" );
+							// boolean isDefault = Boolean.valueOf(
+							// revision.getAttribute( "default" ) );
 
-							License theLicense = new License( licenseName, url );
-							moduleDescriptor.addLicense( theLicense );
-						}
+							ModuleRevisionId id = ModuleRevisionId.newInstance( organisation, moduleName, branch, revisionName );
+							DefaultModuleDescriptor moduleDescriptor = new DefaultModuleDescriptor( id, "release", null );
+							moduleDescriptor.addConfiguration( new Configuration( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) );
+							moduleDescriptor.setHomePage( homePage );
 
-						NodeList callerList = revision.getElementsByTagName( "caller" );
-						for( int callerLength = callerList.getLength(), callerIndex = 0; callerIndex < callerLength; callerIndex++ )
-						{
-							Element caller = (Element) callerList.item( callerIndex );
-							String callerOrganisation = caller.getAttribute( "organisation" );
-							String callerName = caller.getAttribute( "name" );
-							String callerRev = caller.getAttribute( "callerrev" );
+							ResolvedDependency resolvedDependency = new ResolvedDependency( moduleDescriptor, evicted );
+							resolvedDependencys.add( resolvedDependency );
 
-							Caller theCaller = new Caller( callerOrganisation, callerName, callerRev );
-							resolvedDependency.callers.add( theCaller );
-						}
-
-						NodeList artifactsList = revision.getElementsByTagName( "artifacts" );
-						if( artifactsList.getLength() > 0 )
-						{
-							NodeList artifactList = ( (Element) artifactsList.item( 0 ) ).getElementsByTagName( "artifact" );
-							for( int artifactLength = artifactList.getLength(), artifactIndex = 0; artifactIndex < artifactLength; artifactIndex++ )
+							NodeList licenseList = revision.getElementsByTagName( "license" );
+							for( int licenseLength = licenseList.getLength(), licenseIndex = 0; licenseIndex < licenseLength; licenseIndex++ )
 							{
-								Element artifact = (Element) artifactList.item( artifactIndex );
-								String artifactName = artifact.getAttribute( "name" );
-								String artifactType = artifact.getAttribute( "type" );
-								String artifactExt = artifact.getAttribute( "ext" );
-								String artifactSize = artifact.getAttribute( "size" );
-								String artifactLocation = artifact.getAttribute( "location" );
+								Element license = (Element) licenseList.item( licenseIndex );
+								String licenseName = license.getAttribute( "name" );
+								String url = license.getAttribute( "url" );
 
-								HashMap<String, Object> attributes = new HashMap<String, Object>();
-								attributes.put( "size", artifactSize );
-								attributes.put( "location", artifactLocation );
-								DefaultArtifact theArtifact = new DefaultArtifact( id, null, artifactName, artifactType, artifactExt, attributes );
-								moduleDescriptor.addArtifact( "default", theArtifact );
+								License theLicense = new License( licenseName, url );
+								moduleDescriptor.addLicense( theLicense );
+							}
+
+							NodeList callerList = revision.getElementsByTagName( "caller" );
+							for( int callerLength = callerList.getLength(), callerIndex = 0; callerIndex < callerLength; callerIndex++ )
+							{
+								Element caller = (Element) callerList.item( callerIndex );
+								String callerOrganisation = caller.getAttribute( "organisation" );
+								String callerName = caller.getAttribute( "name" );
+								String callerRev = caller.getAttribute( "callerrev" );
+
+								Caller theCaller = new Caller( callerOrganisation, callerName, callerRev );
+								resolvedDependency.callers.add( theCaller );
+							}
+
+							NodeList artifactsList = revision.getElementsByTagName( "artifacts" );
+							if( artifactsList.getLength() > 0 )
+							{
+								NodeList artifactList = ( (Element) artifactsList.item( 0 ) ).getElementsByTagName( "artifact" );
+								for( int artifactLength = artifactList.getLength(), artifactIndex = 0; artifactIndex < artifactLength; artifactIndex++ )
+								{
+									Element artifact = (Element) artifactList.item( artifactIndex );
+									String artifactName = artifact.getAttribute( "name" );
+									String artifactType = artifact.getAttribute( "type" );
+									String artifactExt = artifact.getAttribute( "ext" );
+									String artifactSize = artifact.getAttribute( "size" );
+									String artifactLocation = artifact.getAttribute( "location" );
+
+									HashMap<String, Object> attributes = new HashMap<String, Object>();
+									attributes.put( "size", artifactSize );
+									attributes.put( "location", artifactLocation );
+									DefaultArtifact theArtifact = new DefaultArtifact( id, null, artifactName, artifactType, artifactExt, attributes );
+									moduleDescriptor.addArtifact( "default", theArtifact );
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-
-		dependencies.getContainer().getIvy().popContext();
+		finally
+		{
+			dependencies.getContainer().getIvy().popContext();
+		}
 
 		// Build tree
 		for( ResolvedDependency resolvedDependency : resolvedDependencys )

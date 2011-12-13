@@ -1,11 +1,13 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
@@ -28,7 +30,7 @@ public class ContainerPlugin implements Plugin
 		};
 	}
 
-	public void run( Command command ) throws Exception
+	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "create".equals( commandName ) )
@@ -39,11 +41,11 @@ public class ContainerPlugin implements Plugin
 
 			String containerLocation = arguments[0];
 
-			File containerRootDir = new File( containerLocation ).getCanonicalFile();
+			File containerRootDir = new File( containerLocation );
 			if( containerRootDir.exists() )
 			{
 				if( new File( containerRootDir, Container.SINCERITY_DIR_NAME ).exists() )
-					throw new Exception( "The path is already a Sincerity container: " + containerRootDir );
+					throw new SincerityException( "The path is already a Sincerity container: " + containerRootDir );
 			}
 
 			String template;
@@ -53,12 +55,21 @@ public class ContainerPlugin implements Plugin
 				template = arguments[1];
 			File templateDir = new File( command.getSincerity().getHome(), "templates/" + template );
 			if( !templateDir.isDirectory() )
-				throw new Exception( "Could not find container template: " + templateDir );
+				throw new SincerityException( "Could not find container template: " + templateDir );
 
 			containerRootDir.mkdirs();
 			new File( containerRootDir, Container.SINCERITY_DIR_NAME ).mkdirs();
 			for( File file : templateDir.listFiles() )
-				FileUtil.copyRecursive( file, containerRootDir );
+			{
+				try
+				{
+					FileUtil.copyRecursive( file, containerRootDir );
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not copy file from template to container: " + file );
+				}
+			}
 
 			command.getSincerity().setContainer( containerLocation );
 		}

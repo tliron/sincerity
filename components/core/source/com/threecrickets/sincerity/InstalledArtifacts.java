@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Properties;
+
+import com.threecrickets.sincerity.exception.SincerityException;
 
 public class InstalledArtifacts
 {
@@ -36,7 +38,7 @@ public class InstalledArtifacts
 	// Attributes
 	//
 
-	public boolean isPresent( Artifact artifact ) throws IOException
+	public boolean isPresent( Artifact artifact ) throws SincerityException
 	{
 		validate();
 
@@ -54,7 +56,7 @@ public class InstalledArtifacts
 	// Operations
 	//
 
-	public void update( Iterable<Artifact> artifacts, int mode ) throws ParseException, IOException
+	public void update( Iterable<Artifact> artifacts, int mode ) throws SincerityException
 	{
 		validate();
 
@@ -101,11 +103,18 @@ public class InstalledArtifacts
 					if( url != null )
 					{
 						// Keep changed artifacts
-						Artifact artifact = new Artifact( file, new URL( url ), container );
-						if( artifact.isDifferent() )
+						try
 						{
-							System.out.println( "Keeping changed file: " + path );
-							continue;
+							Artifact artifact = new Artifact( file, new URL( url ), container );
+							if( artifact.isDifferent() )
+							{
+								System.out.println( "Keeping changed file: " + path );
+								continue;
+							}
+						}
+						catch( MalformedURLException x )
+						{
+							throw new SincerityException( "Could not parse artifacts configuration: " + file, x );
 						}
 					}
 
@@ -115,14 +124,21 @@ public class InstalledArtifacts
 			}
 		}
 
-		FileOutputStream stream = new FileOutputStream( file );
 		try
 		{
-			properties.store( stream, "Managed by Sincerity" );
+			FileOutputStream stream = new FileOutputStream( file );
+			try
+			{
+				properties.store( stream, "Managed by Sincerity" );
+			}
+			finally
+			{
+				stream.close();
+			}
 		}
-		finally
+		catch( IOException x )
 		{
-			stream.close();
+			throw new SincerityException( "Could not write artifacts configuration", x );
 		}
 	}
 
@@ -135,7 +151,7 @@ public class InstalledArtifacts
 
 	private Properties properties;
 
-	private void validate() throws IOException
+	private void validate() throws SincerityException
 	{
 		if( properties == null )
 		{
@@ -145,11 +161,18 @@ public class InstalledArtifacts
 				FileInputStream stream = new FileInputStream( file );
 				try
 				{
-					properties.load( stream );
+					try
+					{
+						properties.load( stream );
+					}
+					finally
+					{
+						stream.close();
+					}
 				}
-				finally
+				catch( IOException x )
 				{
-					stream.close();
+					throw new SincerityException( "Could not read artifacts configuration", x );
 				}
 			}
 			catch( FileNotFoundException x )
