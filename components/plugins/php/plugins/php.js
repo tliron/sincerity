@@ -20,7 +20,8 @@ function php(command) {
 		mainArguments.push(arguments[i])
 	}
 	if (mainArguments.length == 1) {
-		mainArguments.push('--help')
+		// Quercus throws an exception if it gets no arguments
+		mainArguments.push('-h')
 	}
 	command.sincerity.run('main:main', mainArguments)
 }
