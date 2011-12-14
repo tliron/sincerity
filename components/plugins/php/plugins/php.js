@@ -19,5 +19,8 @@ function php(command) {
 	for (var i in arguments) {
 		mainArguments.push(arguments[i])
 	}
+	if (mainArguments.length == 1) {
+		mainArguments.push('--help')
+	}
 	command.sincerity.run('main:main', mainArguments)
 }

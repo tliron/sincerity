@@ -108,7 +108,7 @@ public class InstalledArtifacts
 							Artifact artifact = new Artifact( file, new URL( url ), container );
 							if( artifact.isDifferent() )
 							{
-								System.out.println( "Keeping changed file: " + path );
+								System.out.println( "Keeping changed artifact: " + path );
 								continue;
 							}
 						}

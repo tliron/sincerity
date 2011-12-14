@@ -10,7 +10,6 @@ import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
@@ -73,29 +72,6 @@ public class DependenciesPlugin implements Plugin
 			}
 			else
 				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "install." + name );
-		}
-		else if( "unpack".equals( commandName ) )
-		{
-			String[] arguments = command.getArguments();
-			String name;
-			if( arguments.length < 1 )
-				name = null;
-			else
-				name = arguments[0];
-
-			command.setParse( true );
-			boolean overwrite = command.getSwitches().contains( "overwrite" );
-
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			if( name == null )
-				dependencies.getPackages().unpack( overwrite );
-			else
-			{
-				Package pack = dependencies.getPackages().get( name );
-				if( pack == null )
-					throw new SincerityException( "Unknown package: " + name );
-				pack.unpack( overwrite );
-			}
 		}
 		else if( "reset".equals( commandName ) )
 		{

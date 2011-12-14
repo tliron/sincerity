@@ -67,7 +67,7 @@
 							<appendAssemblyId>false</appendAssemblyId>
 							<archive>
 								<manifestEntries>
-									<Package-Name>javascript</Package-Name>
+									<Package-Folders>package</Package-Folders>
 								</manifestEntries>
 							</archive>
 							<descriptors>

@@ -9,7 +9,7 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>python</baseDirectory>
+	<baseDirectory>package</baseDirectory>
 
 	<fileSets>
 		<fileSet>

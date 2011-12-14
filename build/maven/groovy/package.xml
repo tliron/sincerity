@@ -9,7 +9,7 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>groovy</baseDirectory>
+	<baseDirectory>package</baseDirectory>
 
 	<fileSets>
 		<fileSet>

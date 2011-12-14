@@ -9,7 +9,7 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>clojure</baseDirectory>
+	<baseDirectory>package</baseDirectory>
 
 	<fileSets>
 		<fileSet>

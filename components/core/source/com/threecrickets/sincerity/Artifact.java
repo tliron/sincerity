@@ -55,7 +55,7 @@ public class Artifact
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws UnpackingException
+	public void unpack( String filter, boolean overwrite ) throws UnpackingException
 	{
 		if( file.exists() )
 		{
@@ -65,7 +65,8 @@ public class Artifact
 				System.out.println( "Installing artifact (overwriting): " + path );
 			else
 			{
-				System.out.println( "Not installing modified artifact: " + path );
+				// System.out.println( "Not installing modified artifact: " +
+				// path );
 				return;
 			}
 		}

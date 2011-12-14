@@ -9,7 +9,7 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>scala</baseDirectory>
+	<baseDirectory>package</baseDirectory>
 
 	<fileSets>
 		<fileSet>

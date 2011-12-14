@@ -202,13 +202,12 @@ public class Dependencies
 				artifacts.add( new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, container ) );
 		}
 
-		Packages packages = getPackages();
-		for( Package pack : packages.values() )
+		for( Package pack : getPackages() )
 		{
 			for( Artifact artifact : pack )
 			{
 				if( unpack && !installedArtifacts.isPresent( artifact ) )
-					artifact.unpack( overwrite );
+					artifact.unpack( null, overwrite );
 
 				artifacts.add( artifact );
 			}

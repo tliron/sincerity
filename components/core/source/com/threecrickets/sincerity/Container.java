@@ -225,11 +225,17 @@ public class Container implements IvyListener, TransferListener
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
 		{
-			String origin = (String) attributes.get( "origin" );
-			if( origins.remove( origin ) )
+			if( "false".equals( attributes.get( "metadata" ) ) && "successful".equals( attributes.get( "status" ) ) )
 			{
+				// for (Object o : attributes.keySet())
+				// System.out.println(o + ": " + attributes.get(o));
+				// System.out.println(attributes.get("status"));
+				// String origin = (String) attributes.get( "origin" );
+				// if( origins.remove( origin ) )
+				// {
 				String file = (String) attributes.get( "file" );
 				message( "Installing artifact: " + getRelativePath( file ) );
+				// }
 			}
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )

@@ -9,7 +9,7 @@
 		<format>jar</format>
 	</formats>
 
-	<baseDirectory>ruby</baseDirectory>
+	<baseDirectory>package</baseDirectory>
 
 	<fileSets>
 		<fileSet>

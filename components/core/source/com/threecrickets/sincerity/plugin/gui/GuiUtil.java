@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.JTree;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -18,6 +20,27 @@ import com.threecrickets.sincerity.ResolvedDependency;
 
 public class GuiUtil
 {
+	public static void setNativeLookAndFeel()
+	{
+		String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+		try
+		{
+			UIManager.setLookAndFeel( lookAndFeel );
+		}
+		catch( InstantiationException x )
+		{
+		}
+		catch( ClassNotFoundException x )
+		{
+		}
+		catch( UnsupportedLookAndFeelException x )
+		{
+		}
+		catch( IllegalAccessException x )
+		{
+		}
+	}
+
 	public static void expandTree( JTree tree, boolean expand )
 	{
 		expandAll( tree, new TreePath( (TreeNode) tree.getModel().getRoot() ), expand );
@@ -72,11 +95,10 @@ public class GuiUtil
 		for( License license : resolvedDependency.descriptor.getLicenses() )
 		{
 			StringBuilder s = new StringBuilder();
-			s.append( "<html><a href=\"" );
-			s.append( license.getUrl() );
-			s.append( "\">" );
+			s.append( "<html>" );
 			s.append( license.getName() );
-			s.append( "</a>" );
+			s.append( ": " );
+			s.append( license.getUrl() );
 			s.append( "</html>" );
 
 			parent.add( new DefaultMutableTreeNode( s.toString() ) );

@@ -232,6 +232,7 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			System.err.println( x.getMessage() );
+			// x.printStackTrace();
 			System.exit( 1 );
 		}
 		catch( Throwable x )

@@ -10,10 +10,10 @@ public class Package extends ArrayList<Artifact>
 	// Operations
 	//
 
-	public void unpack( boolean overwrite ) throws UnpackingException
+	public void unpack( String filter, boolean overwrite ) throws UnpackingException
 	{
 		for( Artifact artifact : this )
-			artifact.unpack( overwrite );
+			artifact.unpack( filter, overwrite );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -75,7 +75,7 @@
 							<appendAssemblyId>false</appendAssemblyId>
 							<archive>
 								<manifestEntries>
-									<Package-Name>scala</Package-Name>
+									<Package-Folders>package</Package-Folders>
 								</manifestEntries>
 							</archive>
 							<descriptors>

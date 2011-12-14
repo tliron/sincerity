@@ -45,7 +45,11 @@ public class ContainerPlugin implements Plugin
 			if( containerRootDir.exists() )
 			{
 				if( new File( containerRootDir, Container.SINCERITY_DIR ).exists() )
-					throw new SincerityException( "The path is already a Sincerity container: " + containerRootDir );
+				{
+					System.out.println( "The path is already a Sincerity container: " + containerRootDir );
+					command.getSincerity().setContainer( containerLocation );
+					return;
+				}
 			}
 
 			String template;
@@ -79,7 +83,8 @@ public class ContainerPlugin implements Plugin
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "container root path" );
 
-			command.getSincerity().setContainer( arguments[0] );
+			String containerLocation = arguments[0];
+			command.getSincerity().setContainer( containerLocation );
 		}
 		else
 			throw new UnknownCommandException( command );
