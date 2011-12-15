@@ -3,24 +3,52 @@ importClass(
 	org.eclipse.jetty.server.Server,
 	org.eclipse.jetty.server.handler.HandlerList,
 	org.eclipse.jetty.server.handler.ResourceHandler)
-	//org.eclipse.jetty.servlet.ServletContextHandler)
+
+//
+// Logging
+//
+
+try {
+sincerity.run('logging:initialize')
+} catch(x) {}
+
+//
+// Server
+//
+
+var server = new Server(8080)
+
+// The handlers
+var handlers = new HandlerList()
+server.handler = handlers
+
+//
+// Resources (static web)
+//
 
 var resource = new ResourceHandler()
-resource.resourceBase = 'web'
+resource.resourceBase = sincerity.container.getFile('web')
 resource.directoriesListed = true
+handlers.addHandler(resource)
 
-/*var servlet = new ServletContextHandler()
+//
+// Servlets
+//
+
+try {
+importClass(org.eclipse.jetty.servlet.ServletContextHandler)
+var servlet = new ServletContextHandler()
 servlet.contextPath = '/servlet/'
 
 holder = servlet.addServlet(org.eclipse.jetty.servlet.DefaultServlet, '/tmp/*')
 holder.setInitParameter('resourceBase', '/tmp')
-holder.setInitParameter('pathInfoOnly', 'true')*/
+holder.setInitParameter('pathInfoOnly', 'true')
+handlers.addHandler(servlet)
+} catch(x) {}
 
-var handlers = new HandlerList()
-handlers.addHandler(resource)
-//handlers.add(servlet)
+//
+// Start server
+//
 
-var server = new Server(8080)
-server.handler = handlers
 server.start()
 server.join()

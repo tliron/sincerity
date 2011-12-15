@@ -19,14 +19,8 @@ function scala(command) {
 	var mainArguments = [MAIN_CLASS]
 	
 	// Scala uses its own classpath, so we'll just make sure to duplicate it from the container
-	var classpath = []
-	for (var i = command.sincerity.container.dependencies.classpath.iterator(); i.hasNext(); ) {
-		classpath.push(String(i.next()))
-	}
-	if (classpath.length > 0) {
-		mainArguments.push('-classpath')
-		mainArguments.push(classpath.join(':'))
-	}
+	mainArguments.push('-classpath')
+	mainArguments.push(command.sincerity.container.dependencies.classpath)
 	
 	var arguments = command.arguments
 	for (var i in arguments) {

@@ -31,6 +31,7 @@ import org.apache.ivy.plugins.repository.url.URLResource;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.NativeUtil;
+import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
 public class Dependencies
@@ -143,7 +144,7 @@ public class Dependencies
 		if( classLoader == null )
 		{
 			Set<URL> urls = new HashSet<URL>();
-			for( File file : getClasspath() )
+			for( File file : getClasspaths() )
 			{
 				try
 				{
@@ -216,14 +217,23 @@ public class Dependencies
 		return artifacts;
 	}
 
-	public Set<File> getClasspath() throws SincerityException
+	public String getClasspath() throws SincerityException
 	{
-		HashSet<File> files = new HashSet<File>();
+		List<File> classpaths = getClasspaths();
+		ArrayList<String> paths = new ArrayList<String>( classpaths.size() );
+		for( File file : classpaths )
+			paths.add( file.getPath() );
+		return StringUtil.join( paths, ":" );
+	}
+
+	public List<File> getClasspaths() throws SincerityException
+	{
+		ArrayList<File> classpaths = new ArrayList<File>();
 
 		// Classes directory
-		File classesFile = container.getFile( "libraries", "classes" );
-		if( classesFile.isDirectory() )
-			files.add( classesFile.getAbsoluteFile() );
+		File classesDir = container.getFile( "libraries", "classes" );
+		if( classesDir.isDirectory() )
+			classpaths.add( classesDir );
 
 		// Downloaded artifacts
 		for( ArtifactDownloadReport artifact : getDownloadReports() )
@@ -232,7 +242,7 @@ public class Dependencies
 			{
 				File file = artifact.getLocalFile();
 				if( file != null )
-					files.add( file.getAbsoluteFile() );
+					classpaths.add( file.getAbsoluteFile() );
 			}
 		}
 
@@ -243,11 +253,11 @@ public class Dependencies
 			for( File file : jarDir.listFiles() )
 			{
 				if( file.getPath().endsWith( ".jar" ) )
-					files.add( file.getAbsoluteFile() );
+					classpaths.add( file.getAbsoluteFile() );
 			}
 		}
 
-		return files;
+		return classpaths;
 	}
 
 	//
@@ -395,10 +405,14 @@ public class Dependencies
 			ivy.popContext();
 		}
 
-		// Reset class loader
-		classLoader = null;
+		reload();
 
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
+	}
+
+	public void reload()
+	{
+		classLoader = null;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

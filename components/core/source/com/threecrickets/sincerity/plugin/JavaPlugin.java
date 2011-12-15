@@ -35,13 +35,13 @@ public class JavaPlugin implements Plugin
 		String commandName = command.getName();
 		if( "compile".equals( commandName ) )
 		{
-			File javaPath = command.getSincerity().getContainer().getFile( "libraries", "java" );
-			File classesPath = command.getSincerity().getContainer().getFile( "libraries", "classes" );
+			File javaDir = command.getSincerity().getContainer().getFile( "libraries", "java" );
+			File classesDir = command.getSincerity().getContainer().getFile( "libraries", "classes" );
 
-			if( !javaPath.isDirectory() )
+			if( !javaDir.isDirectory() )
 				return;
 
-			classesPath.mkdirs();
+			classesDir.mkdirs();
 
 			try
 			{
@@ -50,10 +50,14 @@ public class JavaPlugin implements Plugin
 
 				ArrayList<String> compileArguments = new ArrayList<String>();
 				compileArguments.add( "-d" );
-				compileArguments.add( classesPath.getAbsolutePath() );
-				addSources( javaPath, compileArguments );
+				compileArguments.add( classesDir.getAbsolutePath() );
+				compileArguments.add( "-classpath" );
+				compileArguments.add( command.getSincerity().getContainer().getDependencies().getClasspath() );
+				addSources( javaDir, compileArguments );
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
+
+				command.getSincerity().getContainer().getDependencies().reload();
 			}
 			catch( ClassNotFoundException x )
 			{

@@ -84,7 +84,7 @@
 
 	<target name="jar-logging" depends="compile-logging" description="Create logging jar">
 		<mkdir dir="${cache.jars}" />
-		<jar destfile="${cache.jars}/logging.jar" basedir="${cache.classes}/logging" />
+		<jar destfile="${cache.jars}/logging.jar" basedir="${cache.classes}/logging" filesetmanifest="merge" />
 	</target>
 
 	<!-- General -->
