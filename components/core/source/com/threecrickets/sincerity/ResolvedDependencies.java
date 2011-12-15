@@ -8,12 +8,14 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.Configuration;
 import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
@@ -60,7 +62,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 			throw new SincerityException( "Could not read resolution report: " + resolutionReport, x );
 		}
 
-		ArrayList<ResolvedDependency> resolvedDependencys = new ArrayList<ResolvedDependency>();
+		ArrayList<ResolvedDependency> resolvedDependencies = new ArrayList<ResolvedDependency>();
 
 		dependencies.getContainer().getIvy().pushContext();
 		try
@@ -95,7 +97,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 							moduleDescriptor.setHomePage( homePage );
 
 							ResolvedDependency resolvedDependency = new ResolvedDependency( moduleDescriptor, evicted );
-							resolvedDependencys.add( resolvedDependency );
+							resolvedDependencies.add( resolvedDependency );
 
 							NodeList licenseList = revision.getElementsByTagName( "license" );
 							for( int licenseLength = licenseList.getLength(), licenseIndex = 0; licenseIndex < licenseLength; licenseIndex++ )
@@ -151,16 +153,17 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 		}
 
 		// Build tree
-		for( ResolvedDependency resolvedDependency : resolvedDependencys )
+		for( ResolvedDependency resolvedDependency : resolvedDependencies )
 		{
 			for( Caller caller : resolvedDependency.callers )
 			{
-				for( ResolvedDependency parentNode : resolvedDependencys )
+				for( ResolvedDependency parentNode : resolvedDependencies )
 				{
 					ModuleRevisionId parentId = parentNode.descriptor.getModuleRevisionId();
 					if( caller.organisation.equals( parentId.getOrganisation() ) && caller.name.equals( parentId.getName() ) && caller.revision.equals( parentId.getRevision() ) )
 					{
 						parentNode.children.add( resolvedDependency );
+						System.out.println("not root: " + resolvedDependency);
 						resolvedDependency.isRoot = false;
 						break;
 					}
@@ -169,7 +172,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 		}
 
 		// Gather roots
-		for( ResolvedDependency resolvedDependency : resolvedDependencys )
+		for( ResolvedDependency resolvedDependency : resolvedDependencies )
 		{
 			if( resolvedDependency.isRoot )
 				add( resolvedDependency );
@@ -183,7 +186,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	public Set<URL> getJarUrls2() throws ParseException, MalformedURLException
 	{
 		HashSet<URL> urls = new HashSet<URL>();
-		for( ResolvedDependency resolvedDependency : getInstalledDependencies() )
+		for( ResolvedDependency resolvedDependency : getAllDependencies() )
 		{
 			for( org.apache.ivy.core.module.descriptor.Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
 			{
@@ -199,12 +202,30 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	// Operations
 	//
 
-	public ArrayList<ResolvedDependency> getInstalledDependencies()
+	public List<ResolvedDependency> getAllDependencies()
 	{
-		ArrayList<ResolvedDependency> installedDependencies = new ArrayList<ResolvedDependency>();
+		ArrayList<ResolvedDependency> allDependencies = new ArrayList<ResolvedDependency>();
 		for( ResolvedDependency resolvedDependency : this )
-			addInstalledDependencies( resolvedDependency, installedDependencies );
-		return installedDependencies;
+			addAllDependencies( resolvedDependency, allDependencies );
+		return allDependencies;
+	}
+
+	public List<Artifact> getArtifacts()
+	{
+		ArrayList<Artifact> artifacts = new ArrayList<Artifact>();
+		for( ResolvedDependency resolvedDependency : getAllDependencies() )
+			for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+				artifacts.add( artifact );
+		return artifacts;
+	}
+
+	public List<License> getLicenses()
+	{
+		ArrayList<License> licenses = new ArrayList<License>();
+		for( ResolvedDependency resolvedDependency : getAllDependencies() )
+			for( License license : resolvedDependency.descriptor.getLicenses() )
+				licenses.add( license );
+		return licenses;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -231,7 +252,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 
 	private static final long serialVersionUID = 1L;
 
-	private static void addInstalledDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
+	private static void addAllDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
 	{
 		if( resolvedDependency.evicted != null )
 			return;
@@ -251,6 +272,6 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 			installedDependencies.add( resolvedDependency );
 
 		for( ResolvedDependency child : resolvedDependency.children )
-			addInstalledDependencies( child, installedDependencies );
+			addAllDependencies( child, installedDependencies );
 	}
 }

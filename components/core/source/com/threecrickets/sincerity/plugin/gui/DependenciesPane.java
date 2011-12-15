@@ -33,7 +33,9 @@ public class DependenciesPane extends JPanel implements ItemListener
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
 
-		asTreeCheckBox = new JCheckBox( "Show tree", asTree );
+		includeSubCheckBox = new JCheckBox( "Include sub-dependencies", includeSub );
+		includeSubCheckBox.addItemListener( this );
+		asTreeCheckBox = new JCheckBox( "Show as tree", asTree );
 		asTreeCheckBox.addItemListener( this );
 		showArtifactsCheckBox = new JCheckBox( "Show artifacts", showArtifacts );
 		showArtifactsCheckBox.addItemListener( this );
@@ -43,6 +45,8 @@ public class DependenciesPane extends JPanel implements ItemListener
 		JPanel buttons = new JPanel();
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		// buttons.add( new JComboBox() );
+		// buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( includeSubCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( asTreeCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
@@ -56,14 +60,19 @@ public class DependenciesPane extends JPanel implements ItemListener
 	}
 
 	//
-	// ActionListener
+	// ItemListener
 	//
 
 	public void itemStateChanged( ItemEvent event )
 	{
 		ItemSelectable item = event.getItemSelectable();
 		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
-		if( item == asTreeCheckBox )
+		if( item == includeSubCheckBox )
+		{
+			includeSub = selected;
+			asTreeCheckBox.setEnabled( includeSub );
+		}
+		else if( item == asTreeCheckBox )
 			asTree = selected;
 		else if( item == showArtifactsCheckBox )
 			showArtifacts = selected;
@@ -80,9 +89,9 @@ public class DependenciesPane extends JPanel implements ItemListener
 	{
 		try
 		{
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode( "Root" );
-			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies() )
-				GuiUtil.addDependency( resolvedDependency, root, dependencies, asTree, showArtifacts, showLicenses );
+			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAllDependencies() : dependencies.getResolvedDependencies() )
+				GuiUtil.addDependency( resolvedDependency, root, dependencies, asTree && includeSub, showLicenses, showArtifacts );
 
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
@@ -96,21 +105,25 @@ public class DependenciesPane extends JPanel implements ItemListener
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private boolean asTree = true;
-
-	private boolean showArtifacts = true;
-
-	private boolean showLicenses = true;
-
 	private final Dependencies dependencies;
 
 	private final JTree tree;
+
+	private final JCheckBox includeSubCheckBox;
 
 	private final JCheckBox asTreeCheckBox;
 
 	private final JCheckBox showArtifactsCheckBox;
 
 	private final JCheckBox showLicensesCheckBox;
+
+	private boolean includeSub = true;
+
+	private boolean asTree = true;
+
+	private boolean showArtifacts = true;
+
+	private boolean showLicenses = true;
 
 	private static final long serialVersionUID = 1L;
 }

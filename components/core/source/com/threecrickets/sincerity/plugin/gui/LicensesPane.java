@@ -7,8 +7,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.apache.ivy.core.module.descriptor.License;
+
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 
 public class LicensesPane extends JPanel
@@ -18,8 +19,8 @@ public class LicensesPane extends JPanel
 		super( new GridLayout( 1, 1 ) );
 
 		DefaultMutableTreeNode root = new DefaultMutableTreeNode( "Root" );
-		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getInstalledDependencies() )
-			GuiUtil.addDependency( resolvedDependency, root, dependencies, false, true, false );
+		for( License license : dependencies.getResolvedDependencies().getLicenses() )
+			GuiUtil.addLicense( license, root );
 
 		JTree tree = new JTree( root );
 		GuiUtil.expandTree( tree, true );

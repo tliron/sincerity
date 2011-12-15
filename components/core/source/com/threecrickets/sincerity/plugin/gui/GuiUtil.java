@@ -22,6 +22,7 @@ public class GuiUtil
 {
 	public static void setNativeLookAndFeel()
 	{
+		// System.setProperty( "awt.useSystemAAFontSettings", "on" );
 		String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
 		try
 		{
@@ -29,15 +30,19 @@ public class GuiUtil
 		}
 		catch( InstantiationException x )
 		{
+			x.printStackTrace();
 		}
 		catch( ClassNotFoundException x )
 		{
+			x.printStackTrace();
 		}
 		catch( UnsupportedLookAndFeelException x )
 		{
+			x.printStackTrace();
 		}
 		catch( IllegalAccessException x )
 		{
+			x.printStackTrace();
 		}
 	}
 
@@ -80,71 +85,67 @@ public class GuiUtil
 		parent.add( node );
 
 		if( licenses )
-			addLicenses( resolvedDependency, node );
+			for( License license : resolvedDependency.descriptor.getLicenses() )
+				addLicense( license, node );
 
 		if( artifacts )
-			addArtifacts( resolvedDependency, node, dependencies );
+			for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+				addArtifact( artifact, node, dependencies );
 
 		if( recursive )
 			for( ResolvedDependency child : resolvedDependency.children )
-				addDependency( child, node, dependencies, recursive, licenses, artifacts );
+				addDependency( child, node, dependencies, true, licenses, artifacts );
 	}
 
-	public static void addLicenses( ResolvedDependency resolvedDependency, DefaultMutableTreeNode parent )
+	public static void addLicense( License license, DefaultMutableTreeNode parent )
 	{
-		for( License license : resolvedDependency.descriptor.getLicenses() )
-		{
-			StringBuilder s = new StringBuilder();
-			s.append( "<html>" );
-			s.append( license.getName() );
-			s.append( ": " );
-			s.append( license.getUrl() );
-			s.append( "</html>" );
+		StringBuilder s = new StringBuilder();
+		s.append( "<html>" );
+		s.append( license.getName() );
+		s.append( ": " );
+		s.append( license.getUrl() );
+		s.append( "</html>" );
 
-			parent.add( new DefaultMutableTreeNode( s.toString() ) );
-		}
+		parent.add( new DefaultMutableTreeNode( s.toString() ) );
 	}
 
-	public static void addArtifacts( ResolvedDependency resolvedDependency, DefaultMutableTreeNode parent, Dependencies dependencies )
+	public static void addArtifact( Artifact artifact, DefaultMutableTreeNode parent, Dependencies dependencies )
 	{
-		for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+		StringBuilder s = new StringBuilder();
+
+		String location = artifact.getId().getAttribute( "location" );
+		boolean installed = location != null && new File( location ).exists();
+
+		s.append( "<html>" );
+		if( !installed )
+			s.append( "<i>" );
+
+		String size = artifact.getId().getAttribute( "size" );
+		if( location != null )
+			s.append( dependencies.getContainer().getRelativePath( location ) );
+		else
 		{
-			StringBuilder s = new StringBuilder();
-
-			String location = artifact.getId().getAttribute( "location" );
-			boolean installed = location != null && new File( location ).exists();
-
-			s.append( "<html>" );
-			if( !installed )
-				s.append( "<i>" );
-
-			String size = artifact.getId().getAttribute( "size" );
-			if( location != null )
-				s.append( dependencies.getContainer().getRelativePath( location ) );
-			else
-			{
-				// Could not find a location for it?
-				s.append( artifact.getName() );
-				s.append( '.' );
-				s.append( artifact.getExt() );
-				s.append( '?' );
-			}
-			s.append( " (" );
-			s.append( artifact.getType() );
-			if( size != null )
-			{
-				s.append( ", " );
-				s.append( size );
-				s.append( " bytes" );
-			}
-			s.append( ')' );
-
-			if( !installed )
-				s.append( "</i>" );
-			s.append( "</html>" );
-
-			parent.add( new DefaultMutableTreeNode( s.toString() ) );
+			// Could not find a location for it?
+			s.append( artifact.getName() );
+			s.append( '.' );
+			s.append( artifact.getExt() );
+			s.append( '?' );
 		}
+		s.append( " (" );
+		s.append( artifact.getType() );
+		if( size != null )
+		{
+			s.append( ", " );
+			s.append( size );
+			s.append( " bytes" );
+		}
+		s.append( ')' );
+
+		if( !installed )
+			s.append( "</i>" );
+		s.append( "</html>" );
+
+		parent.add( new DefaultMutableTreeNode( s.toString() ) );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

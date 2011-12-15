@@ -5,7 +5,6 @@ import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Frame;
-import com.threecrickets.sincerity.plugin.gui.GuiUtil;
 
 public class GuiPlugin implements Plugin
 {
@@ -31,7 +30,7 @@ public class GuiPlugin implements Plugin
 		String commandName = command.getName();
 		if( "gui".equals( commandName ) )
 		{
-			GuiUtil.setNativeLookAndFeel();
+			// GuiUtil.setNativeLookAndFeel();
 			Frame frame = new Frame( command.getSincerity() );
 			frame.setVisible( true );
 		}
