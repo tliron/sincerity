@@ -1,38 +1,123 @@
 package com.threecrickets.sincerity.plugin.gui;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.ItemSelectable;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class LicensesPane extends JPanel
+public class LicensesPane extends JPanel implements ItemListener
 {
+	//
+	// Construction
+	//
+
 	public LicensesPane( Dependencies dependencies ) throws SincerityException
 	{
-		super( new GridLayout( 1, 1 ) );
+		super( new BorderLayout() );
 
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode( "Root" );
-		for( License license : dependencies.getResolvedDependencies().getLicenses() )
-			GuiUtil.addLicense( license, root );
+		this.dependencies = dependencies;
 
-		JTree tree = new JTree( root );
-		GuiUtil.expandTree( tree, true );
+		tree = new JTree();
+		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
+		tree.setRootVisible( false );
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
-		add( scrollableTree );
+		add( scrollableTree, BorderLayout.CENTER );
 
-		tree.setRootVisible( false );
+		showDependenciesCheckBox = new JCheckBox( "Show dependencies", showDependencies );
+		showDependenciesCheckBox.addItemListener( this );
+		showArtifactsCheckBox = new JCheckBox( "Show artifacts", showArtifacts );
+		showArtifactsCheckBox.addItemListener( this );
+		showPackageContentsCheckBox = new JCheckBox( "Show package contents", showPackageContents );
+		showPackageContentsCheckBox.addItemListener( this );
+
+		JPanel buttons = new JPanel();
+		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
+		buttons.add( showDependenciesCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( showArtifactsCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( showPackageContentsCheckBox );
+
+		add( buttons, BorderLayout.EAST );
+
+		refresh();
+	}
+
+	//
+	// ItemListener
+	//
+
+	public void itemStateChanged( ItemEvent event )
+	{
+		ItemSelectable item = event.getItemSelectable();
+		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
+		if( item == showDependenciesCheckBox )
+			showDependencies = selected;
+		else if( item == showArtifactsCheckBox )
+		{
+			showArtifacts = selected;
+			showPackageContentsCheckBox.setEnabled( showArtifacts );
+		}
+		else if( item == showPackageContentsCheckBox )
+			showPackageContents = selected;
+		refresh();
+	}
+
+	//
+	// Operations
+	//
+
+	public void refresh()
+	{
+		try
+		{
+			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			for( License license : dependencies.getResolvedDependencies().getLicenses() )
+				root.add( GuiUtil.createLicenseNode( license, dependencies, true, showDependencies, showArtifacts, showPackageContents ) );
+
+			tree.setModel( new DefaultTreeModel( root ) );
+			GuiUtil.expandTree( tree, true );
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final long serialVersionUID = 1L;
+
+	private final Dependencies dependencies;
+
+	private final JTree tree;
+
+	private final JCheckBox showDependenciesCheckBox;
+
+	private final JCheckBox showArtifactsCheckBox;
+
+	private final JCheckBox showPackageContentsCheckBox;
+
+	private boolean showDependencies = true;
+
+	private boolean showArtifacts = true;
+
+	private boolean showPackageContents = false;
 }

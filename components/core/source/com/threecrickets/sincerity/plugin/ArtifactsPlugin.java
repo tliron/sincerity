@@ -66,7 +66,7 @@ public class ArtifactsPlugin implements Plugin
 	public void printArtifacts( Dependencies dependencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAllDependencies() )
+		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
 		{
 			printWriter.println( resolvedDependency );
 			org.apache.ivy.core.module.descriptor.Artifact[] artifacts = resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION );

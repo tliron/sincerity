@@ -2,14 +2,9 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -163,7 +158,6 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 					if( caller.organisation.equals( parentId.getOrganisation() ) && caller.name.equals( parentId.getName() ) && caller.revision.equals( parentId.getRevision() ) )
 					{
 						parentNode.children.add( resolvedDependency );
-						System.out.println("not root: " + resolvedDependency);
 						resolvedDependency.isRoot = false;
 						break;
 					}
@@ -183,26 +177,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	// Attributes
 	//
 
-	public Set<URL> getJarUrls2() throws ParseException, MalformedURLException
-	{
-		HashSet<URL> urls = new HashSet<URL>();
-		for( ResolvedDependency resolvedDependency : getAllDependencies() )
-		{
-			for( org.apache.ivy.core.module.descriptor.Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
-			{
-				String location = artifact.getId().getAttribute( "location" );
-				if( "jar".equals( artifact.getType() ) && ( location != null ) )
-					urls.add( new File( location ).toURI().toURL() );
-			}
-		}
-		return urls;
-	}
-
-	//
-	// Operations
-	//
-
-	public List<ResolvedDependency> getAllDependencies()
+	public List<ResolvedDependency> getAll()
 	{
 		ArrayList<ResolvedDependency> allDependencies = new ArrayList<ResolvedDependency>();
 		for( ResolvedDependency resolvedDependency : this )
@@ -213,7 +188,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	public List<Artifact> getArtifacts()
 	{
 		ArrayList<Artifact> artifacts = new ArrayList<Artifact>();
-		for( ResolvedDependency resolvedDependency : getAllDependencies() )
+		for( ResolvedDependency resolvedDependency : getAll() )
 			for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
 				artifacts.add( artifact );
 		return artifacts;
@@ -222,10 +197,41 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	public List<License> getLicenses()
 	{
 		ArrayList<License> licenses = new ArrayList<License>();
-		for( ResolvedDependency resolvedDependency : getAllDependencies() )
+		for( ResolvedDependency resolvedDependency : getAll() )
+		{
 			for( License license : resolvedDependency.descriptor.getLicenses() )
-				licenses.add( license );
+			{
+				boolean exists = false;
+				for( License l : licenses )
+				{
+					if( l.getUrl().equals( license.getUrl() ) )
+					{
+						exists = true;
+						break;
+					}
+				}
+				if( !exists )
+					licenses.add( license );
+			}
+		}
 		return licenses;
+	}
+
+	public List<ResolvedDependency> getByLicense( License license )
+	{
+		ArrayList<ResolvedDependency> dependencies = new ArrayList<ResolvedDependency>();
+		for( ResolvedDependency resolvedDependency : getAll() )
+		{
+			for( License l : resolvedDependency.descriptor.getLicenses() )
+			{
+				if( l.getUrl().equals( license.getUrl() ) )
+				{
+					dependencies.add( resolvedDependency );
+					break;
+				}
+			}
+		}
+		return dependencies;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

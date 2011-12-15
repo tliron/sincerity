@@ -25,6 +25,10 @@ import com.threecrickets.sincerity.exception.SincerityException;
 
 public class ArtifactsPane extends JPanel implements ItemListener
 {
+	//
+	// Construction
+	//
+
 	public ArtifactsPane( Dependencies dependencies ) throws SincerityException
 	{
 		super( new BorderLayout() );
@@ -32,6 +36,7 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		this.dependencies = dependencies;
 
 		tree = new JTree();
+		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
@@ -39,11 +44,14 @@ public class ArtifactsPane extends JPanel implements ItemListener
 
 		groupByTypeCheckBox = new JCheckBox( "Group by type", groupByType );
 		groupByTypeCheckBox.addItemListener( this );
+		showPackageContentsCheckBox = new JCheckBox( "Show package contents", showPackageContents );
+		showPackageContentsCheckBox.addItemListener( this );
 
 		JPanel buttons = new JPanel();
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		buttons.add( groupByTypeCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( showPackageContentsCheckBox );
 
 		add( buttons, BorderLayout.EAST );
 
@@ -60,6 +68,8 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
 		if( item == groupByTypeCheckBox )
 			groupByType = selected;
+		else if( item == showPackageContentsCheckBox )
+			showPackageContents = selected;
 		refresh();
 	}
 
@@ -86,18 +96,19 @@ public class ArtifactsPane extends JPanel implements ItemListener
 					}
 					artifacts.add( artifact );
 				}
+
 				for( Map.Entry<String, ArrayList<Artifact>> entry : groups.entrySet() )
 				{
 					DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode( "<html><b>" + entry.getKey() + "</b></html>" );
 					root.add( groupNode );
 					for( Artifact artifact : entry.getValue() )
-						GuiUtil.addArtifact( artifact, groupNode, dependencies );
+						groupNode.add( GuiUtil.createArtifactNode( artifact, dependencies, showPackageContents ) );
 				}
 			}
 			else
 			{
 				for( Artifact artifact : dependencies.getResolvedDependencies().getArtifacts() )
-					GuiUtil.addArtifact( artifact, root, dependencies );
+					root.add( GuiUtil.createArtifactNode( artifact, dependencies, showPackageContents ) );
 			}
 
 			tree.setModel( new DefaultTreeModel( root ) );
@@ -105,6 +116,7 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		}
 		catch( SincerityException x )
 		{
+			GuiUtil.error( x );
 		}
 	}
 
@@ -119,5 +131,9 @@ public class ArtifactsPane extends JPanel implements ItemListener
 
 	private final JCheckBox groupByTypeCheckBox;
 
+	private final JCheckBox showPackageContentsCheckBox;
+
 	private boolean groupByType = true;
+
+	private boolean showPackageContents = false;
 }

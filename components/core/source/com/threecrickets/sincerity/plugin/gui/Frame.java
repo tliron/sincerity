@@ -11,6 +11,10 @@ import com.threecrickets.sincerity.exception.SincerityException;
 
 public class Frame extends JFrame
 {
+	//
+	// Construction
+	//
+
 	public Frame( Sincerity sincerity ) throws SincerityException
 	{
 		super( "Sincerity" );

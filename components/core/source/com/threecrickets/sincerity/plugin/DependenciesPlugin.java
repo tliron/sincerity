@@ -149,7 +149,7 @@ public class DependenciesPlugin implements Plugin
 	public void printLicenses( Dependencies depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAllDependencies() )
+		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAll() )
 		{
 			License[] licenses = resolvedDependency.descriptor.getLicenses();
 			int length = licenses.length;

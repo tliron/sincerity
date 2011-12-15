@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -52,14 +53,14 @@ public class Packages extends ArrayList<Package>
 					if( packageFoldersAttribute != null )
 					{
 						if( !"jar".equals( resource.getProtocol() ) )
-							throw new UnpackingException( "Package folders are not in a jar: " + packageFoldersAttribute + ", manifest: " + manifest );
+							throw new UnpackingException( "Package folders " + packageFoldersAttribute + " is not in a jar file: " + resource );
 
 						JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
 						ArrayList<JarEntry> entries = getJarEntries( jarConnection );
 
 						if( pack == null )
 						{
-							pack = new Package();
+							pack = new Package( container.getRelativeFile( new File( jarConnection.getJarFileURL().toURI() ) ) );
 							add( pack );
 						}
 
@@ -86,14 +87,14 @@ public class Packages extends ArrayList<Package>
 					if( packageFilesAttribute != null )
 					{
 						if( !"jar".equals( resource.getProtocol() ) )
-							throw new UnpackingException( "Package files are not in a jar: " + packageFilesAttribute + ", manifest: " + manifest );
+							throw new UnpackingException( "Package files " + packageFilesAttribute + " is not in a jar file: " + resource );
 
 						JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
 						ArrayList<JarEntry> entries = getJarEntries( jarConnection );
 
 						if( pack == null )
 						{
-							pack = new Package();
+							pack = new Package( container.getRelativeFile( new File( jarConnection.getJarFileURL().toURI() ) ) );
 							add( pack );
 						}
 
@@ -112,7 +113,7 @@ public class Packages extends ArrayList<Package>
 								}
 							}
 							if( !found )
-								throw new UnpackingException( "Package file " + packageFile + " not found in " + jarConnection.getJarFileURL() );
+								throw new UnpackingException( "Package file " + packageFile + " not found in " + pack.getFile() );
 						}
 					}
 
@@ -121,7 +122,11 @@ public class Packages extends ArrayList<Package>
 					{
 						if( pack == null )
 						{
-							pack = new Package();
+							if( !"jar".equals( resource.getProtocol() ) )
+								throw new UnpackingException( "Package resources " + packageFoldersAttribute + " is not in a jar file: " + resource );
+
+							JarURLConnection jarConnection = (JarURLConnection) resource.openConnection();
+							pack = new Package( container.getRelativeFile( new File( jarConnection.getJarFileURL().toURI() ) ) );
 							add( pack );
 						}
 
@@ -129,7 +134,7 @@ public class Packages extends ArrayList<Package>
 						{
 							URL url = classLoader.getResource( name );
 							if( url == null )
-								throw new UnpackingException( "Could not find packaged resource " + name + " specified in manifest " + manifest );
+								throw new UnpackingException( "Could not find packaged resource " + name + " from " + pack.getFile() );
 
 							pack.add( new Artifact( new File( root, name ), url, container ) );
 						}
@@ -145,10 +150,35 @@ public class Packages extends ArrayList<Package>
 		{
 			throw new UnpackingException( "Parsing error while looking for packages", x );
 		}
+		catch( URISyntaxException x )
+		{
+			throw new UnpackingException( "Parsing error while looking for packages", x );
+		}
 		catch( IOException x )
 		{
 			throw new UnpackingException( "I/O error while looking for packages", x );
 		}
+	}
+
+	//
+	// Attributes
+	//
+
+	public Package getByPackage( File file )
+	{
+		for( Package pack : this )
+			if( file.equals( pack.getFile() ) )
+				return pack;
+		return null;
+	}
+
+	public Package getByPacked( File file )
+	{
+		for( Package pack : this )
+			for( Artifact artifact : pack )
+				if( file.equals( artifact.getFile() ) )
+					return pack;
+		return null;
 	}
 
 	//
