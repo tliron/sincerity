@@ -54,9 +54,14 @@
 		<module>groovy</module>
 		<module>javascript</module>
 		<module>php</module>
+		<module>prudence</module>
 		<module>python</module>
+		<module>rest</module>
 		<module>ruby</module>
+		<module>savory</module>
 		<module>scala</module>
+		<module>service</module>
+		<module>web</module>
 	</modules>
 
 </project>

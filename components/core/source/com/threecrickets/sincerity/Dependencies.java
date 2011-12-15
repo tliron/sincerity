@@ -163,7 +163,7 @@ public class Dependencies
 				Thread.currentThread().setContextClassLoader( classLoader );
 			}
 
-			File nativeDir = new File( container.getRoot(), "libraries/native" );
+			File nativeDir = container.getFile( "libraries", "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
 		}
@@ -221,7 +221,7 @@ public class Dependencies
 		HashSet<File> files = new HashSet<File>();
 
 		// Classes directory
-		File classesFile = new File( container.getRoot(), "libraries/classes" );
+		File classesFile = container.getFile( "libraries", "classes" );
 		if( classesFile.isDirectory() )
 			files.add( classesFile.getAbsoluteFile() );
 
@@ -237,7 +237,7 @@ public class Dependencies
 		}
 
 		// TODO: This should be recursive
-		File jarDir = new File( container.getRoot(), "libraries/jars" );
+		File jarDir = container.getFile( "libraries", "jars" );
 		if( jarDir.isDirectory() )
 		{
 			for( File file : jarDir.listFiles() )

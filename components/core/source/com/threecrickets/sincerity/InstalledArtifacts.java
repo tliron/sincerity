@@ -96,7 +96,7 @@ public class InstalledArtifacts
 
 					File file = new File( path );
 					if( !file.isAbsolute() )
-						file = new File( container.getRoot(), path );
+						file = container.getFile( path );
 					if( !file.exists() )
 						continue;
 

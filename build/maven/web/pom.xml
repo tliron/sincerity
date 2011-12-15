@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>logging</artifactId>
+	<artifactId>web</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Plugin: Logging</name>
-	<description>A Sincerity plugin that manages logging for a container.</description>
+	<name>Sincerity Plugin: Web</name>
+	<description>A Sincerity plugin that turns your container into a web server using Jetty.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,14 +49,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jul-to-slf4j</artifactId>
-			<version>1.6.4</version>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-server</artifactId>
+			<version>7.2.2</version>
 		</dependency>
 	</dependencies>
 
@@ -66,23 +61,26 @@
 		<plugins>
 			<!-- jar artifact -->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attach-artifact</goal>
+							<goal>single</goal>
 						</goals>
 						<configuration>
-							<artifacts>
-								<artifact>
-									<type>jar</type>
-									<file>../../cache/jars/logging.jar</file>
-								</artifact>
-							</artifacts>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifestEntries>
+									<Package-Folders>package</Package-Folders>
+								</manifestEntries>
+							</archive>
+							<descriptors>
+								<descriptor>package.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
 				</executions>

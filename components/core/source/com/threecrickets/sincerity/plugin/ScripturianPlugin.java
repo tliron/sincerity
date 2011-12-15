@@ -1,9 +1,9 @@
 package com.threecrickets.sincerity.plugin;
 
-import java.io.File;
-
+import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.Main;
+import com.threecrickets.scripturian.document.DocumentFileSource;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
@@ -39,8 +39,11 @@ public class ScripturianPlugin implements Plugin
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "uri" );
 
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, new File( command.getSincerity().getContainer().getRoot(), "cache" ).getAbsolutePath() );
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, command.getSincerity().getContainer().getFile( "cache" ).getPath() );
+
 			Main main = new Main( arguments );
+			main.setSource( new DocumentFileSource<Executable>( command.getSincerity().getContainer().getRoot(), "default", "js", -1 ) );
+			main.getLibrarySources().add( new DocumentFileSource<Executable>( command.getSincerity().getContainer().getFile( "libraries" ), "default", "js", -1 ) );
 			main.setExecutionController( new SincerityExecutionController( command.getSincerity() ) );
 			main.run();
 

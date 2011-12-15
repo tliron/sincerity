@@ -145,7 +145,7 @@ public class Container implements IvyListener, TransferListener
 		// Resolution cache manager
 		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( ivy.getSettings().getDefaultResolutionCacheBasedir() ) );
 
-		File configuration = new File( new File( root, "configuration" ), "sincerity" );
+		File configuration = getFile( "configuration", "sincerity" );
 		configuration.mkdirs();
 		repositories = new Repositories( new File( configuration, REPOSITORIES_CONF ), ivy );
 		dependencies = new Dependencies( new File( configuration, DEPENDENCIES_CONF ), new File( configuration, ARTIFACTS_CONF ), this );
@@ -181,6 +181,14 @@ public class Container implements IvyListener, TransferListener
 	public Shortcuts getShortcuts()
 	{
 		return shortcuts;
+	}
+
+	public File getFile( String... parts )
+	{
+		File file = root;
+		for( String part : parts )
+			file = new File( file, part );
+		return file;
 	}
 
 	public File getRelativeFile( File file )

@@ -35,9 +35,8 @@ public class JavaPlugin implements Plugin
 		String commandName = command.getName();
 		if( "compile".equals( commandName ) )
 		{
-			File root = command.getSincerity().getContainer().getRoot();
-			File javaPath = new File( root, "libraries/java" );
-			File classesPath = new File( root, "libraries/classes" );
+			File javaPath = command.getSincerity().getContainer().getFile( "libraries", "java" );
+			File classesPath = command.getSincerity().getContainer().getFile( "libraries", "classes" );
 
 			if( !javaPath.isDirectory() )
 				return;
