@@ -18,6 +18,7 @@ import java.util.jar.Manifest;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
+import com.threecrickets.sincerity.internal.ClassUtil;
 
 public class Package extends AbstractList<Artifact>
 {
@@ -46,7 +47,7 @@ public class Package extends AbstractList<Artifact>
 		ArrayList<Artifact> artifacts = new ArrayList<Artifact>();
 
 		File root = container.getRoot();
-		JarHelper helper = null;
+		Jar jar = null;
 
 		try
 		{
@@ -59,23 +60,23 @@ public class Package extends AbstractList<Artifact>
 				if( packageInstallerAttribute != null )
 					installer = packageInstallerAttribute.toString();
 
-				Object packageUnuninstallerAttribute = manifest.getValue( PACKAGE_UNINSTALLER );
-				if( packageUnuninstallerAttribute != null )
-					uninstaller = packageUnuninstallerAttribute.toString();
+				Object packageUninstallerAttribute = manifest.getValue( PACKAGE_UNINSTALLER );
+				if( packageUninstallerAttribute != null )
+					uninstaller = packageUninstallerAttribute.toString();
 
 				Object packageFoldersAttribute = manifest.getValue( PACKAGE_FOLDERS );
 				if( packageFoldersAttribute != null )
 				{
-					if( helper == null )
-						helper = new JarHelper( manifestUrl, container, "Package folders " + packageFoldersAttribute );
+					if( jar == null )
+						jar = new Jar( manifestUrl, container, "Package folders " + packageFoldersAttribute );
 
 					for( String packageFolder : packageFoldersAttribute.toString().split( "," ) )
 					{
 						String prefix = packageFolder + "/";
 						int prefixLength = prefix.length();
 
-						URL urlContext = new URL( "jar:" + helper.url + "!/" + packageFolder );
-						for( JarEntry entry : helper.entries )
+						URL urlContext = new URL( "jar:" + jar.url + "!/" + packageFolder );
+						for( JarEntry entry : jar.entries )
 						{
 							String name = entry.getName();
 							if( name.startsWith( prefix ) && name.length() > prefixLength )
@@ -90,39 +91,39 @@ public class Package extends AbstractList<Artifact>
 				Object packageFilesAttribute = manifest.getValue( PACKAGE_FILES );
 				if( packageFilesAttribute != null )
 				{
-					if( helper == null )
-						helper = new JarHelper( manifestUrl, container, "Package files " + packageFilesAttribute );
+					if( jar == null )
+						jar = new Jar( manifestUrl, container, "Package files " + packageFilesAttribute );
 
 					for( String packageFile : packageFilesAttribute.toString().split( "," ) )
 					{
 						boolean found = false;
-						for( JarEntry entry : helper.entries )
+						for( JarEntry entry : jar.entries )
 						{
 							if( packageFile.equals( entry.getName() ) )
 							{
-								URL url = new URL( "jar:" + helper.url + "!/" + packageFile );
+								URL url = new URL( "jar:" + jar.url + "!/" + packageFile );
 								artifacts.add( new Artifact( new File( root, packageFile ), url, container ) );
 								found = true;
 								break;
 							}
 						}
 						if( !found )
-							throw new UnpackingException( "Package file " + packageFile + " not found in " + helper.file );
+							throw new UnpackingException( "Package file " + packageFile + " not found in " + jar.file );
 					}
 				}
 
 				Object packageResourcesAttribute = manifest.getValue( PACKAGE_RESOURCES );
 				if( packageResourcesAttribute != null )
 				{
-					if( helper == null )
-						helper = new JarHelper( manifestUrl, container, "Package resources " + packageResourcesAttribute );
+					if( jar == null )
+						jar = new Jar( manifestUrl, container, "Package resources " + packageResourcesAttribute );
 
 					ClassLoader classLoader = container.getDependencies().getClassLoader();
 					for( String name : packageResourcesAttribute.toString().split( "," ) )
 					{
 						URL url = classLoader.getResource( name );
 						if( url == null )
-							throw new UnpackingException( "Could not find packaged resource " + name + " from " + helper.file );
+							throw new UnpackingException( "Could not find packaged resource " + name + " from " + jar.file );
 
 						artifacts.add( new Artifact( new File( root, name ), url, container ) );
 					}
@@ -145,7 +146,7 @@ public class Package extends AbstractList<Artifact>
 		if( installer == null && uninstaller == null && artifacts.isEmpty() )
 			return null;
 
-		return new Package( installer, uninstaller, helper != null ? helper.file : null, artifacts );
+		return new Package( installer, uninstaller, jar != null ? jar.file : null, artifacts );
 	}
 
 	//
@@ -170,6 +171,24 @@ public class Package extends AbstractList<Artifact>
 	//
 	// Operations
 	//
+
+	public void install() throws SincerityException
+	{
+		if( installer != null )
+		{
+			String[] arguments = installer.split( " " );
+			ClassUtil.main( null, arguments );
+		}
+	}
+
+	public void uninstall() throws SincerityException
+	{
+		if( uninstaller != null )
+		{
+			String[] arguments = uninstaller.split( " " );
+			ClassUtil.main( null, arguments );
+		}
+	}
 
 	public void unpack( String filter, boolean overwrite ) throws UnpackingException
 	{
@@ -213,9 +232,9 @@ public class Package extends AbstractList<Artifact>
 		this.artifacts = artifacts;
 	}
 
-	private static class JarHelper
+	private static class Jar
 	{
-		public JarHelper( URL manifestUrl, Container container, String errorMessage ) throws UnpackingException
+		public Jar( URL manifestUrl, Container container, String errorMessage ) throws UnpackingException
 		{
 			if( !"jar".equals( manifestUrl.getProtocol() ) )
 				throw new UnpackingException( errorMessage + " is not in a jar file: " + manifestUrl );
@@ -243,7 +262,7 @@ public class Package extends AbstractList<Artifact>
 			try
 			{
 				JarFile jarFile = connection.getJarFile();
-				entries = new ArrayList<JarEntry>();
+				entries = new ArrayList<JarEntry>( jarFile.size() );
 				for( Enumeration<JarEntry> e = jarFile.entries(); e.hasMoreElements(); )
 				{
 					JarEntry entry = e.nextElement();

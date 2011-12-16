@@ -193,7 +193,7 @@ public class Dependencies
 		return getArtifacts( false, false );
 	}
 
-	public Set<Artifact> getArtifacts( boolean unpack, boolean overwrite ) throws SincerityException
+	public Set<Artifact> getArtifacts( boolean install, boolean overwrite ) throws SincerityException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
 
@@ -207,11 +207,14 @@ public class Dependencies
 		{
 			for( Artifact artifact : pack )
 			{
-				if( unpack && !installedArtifacts.isPresent( artifact ) )
+				if( install && !installedArtifacts.isMarkedAsPresent( artifact ) )
 					artifact.unpack( null, overwrite );
 
 				artifacts.add( artifact );
 			}
+
+			if( install )
+				pack.install();
 		}
 
 		return artifacts;

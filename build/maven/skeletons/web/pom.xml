@@ -76,6 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity scripturian:execute /libraries/javascript/installers/web/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

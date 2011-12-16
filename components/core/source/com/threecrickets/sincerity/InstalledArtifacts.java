@@ -38,7 +38,7 @@ public class InstalledArtifacts
 	// Attributes
 	//
 
-	public boolean isPresent( Artifact artifact ) throws SincerityException
+	public boolean isMarkedAsPresent( Artifact artifact ) throws SincerityException
 	{
 		validate();
 

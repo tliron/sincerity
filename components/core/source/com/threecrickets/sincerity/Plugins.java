@@ -64,7 +64,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 
 		// JVM plugins
 		for( Plugin plugin : ServiceLoader.load( Plugin.class, classLoader ) )
-			put( plugin.getName(), plugin );
+			plugins.put( plugin.getName(), plugin );
 	}
 
 	//

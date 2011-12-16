@@ -48,9 +48,11 @@ public class Sincerity implements Runnable
 	{
 		try
 		{
-			Sincerity sincerity = new Sincerity( arguments );
+			Sincerity current = getCurrent();
+			Sincerity sincerity = new Sincerity( arguments, current );
 			setCurrent( sincerity );
 			sincerity.run();
+			setCurrent( current );
 		}
 		catch( SincerityException x )
 		{
@@ -70,6 +72,18 @@ public class Sincerity implements Runnable
 
 	public Sincerity( String[] arguments ) throws SincerityException
 	{
+		this( arguments, null );
+	}
+
+	public Sincerity( String[] arguments, Sincerity sincerity ) throws SincerityException
+	{
+		if( sincerity != null )
+		{
+			container = sincerity.container;
+			containerRoot = sincerity.containerRoot;
+			plugins = sincerity.plugins;
+			sincerityHome = sincerity.sincerityHome;
+		}
 		commands = parseCommands( arguments );
 	}
 

@@ -65,10 +65,19 @@ public class Packages extends ArrayList<Package>
 	// Operations
 	//
 
-	public void unpack( String filter, boolean overwrite ) throws UnpackingException
+	public void unpack( String filter, boolean overwrite ) throws SincerityException
 	{
 		for( Package pack : this )
+		{
 			pack.unpack( filter, overwrite );
+			pack.install();
+		}
+	}
+
+	public void uninstall() throws SincerityException
+	{
+		for( Package pack : this )
+			pack.uninstall();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
