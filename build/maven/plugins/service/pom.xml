@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity</groupId>
-	<artifactId>sincerity-project</artifactId>
-	<version>1.1.0</version>
+	<groupId>com.threecrickets.sincerity.plugin</groupId>
+	<artifactId>service</artifactId>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Project</name>
-	<description>Advanced container management for the JVM.</description>
+	<name>Sincerity Plugin: Service</name>
+	<description>A Sincerity plugin that let's you run your container as a service (daemon) using Tanuki's Java Service Wrapper.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -47,21 +47,40 @@
 		</mailingList>
 	</mailingLists>
 
-	<modules>
-		<module>core</module>
-		<module>plugins/logging</module>
-		<module>plugins/clojure</module>
-		<module>plugins/groovy</module>
-		<module>plugins/javascript</module>
-		<module>plugins/php</module>
-		<module>plugins/python</module>
-		<module>plugins/ruby</module>
-		<module>plugins/scala</module>
-		<module>plugins/service</module>
-		<module>skeletons/prudence</module>
-		<module>skeletons/restlet</module>
-		<module>skeletons/savory</module>
-		<module>skeletons/web</module>
-	</modules>
+	<dependencies>
+	</dependencies>
+
+	<build>
+		<directory>../../../cache/maven</directory>
+
+		<plugins>
+			<!-- jar artifact -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifestEntries>
+									<Package-Folders>package</Package-Folders>
+								</manifestEntries>
+							</archive>
+							<descriptors>
+								<descriptor>package.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

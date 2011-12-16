@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity</groupId>
-	<artifactId>sincerity-project</artifactId>
-	<version>1.1.0</version>
+	<groupId>com.threecrickets.sincerity.plugin</groupId>
+	<artifactId>logging</artifactId>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Project</name>
-	<description>Advanced container management for the JVM.</description>
+	<name>Sincerity Plugin: Logging</name>
+	<description>A Sincerity plugin that manages logging for a container.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -47,21 +47,47 @@
 		</mailingList>
 	</mailingLists>
 
-	<modules>
-		<module>core</module>
-		<module>plugins/logging</module>
-		<module>plugins/clojure</module>
-		<module>plugins/groovy</module>
-		<module>plugins/javascript</module>
-		<module>plugins/php</module>
-		<module>plugins/python</module>
-		<module>plugins/ruby</module>
-		<module>plugins/scala</module>
-		<module>plugins/service</module>
-		<module>skeletons/prudence</module>
-		<module>skeletons/restlet</module>
-		<module>skeletons/savory</module>
-		<module>skeletons/web</module>
-	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.6.4</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<directory>../../../cache/maven</directory>
+
+		<plugins>
+			<!-- jar artifact -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<type>jar</type>
+									<file>../../../cache/jars/logging.jar</file>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
