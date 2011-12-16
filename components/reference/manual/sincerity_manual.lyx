@@ -1,0 +1,581 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\usepackage{prettyref}
+\newrefformat{}{section~\ref{#1}}
+\sloppy
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman newcent
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2cm
+\topmargin 2cm
+\rightmargin 2cm
+\bottommargin 2cm
+\secnumdepth 0
+\tocdepth 2
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+The Sincerity Manual
+\end_layout
+
+\begin_layout Author
+Version %VERSION%
+\end_layout
+
+\begin_layout Author
+Main text written by Tal Liron
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+Copyright 2011 by Three Crickets LLC.
+\begin_inset Newline newline
+\end_inset
+
+This work is licensed under a
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License"
+target "http://creativecommons.org/licenses/by-nc-sa/3.0/"
+
+\end_inset
+
+.
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Subsection
+Why Sincerity?
+\end_layout
+
+\begin_layout Subsubsection
+Lather, Rinse, Repeat
+\end_layout
+
+\begin_layout Subsubsection
+Reinventing Wheels
+\end_layout
+
+\begin_layout Standard
+It's fine and good that we can choose our wheels.
+ But can't we at least lest the best practices roll? Design your car so
+ that it will fit the standard wheels, and let the more particular users
+ replace the standards with something more specific.
+\end_layout
+
+\begin_layout Subsubsection
+DLL Hell
+\end_layout
+
+\begin_layout Standard
+OSGi is a decent solution, but boy is it intricate.
+\end_layout
+
+\begin_layout Subsubsection
+Self-Containment
+\end_layout
+
+\begin_layout Section
+Tutorial
+\end_layout
+
+\begin_layout Subsection
+Part 1: One-Line Wonders
+\end_layout
+
+\begin_layout Standard
+Install Python, install a library, and run a script
+\end_layout
+
+\begin_layout Standard
+Create a web server, just like that.
+\end_layout
+
+\begin_layout Subsection
+Part 2: Graphical User Interface
+\end_layout
+
+\begin_layout Subsection
+Part 3: Sincerely Yours: Your First Container
+\end_layout
+
+\begin_layout Subsection
+Part 4: Get with the Program
+\end_layout
+
+\begin_layout Standard
+Execute JavaScript code in the container
+\end_layout
+
+\begin_layout Standard
+Compile and execute Java code in the container
+\end_layout
+
+\begin_layout Standard
+Ruby, Groovy, etc.
+\end_layout
+
+\begin_layout Subsection
+Part 5: Skeletons in the Closet
+\end_layout
+
+\begin_layout Section
+Basic Concepts
+\end_layout
+
+\begin_layout Subsection
+Container
+\end_layout
+
+\begin_layout Standard
+A set of files implementing a self-contained JVM-based execution environment
+ managed by Sincerity and by you.
+ The container has a root path, under which it may have a directory structure
+ of any depth.
+ Libraries, binary executables, configuration files, temporary work files
+ and logs are all by default stored within the container.
+\end_layout
+
+\begin_layout Standard
+Why such an emphasis on self-containment? One goal is for the container
+ to be deployable anywhere as a whole, simply by copying the directory elsewhere.
+ Another goal is for the container to be a useful playground: you can install
+ and try out various applications and libraries without affecting your operating
+ system.
+ You can undo you work simply by deleting the container's directory.
+\end_layout
+
+\begin_layout Subsection
+Dependency
+\end_layout
+
+\begin_layout Standard
+A contained, versioned, installable set of files (called 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts
+\begin_inset Quotes erd
+\end_inset
+
+), which can in turn have its own list of dependencies.
+ Dependencies are deployable software bundles, representing things like
+ libraries, or complete applications and services.
+\end_layout
+
+\begin_layout Standard
+All dependencies in Sincerity are identified by a two-part name, composed
+ of a 
+\begin_inset Quotes eld
+\end_inset
+
+group
+\begin_inset Quotes erd
+\end_inset
+
+ prefix plus a unique 
+\begin_inset Quotes eld
+\end_inset
+
+name
+\begin_inset Quotes erd
+\end_inset
+
+ within the group, plus a version specifier.
+ Different dependencies might have their own versioning schemes, but Sincerity
+ is good at guessing these for the purposes of comparing versions.
+\end_layout
+
+\begin_layout Standard
+Note that a dependency can also have none of its own files, and only a list
+ of its own dependencies.
+ These are sometimes called 
+\begin_inset Quotes eld
+\end_inset
+
+meta-dependencies.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Artifact
+\end_layout
+
+\begin_layout Standard
+A fancy way to refer to files within a dependency.
+ Sincerity supports a specific set of artifact types: JVM libraries (jars),
+ language-specific libraries (Python eggs, Ruby gems, PHP packages, etc.),
+ documentation bundles, source code bundles, software licenses, installers,
+ dependency descriptors and more generic 
+\begin_inset Quotes eld
+\end_inset
+
+packages
+\begin_inset Quotes erd
+\end_inset
+
+ (see below).
+ 
+\end_layout
+
+\begin_layout Subsection
+Package
+\end_layout
+
+\begin_layout Standard
+This is a special kind of Sincerity-specific jar artifact that can contain
+ other files, and can additionally have special install/uninstall hooks.
+\end_layout
+
+\begin_layout Standard
+On the one hand, it is the most straightforward artifact type, as it simply
+ installs any number of files into a container.
+ On the other hand, it is the most flexible, as the hooks let packages intervene
+ in arbitrary way in the installation process.
+ A common use case is for the install hook to manipulate the unpacked files
+ in order to tailor them for the specific environment in which the container
+ is running.
+\end_layout
+
+\begin_layout Standard
+Sincerity contains tools to help you easily create your own packages, as
+ well as documentation about the package specification, so that you can
+ manually create your own.
+ 
+\end_layout
+
+\begin_layout Subsection
+Repository
+\end_layout
+
+\begin_layout Standard
+A store for dependencies and their artifacts.
+ Repositories usually contain indexes of available dependencies and versions.
+ Some repositories also have friendly human-facing web frontends which you
+ can use to search for dependencies.
+\end_layout
+
+\begin_layout Standard
+Sincerity supports several repository technologies, and can also help you
+ deploy your own dependencies to them.
+ 
+\end_layout
+
+\begin_layout Subsection
+Shortcut
+\end_layout
+
+\begin_layout Subsection
+Plugin
+\end_layout
+
+\begin_layout Subsection
+Skeleton
+\end_layout
+
+\begin_layout Subsection
+Template
+\end_layout
+
+\begin_layout Section
+Containers
+\end_layout
+
+\begin_layout Subsection
+Structure
+\end_layout
+
+\begin_layout Standard
+A strict structure, non-negotiable, non-configurable.
+ Use symbolic links to get away from it.
+\end_layout
+
+\begin_layout Subsubsection
+/programs/
+\end_layout
+
+\begin_layout Subsubsection
+/logs/
+\end_layout
+
+\begin_layout Subsubsection
+/cache/
+\end_layout
+
+\begin_layout Subsubsection
+/configuration/
+\end_layout
+
+\begin_layout Subsubsection
+/libraries/
+\end_layout
+
+\begin_layout Subsubsection
+/reference/
+\end_layout
+
+\begin_layout Section
+Commands
+\end_layout
+
+\begin_layout Section
+The GUI
+\end_layout
+
+\begin_layout Section
+Templates
+\end_layout
+
+\begin_layout Section
+Repositories
+\end_layout
+
+\begin_layout Section
+Packages
+\end_layout
+
+\begin_layout Section
+Shortcuts
+\end_layout
+
+\begin_layout Standard
+/configuration/sincerity/shortcuts.conf
+\end_layout
+
+\begin_layout Section
+Built-In Plugins
+\end_layout
+
+\begin_layout Section
+Custom Plugins
+\end_layout
+
+\begin_layout Standard
+Creating your own
+\end_layout
+
+\begin_layout Section
+Integration with Version Control Systems
+\end_layout
+
+\begin_layout Standard
+git, Mercurial, Bazaar, Subversion
+\end_layout
+
+\begin_layout Section
+The Sincerity Ecosystem
+\end_layout
+
+\begin_layout Subsection
+Plugins
+\end_layout
+
+\begin_layout Subsubsection
+Built-In Plugins
+\end_layout
+
+\begin_layout Subsubsection
+Programming Language Plugins
+\end_layout
+
+\begin_layout Paragraph
+JavaScript
+\end_layout
+
+\begin_layout Paragraph
+Python
+\end_layout
+
+\begin_layout Paragraph
+Ruby
+\end_layout
+
+\begin_layout Paragraph
+PHP
+\end_layout
+
+\begin_layout Paragraph
+Groovy
+\end_layout
+
+\begin_layout Paragraph
+Clojure
+\end_layout
+
+\begin_layout Paragraph
+Scala
+\end_layout
+
+\begin_layout Subsubsection
+The Logging Plugin
+\end_layout
+
+\begin_layout Standard
+/configuration/logging.conf
+\end_layout
+
+\begin_layout Subsubsection
+The Wrapper Plugin
+\end_layout
+
+\begin_layout Subsubsection
+Community Plugins
+\end_layout
+
+\begin_layout Subsection
+Skeletons
+\end_layout
+
+\begin_layout Subsubsection
+Web Server Skeleton
+\end_layout
+
+\begin_layout Subsubsection
+Servlet Skeleton
+\end_layout
+
+\begin_layout Subsubsection
+Restlet Skeleton
+\end_layout
+
+\begin_layout Subsubsection
+Prudence Skeleton
+\end_layout
+
+\begin_layout Subsubsection
+Savory Skeleton
+\end_layout
+
+\begin_layout Subsubsection
+Game Skeleton
+\end_layout
+
+\begin_layout Subsection
+Shortcuts
+\end_layout
+
+\begin_layout Subsection
+Repositories
+\end_layout
+
+\begin_layout Subsubsection
+The Three Crickets Repository
+\end_layout
+
+\begin_layout Subsubsection
+Maven Repositories
+\end_layout
+
+\begin_layout Subsubsection
+Python and PyPI
+\end_layout
+
+\begin_layout Subsubsection
+Ruby and Gems
+\end_layout
+
+\begin_layout Subsubsection
+PHP and PEAR
+\end_layout
+
+\begin_layout Subsubsection
+Community Repositories
+\end_layout
+
+\begin_layout Section
+Appendix: Specifications
+\end_layout
+
+\begin_layout Subsection
+Repositories
+\end_layout
+
+\begin_layout Subsection
+Packages
+\end_layout
+
+\end_body
+\end_document

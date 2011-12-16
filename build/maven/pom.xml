@@ -14,7 +14,7 @@
 	<inceptionYear>2011</inceptionYear>
 
 	<scm>
-		<connection>scm:svn:https://sincerity.googlecode.com/svn/trunk/</connection>
+		<connection>scm:git:https://code.google.com/p/sincerity/</connection>
 		<url>https://code.google.com/p/sincerity/source/checkout</url>
 	</scm>
 

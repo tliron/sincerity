@@ -2,6 +2,7 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,7 @@ import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class ResolvedDependencies extends ArrayList<ResolvedDependency>
+public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 {
 	//
 	// Construction
@@ -169,7 +170,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 		for( ResolvedDependency resolvedDependency : resolvedDependencies )
 		{
 			if( resolvedDependency.isRoot )
-				add( resolvedDependency );
+				this.roots.add( resolvedDependency );
 		}
 	}
 
@@ -234,6 +235,22 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 		return dependencies;
 	}
 
+	//
+	// AbstractList
+	//
+
+	@Override
+	public int size()
+	{
+		return roots.size();
+	}
+
+	@Override
+	public ResolvedDependency get( int index )
+	{
+		return roots.get( index );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Protected
 
@@ -256,7 +273,7 @@ public class ResolvedDependencies extends ArrayList<ResolvedDependency>
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static final long serialVersionUID = 1L;
+	private final List<ResolvedDependency> roots = new ArrayList<ResolvedDependency>();
 
 	private static void addAllDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
 	{

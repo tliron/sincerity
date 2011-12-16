@@ -109,7 +109,7 @@ public class Dependencies
 
 	public Packages getPackages() throws SincerityException
 	{
-		return new Packages( container.getRoot(), getClassLoader(), container );
+		return new Packages( container );
 	}
 
 	public boolean has( String organisation, String name, String revision )

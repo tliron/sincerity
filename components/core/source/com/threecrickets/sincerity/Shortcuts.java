@@ -4,15 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownShortcutException;
 
-public class Shortcuts implements Iterable<String>
+public class Shortcuts extends AbstractList<String>
 {
 	//
 	// Constants
@@ -66,16 +66,22 @@ public class Shortcuts implements Iterable<String>
 	}
 
 	//
-	// Iterable
+	// AbstractList
 	//
 
-	public Iterator<String> iterator()
+	@Override
+	public int size()
 	{
-		ArrayList<String> shortcuts = new ArrayList<String>();
-		for( Object shortcut : properties.keySet() )
-			shortcuts.add( shortcut.toString() );
+		return properties.size();
+	}
 
-		return shortcuts.iterator();
+	@Override
+	public String get( int index )
+	{
+		ArrayList<String> keys = new ArrayList<String>( properties.size() );
+		for( Object key : properties.keySet() )
+			keys.add( key.toString() );
+		return keys.get( index );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

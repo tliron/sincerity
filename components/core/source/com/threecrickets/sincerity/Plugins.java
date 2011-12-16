@@ -1,7 +1,11 @@
 package com.threecrickets.sincerity;
 
 import java.io.File;
+import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.LanguageManager;
@@ -11,7 +15,7 @@ import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class Plugins extends HashMap<String, Plugin>
+public class Plugins extends AbstractMap<String, Plugin>
 {
 	//
 	// Construction
@@ -42,7 +46,7 @@ public class Plugins extends HashMap<String, Plugin>
 					try
 					{
 						Plugin plugin = new ScripturianPlugin( pluginFile, parsingContext, sincerity );
-						put( plugin.getName(), plugin );
+						plugins.put( plugin.getName(), plugin );
 					}
 					catch( Exception x )
 					{
@@ -72,10 +76,20 @@ public class Plugins extends HashMap<String, Plugin>
 		return classLoader;
 	}
 
+	//
+	// AbstractMap
+	//
+
+	@Override
+	public Set<Map.Entry<String, Plugin>> entrySet()
+	{
+		return Collections.unmodifiableSet( plugins.entrySet() );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static final long serialVersionUID = 1L;
-
 	private final ClassLoader classLoader;
+
+	private HashMap<String, Plugin> plugins = new HashMap<String, Plugin>();
 }

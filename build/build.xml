@@ -24,6 +24,8 @@
 	<property name="distribution.jars" value="${distribution.content}/libraries/jars" />
 	<property name="distribution.jars.pattern" value="${distribution.jars}/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
+	<property name="distribution.manual" value="${distribution.reference}/documentation/manual" />
+	<property name="distribution.api" value="${distribution.reference}/documentation/api" />
 	<property name="distribution.source" value="${distribution.content}/reference/source" />
 
 	<!-- We'll use Ivy to resolve and fetch our dependencies -->
@@ -94,58 +96,91 @@
 	<target name="libraries" depends="jar-core, jar-logging, dependencies-core, dependencies-logging" description="Resolve dependencies" />
 
 	<target name="javadoc" description="Create Sincerity API docs">
-		<available file="${distribution.reference}/documentation/api" property="javadoc-present" />
+		<available file="${distribution.api}" property="javadoc-present" />
 		<antcall target="javadoc-unless" />
+	</target>
+	
+	<target name="clean-javadoc" description="Clean Sinceity API docs">
+		<delete dir="${distribution.api}" />
 	</target>
 
 	<target name="javadoc-unless" depends="dependencies-core" description="Create Sincerity API docs" unless="javadoc-present">
-		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${distribution.reference}/documentation/api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${jvm.version}" sourcepath="${core.source}" splitindex="true" use="true" version="true" windowtitle="Sincerity ${version}" doctitle="Sincerity ${version}">
+		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${distribution.api}" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${jvm.version}" sourcepath="${core.source}" splitindex="true" use="true" version="true" windowtitle="Sincerity ${version}" doctitle="Sincerity ${version}">
 			<link href="${jvm.docs}" />
 			<classpath refid="dependencies-core" />
 			<bottom>
 				<![CDATA[<i>Copyright &#169; 2011 <a target="_top" href="http://threecrickets.com/">Three Crickets LLC</a>.</i>]]>
 			</bottom>
-	</javadoc>
-</target>
+		</javadoc>
+	</target>
 
-<target name="source" description="Fetch Sincerity source">
-	<copy todir="${distribution.source}/com.threecrickets.sincerity/sincerity/${version}">
-		<fileset dir="${core.source}" excludes="**/.svn/" />
-	</copy>
-	<copy todir="${distribution.source}/com.threecrickets.sincerity.plugin/logging/${version}">
-		<fileset dir="${logging.source}" excludes="**/.svn/" />
-	</copy>
-</target>
+	<target name="manual" description="Create Sincerity Manual">
+		<available file="${distribution.manual}" property="manual-present" />
+		<antcall target="manual-unless" />
+	</target>
+	
+	<target name="clean-manual" description="Clean Sincerity Manual">
+		<delete dir="${distribution.manual}" />
+	</target>
 
-<target name="distribution" depends="libraries, source, javadoc" description="Create distribution">
-	<copy todir="${distribution.content}">
-		<fileset dir="${reference}" excludes="**/.svn/" />
-		<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
-		<fileset dir="${dependencies}" excludes="**/.svn/" />
-	</copy>
-	<mkdir dir="${distribution.content}/templates" />
-	<copy todir="${distribution.content}/templates">
-		<fileset dir="${templates}" excludes="**/.svn/" />
-	</copy>
-	<chmod perm="ugo+rx">
-		<fileset dir="${distribution.content}" includes="sincerity" />
-	</chmod>
-</target>
-
-<target name="package" depends="distribution" description="Create Sincerity zip">
-	<zip destfile="${distribution}/sincerity-${version}.zip" level="9">
-		<zipfileset prefix="sincerity" dir="${distribution.content}" excludes="sincerity" />
-		<zipfileset prefix="sincerity" dir="${distribution.content}" filemode="755" includes="sincerity" />
-	</zip>
-</target>
-
-<target name="build" depends="package" description="Build Sincerity" />
-
-<target name="clean" description="Clean">
-	<delete dir="${cache}" />
-	<delete dir="${distribution}" />
-</target>
-
-<target name="rebuild" depends="clean, build" description="Clean and build Sincerity" />
+	<target name="manual-unless" description="Create Sincerity Manual" unless="manual-present">
+		<mkdir dir="${distribution.manual}" />
+		<copy todir="${distribution.manual}">
+			<fileset dir="${reference}/manual" excludes="*~, **/.svn/" />
+		</copy>
+		<replace dir="${distribution.manual}" includes="sincerity_manual.lyx" token="%VERSION%" value="${version}" />
+		<exec executable="lyx" failifexecutionfails="false">
+			<arg value="--export" />
+			<arg value="pdf" />
+			<arg value="${distribution.manual}/sincerity_manual.lyx" />
+		</exec>
+		<exec executable="elyxer" failifexecutionfails="false">
+			<arg value="--unicode" />
+			<arg value="--title" />
+			<arg value="Sincerity Manual" />
+			<arg value="${distribution.manual}/sincerity_manual.lyx" />
+			<arg value="${distribution.manual}/sincerity_manual.html" />
+		</exec>
+	</target>
+	
+	<target name="source" description="Fetch Sincerity source">
+		<copy todir="${distribution.source}/com.threecrickets.sincerity/sincerity/${version}">
+			<fileset dir="${core.source}" excludes="**/.svn/" />
+		</copy>
+		<copy todir="${distribution.source}/com.threecrickets.sincerity.plugin/logging/${version}">
+			<fileset dir="${logging.source}" excludes="**/.svn/" />
+		</copy>
+	</target>
+	
+	<target name="distribution" depends="libraries, source, javadoc, manual" description="Create distribution">
+		<copy todir="${distribution.content}">
+			<fileset dir="${reference}" excludes="**/.svn/" includes="*.txt" />
+			<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
+			<fileset dir="${dependencies}" excludes="**/.svn/" />
+		</copy>
+		<mkdir dir="${distribution.content}/templates" />
+		<copy todir="${distribution.content}/templates">
+			<fileset dir="${templates}" excludes="**/.svn/" />
+		</copy>
+		<chmod perm="ugo+rx">
+			<fileset dir="${distribution.content}" includes="sincerity" />
+		</chmod>
+	</target>
+	
+	<target name="package" depends="distribution" description="Create Sincerity zip">
+		<zip destfile="${distribution}/sincerity-${version}.zip" level="9">
+			<zipfileset prefix="sincerity" dir="${distribution.content}" excludes="sincerity" />
+			<zipfileset prefix="sincerity" dir="${distribution.content}" filemode="755" includes="sincerity" />
+		</zip>
+	</target>
+	
+	<target name="build" depends="package" description="Build Sincerity" />
+	
+	<target name="clean" description="Clean">
+		<delete dir="${cache}" />
+		<delete dir="${distribution}" />
+	</target>
+	
+	<target name="rebuild" depends="clean, build" description="Clean and build Sincerity" />
 
 </project>
