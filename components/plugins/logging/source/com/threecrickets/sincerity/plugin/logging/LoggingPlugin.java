@@ -1,5 +1,6 @@
 package com.threecrickets.sincerity.plugin.logging;
 
+import java.io.File;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -59,7 +60,9 @@ public class LoggingPlugin implements Plugin
 		try
 		{
 			System.setProperty( "sincerity.logs", sincerity.getContainer().getFile( "logs" ).getPath() );
-			org.apache.log4j.PropertyConfigurator.configure( sincerity.getContainer().getFile( "configuration", "logging.conf" ).getPath() );
+			File configurationFile = sincerity.getContainer().getFile( "configuration", "logging.conf" );
+			if( configurationFile.exists() )
+				org.apache.log4j.xml.DOMConfigurator.configureAndWatch( configurationFile.getPath() );
 		}
 		catch( Exception x )
 		{

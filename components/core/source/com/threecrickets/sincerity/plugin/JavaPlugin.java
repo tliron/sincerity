@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
+import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -35,29 +37,32 @@ public class JavaPlugin implements Plugin
 		String commandName = command.getName();
 		if( "compile".equals( commandName ) )
 		{
-			File javaDir = command.getSincerity().getContainer().getFile( "libraries", "java" );
-			File classesDir = command.getSincerity().getContainer().getFile( "libraries", "classes" );
+			Container container = command.getSincerity().getContainer();
+			Dependencies dependencies = container.getDependencies();
+
+			File javaDir = container.getFile( "libraries", "java" );
+			File classesDir = container.getFile( "libraries", "classes" );
 
 			if( !javaDir.isDirectory() )
 				return;
 
-			classesDir.mkdirs();
-
 			try
 			{
-				Class<?> javac = command.getSincerity().getContainer().getDependencies().getClassLoader().loadClass( "com.sun.tools.javac.Main" );
+				Class<?> javac = dependencies.getClassLoader().loadClass( "com.sun.tools.javac.Main" );
 				Method compileMethod = javac.getMethod( "compile", String[].class );
 
 				ArrayList<String> compileArguments = new ArrayList<String>();
 				compileArguments.add( "-d" );
 				compileArguments.add( classesDir.getAbsolutePath() );
 				compileArguments.add( "-classpath" );
-				compileArguments.add( command.getSincerity().getContainer().getDependencies().getClasspath() );
+				compileArguments.add( dependencies.getClasspath() );
 				addSources( javaDir, compileArguments );
+
+				classesDir.mkdirs();
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
 
-				command.getSincerity().getContainer().getDependencies().reload();
+				dependencies.reload();
 			}
 			catch( ClassNotFoundException x )
 			{

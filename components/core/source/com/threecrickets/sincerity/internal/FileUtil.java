@@ -125,6 +125,15 @@ public class FileUtil
 		copyRecursive( manager, manager.resolveFile( fromDir.toURI().toString() ), manager.resolveFile( toDir.toURI().toString() ) );
 	}
 
+	public static void deleteRecursive( File file ) throws IOException
+	{
+		if( file.isDirectory() )
+			for( File child : file.listFiles() )
+				deleteRecursive( child );
+		if( !file.delete() )
+			throw new IOException( "Could not delete file: " + file );
+	}
+
 	public static boolean isSameContent( URL url, File file ) throws IOException
 	{
 		try

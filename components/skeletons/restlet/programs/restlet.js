@@ -52,10 +52,10 @@ component.clients.add(Protocol.FILE)
 // Resources
 //
 
-//try {
+try {
 sincerity.run('java:compile')
 router.attach('resource/', sincerity.container.dependencies.classLoader.loadClass('rest.DefaultResource'))
-//} catch(x) {}
+} catch(x) { x.printStackTrace() }
 
 //
 // Start server

@@ -9,3 +9,4 @@ com.threecrickets.sincerity.plugin.PackagesPlugin
 com.threecrickets.sincerity.plugin.RepositoriesPlugin
 com.threecrickets.sincerity.plugin.ScripturianPlugin
 com.threecrickets.sincerity.plugin.ShortcutsPlugin
+com.threecrickets.sincerity.plugin.TemplatesPlugin

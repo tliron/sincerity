@@ -10,6 +10,7 @@ import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.internal.FileUtil;
 
 public class Sincerity implements Runnable
 {
@@ -124,32 +125,33 @@ public class Sincerity implements Runnable
 			// 4. Search up filesystem tree from current path
 			//
 
-			if( containerLocation == null )
+			if( containerRoot == null )
 			{
-				containerLocation = System.getProperty( CONTAINER_PROPERTY );
-				if( containerLocation == null )
-					containerLocation = System.getenv( CONTAINER_ENV );
+				String prop = System.getProperty( CONTAINER_PROPERTY );
+				if( prop == null )
+					prop = System.getenv( CONTAINER_ENV );
+				if( prop != null )
+					containerRoot = new File( prop );
 			}
 
-			File containerRootDir = null;
-			if( containerLocation != null )
+			if( containerRoot != null )
 			{
 				try
 				{
-					containerRootDir = new File( containerLocation ).getCanonicalFile();
+					containerRoot = containerRoot.getCanonicalFile();
 				}
 				catch( IOException x )
 				{
-					throw new SincerityException( "Could not determine location of container: " + containerLocation, x );
+					throw new SincerityException( "Could not determine location of container: " + containerRoot, x );
 				}
 
-				if( !containerRootDir.exists() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRootDir );
-				if( !containerRootDir.isDirectory() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRootDir );
-				File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR );
+				if( !containerRoot.exists() )
+					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
+				if( !containerRoot.isDirectory() )
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRoot );
+				File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
 				if( !sincerityDir.isDirectory() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRootDir );
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRoot );
 			}
 			else
 			{
@@ -162,25 +164,25 @@ public class Sincerity implements Runnable
 				{
 					throw new SincerityException( "Could not determine location of current directory", x );
 				}
-				containerRootDir = currentDir;
+				containerRoot = currentDir;
 				while( true )
 				{
-					File sincerityDir = new File( containerRootDir, Container.SINCERITY_DIR );
+					File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
 					if( sincerityDir.isDirectory() )
 					{
 						// Found it!
 						break;
 					}
-					containerRootDir = containerRootDir.getParentFile();
-					if( containerRootDir == null )
+					containerRoot = containerRoot.getParentFile();
+					if( containerRoot == null )
 						throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
 					try
 					{
-						containerRootDir = containerRootDir.getCanonicalFile();
+						containerRoot = containerRoot.getCanonicalFile();
 					}
 					catch( IOException x )
 					{
-						throw new SincerityException( "Could not determine location of container: " + containerRootDir, x );
+						throw new SincerityException( "Could not determine location of container: " + containerRoot, x );
 					}
 				}
 			}
@@ -201,18 +203,50 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			container = new Container( containerRootDir, debugLevel );
+			container = new Container( containerRoot, debugLevel );
 
-			System.out.println( "Using Sincerity container at: " + containerRootDir );
+			System.out.println( "Using Sincerity container at: " + containerRoot );
 		}
 
 		return container;
 	}
 
-	public void setContainer( String containerLocation )
+	public void setContainerRoot( File containerRoot )
 	{
-		this.containerLocation = containerLocation;
+		this.containerRoot = containerRoot;
 		container = null;
+	}
+
+	public void createContainer( File containerRoot, File templateDir ) throws SincerityException
+	{
+		if( containerRoot.exists() )
+		{
+			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
+			{
+				System.out.println( "The path is already a Sincerity container: " + containerRoot );
+				setContainerRoot( containerRoot );
+				return;
+			}
+		}
+
+		if( !templateDir.isDirectory() )
+			throw new SincerityException( "Could not find container template: " + templateDir );
+
+		containerRoot.mkdirs();
+		new File( containerRoot, Container.SINCERITY_DIR ).mkdirs();
+		for( File file : templateDir.listFiles() )
+		{
+			try
+			{
+				FileUtil.copyRecursive( file, containerRoot );
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not copy file from template to container: " + file );
+			}
+		}
+
+		setContainerRoot( containerRoot );
 	}
 
 	//
@@ -351,7 +385,7 @@ public class Sincerity implements Runnable
 
 	private File sincerityHome;
 
-	private String containerLocation;
+	private File containerRoot;
 
 	private Container container;
 
