@@ -2,6 +2,9 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +14,8 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.Pipe;
+import com.threecrickets.sincerity.internal.StringUtil;
 
 public class Sincerity implements Runnable
 {
@@ -110,6 +115,16 @@ public class Sincerity implements Runnable
 			}
 		}
 		return sincerityHome;
+	}
+
+	public PrintWriter getOut()
+	{
+		return out;
+	}
+
+	public PrintWriter getErr()
+	{
+		return err;
 	}
 
 	public Plugins getPlugins() throws SincerityException
@@ -279,7 +294,7 @@ public class Sincerity implements Runnable
 		}
 		catch( SincerityException x )
 		{
-			System.err.println( x.getMessage() );
+			err.println( x.getMessage() );
 			// x.printStackTrace();
 			System.exit( 1 );
 		}
@@ -294,7 +309,7 @@ public class Sincerity implements Runnable
 	// Operations
 	//
 
-	public List<Command> parseCommands( String[] arguments )
+	public List<Command> parseCommands( String... arguments )
 	{
 		ArrayList<Command> commands = new ArrayList<Command>();
 
@@ -392,6 +407,20 @@ public class Sincerity implements Runnable
 		run( command );
 	}
 
+	public void exec( String... command ) throws SincerityException
+	{
+		try
+		{
+			Process process = Runtime.getRuntime().exec( command );
+			new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), out ) ).start();
+			new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), err ) ).start();
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Error executing system command: " + StringUtil.join( command, " " ), x );
+		}
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
@@ -404,6 +433,10 @@ public class Sincerity implements Runnable
 	private Container container;
 
 	private Plugins plugins;
+
+	private PrintWriter out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+
+	private PrintWriter err = new PrintWriter( new OutputStreamWriter( System.err ), true );
 
 	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
 }

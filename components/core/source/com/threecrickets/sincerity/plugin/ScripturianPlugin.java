@@ -43,6 +43,8 @@ public class ScripturianPlugin implements Plugin
 			Container container = command.getSincerity().getContainer();
 			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getFile( "cache" ).getPath() );
 
+			// TODO: sincerity.getOut, sincerity.getErr
+
 			Main main = new Main( arguments );
 			main.setSource( new DocumentFileSource<Executable>( container.getRoot(), "default", "js", -1 ) );
 			main.getLibrarySources().add( new DocumentFileSource<Executable>( container.getFile( "libraries" ), "default", "js", -1 ) );

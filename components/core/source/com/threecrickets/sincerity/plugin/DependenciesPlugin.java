@@ -1,6 +1,5 @@
 package com.threecrickets.sincerity.plugin;
 
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class DependenciesPlugin implements Plugin
 		if( "dependencies".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printTree( dependencies, new OutputStreamWriter( System.out ) );
+			printTree( dependencies, command.getSincerity().getOut() );
 		}
 		else if( "licenses".equals( commandName ) )
 		{
@@ -51,7 +50,7 @@ public class DependenciesPlugin implements Plugin
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printLicenses( dependencies, new OutputStreamWriter( System.out ), verbose );
+			printLicenses( dependencies, command.getSincerity().getOut(), verbose );
 		}
 		else if( "install".equals( commandName ) )
 		{
@@ -102,7 +101,7 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.add( group, name, version ) )
-				System.err.println( "Dependency already in container: " + group + ":" + name + ":" + version );
+				command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + ":" + version );
 		}
 		else if( "revise".equals( commandName ) )
 		{
@@ -119,7 +118,7 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.revise( group, name, version ) )
-				System.err.println( "Dependency not revised: " + group + ":" + name + ":" + version );
+				command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + ":" + version );
 
 		}
 		else if( "remove".equals( commandName ) )
@@ -133,7 +132,7 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.remove( group, name ) )
-				System.err.println( "Dependency was not in container: " + group + ":" + name );
+				command.getSincerity().getErr().println( "Dependency was not in container: " + group + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

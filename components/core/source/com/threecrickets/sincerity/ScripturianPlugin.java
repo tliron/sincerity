@@ -28,6 +28,8 @@ public class ScripturianPlugin implements Plugin
 		{
 			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( pluginFilename, false, parsingContext );
 			Executable executable = documentDescriptor.getDocument();
+			executionContext.setWriter( sincerity.getOut() );
+			executionContext.setErrorWriter( sincerity.getErr() );
 			enterable = executable.makeEnterable( ENTERING_KEY, executionContext, null, new SincerityExecutionController( sincerity ) );
 			if( enterable )
 				this.executable = executable;
