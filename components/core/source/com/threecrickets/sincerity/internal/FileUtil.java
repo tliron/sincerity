@@ -9,6 +9,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
@@ -132,6 +133,15 @@ public class FileUtil
 				deleteRecursive( child );
 		if( !file.delete() )
 			throw new IOException( "Could not delete file: " + file );
+	}
+
+	public static void listRecursiveEndsWith( File file, String postfix, Collection<File> files )
+	{
+		if( file.isDirectory() )
+			for( File child : file.listFiles() )
+				listRecursiveEndsWith( child, postfix, files );
+		else if( file.getName().endsWith( postfix ) )
+			files.add( file );
 	}
 
 	public static boolean isSameContent( URL url, File file ) throws IOException

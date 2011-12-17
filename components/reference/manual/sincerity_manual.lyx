@@ -176,7 +176,7 @@ Part 2: Graphical User Interface
 \end_layout
 
 \begin_layout Subsection
-Part 3: Sincerely Yours: Your First Container
+Part 3: Containers
 \end_layout
 
 \begin_layout Subsection
@@ -415,6 +415,14 @@ Repositories
 
 \begin_layout Section
 Packages
+\end_layout
+
+\begin_layout Subsection
+Skeletons
+\end_layout
+
+\begin_layout Subsection
+Installers and Uninstallers
 \end_layout
 
 \begin_layout Section

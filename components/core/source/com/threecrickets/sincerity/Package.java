@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -16,6 +17,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.threecrickets.sincerity.exception.InstallationException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
 import com.threecrickets.sincerity.internal.ClassUtil;
@@ -177,7 +179,14 @@ public class Package extends AbstractList<Artifact>
 		if( installer != null )
 		{
 			String[] arguments = installer.split( " " );
-			ClassUtil.main( null, arguments );
+			try
+			{
+				ClassUtil.main( null, arguments );
+			}
+			catch( SincerityException x )
+			{
+				throw new InstallationException( "Could not install package: " + file, x );
+			}
 		}
 	}
 
@@ -209,6 +218,11 @@ public class Package extends AbstractList<Artifact>
 	@Override
 	public Artifact get( int index )
 	{
+		if( !sorted )
+		{
+			Collections.sort( artifacts );
+			sorted = true;
+		}
 		return artifacts.get( index );
 	}
 
@@ -222,6 +236,8 @@ public class Package extends AbstractList<Artifact>
 	private final File file;
 
 	private final List<Artifact> artifacts;
+
+	public boolean sorted;
 
 	private Package( String installer, String uninstaller, File file, List<Artifact> artifacts )
 	{

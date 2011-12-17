@@ -33,7 +33,7 @@ public class DependenciesPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"dependencies", "licenses", "install", "unpack", "reset", "add", "revise", "remove"
+			"dependencies", "licenses", "install", "uninstall", "reset", "add", "revise", "remove"
 		};
 	}
 
@@ -72,6 +72,11 @@ public class DependenciesPlugin implements Plugin
 			}
 			else
 				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "install." + name );
+		}
+		else if( "uninstall".equals( commandName ) )
+		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			dependencies.uninstall();
 		}
 		else if( "reset".equals( commandName ) )
 		{

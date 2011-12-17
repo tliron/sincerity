@@ -1,7 +1,6 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -9,13 +8,11 @@ import java.io.Writer;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.TreeUtil;
 
 public class ArtifactsPlugin implements Plugin
@@ -33,7 +30,7 @@ public class ArtifactsPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"artifacts", "resolve", "clean", "prune"
+			"artifacts", "prune"
 		};
 	}
 
@@ -47,25 +44,6 @@ public class ArtifactsPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printArtifacts( dependencies, new OutputStreamWriter( System.out ), verbose );
-		}
-		else if( "clean".equals( commandName ) )
-		{
-			Container container = command.getSincerity().getContainer();
-			Dependencies dependencies = container.getDependencies();
-			dependencies.clean();
-
-			File cache = container.getFile( "cache" );
-			if( cache.isDirectory() )
-			{
-				try
-				{
-					FileUtil.deleteRecursive( cache );
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not clean cache", x );
-				}
-			}
 		}
 		else if( "prune".equals( commandName ) )
 		{

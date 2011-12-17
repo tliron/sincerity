@@ -1,12 +1,16 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
+import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.internal.FileUtil;
 
 public class ContainerPlugin implements Plugin
 {
@@ -23,7 +27,7 @@ public class ContainerPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"create", "use", "clone"
+			"create", "use", "clone", "clean"
 		};
 	}
 
@@ -63,6 +67,25 @@ public class ContainerPlugin implements Plugin
 
 			File containerRoot = new File( arguments[0] );
 			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot() );
+		}
+		else if( "clean".equals( commandName ) )
+		{
+			Container container = command.getSincerity().getContainer();
+			Dependencies dependencies = container.getDependencies();
+			dependencies.uninstall();
+
+			File cache = container.getFile( "cache" );
+			if( cache.isDirectory() )
+			{
+				try
+				{
+					FileUtil.deleteRecursive( cache );
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not clean cache", x );
+				}
+			}
 		}
 		else
 			throw new UnknownCommandException( command );

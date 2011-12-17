@@ -32,10 +32,10 @@ public class Plugins extends AbstractMap<String, Plugin>
 			classLoader = sincerity.getContainer().getDependencies().getClassLoader();
 
 			// Scripturian plugins
-			File pluginsDir = sincerity.getContainer().getFile( "plugins" );
+			File pluginsDir = sincerity.getContainer().getLibrariesFile( "plugins" );
 			if( pluginsDir.isDirectory() )
 			{
-				System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, sincerity.getContainer().getFile( "cache" ).getPath() );
+				System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, sincerity.getContainer().getCacheFile( "cache" ).getPath() );
 				ParsingContext parsingContext = new ParsingContext();
 				parsingContext.setLanguageManager( new LanguageManager() );
 				parsingContext.setDocumentSource( new DocumentFileSource<Executable>( pluginsDir, "default", "js", 1000 ) );

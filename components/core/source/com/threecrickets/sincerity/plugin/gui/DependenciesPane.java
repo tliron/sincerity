@@ -134,7 +134,7 @@ public class DependenciesPane extends JPanel implements ItemListener
 
 	private boolean asTree = true;
 
-	private boolean showLicenses = true;
+	private boolean showLicenses = false;
 
 	private boolean showArtifacts = true;
 

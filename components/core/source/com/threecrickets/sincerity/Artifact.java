@@ -7,7 +7,7 @@ import java.net.URL;
 import com.threecrickets.sincerity.exception.UnpackingException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
-public class Artifact
+public class Artifact implements Comparable<Artifact>
 {
 	//
 	// Construction
@@ -81,6 +81,15 @@ public class Artifact
 		{
 			throw new UnpackingException( "Could not copy artifact from " + url + " to " + file, x );
 		}
+	}
+
+	//
+	// Comparable
+	//
+
+	public int compareTo( Artifact o )
+	{
+		return file.compareTo( o.file );
 	}
 
 	//

@@ -30,6 +30,7 @@ import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
 
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
@@ -164,7 +165,7 @@ public class Dependencies
 				Thread.currentThread().setContextClassLoader( classLoader );
 			}
 
-			File nativeDir = container.getFile( "libraries", "native" );
+			File nativeDir = container.getLibrariesFile( "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
 		}
@@ -234,9 +235,12 @@ public class Dependencies
 		ArrayList<File> classpaths = new ArrayList<File>();
 
 		// Classes directory
-		File classesDir = container.getFile( "libraries", "classes" );
+		File classesDir = container.getLibrariesFile( "classes" );
 		if( classesDir.isDirectory() )
 			classpaths.add( classesDir );
+
+		// Jar directory
+		FileUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );
 
 		// Downloaded artifacts
 		for( ArtifactDownloadReport artifact : getDownloadReports() )
@@ -245,17 +249,6 @@ public class Dependencies
 			{
 				File file = artifact.getLocalFile();
 				if( file != null )
-					classpaths.add( file.getAbsoluteFile() );
-			}
-		}
-
-		// TODO: This should be recursive
-		File jarDir = container.getFile( "libraries", "jars" );
-		if( jarDir.isDirectory() )
-		{
-			for( File file : jarDir.listFiles() )
-			{
-				if( file.getPath().endsWith( ".jar" ) )
 					classpaths.add( file.getAbsoluteFile() );
 			}
 		}
@@ -372,15 +365,16 @@ public class Dependencies
 		return true;
 	}
 
-	public void clean() throws SincerityException
-	{
-		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
-		classLoader = null;
-	}
-
 	public void prune() throws SincerityException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
+		classLoader = null;
+	}
+
+	public void uninstall() throws SincerityException
+	{
+		getPackages().uninstall();
+		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
 		classLoader = null;
 	}
 

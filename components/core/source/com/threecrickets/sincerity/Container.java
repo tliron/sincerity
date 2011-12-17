@@ -158,11 +158,6 @@ public class Container implements IvyListener, TransferListener
 	// Attributes
 	//
 
-	public File getRoot()
-	{
-		return root;
-	}
-
 	public Ivy getIvy()
 	{
 		return ivy;
@@ -183,12 +178,49 @@ public class Container implements IvyListener, TransferListener
 		return shortcuts;
 	}
 
+	public File getRoot()
+	{
+		return root;
+	}
+
 	public File getFile( String... parts )
 	{
 		File file = root;
 		for( String part : parts )
 			file = new File( file, part );
 		return file;
+	}
+
+	public File getConfigurationFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = "configuration";
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
+	}
+
+	public File getLogsFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = "logs";
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
+	}
+
+	public File getCacheFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = "cache";
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
+	}
+
+	public File getLibrariesFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = "libraries";
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
 	}
 
 	public File getRelativeFile( File file )

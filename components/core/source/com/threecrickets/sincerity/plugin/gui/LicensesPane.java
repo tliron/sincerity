@@ -117,7 +117,7 @@ public class LicensesPane extends JPanel implements ItemListener
 
 	private boolean showDependencies = true;
 
-	private boolean showArtifacts = true;
+	private boolean showArtifacts = false;
 
 	private boolean showPackageContents = false;
 }
