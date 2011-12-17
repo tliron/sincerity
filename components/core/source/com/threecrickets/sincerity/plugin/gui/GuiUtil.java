@@ -16,8 +16,10 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.License;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
+import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 
@@ -30,6 +32,12 @@ public class GuiUtil
 	public static final ImageIcon FOLDER_ICON = new ImageIcon( GuiUtil.class.getResource( "folder.png" ) );
 
 	public static final ImageIcon FILE_ICON = new ImageIcon( GuiUtil.class.getResource( "database.png" ) );
+
+	public static final ImageIcon PACKAGE_ICON = new ImageIcon( GuiUtil.class.getResource( "database_add.png" ) );
+
+	public static final ImageIcon PLUGIN_ICON = new ImageIcon( GuiUtil.class.getResource( "plugin.png" ) );
+
+	public static final ImageIcon COMMAND_ICON = new ImageIcon( GuiUtil.class.getResource( "control_play.png" ) );
 
 	public static void setNativeLookAndFeel()
 	{
@@ -101,7 +109,7 @@ public class GuiUtil
 	public static DefaultMutableTreeNode createDependencyNode( ResolvedDependency resolvedDependency, Dependencies dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses,
 		boolean includeArtifacts, boolean includePackageContents ) throws SincerityException
 	{
-		EnhancedNode node = new EnhancedNode( resolvedDependency, toHtml( resolvedDependency, isMain, false ), GuiUtil.DEPENDENCY_ICON );
+		EnhancedNode node = new EnhancedNode( resolvedDependency, toHtml( resolvedDependency, isMain, false ), DEPENDENCY_ICON );
 
 		if( includeLicenses )
 			for( License license : resolvedDependency.descriptor.getLicenses() )
@@ -132,7 +140,7 @@ public class GuiUtil
 			s.append( "</b>" );
 		s.append( "</html>" );
 
-		EnhancedNode node = new EnhancedNode( license, s.toString(), GuiUtil.LICENSE_ICON );
+		EnhancedNode node = new EnhancedNode( license, s.toString(), LICENSE_ICON );
 
 		if( includeDependencies )
 			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
@@ -186,19 +194,32 @@ public class GuiUtil
 			s.append( "</i>" );
 		s.append( "</html>" );
 
-		EnhancedNode node = new EnhancedNode( artifact, s.toString(), GuiUtil.FILE_ICON );
+		Package pack = location != null ? dependencies.getPackages().getByPackage( new File( location ) ) : null;
+		EnhancedNode node = new EnhancedNode( artifact, s.toString(), pack != null ? PACKAGE_ICON : FILE_ICON );
 
-		if( location != null && includePackageContents )
+		if( includePackageContents && pack != null )
 		{
-			Package pack = dependencies.getPackages().getByPackage( new File( location ) );
-			if( pack != null )
-			{
-				for( com.threecrickets.sincerity.Artifact packedArtifact : pack )
-					addFileNode( dependencies.getContainer().getRelativeFile( packedArtifact.getFile() ), GuiUtil.FILE_ICON, node );
-			}
+			for( com.threecrickets.sincerity.Artifact packedArtifact : pack )
+				addFileNode( dependencies.getContainer().getRelativeFile( packedArtifact.getFile() ), FILE_ICON, node );
 		}
 
 		return node;
+	}
+
+	public static DefaultMutableTreeNode createPluginNode( Plugin plugin, boolean includeCommands ) throws SincerityException
+	{
+		EnhancedNode node = new EnhancedNode( plugin, "<html><b>" + plugin.getName() + "</b></html>", PLUGIN_ICON );
+
+		if( includeCommands )
+			for( String command : plugin.getCommands() )
+				node.add( createCommandNode( command, plugin, false ) );
+
+		return node;
+	}
+
+	public static DefaultMutableTreeNode createCommandNode( String command, Plugin plugin, boolean includePluginName ) throws SincerityException
+	{
+		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
 	}
 
 	private static EnhancedNode findFileNode( File file, EnhancedNode from, EnhancedNode root )
@@ -227,7 +248,7 @@ public class GuiUtil
 		{
 			parentNode = findFileNode( parent, root, root );
 			if( parentNode == null )
-				parentNode = addFileNode( parent, GuiUtil.FOLDER_ICON, root );
+				parentNode = addFileNode( parent, FOLDER_ICON, root );
 		}
 		EnhancedNode node = new EnhancedNode( file, file.getName(), icon );
 		parentNode.add( node );

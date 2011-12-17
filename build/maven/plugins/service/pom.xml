@@ -48,6 +48,11 @@
 	</mailingLists>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.tanukisoftware</groupId>
+			<artifactId>wrapper-linux</artifactId>
+			<version>3.5.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>

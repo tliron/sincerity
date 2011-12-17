@@ -24,6 +24,7 @@ public class Frame extends JFrame
 		JTabbedPane panes = new JTabbedPane();
 		getContentPane().add( panes );
 
+		panes.add( "Actions", new ActionsPane( sincerity ) );
 		panes.add( "Dependencies", new DependenciesPane( sincerity.getContainer().getDependencies() ) );
 		panes.add( "Artifacts", new ArtifactsPane( sincerity.getContainer().getDependencies() ) );
 		panes.add( "Licenses", new LicensesPane( sincerity.getContainer().getDependencies() ) );
