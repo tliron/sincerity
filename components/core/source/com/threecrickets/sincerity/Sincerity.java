@@ -64,11 +64,6 @@ public class Sincerity implements Runnable
 			System.err.println( x.getMessage() );
 			System.exit( 1 );
 		}
-		catch( Throwable x )
-		{
-			x.printStackTrace();
-			System.exit( 1 );
-		}
 	}
 
 	//
@@ -295,7 +290,7 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			err.println( x.getMessage() );
-			// x.printStackTrace();
+			x.printStackTrace();
 			System.exit( 1 );
 		}
 		catch( Throwable x )
@@ -417,6 +412,7 @@ public class Sincerity implements Runnable
 		}
 		catch( IOException x )
 		{
+			x.printStackTrace();
 			throw new SincerityException( "Error executing system command: " + StringUtil.join( command, " " ), x );
 		}
 	}

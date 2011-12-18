@@ -37,6 +37,7 @@ public class Pipe implements Runnable
 		}
 		catch( IOException x )
 		{
+			x.printStackTrace();
 		}
 		finally
 		{

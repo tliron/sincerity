@@ -223,6 +223,11 @@ public class Dependencies
 
 	public String getClasspath() throws SincerityException
 	{
+		return getClasspath( false );
+	}
+
+	public String getClasspath( boolean includeSystem ) throws SincerityException
+	{
 		List<File> classpaths = getClasspaths();
 		ArrayList<String> paths = new ArrayList<String>( classpaths.size() );
 		for( File file : classpaths )
@@ -231,6 +236,11 @@ public class Dependencies
 	}
 
 	public List<File> getClasspaths() throws SincerityException
+	{
+		return getClasspaths( false );
+	}
+
+	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
 	{
 		ArrayList<File> classpaths = new ArrayList<File>();
 
@@ -250,6 +260,16 @@ public class Dependencies
 				File file = artifact.getLocalFile();
 				if( file != null )
 					classpaths.add( file.getAbsoluteFile() );
+			}
+		}
+
+		if( includeSystem )
+		{
+			String system = System.getProperty( "java.class.path" );
+			if( system != null )
+			{
+				for( String path : system.split( ":" ) )
+					classpaths.add( new File( path ) );
 			}
 		}
 
