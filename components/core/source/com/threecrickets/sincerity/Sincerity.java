@@ -2,7 +2,6 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -14,8 +13,6 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
-import com.threecrickets.sincerity.internal.Pipe;
-import com.threecrickets.sincerity.internal.StringUtil;
 
 public class Sincerity implements Runnable
 {
@@ -393,6 +390,7 @@ public class Sincerity implements Runnable
 
 	public void run( String name, String... arguments ) throws SincerityException
 	{
+		// We ignore the greedy postfix in this case
 		if( name.endsWith( Command.GREEDY_POSTFIX ) )
 			name = name.substring( 0, name.length() - Command.GREEDY_POSTFIX_LENGTH );
 
@@ -400,21 +398,6 @@ public class Sincerity implements Runnable
 		for( String argument : arguments )
 			command.rawArguments.add( argument );
 		run( command );
-	}
-
-	public void exec( String... command ) throws SincerityException
-	{
-		try
-		{
-			Process process = Runtime.getRuntime().exec( command );
-			new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), out ) ).start();
-			new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), err ) ).start();
-		}
-		catch( IOException x )
-		{
-			x.printStackTrace();
-			throw new SincerityException( "Error executing system command: " + StringUtil.join( command, " " ), x );
-		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

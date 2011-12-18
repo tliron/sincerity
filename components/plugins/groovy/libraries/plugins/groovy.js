@@ -19,5 +19,5 @@ function groovy(command) {
 	for (var i in arguments) {
 		mainArguments.push(arguments[i])
 	}
-	command.sincerity.run('main:main', mainArguments)
+	command.sincerity.run('delegate:main', mainArguments)
 }

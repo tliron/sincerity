@@ -1,12 +1,11 @@
 com.threecrickets.sincerity.plugin.ArtifactsPlugin
 com.threecrickets.sincerity.plugin.ContainerPlugin
+com.threecrickets.sincerity.plugin.DelegatePlugin
 com.threecrickets.sincerity.plugin.DependenciesPlugin
 com.threecrickets.sincerity.plugin.GuiPlugin
 com.threecrickets.sincerity.plugin.HelpPlugin
 com.threecrickets.sincerity.plugin.JavaPlugin
-com.threecrickets.sincerity.plugin.MainPlugin
 com.threecrickets.sincerity.plugin.PackagesPlugin
 com.threecrickets.sincerity.plugin.RepositoriesPlugin
-com.threecrickets.sincerity.plugin.ScripturianPlugin
 com.threecrickets.sincerity.plugin.ShortcutsPlugin
 com.threecrickets.sincerity.plugin.TemplatesPlugin

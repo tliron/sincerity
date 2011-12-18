@@ -46,7 +46,7 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( "Error executing Scripturian plugin: " + pluginFilename, x );
+			throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( IOException x )
 		{
@@ -106,7 +106,7 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( "Error executing Scripturian plugin: " + defaultName, x );
+			throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -126,7 +126,7 @@ public class ScripturianPlugin implements Plugin
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( "Error executing Scripturian plugin: " + defaultName, x );
+			throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{

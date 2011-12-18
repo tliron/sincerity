@@ -44,15 +44,16 @@ function python(command) {
 		}
 	}
 	
-	// Jython does not initialize its state more than once, so we must explicitly
-	// set sys.argv if we want to run it more than once with different arguments
+	// The Jython runtime does not reinitialize its state if its already initialized, so we must
+	// explicitly set sys.argv if we want to run it more than once with different arguments
+    sys.argv.clear()
 
 	var mainArguments = [MAIN_CLASS]
 	var arguments = command.arguments
-    sys.argv.clear()
-	for (var i in arguments) {
-		mainArguments.push(arguments[i])
-		sys.argv.add(arguments[i])
+	for (var i in command.arguments) {
+		mainArguments.push(command.arguments[i])
+		sys.argv.add(command.arguments[i])
 	}
-	command.sincerity.run('main:main', mainArguments)
+
+	command.sincerity.run('delegate:main', mainArguments)
 }

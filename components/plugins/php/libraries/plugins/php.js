@@ -23,5 +23,5 @@ function php(command) {
 		// Quercus throws an exception if it gets no arguments
 		mainArguments.push('-h')
 	}
-	command.sincerity.run('main:main', mainArguments)
+	command.sincerity.run('delegate:main', mainArguments)
 }

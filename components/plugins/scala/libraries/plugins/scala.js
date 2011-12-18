@@ -26,7 +26,7 @@ function scala(command) {
 	for (var i in arguments) {
 		mainArguments.push(arguments[i])
 	}
-	command.sincerity.run('main:main', mainArguments)
+	command.sincerity.run('delegate:main', mainArguments)
 	
 	// The Scala REPL (which uses JLine) does not restore terminal echo, so we will do it manually
 	// (See: http://scala-forum.org/read.php?5,411,411)
