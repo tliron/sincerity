@@ -213,10 +213,11 @@ public class Dependencies
 
 				artifacts.add( artifact );
 			}
-
-			if( install )
-				pack.install();
 		}
+
+		if( install )
+			for( Package pack : getPackages() )
+				pack.install();
 
 		return artifacts;
 	}

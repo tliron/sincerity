@@ -152,7 +152,27 @@ OSGi is a decent solution, but boy is it intricate.
 \end_layout
 
 \begin_layout Subsubsection
-Self-Containment
+Goal 1: Self-Containment
+\end_layout
+
+\begin_layout Subsubsection
+Goal 2: Fun
+\end_layout
+
+\begin_layout Subsubsection
+Comparison with Maven
+\end_layout
+
+\begin_layout Standard
+Not fun.
+\end_layout
+
+\begin_layout Subsubsection
+Comparison with OSGi
+\end_layout
+
+\begin_layout Standard
+There are more straightforward solutions to DLL hell.
 \end_layout
 
 \begin_layout Section

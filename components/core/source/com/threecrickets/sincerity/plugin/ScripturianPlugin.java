@@ -45,6 +45,9 @@ public class ScripturianPlugin implements Plugin
 
 			// TODO: sincerity.getOut, sincerity.getErr
 
+			if( !arguments[0].startsWith( "/" ) )
+				arguments[0] = "/programs/" + arguments[0];
+
 			Main main = new Main( arguments );
 			main.setSource( new DocumentFileSource<Executable>( container.getRoot(), "default", "js", -1 ) );
 			main.getLibrarySources().add( new DocumentFileSource<Executable>( container.getFile( "libraries" ), "default", "js", -1 ) );
