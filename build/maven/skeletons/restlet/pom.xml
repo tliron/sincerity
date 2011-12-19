@@ -58,6 +58,7 @@
 			<artifactId>restlet-jetty</artifactId>
 			<version>2.0.10</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>restlet-slf4j</artifactId>
@@ -68,6 +69,7 @@
 			<artifactId>logging</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		 -->
 	</dependencies>
 
 	<build>
