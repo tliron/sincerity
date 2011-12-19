@@ -38,13 +38,20 @@ public class JavaPlugin implements Plugin
 		if( "compile".equals( commandName ) )
 		{
 			Container container = command.getSincerity().getContainer();
-			Dependencies dependencies = container.getDependencies();
 
-			File javaDir = container.getFile( "libraries", "java" );
-			File classesDir = container.getFile( "libraries", "classes" );
+			String[] arguments = command.getArguments();
+			File javaDir;
+			if( arguments.length < 1 )
+				javaDir = container.getFile( "libraries", "java" );
+			else
+				javaDir = new File( arguments[0] );
 
 			if( !javaDir.isDirectory() )
 				return;
+
+			File classesDir = container.getFile( "libraries", "classes" );
+
+			Dependencies dependencies = container.getDependencies();
 
 			try
 			{

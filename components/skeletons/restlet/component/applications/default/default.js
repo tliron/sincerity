@@ -42,6 +42,6 @@ component.clients.add(Protocol.FILE)
 //
 
 try {
-sincerity.run('java:compile')
+sincerity.run('java:compile', [new File(here, 'java')])
 router.attach('resource/', sincerity.container.dependencies.classLoader.loadClass('rest.DefaultResource'))
 } catch(x) { x.printStackTrace() }
