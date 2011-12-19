@@ -8,8 +8,8 @@
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Plugin: Service</name>
-	<description>A Sincerity plugin that let's you run your container as a service (daemon) using Tanuki's Java Service Wrapper.</description>
+	<name>Sincerity Plugin Add-on: Service JMX</name>
+	<description>Adds JMX support to the service plugin.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
