@@ -10,4 +10,13 @@ function makeExecutable(file) {
 	}
 }
 
-makeExecutable(sincerity.container.getLibrariesFile('native', 'wrapper-linux-x86-64'))
+var nativeDir = sincerity.container.getLibrariesFile('native')
+if (nativeDir.directory) {
+	var files = nativeDir.listFiles()
+	for (var f in files) {
+		var file = files[f]
+		if (file.name.startsWith('wrapper-')) {
+			makeExecutable(file)
+		}
+	}
+}

@@ -1,5 +1,13 @@
 
-importClass(com.threecrickets.sincerity.exception.BadArgumentsCommandException)
+importClass(
+	com.threecrickets.sincerity.exception.BadArgumentsCommandException,
+	com.threecrickets.sincerity.exception.SincerityException,
+	java.io.File,
+	java.io.BufferedReader,
+	java.io.FileReader,
+	java.lang.System)
+
+var os = getOs()
 
 function getCommands() {
 	return ['service']
@@ -13,34 +21,21 @@ function run(command) {
 	}
 }
 
-function getPid(pidFile) {
-	if (!pidFile.exists()) {
-		return null
-	}
-	var reader = new java.io.BufferedReader(new java.io.FileReader(pidFile))
-	try {
-		return reader.readLine()
-	}
-	finally {
-		reader.close()
-	}
-}
-
-function kill(pid) {
-	sincerity.run('delegate:launch', 'kill', pid)
-}
-
 function service(command) {
-	if (command.arguments.length < 1) {
-		throw new BadArgumentsCommandException(command, 'verb ("start", "stop", "run", or "status")', 'uri (for "start" or "run")')
+	if (command.arguments.length < 2) {
+		throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "run", or "status")')
 	}
 
-	var verb = command.arguments[0]
+	var uri = command.arguments[0]
+	var verb = command.arguments[1]
 
-	var name = 'sincerity'
-	var displayName = 'Sincerity'
+	var name = uri.replace('/', '_')
+	var displayName = name
 
-	var pidFile = sincerity.container.getCacheFile(name + '.pid')
+	var cacheDir = sincerity.container.getCacheFile('service')
+	cacheDir.mkdirs()
+	
+	var pidFile = new File(cacheDir, name + '.pid')
 	
 	if (verb == 'status') {
 		var pid = getPid(pidFile)
@@ -50,33 +45,44 @@ function service(command) {
 		else {
 			command.sincerity.out.println(displayName + ' is running (pid: ' + pid + ')')
 		}
+		return
 	}
-	else if (verb == 'stop') {
+	
+	if ((verb == 'stop' ) || (verb == 'restart')) {
 		var pid = getPid(pidFile)
 		if (null === pid) {
 			command.sincerity.out.println(displayName + ' is not running')
+			return
 		}
-		else {
-			command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
-			kill(pid)
-			pid = getPid(pidFile)
-			if (null !== pid) {
-				command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
-				while (null !== pid) {
-					java.lang.Thread.sleep(1000)
-					pid = getPid(pidFile)
-				}
+		
+		command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
+		kill(pid)
+		pid = getPid(pidFile)
+		if (null !== pid) {
+			command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
+			while (null !== pid) {
+				java.lang.Thread.sleep(1000)
+				pid = getPid(pidFile)
 			}
-			command.sincerity.out.println(displayName + ' has stopped')
+		}
+		command.sincerity.out.println(displayName + ' has stopped')
+		if (verb == 'stop') {
+			return
 		}
 	}
-	else if ((verb == 'start') || (verb == 'run')) {
-		if (command.arguments.length < 2) {
-			throw new BadArgumentsCommandException(command, '"' + verb + '"', 'uri')
+	
+	if ((verb == 'start') || (verb == 'restart') || (verb == 'run')) {
+		var pid = getPid(pidFile)
+		if (null !== pid) {
+			command.sincerity.out.println(displayName + ' is already running (pid: ' + pid + ')')
+			return
 		}
 
-		var binary = sincerity.container.getLibrariesFile('native', 'wrapper-linux-x86-64')
-		var uri = command.arguments[1]
+		var binary = 'wrapper-' + os.name + '-' + os.architecture + '-' + os.bits
+		binary = sincerity.container.getLibrariesFile('native', binary)
+		if (!binary.exists()) {
+			throw new SincerityException('The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+		}
 	
 		// This configuration will override anything in service.conf
 		// See: http://wrapper.tanukisoftware.com/doc/english/properties.html
@@ -122,8 +128,86 @@ function service(command) {
 		if (verb == 'start') {
 			command.sincerity.out.println('Started ' + displayName)
 		}
+		return
+	}
+
+	throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "run", or "status")')
+}
+
+function getOs() {
+	// See: http://lopica.sourceforge.net/os.html
+	var name = System.getProperty('os.name')
+	var architecture = System.getProperty('os.arch')
+	var bits = System.getProperty('sun.arch.data.model')
+	
+	if (name == 'AIX') {
+		name = 'aix'
+		architecture = 'ppc'
+	}
+	else if (name == 'FreeBSD') {
+		name = 'freebsd'
+		architecture = 'x86'
+	}
+	else if (name == 'HP-UX') {
+		name = 'hpux'
+		if (architecture.indexOf('RISC') != -1) {
+			architecture = 'parisc'
+		}
+		else {
+			architecture = 'ia'
+		}
+	}
+	else if (name == 'Linux') {
+		name = 'linux'
+		if ((architecture.indexOf('86') != -1) || (architecture.indexOf('amd') != -1)) {
+			architecture = 'x86'
+		}
+		else if (architecture.indexOf('ppc') != -1) {
+			architecture = 'ppc'
+		}
+		else {
+			architecture = 'ia'
+		}
+	}
+	else if (name == 'MacOS X') {
+		name = 'macosx'
+		architecture = 'universal'
+	}
+	else if ((name == 'Solaris') || (name == 'SunOS')) {
+		name = 'solaris'
+		if ((architecture.indexOf('86') != -1) || (architecture.indexOf('amd') != -1)) {
+			architecture = 'x86'
+		}
+		else {
+			architecture = 'sparc'
+		}
+	}
+
+	return {
+		name: name,
+		architecture: architecture,
+		bits: bits
+	}
+}
+
+function getPid(pidFile) {
+	if (!pidFile.exists()) {
+		return null
+	}
+	var reader = new BufferedReader(new FileReader(pidFile))
+	try {
+		return reader.readLine()
+	}
+	finally {
+		reader.close()
+	}
+}
+
+function kill(pid) {
+	if (os.name == 'Windows') {
+		// TODO
 	}
 	else {
-		throw new BadArgumentsCommandException(command, 'verb ("start", "stop", "run", or "status")', 'uri (for "start" or "run")')
+		sincerity.run('delegate:launch', 'kill', pid)
 	}
 }
