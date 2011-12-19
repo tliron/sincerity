@@ -25,14 +25,17 @@ function run(command) {
 function logging(command) {
 	var configurationFile = command.sincerity.container.getConfigurationFile('logging.conf')
 	if (configurationFile.exists()) {
-		// log4j configuration files can use this
-		System.setProperty('sincerity.logs', command.sincerity.container.logsFile)
+		var logsDir = command.sincerity.container.getLogsFile()
+		logsDir.mkdirs()
+
+		// The log4j configuration can use this property
+		System.setProperty('sincerity.logs', logsDir)
 
 		try {
 			org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
 		}
 		catch (x if x.javaException instanceof ClassNotFoundException) {
-			throw new SincerityException('Could not find log4j in claspath', x.javaException)
+			throw new SincerityException('Could not find log4j in classpath', x.javaException)
 		}
 	}
 
@@ -47,7 +50,7 @@ function logging(command) {
 		org.slf4j.bridge.SLF4JBridgeHandler.install()
 	}
 	catch (x if x.javaException instanceof ClassNotFoundException) {
-		throw new SincerityException('Could not find SLF4J bridge in claspath', x.javaException)
+		throw new SincerityException('Could not find SLF4J bridge in classpath', x.javaException)
 	}
 }
 
