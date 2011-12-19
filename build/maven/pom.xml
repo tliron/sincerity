@@ -58,8 +58,11 @@
 		<module>plugins/ruby</module>
 		<module>plugins/scala</module>
 		<module>plugins/service</module>
+		<module>plugins/service-jmx</module>
 		<module>skeletons/prudence</module>
 		<module>skeletons/restlet</module>
+		<module>skeletons/restlet-jetty</module>
+		<module>skeletons/restlet-logging</module>
 		<module>skeletons/savory</module>
 		<module>skeletons/web</module>
 	</modules>

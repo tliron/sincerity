@@ -36,22 +36,28 @@ function service(command) {
 	cacheDir.mkdirs()
 	
 	var pidFile = new File(cacheDir, name + '.pid')
+	var statusFile = new File(cacheDir, name + '.status')
 	
 	if (verb == 'status') {
-		var pid = getPid(pidFile)
-		if (null === pid) {
+		var status = getStatus(statusFile)
+		if (null === status) {
 			command.sincerity.out.println(displayName + ' is not running')
 		}
 		else {
-			command.sincerity.out.println(displayName + ' is running (pid: ' + pid + ')')
+			var pid = null
+			if (isRunning(status)) {
+				pid = getPid(pidFile)
+			}
+			command.sincerity.out.println(displayName + ': ' + status + (null === pid ? '' : ' (pid: ' + pid + ')'))
 		}
 		return
 	}
 	
 	if ((verb == 'stop' ) || (verb == 'restart')) {
+		var status = getStatus(statusFile)
 		var pid = getPid(pidFile)
-		if (null === pid) {
-			command.sincerity.out.println(displayName + ' is not running')
+		if (isStopped(status) || (null === pid)) {
+			command.sincerity.out.println(displayName + ' is not running' + (null === status ? '' : ' (' + status + ')'))
 			return
 		}
 		
@@ -72,9 +78,9 @@ function service(command) {
 	}
 	
 	if ((verb == 'start') || (verb == 'restart') || (verb == 'run')) {
-		var pid = getPid(pidFile)
-		if (null !== pid) {
-			command.sincerity.out.println(displayName + ' is already running (pid: ' + pid + ')')
+		var status = getStatus(statusFile)
+		if (isRunning(status)) {
+			command.sincerity.out.println(displayName + ' is already running (' + status + ')')
 			return
 		}
 
@@ -89,6 +95,7 @@ function service(command) {
 		var configuration = {
 			'wrapper.working.dir': sincerity.container.root,
 			'wrapper.pidfile': pidFile,
+			'wrapper.java.statusfile': statusFile,
 			'wrapper.name': name,
 			'wrapper.displayname': displayName,
 			'wrapper.ntservice.name': name,
@@ -103,8 +110,32 @@ function service(command) {
 			'wrapper.app.parameter.3': uri
 		}
 		
-		// Classpath
+		// JVM switches
+		var jvmDir = sincerity.container.getConfigurationFile('service', 'jvm')
 		var index = 1
+		if (jvmDir.directory) {
+			var files = jvmDir.listFiles()
+			for (var f in files) {
+				var file = files[f]
+				if (file.name.endsWith('.conf')) {
+					var reader = new BufferedReader(new FileReader(file))
+					try {
+						while (null !== (line = reader.readLine())) {
+							if ((line.length() == 0) || line.startsWith('#')) {
+								continue
+							}
+							configuration['wrapper.java.additional.' + index++] = line
+						}
+					}
+					finally {
+						reader.close()
+					}
+				}
+			}
+		}
+		
+		// Classpath
+		index = 1
 		for (var i = sincerity.container.dependencies.getClasspaths(true).iterator(); i.hasNext(); ) {
 			configuration['wrapper.java.classpath.' + index++] = i.next()
 		}
@@ -114,13 +145,18 @@ function service(command) {
 			configuration['wrapper.daemonize'] = 'TRUE'
 		}
 
-		// Launch native wrapper binary
-		var arguments = [binary, sincerity.container.getConfigurationFile('service.conf')]
+		// Assemble arguments
+		var arguments = [binary, sincerity.container.getConfigurationFile('service', 'service.conf')]
 		for (var c in configuration) {
 			arguments.push(c + '=' + configuration[c])
 		}
 		sincerity.container.getLogsFile().mkdirs()
-		
+
+		/*for (c in arguments) {
+			command.sincerity.out.println(c + ' = ' + arguments[c])
+		}*/
+
+		// Launch native wrapper binary
 		if (verb == 'run') {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
@@ -201,6 +237,27 @@ function getPid(pidFile) {
 	finally {
 		reader.close()
 	}
+}
+
+function getStatus(statusFile) {
+	if (!statusFile.exists()) {
+		return null
+	}
+	var reader = new BufferedReader(new FileReader(statusFile))
+	try {
+		return reader.readLine()
+	}
+	finally {
+		reader.close()
+	}
+}
+
+function isRunning(status) {
+	return (status == 'LAUNCH(DELAY)') || (status == 'LAUNCHING') || (status == 'LAUNCHED') || (status == 'STARTING') || (status == 'STARTED')	
+}
+
+function isStopped(status) {
+	return (null === status) || (status == 'DOWN') || (status == 'DOWN_CLEAN') || (status == 'STOPPING') || (status == 'STOPPED')
 }
 
 function kill(pid) {

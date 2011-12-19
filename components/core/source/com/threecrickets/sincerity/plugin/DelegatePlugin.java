@@ -15,6 +15,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.ClassUtil;
 import com.threecrickets.sincerity.internal.Pipe;
+import com.threecrickets.sincerity.internal.ProcessDestroyer;
 import com.threecrickets.sincerity.internal.SincerityExecutionController;
 import com.threecrickets.sincerity.internal.StringUtil;
 
@@ -74,7 +75,9 @@ public class DelegatePlugin implements Plugin
 			String[] arguments = command.getArguments();
 			try
 			{
-				Process process = Runtime.getRuntime().exec( arguments );
+				Runtime runtime = Runtime.getRuntime();
+				Process process = runtime.exec( arguments );
+				runtime.addShutdownHook( new ProcessDestroyer( process ) );
 				new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), command.getSincerity().getOut() ) ).start();
 				new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), command.getSincerity().getErr() ) ).start();
 			}

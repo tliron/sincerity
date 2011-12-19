@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>restlet</artifactId>
+	<artifactId>restlet-jetty</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Restlet</name>
-	<description>A Sincerity skeleton that turns your container into a REST component using Restlet.</description>
+	<name>Sincerity Skeleton Add-on: Restlet Jetty</name>
+	<description>Adds Jetty connector to the Restlet skeleton.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,43 +49,15 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.restlet.jse</groupId>
+			<groupId>com.threecrickets.sincerity.skeleton</groupId>
 			<artifactId>restlet</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>restlet-jetty</artifactId>
 			<version>2.0.10</version>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<directory>../../../cache/maven</directory>
-
-		<plugins>
-			<!-- jar artifact -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestEntries>
-									<Package-Folders>package</Package-Folders>
-								</manifestEntries>
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
