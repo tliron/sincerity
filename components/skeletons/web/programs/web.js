@@ -12,7 +12,7 @@ var root = 'web'
 //
 
 try {
-sincerity.run('logging:initialize')
+sincerity.run('logging:logging')
 } catch(x) {}
 
 //

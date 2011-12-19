@@ -8,8 +8,10 @@
 
 	<property name="core.source" value="../components/core/source" />
 	<property name="core.resources" value="../components/core/resources" />
+	<!--
 	<property name="logging.source" value="../components/plugins/logging/source" />
 	<property name="logging.resources" value="../components/plugins/logging/resources" />
+	-->
 	<property name="reference" value="../components/reference" />
 	<property name="scripts" value="../components/scripts" />
 	<property name="templates" value="../components/templates" />
@@ -64,7 +66,7 @@
 	</target>
 
 	<!-- Logging Plugin -->
-
+	<!--
 	<target name="dependencies-logging" depends="ivy, compile-core" description="Resolve dependencies for logging plugin">
 		<ivy:resolve file="ivy/logging.xml" log="download-only" resolveId="logging" />
 		<ivy:cachepath pathid="dependencies-logging-ivy" type="jar" resolveId="logging" />
@@ -88,12 +90,12 @@
 		<mkdir dir="${cache.jars}" />
 		<jar destfile="${cache.jars}/logging.jar" basedir="${cache.classes}/logging" filesetmanifest="merge" />
 	</target>
-
+	-->
 	<!-- General -->
 
-	<target name="compile" depends="compile-core, compile-logging" description="Compile Java code" />
+	<target name="compile" depends="compile-core" description="Compile Java code" />
 
-	<target name="libraries" depends="jar-core, jar-logging, dependencies-core, dependencies-logging" description="Resolve dependencies" />
+	<target name="libraries" depends="jar-core, dependencies-core" description="Resolve dependencies" />
 
 	<target name="javadoc" description="Create Sincerity API docs">
 		<available file="${distribution.api}" property="javadoc-present" />
@@ -147,9 +149,10 @@
 		<copy todir="${distribution.source}/com.threecrickets.sincerity/sincerity/${version}">
 			<fileset dir="${core.source}" excludes="**/.svn/" />
 		</copy>
+		<!--
 		<copy todir="${distribution.source}/com.threecrickets.sincerity.plugin/logging/${version}">
 			<fileset dir="${logging.source}" excludes="**/.svn/" />
-		</copy>
+		</copy>-->
 	</target>
 	
 	<target name="distribution" depends="libraries, source, javadoc, manual" description="Create distribution">

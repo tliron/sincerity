@@ -34,9 +34,6 @@ directory.listingAllowed = true
 router.attach('', directory, Template.MODE_EQUALS)
 router.attach('static/', directory)
 
-// The directory needs to access file URIs
-component.clients.add(Protocol.FILE)
-
 //
 // Resources
 //

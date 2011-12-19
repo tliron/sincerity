@@ -153,7 +153,7 @@ public class Dependencies
 				}
 				catch( MalformedURLException x )
 				{
-					throw new RuntimeException( x );
+					throw new SincerityException( "Parsing error while initializing classloader", x );
 				}
 			}
 
@@ -248,7 +248,8 @@ public class Dependencies
 		// Classes directory
 		File classesDir = container.getLibrariesFile( "classes" );
 		if( classesDir.isDirectory() )
-			classpaths.add( classesDir );
+			if( !classpaths.contains( classesDir ) )
+				classpaths.add( classesDir );
 
 		// Jar directory
 		FileUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );
@@ -260,7 +261,11 @@ public class Dependencies
 			{
 				File file = artifact.getLocalFile();
 				if( file != null )
-					classpaths.add( file.getAbsoluteFile() );
+				{
+					file = file.getAbsoluteFile();
+					if( !classpaths.contains( file ) )
+						classpaths.add( file );
+				}
 			}
 		}
 
@@ -270,7 +275,11 @@ public class Dependencies
 			if( system != null )
 			{
 				for( String path : system.split( ":" ) )
-					classpaths.add( new File( path ) );
+				{
+					File file = new File( path ).getAbsoluteFile();
+					if( !classpaths.contains( file ) )
+						classpaths.add( file );
+				}
 			}
 		}
 
@@ -389,14 +398,14 @@ public class Dependencies
 	public void prune() throws SincerityException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
-		classLoader = null;
+		reload();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
-		classLoader = null;
+		reload();
 	}
 
 	public void install( boolean overwrite ) throws SincerityException
@@ -426,6 +435,8 @@ public class Dependencies
 		reload();
 
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
+
+		reload();
 	}
 
 	public void reload()

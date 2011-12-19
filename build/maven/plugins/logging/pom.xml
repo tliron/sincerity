@@ -66,23 +66,26 @@
 		<plugins>
 			<!-- jar artifact -->
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.7</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
 				<executions>
 					<execution>
 						<id>jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attach-artifact</goal>
+							<goal>single</goal>
 						</goals>
 						<configuration>
-							<artifacts>
-								<artifact>
-									<type>jar</type>
-									<file>../../../cache/jars/logging.jar</file>
-								</artifact>
-							</artifacts>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archive>
+								<manifestEntries>
+									<Package-Folders>package</Package-Folders>
+								</manifestEntries>
+							</archive>
+							<descriptors>
+								<descriptor>package.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
 				</executions>

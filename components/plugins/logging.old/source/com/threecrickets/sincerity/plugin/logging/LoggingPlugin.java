@@ -26,14 +26,14 @@ public class LoggingPlugin implements Plugin
 	{
 		return new String[]
 		{
-			"initialize", "log"
+			"logging", "log"
 		};
 	}
 
 	public void run( Command command ) throws SincerityException
 	{
 		String name = command.getName();
-		if( "initialize".equals( name ) )
+		if( "logging".equals( name ) )
 		{
 			initialize( command.getSincerity() );
 		}
@@ -54,19 +54,35 @@ public class LoggingPlugin implements Plugin
 	// Operations
 	//
 
-	public void initialize( Sincerity sincerity )
+	public void initialize( Sincerity sincerity ) throws SincerityException
 	{
 		// Configure log4j
-		try
+		File configurationFile = sincerity.getContainer().getFile( "configuration", "logging.conf" );
+		if( configurationFile.exists() )
 		{
+			// log4j configuration files can use this
 			System.setProperty( "sincerity.logs", sincerity.getContainer().getFile( "logs" ).getPath() );
-			File configurationFile = sincerity.getContainer().getFile( "configuration", "logging.conf" );
-			if( configurationFile.exists() )
+
+			try
+			{
+				sincerity.getContainer().getDependencies().reload();
+				System.out.println(sincerity.getContainer().getDependencies().getClassLoader().loadClass( "org.apache.log4j.xml.DOMConfigurator" ));
 				org.apache.log4j.xml.DOMConfigurator.configureAndWatch( configurationFile.getPath() );
+			}
+			catch( NoClassDefFoundError x )
+			{
+				x.printStackTrace();
+				throw new SincerityException( "Could not find log4j in claspath", x );
+			}
+			catch( ClassNotFoundException e )
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		catch( Exception x )
-		{
-		}
+
+		// Makes sure some servers (such as Jetty) don't log to console
+		System.setProperty( "java.util.logging.config.file", "none" );
 
 		// Remove any pre-existing configuration from JULI
 		LogManager.getLogManager().reset();
@@ -76,8 +92,9 @@ public class LoggingPlugin implements Plugin
 		{
 			org.slf4j.bridge.SLF4JBridgeHandler.install();
 		}
-		catch( Exception x )
+		catch( NoClassDefFoundError x )
 		{
+			throw new SincerityException( "Could not find SLF4J bridge in claspath", x );
 		}
 	}
 }
