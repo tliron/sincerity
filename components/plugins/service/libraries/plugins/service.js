@@ -22,12 +22,12 @@ function run(command) {
 }
 
 function service(command) {
-	if (command.arguments.length < 2) {
+	if (command.arguments.length < 1) {
 		throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "run", or "status")')
 	}
 
 	var uri = command.arguments[0]
-	var verb = command.arguments[1]
+	var verb = command.arguments.length > 1 ? command.arguments[1] : 'status'
 
 	var name = uri.replace('/', '_')
 	var displayName = name
