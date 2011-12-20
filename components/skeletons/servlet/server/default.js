@@ -38,6 +38,7 @@ if (warsDir.directory) {
 		if (name.endsWith('.war')) {
 			name = name.substring(0, name.length() - 4)
 			var context = new WebAppContext(server.handler, file, '/' + name)
+			cacheDir.mkdirs()
 			context.tempDirectory = new File(cacheDir, name)
 			context.securityHandler.loginService = new HashLoginService() 
 		}

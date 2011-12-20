@@ -61,10 +61,12 @@
 		<module>plugins/service-jmx</module>
 		<module>skeletons/prudence</module>
 		<module>skeletons/restlet</module>
+		<module>skeletons/restlet-example</module>
 		<module>skeletons/restlet-jetty</module>
 		<module>skeletons/restlet-logging</module>
 		<module>skeletons/savory</module>
 		<module>skeletons/servlet</module>
+		<module>skeletons/servlet-example</module>
 		<module>skeletons/web</module>
 	</modules>
 
