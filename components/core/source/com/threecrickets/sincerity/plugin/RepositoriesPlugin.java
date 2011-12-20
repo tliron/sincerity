@@ -31,6 +31,7 @@ public class RepositoriesPlugin implements Plugin
 		String commandName = command.getName();
 		if( "attach".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "section", "name", "type" );
@@ -66,6 +67,7 @@ public class RepositoriesPlugin implements Plugin
 		}
 		else if( "detach".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "section", "name" );

@@ -55,7 +55,6 @@ public class DependenciesPlugin implements Plugin
 		else if( "install".equals( commandName ) )
 		{
 			command.setParse( true );
-
 			String[] arguments = command.getArguments();
 			String name;
 			if( arguments.length < 1 )
@@ -84,6 +83,7 @@ public class DependenciesPlugin implements Plugin
 		}
 		else if( "add".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
@@ -105,6 +105,7 @@ public class DependenciesPlugin implements Plugin
 		}
 		else if( "revise".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 3 )
 				throw new BadArgumentsCommandException( command, "group", "name", "version" );
@@ -123,6 +124,7 @@ public class DependenciesPlugin implements Plugin
 		}
 		else if( "remove".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 2 )
 				throw new BadArgumentsCommandException( command, "group", "name" );
