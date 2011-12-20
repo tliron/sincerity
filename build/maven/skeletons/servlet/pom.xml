@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>restlet</artifactId>
+	<artifactId>servlet</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Restlet</name>
-	<description>A Sincerity skeleton that turns your container into a REST component using Restlet.</description>
+	<name>Sincerity Skeleton: Servlet</name>
+	<description>A Sincerity skeleton that turns your container into a servlet container using Jetty.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,9 +49,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.restlet.jse</groupId>
-			<artifactId>restlet</artifactId>
-			<version>2.0.10</version>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>7.5.4</version>
 		</dependency>
 	</dependencies>
 
@@ -76,7 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/javascript/installers/restlet/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/javascript/installers/servlet/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

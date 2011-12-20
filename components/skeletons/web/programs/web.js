@@ -35,21 +35,6 @@ resource.directoriesListed = true
 handlers.addHandler(resource)
 
 //
-// Servlets
-//
-
-try {
-importClass(org.eclipse.jetty.servlet.ServletContextHandler)
-var servlet = new ServletContextHandler()
-servlet.contextPath = '/servlet/'
-
-holder = servlet.addServlet(org.eclipse.jetty.servlet.DefaultServlet, '/tmp/*')
-holder.setInitParameter('resourceBase', '/tmp')
-holder.setInitParameter('pathInfoOnly', 'true')
-handlers.addHandler(servlet)
-} catch(x) {}
-
-//
 // Start server
 //
 

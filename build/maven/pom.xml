@@ -64,6 +64,7 @@
 		<module>skeletons/restlet-jetty</module>
 		<module>skeletons/restlet-logging</module>
 		<module>skeletons/savory</module>
+		<module>skeletons/servlet</module>
 		<module>skeletons/web</module>
 	</modules>
 

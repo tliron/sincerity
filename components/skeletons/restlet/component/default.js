@@ -1,6 +1,7 @@
 
 importClass(
-	org.restlet.Component)
+	org.restlet.Component,
+	java.io.File)
 
 var here
 	
@@ -14,12 +15,16 @@ function executeAll(dir) {
 		}
 	}
 }
-	
+
+// The component
 var component = new Component()
 
-executeAll(sincerity.container.getFile('component', 'clients'))
-executeAll(sincerity.container.getFile('component', 'servers'))
-executeAll(sincerity.container.getFile('component', 'hosts'))
-executeAll(sincerity.container.getFile('component', 'applications'))
+// Assemble the component
+var componentDir = sincerity.container.getFile('component')
+executeAll(new File(componentDir, 'clients'))
+executeAll(new File(componentDir, 'servers'))
+executeAll(new File(componentDir, 'hosts'))
+executeAll(new File(componentDir, 'applications'))
 
+// Start it!
 component.start()
