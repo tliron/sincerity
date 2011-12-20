@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>service-jmx</artifactId>
+	<groupId>com.threecrickets.sincerity.skeleton</groupId>
+	<artifactId>servlet-jsp</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Plugin Add-on: Service JMX</name>
-	<description>Adds JMX support to the service plugin.</description>
+	<name>Sincerity Skeleton Add-on: Servlet JSP</name>
+	<description>Adds JSP support to the servlet skeleton.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,48 +49,20 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>service</artifactId>
+			<groupId>com.threecrickets.sincerity.skeleton</groupId>
+			<artifactId>servlet</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.am.rmi</groupId>
-			<artifactId>firewall-friendly-agent</artifactId>
-			<version>1.0</version>
+			<groupId>org.glassfish.web</groupId>
+			<artifactId>jsp-impl</artifactId>
+			<version>2.1.3-b10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>3.7</version>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<directory>../../../cache/maven</directory>
-
-		<plugins>
-			<!-- jar artifact -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestEntries>
-									<Package-Folders>package</Package-Folders>
-								</manifestEntries>
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

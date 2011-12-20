@@ -3,19 +3,19 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity</groupId>
-	<artifactId>sincerity-project</artifactId>
-	<version>1.1.0</version>
+	<groupId>com.threecrickets.sincerity.skeleton</groupId>
+	<artifactId>servlet-jmx</artifactId>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Project</name>
-	<description>Advanced container management for the JVM.</description>
+	<name>Sincerity Skeleton Add-on: Servlet JMX</name>
+	<description>Adds JMX support to the servlet skeleton.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
 	<scm>
 		<connection>scm:git:https://code.google.com/p/sincerity/</connection>
-		<url>https://code.google.com/p/sincerity/source/checkout</url>
+		<url>http://code.google.com/p/sincerity/source/browse/</url>
 	</scm>
 
 	<organization>
@@ -47,29 +47,17 @@
 		</mailingList>
 	</mailingLists>
 
-	<modules>
-		<module>core</module>
-		<module>plugins/logging</module>
-		<module>plugins/clojure</module>
-		<module>plugins/groovy</module>
-		<module>plugins/javascript</module>
-		<module>plugins/php</module>
-		<module>plugins/python</module>
-		<module>plugins/ruby</module>
-		<module>plugins/scala</module>
-		<module>plugins/service</module>
-		<module>plugins/service-remote-jmx</module>
-		<module>skeletons/prudence</module>
-		<module>skeletons/restlet</module>
-		<module>skeletons/restlet-example</module>
-		<module>skeletons/restlet-jetty</module>
-		<module>skeletons/restlet-logging</module>
-		<module>skeletons/savory</module>
-		<module>skeletons/servlet</module>
-		<module>skeletons/servlet-example</module>
-		<module>skeletons/servlet-jmx</module>
-		<module>skeletons/servlet-jsp</module>
-		<module>skeletons/web</module>
-	</modules>
+	<dependencies>
+		<dependency>
+			<groupId>com.threecrickets.sincerity.skeleton</groupId>
+			<artifactId>servlet</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-jmx</artifactId>
+			<version>7.5.4</version>
+		</dependency>
+	</dependencies>
 
 </project>

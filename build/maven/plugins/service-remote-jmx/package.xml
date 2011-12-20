@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/service-jmx</directory>
+			<directory>../../../../components/plugins/service-remote-jmx</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

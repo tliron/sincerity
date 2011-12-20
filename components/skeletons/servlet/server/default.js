@@ -21,6 +21,21 @@ function executeAll(dir) {
 	
 var server = new Server()
 
+// JMX (if available)
+try {
+	importClass(
+		org.eclipse.jetty.jmx.MBeanContainer,
+		org.eclipse.jetty.util.log.Log,
+		java.lang.management.ManagementFactory)
+
+	var mBeanServer = ManagementFactory.platformMBeanServer
+	var mBeanContainer = new MBeanContainer(mBeanServer)
+	mBeanContainer.addBean(Log.log)
+	server.addBean(mBeanContainer)
+	server.container.addEventListener(mBeanContainer)
+}
+catch (x) {}
+
 // Assemble server
 var serverDir = sincerity.container.getFile('server')
 executeAll(new File(serverDir, 'connectors'))
