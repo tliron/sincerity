@@ -41,15 +41,19 @@ public class JavaPlugin implements Plugin
 
 			String[] arguments = command.getArguments();
 			File javaDir;
-			if( arguments.length < 1 )
-				javaDir = container.getFile( "libraries", "java" );
-			else
+			if( arguments.length > 0 )
 				javaDir = new File( arguments[0] );
+			else
+				javaDir = container.getFile( "libraries", "java" );
 
 			if( !javaDir.isDirectory() )
 				return;
 
-			File classesDir = container.getFile( "libraries", "classes" );
+			File classesDir;
+			if( arguments.length > 1 )
+				classesDir = new File( arguments[1] );
+			else
+				classesDir = container.getFile( "libraries", "classes" );
 
 			Dependencies dependencies = container.getDependencies();
 

@@ -2,6 +2,8 @@
 importClass(
 	org.eclipse.jetty.server.Server,
 	org.eclipse.jetty.server.handler.ContextHandlerCollection,
+	org.eclipse.jetty.webapp.WebAppContext,
+	org.eclipse.jetty.security.HashLoginService,
 	java.io.File)
 
 var here
@@ -24,6 +26,23 @@ var serverDir = sincerity.container.getFile('server')
 executeAll(new File(serverDir, 'connectors'))
 server.handler = new ContextHandlerCollection()
 executeAll(new File(serverDir, 'contexts'))
+
+// Add wars
+var warsDir = new File(serverDir, 'wars')
+if (warsDir.directory) {
+	var cacheDir = sincerity.container.getCacheFile('jetty', 'wars')
+	var files = warsDir.listFiles()
+	for (var f in files) {
+		var file = files[f]
+		var name = file.name
+		if (name.endsWith('.war')) {
+			name = name.substring(0, name.length() - 4)
+			var context = new WebAppContext(server.handler, file, '/' + name)
+			context.tempDirectory = new File(cacheDir, name)
+			context.securityHandler.loginService = new HashLoginService() 
+		}
+	}
+}
 
 // Start server
 server.start()
