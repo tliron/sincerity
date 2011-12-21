@@ -87,7 +87,13 @@ function service(command) {
 		var binary = 'wrapper-' + os.name + '-' + os.architecture + '-' + os.bits
 		binary = sincerity.container.getLibrariesFile('native', binary)
 		if (!binary.exists()) {
-			throw new SincerityException('The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+			if (isSupported(os)) {
+				sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, '3.5.13'])
+				sincerity.run('dependencies:install')
+			}
+			if (!binary.exists()) {
+				throw new SincerityException('The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+			}
 		}
 	
 		// This configuration will override anything in service.conf
@@ -258,6 +264,10 @@ function isRunning(status) {
 
 function isStopped(status) {
 	return (null === status) || (status == 'DOWN') || (status == 'DOWN_CLEAN') || (status == 'STOPPING') || (status == 'STOPPED')
+}
+
+function isSupported(os) {
+	return (os.name == 'aix') || (os.name == 'freebsd') || (os.name == 'hpux') || (os.name == 'linux') || (os.name == 'macosx') || (os.name == 'solaris') || (os.name == 'windows')
 }
 
 function kill(pid) {
