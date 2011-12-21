@@ -53,11 +53,13 @@
 			<artifactId>jython-standalone</artifactId>
 			<version>2.5.2</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>python</groupId>
 			<artifactId>setuptools</artifactId>
 			<version>0.6c11</version>
 		</dependency>
+		 -->
 	</dependencies>
 
 	<build>
@@ -81,6 +83,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/installers/python/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

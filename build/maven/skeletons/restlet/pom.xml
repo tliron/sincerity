@@ -76,7 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/javascript/installers/restlet/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/installers/restlet/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

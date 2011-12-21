@@ -4,13 +4,16 @@ importClass(java.lang.System, java.io.File)
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getCommands() {
-	return ['python']
+	return ['python', 'easy_install']
 }
 
 function run(command) {
 	switch (String(command.name)) {
 		case 'python':
 			python(command)
+			break
+		case 'easy_install':
+			easy_install(command)
 			break
 	}
 }
@@ -56,4 +59,16 @@ function python(command) {
 	}
 
 	command.sincerity.run('delegate:main', mainArguments)
+}
+
+function easy_install(command) {
+	var sitePackages = command.sincerity.container.getLibrariesFile('python', 'Lib', 'site-packages')
+	sitePackages.mkdirs()
+	var egg = command.sincerity.container.getLibrariesFile('python', 'setuptools-0.6c11-py2.5.egg')
+	command.sincerity.run('python:python', ['-c', "" +
+	"egg = '/home/emblemparade/xxx/libraries/python/setuptools-0.6c11-py2.5.egg';" +
+	"from setuptools.command.easy_install import main;" +                           
+	"import sys;" +
+	"sys.argv=['easy_install', egg];" +
+	"main();"])
 }

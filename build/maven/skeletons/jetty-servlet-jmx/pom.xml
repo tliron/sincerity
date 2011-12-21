@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>web</artifactId>
+	<artifactId>jetty-servlet-jmx</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Web</name>
-	<description>A Sincerity skeleton that turns your container into a web server using Jetty.</description>
+	<name>Sincerity Skeleton Add-on: Jetty Servlet JMX</name>
+	<description>Adds JMX support to the Jetty servlet skeleton.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,44 +49,15 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.threecrickets.sincerity.skeleton</groupId>
+			<artifactId>jetty-servlet</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
+			<artifactId>jetty-jmx</artifactId>
 			<version>7.5.4</version>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<directory>../../../cache/maven</directory>
-
-		<plugins>
-			<!-- jar artifact -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestEntries>
-									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/javascript/installers/web/</Package-Installer>
-								</manifestEntries>
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

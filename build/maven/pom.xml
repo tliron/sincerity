@@ -65,11 +65,11 @@
 		<module>skeletons/restlet-jetty</module>
 		<module>skeletons/restlet-logging</module>
 		<module>skeletons/savory</module>
-		<module>skeletons/servlet</module>
-		<module>skeletons/servlet-example</module>
-		<module>skeletons/servlet-jmx</module>
-		<module>skeletons/servlet-jsp</module>
-		<module>skeletons/web</module>
+		<module>skeletons/jetty-servlet</module>
+		<module>skeletons/jetty-servlet-example</module>
+		<module>skeletons/jetty-servlet-jmx</module>
+		<module>skeletons/jetty-servlet-jsp</module>
+		<module>skeletons/jetty-web</module>
 	</modules>
 
 </project>

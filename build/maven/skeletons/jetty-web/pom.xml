@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>servlet</artifactId>
+	<artifactId>jetty-web</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Servlet</name>
-	<description>A Sincerity skeleton that turns your container into a servlet container using Jetty.</description>
+	<name>Sincerity Skeleton: Jetty Web</name>
+	<description>A Sincerity skeleton that turns your container into a web server using Jetty.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-webapp</artifactId>
+			<artifactId>jetty-server</artifactId>
 			<version>7.5.4</version>
 		</dependency>
 	</dependencies>
@@ -76,7 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/javascript/installers/servlet/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/installers/jetty-web/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>
