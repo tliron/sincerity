@@ -36,13 +36,18 @@ var examples = [
 	
 	'examples.spaceinvaders.Game']
 
-print('Choose an LWJGL example to run:\n\n')
+print('Available LWJGL examples:\n\n')
 for (var i in examples) {
 	print('  ' + i + ') ' + examples[i] + '\n')
 }
+print('\nChoose an LWJGL example to run: ')
 
 var reader = new BufferedReader(new InputStreamReader(System['in']))
 var example = reader.readLine()
 example = examples[parseInt(example)]
 
-sincerity.run('delegate:main', ['org.lwjgl.' + example])
+var arguments = ['org.lwjgl.' + example]
+for (var i = 1, length = application.arguments.length; i < length; i++) {
+	arguments.push(application.arguments[i])
+}
+sincerity.run('delegate:main', arguments)
