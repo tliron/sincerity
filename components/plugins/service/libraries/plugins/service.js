@@ -211,7 +211,7 @@ function getOs() {
 			architecture = 'ia'
 		}
 	}
-	else if (name == 'MacOS X') {
+	else if (name == 'Mac OS X') {
 		name = 'macosx'
 		architecture = 'universal'
 	}

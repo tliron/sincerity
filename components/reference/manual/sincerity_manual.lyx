@@ -128,6 +128,32 @@ Introduction
 Why Sincerity?
 \end_layout
 
+\begin_layout Standard
+The free software and open source movements have utterly changed how we
+ develop new software.
+ Though freely available libraries had existed before, these movements have
+ created a culture of sharing and viable business models that have cultivated
+ an unprecedented wealth of solutions.
+ For any problem you encounter in your everyday development work, there
+ is likely a library out there that you can download for free.
+ Your mileage may vary, as they say: quality may not always be up to snuff,
+ and no warranty is provided, but the source code is included and you can
+ make it better, for yourself and for others.
+ Importantly, it's relatively worry-free to invest in free software: you
+ can be certain that your license to use the library will not be revoked
+ and that bugs 
+\emph on
+could
+\emph default
+ be solved.
+\end_layout
+
+\begin_layout Standard
+(Of course, you do need to worry whether the software breaks any owned patents,
+ but that problem exists for any software, whether it's free or proprietary,
+ from a third party or developed by you.)
+\end_layout
+
 \begin_layout Subsubsection
 Lather, Rinse, Repeat
 \end_layout

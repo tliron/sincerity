@@ -48,5 +48,22 @@ public class NativeUtil
 		catch( IllegalAccessException e )
 		{
 		}
+
+		String javaLibraryPath = System.getProperty( "java.library.path" );
+		String[] paths = javaLibraryPath.split( ":" );
+		boolean exists = false;
+		for( String path : paths )
+		{
+			if( path.equals( nativePath ) )
+			{
+				exists = true;
+				break;
+			}
+		}
+		if( !exists )
+		{
+			javaLibraryPath += ":" + nativePath;
+			System.setProperty( "java.library.path", javaLibraryPath );
+		}
 	}
 }

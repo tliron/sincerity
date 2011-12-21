@@ -70,6 +70,8 @@
 		<module>skeletons/jetty-servlet-jmx</module>
 		<module>skeletons/jetty-servlet-jsp</module>
 		<module>skeletons/jetty-web</module>
+		<module>skeletons/lwjgl</module>
+		<module>skeletons/lwjgl-example</module>
 	</modules>
 
 </project>

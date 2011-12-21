@@ -168,6 +168,7 @@ public class Dependencies
 			File nativeDir = container.getLibrariesFile( "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
+			NativeUtil.addNativePath( "/Depot/Libraries/lwjgl/native/linux" );
 		}
 
 		return classLoader;

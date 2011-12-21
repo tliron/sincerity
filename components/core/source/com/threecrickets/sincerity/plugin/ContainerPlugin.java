@@ -48,6 +48,10 @@ public class ContainerPlugin implements Plugin
 				template = arguments[1];
 			File templateDir = new File( new File( command.getSincerity().getHome(), "templates" ), template );
 
+			// TODO: look for templates according to ~/.sincerity/sincerity.conf
+			// first (likely ~/.sincerity/templates
+			// same for 'templatize'
+
 			command.getSincerity().createContainer( containerRoot, templateDir );
 		}
 		else if( "use".equals( commandName ) )
