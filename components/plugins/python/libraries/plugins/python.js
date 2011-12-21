@@ -46,7 +46,7 @@ function python(command) {
 	
 	// The Jython runtime does not reinitialize its state if its already initialized, so we must
 	// explicitly set sys.argv if we want to run it more than once with different arguments
-    sys.argv.clear()
+	sys.argv.clear()
 
 	var mainArguments = [MAIN_CLASS]
 	var arguments = command.arguments

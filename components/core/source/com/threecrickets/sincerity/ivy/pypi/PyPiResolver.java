@@ -2,7 +2,6 @@ package com.threecrickets.sincerity.ivy.pypi;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -49,6 +48,7 @@ import org.apache.ivy.plugins.resolver.util.ResolvedResource;
 import org.apache.ivy.util.Message;
 
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.ivy.SincerityRepositoryCacheManager;
 
@@ -61,6 +61,8 @@ public class PyPiResolver extends BasicResolver
 	public static final String DEFAULT_ORGANIZATION = "python";
 
 	public static final String DEFAULT_ROOT = "http://pypi.python.org/simple";
+
+	public static final String PYTHON_ARCHIVE_EGG = "python-archive-egg";
 
 	//
 	// Construction
@@ -288,7 +290,7 @@ public class PyPiResolver extends BasicResolver
 					if( "egg".equals( extension ) )
 					{
 						type = "python-egg";
-						archiveType = "python-archive-egg";
+						archiveType = PYTHON_ARCHIVE_EGG;
 					}
 					else
 					{
@@ -312,7 +314,7 @@ public class PyPiResolver extends BasicResolver
 					File archiveFile = getFile( archiveArtifact );
 
 					File eggFile = null;
-					if( "python-archive-egg".equals( archiveType ) )
+					if( PYTHON_ARCHIVE_EGG.equals( archiveType ) )
 					{
 						eggFile = archiveFile;
 					}
@@ -324,7 +326,7 @@ public class PyPiResolver extends BasicResolver
 						{
 							// Make sure the built egg is archived, too
 							URL eggUrl = eggFile.toURI().toURL();
-							DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, "python-archive-egg", "egg", eggUrl, null );
+							DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, PYTHON_ARCHIVE_EGG, "egg", eggUrl, null );
 							getFile( eggArtifact );
 
 							// Add built egg as artifact
@@ -426,7 +428,7 @@ public class PyPiResolver extends BasicResolver
 		// We might already have it archived
 		if( "python-egg".equals( artifact.getType() ) )
 		{
-			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), "python-archive-egg", artifact.getExt() );
+			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), PYTHON_ARCHIVE_EGG, artifact.getExt() );
 			File archivedEggFile = getCachedFile( archivedEggArtifact );
 			if( archivedEggFile != null )
 			{
@@ -559,14 +561,30 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private File buildEgg( File archiveFile, File eggDir, File unpackedArchiveDir )
+	private static void setup( File setupFile, File eggDir, Sincerity sincerity ) throws SincerityException
+	{
+		// Notes:
+		//
+		// 1. setup.py often expects to be in the current
+		// directory
+		//
+		// 2. bdist_egg only works for a setup.py based on
+		// setuptools, not on distutils, but by importing
+		// setuptools we let it install its extensions so
+		// that distutils can use them
+
+		sincerity.run( "python:python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
+		sincerity.run( "python:python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+	}
+
+	private static File buildEgg( File archiveFile, File eggDir, File unpackedArchiveDir )
 	{
 		// Do we have a cached built egg?
 		if( eggDir.isDirectory() )
 			for( File file : eggDir.listFiles() )
 				return file;
 
-		// Unpack only we haven't already unpacked into the cache
+		// Unpack only if we haven't already unpacked into the cache
 		if( unpackedArchiveDir.isDirectory() || FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir ) )
 		{
 			// Find setup.py
@@ -598,47 +616,9 @@ public class PyPiResolver extends BasicResolver
 				{
 					try
 					{
-						// Notes:
-						//
-						// 1. setup.py often expects to be in the current
-						// directory
-						//
-						// 2. bdist_egg only works for a setup.py based on
-						// setuptools, not on distutils, but by importing
-						// setuptools we let it install its extensions so
-						// that distutils can use them
-
-						sincerity.run( "python:python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
-						sincerity.run( "python:python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+						setup( setupFile, eggDir, sincerity );
 					}
-					catch( Exception x )
-					{
-						x.printStackTrace();
-					}
-				}
-				else
-				{
-					File setupDir = setupFile.getParentFile();
-					try
-					{
-						// Create our entry point, converting our function
-						// arguments to system arguments
-
-						FileWriter writer = new FileWriter( new File( setupDir, "__setup.py" ) );
-						writer.write( "import sys, os\n" );
-						writer.write( "def setup(*args):\n" );
-						writer.write( "  sys.argv = ['setup.py'] + list(str(arg) for arg in args)\n" );
-						writer.write( "  os.chdir('" + setupDir + "')\n" );
-						writer.write( "  import setup\n" );
-						writer.close();
-
-						// bdist_egg only works for a setup.py based on
-						// setuptools, not on distutils.
-
-						Python setup = new Python( "__setup.py", setupDir );
-						setup.call( "setup", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
-					}
-					catch( Exception x )
+					catch( SincerityException x )
 					{
 						x.printStackTrace();
 					}
@@ -646,11 +626,9 @@ public class PyPiResolver extends BasicResolver
 
 				// Return the built egg
 				if( eggDir.isDirectory() )
-				{
 					for( File file : eggDir.listFiles() )
 						if( file.getName().endsWith( ".egg" ) )
 							return file;
-				}
 			}
 		}
 		return null;
