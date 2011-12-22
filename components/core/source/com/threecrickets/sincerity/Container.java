@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.ivy.Ivy;
 import org.apache.ivy.core.event.IvyEvent;
@@ -275,29 +273,26 @@ public class Container implements IvyListener, TransferListener
 		{
 			// for (Object o : attributes.keySet())
 			// System.out.println(o + ": " + attributes.get(o));
-			String organization = (String) attributes.get( "organisation" );
-			String module = (String) attributes.get( "module" );
-			String artifact = (String) attributes.get( "artifact" );
-			String revision = (String) attributes.get( "revision" );
-			String type = (String) attributes.get( "type" );
-			String origin = (String) attributes.get( "origin" );
-			if( name == null )
-				message( "Fetching file:\n  type: " + type + "\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision + "\n  from: " + origin );
-			origins.add( origin );
+			if( "false".equals( attributes.get( "metadata" ) ) )
+			{
+				String organization = (String) attributes.get( "organisation" );
+				String module = (String) attributes.get( "module" );
+				String artifact = (String) attributes.get( "artifact" );
+				String revision = (String) attributes.get( "revision" );
+				String type = (String) attributes.get( "type" );
+				String origin = (String) attributes.get( "origin" );
+				if( name == null )
+					message( "Fetching file:\n  type: " + type + "\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision + "\n  from: " + origin );
+				message( "Downloading " + origin );
+			}
+
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
 		{
 			if( "false".equals( attributes.get( "metadata" ) ) && "successful".equals( attributes.get( "status" ) ) )
 			{
-				// for (Object o : attributes.keySet())
-				// System.out.println(o + ": " + attributes.get(o));
-				// System.out.println(attributes.get("status"));
-				// String origin = (String) attributes.get( "origin" );
-				// if( origins.remove( origin ) )
-				// {
 				String file = (String) attributes.get( "file" );
 				message( "Installing artifact: " + getRelativePath( file ) );
-				// }
 			}
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )
@@ -341,8 +336,6 @@ public class Container implements IvyListener, TransferListener
 	private final Dependencies dependencies;
 
 	private final Shortcuts shortcuts;
-
-	private final List<String> origins = new CopyOnWriteArrayList<String>();
 
 	private void message( String message )
 	{

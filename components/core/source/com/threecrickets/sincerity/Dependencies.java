@@ -22,6 +22,7 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
+import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
@@ -95,6 +96,7 @@ public class Dependencies
 		{
 			"default"
 		} );
+		defaultResolveOptions.setCheckIfChanged( true );
 		defaultResolveOptions.setLog( LogOptions.LOG_QUIET );
 	}
 
@@ -417,14 +419,16 @@ public class Dependencies
 
 	public void install( boolean overwrite ) throws SincerityException
 	{
-		// Make sure class loader is set
+		container.getSincerity().getOut().println( "Making sure all dependencies are installed..." );
+
+		// Make sure class loader is set in thread
 		getClassLoader();
 
-		System.out.println( "Resolving dependencies" );
 		ivy.pushContext();
+		ResolveReport report;
 		try
 		{
-			ivy.resolve( moduleDescriptor, defaultResolveOptions );
+			report = ivy.resolve( moduleDescriptor, defaultResolveOptions );
 		}
 		catch( ParseException x )
 		{
@@ -439,11 +443,18 @@ public class Dependencies
 			ivy.popContext();
 		}
 
-		uninitialize();
+		if( report.hasError() )
+			throw new SincerityException( "Some dependencies could not be installed" );
+
+		if( report.hasChanged() )
+			uninitialize();
+		else
+			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
 
-		uninitialize();
+		if( report.hasChanged() )
+			uninitialize();
 	}
 
 	public void uninitialize()
