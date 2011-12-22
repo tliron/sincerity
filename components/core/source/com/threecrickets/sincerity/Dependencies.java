@@ -2,6 +2,7 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -447,7 +448,10 @@ public class Dependencies
 			throw new SincerityException( "Some dependencies could not be installed" );
 
 		if( report.hasChanged() )
+		{
+			printDisclaimer( container.getSincerity().getOut() );
 			uninitialize();
+		}
 		else
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
@@ -522,5 +526,28 @@ public class Dependencies
 		if( parser != null )
 			artifacts.addAll( Arrays.asList( parser.getArtifactReports() ) );
 		return artifacts;
+	}
+
+	private static void printDisclaimer( PrintWriter out )
+	{
+		out.println();
+		out.println( "Sincerity has has downloaded software from a repository and installed in your container." );
+		out.println( "However, it is up to you to ensure that it is legal for you to use the installed software." );
+		out.println( "Neither the developers of Sincerity nor the maintainers of the repositories can be held" );
+		out.println( "legally responsible for your usage. In particular, note that most free and open source " );
+		out.println( "software licenses grant you permission to use the software, without warranty, but place" );
+		out.println( "limitations on your freedom to redistribute it." );
+		out.println();
+		out.println( "For your convenience, an effort has been made to provide you with access to the software" );
+		out.println( "licenses. However, it is up to you to ensure that these are indeed the correct licenses for" );
+		out.println( "each particular software product. Neither the developers of Sincerity nor the maintainers" );
+		out.println( "of the repositories can be held legally responsible for the veracity of the information" );
+		out.println( "regarding the licensing of particular software products. In particular, note that software" );
+		out.println( "licenses may differ per version or edition of the software product, and that some software" );
+		out.println( "is available under multiple licenses." );
+		out.println();
+		out.println( "Use the \"sincerity dependencies:licenses\" command to see a list of all licenses, or" );
+		out.println( "\"sincerity gui:gui\" for a graphical interface." );
+		out.println();
 	}
 }

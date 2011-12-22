@@ -47,10 +47,10 @@ public class DependenciesPlugin implements Plugin
 		else if( "licenses".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean verbose = command.getSwitches().contains( "verbose" );
+			boolean shortSwitch = command.getSwitches().contains( "short" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printLicenses( dependencies, command.getSincerity().getOut(), verbose );
+			printLicenses( dependencies, command.getSincerity().getOut(), !shortSwitch );
 		}
 		else if( "install".equals( commandName ) )
 		{
