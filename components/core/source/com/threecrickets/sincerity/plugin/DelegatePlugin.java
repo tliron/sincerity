@@ -79,15 +79,36 @@ public class DelegatePlugin implements Plugin
 
 			try
 			{
+				boolean block = false;
+				if( "--block".equals( arguments[0] ) )
+				{
+					block = true;
+					String[] newArguments = new String[arguments.length - 1];
+					System.arraycopy( arguments, 1, newArguments, 0, newArguments.length );
+					arguments = newArguments;
+				}
+
 				File executable = command.getSincerity().getContainer().getExecutablesFile( arguments[0] );
 				if( executable.exists() )
 					arguments[0] = executable.getPath();
 
 				Runtime runtime = Runtime.getRuntime();
 				Process process = runtime.exec( arguments );
-				runtime.addShutdownHook( new ProcessDestroyer( process ) );
+				if( !block )
+					runtime.addShutdownHook( new ProcessDestroyer( process ) );
 				new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), command.getSincerity().getOut() ) ).start();
 				new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), command.getSincerity().getErr() ) ).start();
+				if( block )
+				{
+					try
+					{
+						process.waitFor();
+					}
+					catch( InterruptedException x )
+					{
+						throw new SincerityException( "System command execution was interrupted: " + StringUtil.join( arguments, " " ), x );
+					}
+				}
 			}
 			catch( IOException x )
 			{

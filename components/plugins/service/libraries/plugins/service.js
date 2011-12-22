@@ -147,7 +147,7 @@ function service(command) {
 		}
 
 		// Daemonize?
-		if (verb == 'start') {
+		if ((verb == 'start') || (verb == 'restart')) {
 			configuration['wrapper.daemonize'] = 'TRUE'
 		}
 
@@ -167,7 +167,7 @@ function service(command) {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
 		sincerity.run('delegate:execute', arguments)
-		if (verb == 'start') {
+		if ((verb == 'start') || (verb == 'restart')) {
 			command.sincerity.out.println('Started ' + displayName)
 		}
 		return
