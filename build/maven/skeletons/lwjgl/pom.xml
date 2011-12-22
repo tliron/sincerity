@@ -76,7 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:run /libraries/installers/lwjgl/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/installers/lwjgl/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

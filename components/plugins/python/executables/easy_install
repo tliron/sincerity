@@ -1,0 +1,6 @@
+#!/bin/bash
+
+HERE=$(dirname "$0")
+ROOT="$HERE/.."
+
+sincerity container:use "$ROOT" : python:python "$ROOT/programs/easy_install.py" --script-dir "$HERE" ${@:1}

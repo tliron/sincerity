@@ -1,5 +1,6 @@
 package com.threecrickets.sincerity.plugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -34,7 +35,7 @@ public class DelegatePlugin implements Plugin
 	{
 		return new String[]
 		{
-			"main", "run", "launch"
+			"main", "start", "execute"
 		};
 	}
 
@@ -49,7 +50,7 @@ public class DelegatePlugin implements Plugin
 
 			ClassUtil.main( command.getSincerity(), arguments );
 		}
-		else if( "run".equals( commandName ) )
+		else if( "start".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
@@ -70,11 +71,18 @@ public class DelegatePlugin implements Plugin
 			// MainPlugin.main( sincerity,
 			// "com.threecrickets.scripturian.Scripturian", arguments );
 		}
-		else if( "launch".equals( commandName ) )
+		else if( "execute".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
+			if( arguments.length < 1 )
+				throw new BadArgumentsCommandException( command );
+
 			try
 			{
+				File executable = command.getSincerity().getContainer().getExecutablesFile( arguments[0] );
+				if( executable.exists() )
+					arguments[0] = executable.getPath();
+
 				Runtime runtime = Runtime.getRuntime();
 				Process process = runtime.exec( arguments );
 				runtime.addShutdownHook( new ProcessDestroyer( process ) );

@@ -112,7 +112,7 @@ function service(command) {
 			'wrapper.java.library.path.1': sincerity.container.getLibrariesFile('native'),
 			'wrapper.java.mainclass': 'org.tanukisoftware.wrapper.WrapperSimpleApp',
 			'wrapper.app.parameter.1': 'com.threecrickets.sincerity.Sincerity',
-			'wrapper.app.parameter.2': 'delegate:run',
+			'wrapper.app.parameter.2': 'delegate:start',
 			'wrapper.app.parameter.3': uri
 		}
 		
@@ -166,7 +166,7 @@ function service(command) {
 		if (verb == 'run') {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
-		sincerity.run('delegate:launch', arguments)
+		sincerity.run('delegate:execute', arguments)
 		if (verb == 'start') {
 			command.sincerity.out.println('Started ' + displayName)
 		}
@@ -275,6 +275,6 @@ function kill(pid) {
 		// TODO
 	}
 	else {
-		sincerity.run('delegate:launch', 'kill', pid)
+		sincerity.run('delegate:execute', 'kill', pid)
 	}
 }

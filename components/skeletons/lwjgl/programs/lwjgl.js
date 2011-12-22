@@ -33,4 +33,4 @@ var arguments = ['game']
 for (var i = 1, length = application.arguments.length; i < length; i++) {
 	arguments.push(application.arguments[i])
 }
-sincerity.run('delegate:run', arguments)
+sincerity.run('delegate:start', arguments)

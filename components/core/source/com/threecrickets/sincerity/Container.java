@@ -231,6 +231,14 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	public File getExecutablesFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = "executables";
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
+	}
+
 	public File getRelativeFile( File file )
 	{
 		return new File( getRelativePath( file.getPath() ) );

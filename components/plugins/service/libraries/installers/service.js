@@ -5,7 +5,7 @@ function makeExecutable(file) {
 			file.executable = true
 		}
 		else {
-			sincerity.run('delegate:launch', 'chmod', '+x', file)
+			sincerity.run('delegate:execute', 'chmod', '+x', file)
 		}
 	}
 }

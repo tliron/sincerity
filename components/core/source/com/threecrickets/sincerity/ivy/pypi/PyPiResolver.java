@@ -47,6 +47,7 @@ import org.apache.ivy.plugins.resolver.BasicResolver;
 import org.apache.ivy.plugins.resolver.util.ResolvedResource;
 import org.apache.ivy.util.Message;
 
+import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
@@ -573,8 +574,8 @@ public class PyPiResolver extends BasicResolver
 		// setuptools we let it install its extensions so
 		// that distutils can use them
 
-		sincerity.run( "python:python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
-		sincerity.run( "python:python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
+		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
 	}
 
 	private static File buildEgg( File archiveFile, File eggDir, File unpackedArchiveDir )

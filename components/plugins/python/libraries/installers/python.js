@@ -5,12 +5,10 @@ function makeExecutable(file) {
 			file.executable = true
 		}
 		else {
-			sincerity.run('delegate:launch', 'chmod', '+x', file)
+			sincerity.run('delegate:execute', 'chmod', '+x', file)
 		}
 	}
 }
 
-var file = sincerity.container.getProgramsFile('python')
-if (file.exists()) {
-	makeExecutable(file)
-}
+makeExecutable(sincerity.container.getExecutablesFile('python'))
+makeExecutable(sincerity.container.getExecutablesFile('easy_install'))
