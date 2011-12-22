@@ -57,14 +57,14 @@ public class DelegatePlugin implements Plugin
 				throw new BadArgumentsCommandException( command, "uri" );
 
 			Container container = command.getSincerity().getContainer();
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getFile( "cache" ).getPath() );
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
 
 			if( !arguments[0].startsWith( "/" ) )
 				arguments[0] = "/programs/" + arguments[0];
 
 			Main scripturian = new Main( new LanguageManager( container.getDependencies().getClassLoader() ), container.getRoot(), true, arguments[0], "default", "js", "document", "application", command.getSincerity()
 				.getOut(), command.getSincerity().getErr(), arguments );
-			scripturian.getLibrarySources().add( new DocumentFileSource<Executable>( container.getFile( "libraries" ), "default", "js", -1 ) );
+			scripturian.getLibrarySources().add( new DocumentFileSource<Executable>( container.getLibrariesFile(), "default", "js", -1 ) );
 			scripturian.setExecutionController( new SincerityExecutionController( command.getSincerity() ) );
 			scripturian.run();
 
