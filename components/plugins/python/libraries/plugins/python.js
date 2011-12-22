@@ -3,13 +3,12 @@ importClass(
 	org.python.core.Py,
 	org.python.core.PyString,
 	org.python.core.Options,
-	java.lang.System,
-	java.io.File)
+	java.lang.System)
 
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getCommands() {
-	return ['python', 'easy_install']
+	return ['python']
 }
 
 function run(command) {
@@ -17,16 +16,12 @@ function run(command) {
 		case 'python':
 			python(command)
 			break
-		case 'easy_install':
-			easy_install(command)
-			break
 	}
 }
 
 function python(command) {
-	// The Python standard library is here
-	var pythonHome = command.sincerity.container.getLibrariesFile('python')
-	System.setProperty('python.home', pythonHome)
+	// The Python standard library is here (Jython expects a "Lib" subdirectory underneath)
+	System.setProperty('python.home', command.sincerity.container.getLibrariesFile('python'))
 
 	// The cachedir must be absolute or relative to PYTHON_HOME (Jython will add a "packages" subdirectory to it)
 	System.setProperty('python.cachedir', command.sincerity.container.getCacheFile('python'))
@@ -37,20 +32,22 @@ function python(command) {
 	// This is Jython's 'sys' module (a singleton)
 	var sys = Py.systemState
 
-	// sys.executable is used to spawn Python subprocesses
+	sys.exec_prefix = new PyString(command.sincerity.container.getExecutablesFile())
 	sys.executable = new PyString(command.sincerity.container.getExecutablesFile('python'))
-	//sys.exec_prefix = new org.python.core.PyString(new File(root, 'programs').canonicalPath)
 	
 	// Put eggs into sys.path
-	var files = pythonHome.listFiles()
-	for (var i in files) {
-		var file = files[i]
-		if (file.name.endsWith('.egg')) {
-			sys.path.add(String(file))
+	var eggsDir = command.sincerity.container.getLibrariesFile('eggs')
+	if (eggsDir.directory) {
+		var files = eggsDir.listFiles()
+		for (var i in files) {
+			var file = files[i]
+			if (file.name.endsWith('.egg')) {
+				sys.path.add(String(file))
+			}
 		}
 	}
 	
-	// The Jython runtime does not reinitialize the 'sys' module singleton if its already initialized,
+	// The Jython runtime does not reinitialize the 'sys' module singleton if it's already initialized,
 	// so we must explicitly set sys.argv if we want to run it more than once with different arguments
 	sys.argv.clear()
 
@@ -62,16 +59,4 @@ function python(command) {
 	}
 
 	command.sincerity.run('delegate:main', mainArguments)
-}
-
-function easy_install(command) {
-	var sitePackages = command.sincerity.container.getLibrariesFile('python', 'Lib', 'site-packages')
-	sitePackages.mkdirs()
-	var egg = command.sincerity.container.getLibrariesFile('python', 'setuptools-0.6c11-py2.5.egg')
-	command.sincerity.run('python:python', ['-c', "" +
-	"egg = '/home/emblemparade/xxx/libraries/python/setuptools-0.6c11-py2.5.egg';" +
-	"from setuptools.command.easy_install import main;" +                           
-	"import sys;" +
-	"sys.argv=['easy_install', egg];" +
-	"main();"])
 }

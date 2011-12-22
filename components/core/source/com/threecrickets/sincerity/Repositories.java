@@ -30,6 +30,12 @@ import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 public class Repositories
 {
 	//
+	// Constants
+	//
+
+	public static final String REPOSITORY_SECTION_SEPARATOR = ":";
+
+	//
 	// Construction
 	//
 
@@ -63,7 +69,7 @@ public class Repositories
 		{
 			DependencyResolver resolver = (DependencyResolver) r;
 			String name = resolver.getName();
-			String[] names = name.split( ":", 2 );
+			String[] names = name.split( REPOSITORY_SECTION_SEPARATOR, 2 );
 			if( names.length > 1 )
 				addResolver( names[0], resolver, false );
 		}
@@ -75,7 +81,7 @@ public class Repositories
 
 	public boolean addMaven( String section, String name, String url ) throws SincerityException
 	{
-		name = section + ":" + name;
+		name = section + REPOSITORY_SECTION_SEPARATOR + name;
 		if( ivy.getSettings().getResolver( name ) != null )
 			return false;
 
@@ -112,7 +118,7 @@ public class Repositories
 
 	public boolean addPyPi( String section, String name, String url ) throws SincerityException
 	{
-		name = section + ":" + name;
+		name = section + REPOSITORY_SECTION_SEPARATOR + name;
 		if( ivy.getSettings().getResolver( name ) != null )
 			return false;
 
@@ -147,7 +153,7 @@ public class Repositories
 
 	public boolean remove( String section, String name )
 	{
-		name = section + ":" + name;
+		name = section + REPOSITORY_SECTION_SEPARATOR + name;
 		if( ivy.getSettings().getResolver( name ) == null )
 			return false;
 

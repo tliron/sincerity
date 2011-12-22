@@ -29,7 +29,7 @@ public class HelpPlugin implements Plugin
 		String commandName = command.getName();
 		if( "help".equals( commandName ) )
 		{
-			for( Plugin plugin : command.getSincerity().getPlugins().values() )
+			for( Plugin plugin : command.getSincerity().getContainer().getDependencies().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
 					System.out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
 		}

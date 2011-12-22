@@ -72,12 +72,12 @@ public class ActionsPane extends JPanel implements ItemListener
 			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 			if( groupByPlugin )
 			{
-				for( Plugin plugin : sincerity.getPlugins().values() )
+				for( Plugin plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
 					root.add( GuiUtil.createPluginNode( plugin, true ) );
 			}
 			else
 			{
-				for( Plugin plugin : sincerity.getPlugins().values() )
+				for( Plugin plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
 					for( String command : plugin.getCommands() )
 						root.add( GuiUtil.createCommandNode( command, plugin, true ) );
 			}

@@ -101,13 +101,14 @@ public class Container implements IvyListener, TransferListener
 	// Construction
 	//
 
-	public Container() throws SincerityException
+	public Container( Sincerity sincerity ) throws SincerityException
 	{
-		this( null, Message.MSG_WARN );
+		this( sincerity, null, Message.MSG_WARN );
 	}
 
-	public Container( File root, int debugLevel ) throws SincerityException
+	public Container( Sincerity sincerity, File root, int debugLevel ) throws SincerityException
 	{
+		this.sincerity = sincerity;
 		this.root = root;
 
 		root.mkdirs();
@@ -161,6 +162,11 @@ public class Container implements IvyListener, TransferListener
 	public Ivy getIvy()
 	{
 		return ivy;
+	}
+
+	public Sincerity getSincerity()
+	{
+		return sincerity;
 	}
 
 	public Repositories getRepositories()
@@ -323,6 +329,8 @@ public class Container implements IvyListener, TransferListener
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private final Sincerity sincerity;
 
 	private final File root;
 

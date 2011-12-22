@@ -95,7 +95,6 @@ public class Dependencies
 		{
 			"default"
 		} );
-		// defaultResolveOptions.setOutputReport( false );
 		defaultResolveOptions.setLog( LogOptions.LOG_QUIET );
 	}
 
@@ -140,6 +139,14 @@ public class Dependencies
 		return resolvedDependencies;
 	}
 
+	public Plugins getPlugins() throws SincerityException
+	{
+		if( plugins == null )
+			plugins = new Plugins( container.getSincerity() );
+
+		return plugins;
+	}
+
 	public ClassLoader getClassLoader() throws SincerityException
 	{
 		if( classLoader == null )
@@ -168,7 +175,6 @@ public class Dependencies
 			File nativeDir = container.getLibrariesFile( "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
-			NativeUtil.addNativePath( "/Depot/Libraries/lwjgl/native/linux" );
 		}
 
 		return classLoader;
@@ -234,7 +240,7 @@ public class Dependencies
 		ArrayList<String> paths = new ArrayList<String>( classpaths.size() );
 		for( File file : classpaths )
 			paths.add( file.getPath() );
-		return StringUtil.join( paths, ":" );
+		return StringUtil.join( paths, File.pathSeparator );
 	}
 
 	public List<File> getClasspaths() throws SincerityException
@@ -275,7 +281,7 @@ public class Dependencies
 			String system = System.getProperty( "java.class.path" );
 			if( system != null )
 			{
-				for( String path : system.split( ":" ) )
+				for( String path : system.split( File.pathSeparator ) )
 				{
 					File file = new File( path ).getAbsoluteFile();
 					if( !classpaths.contains( file ) )
@@ -399,14 +405,14 @@ public class Dependencies
 	public void prune() throws SincerityException
 	{
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
-		reload();
+		uninitialize();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
 		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
-		reload();
+		uninitialize();
 	}
 
 	public void install( boolean overwrite ) throws SincerityException
@@ -433,16 +439,17 @@ public class Dependencies
 			ivy.popContext();
 		}
 
-		reload();
+		uninitialize();
 
 		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
 
-		reload();
+		uninitialize();
 	}
 
-	public void reload()
+	public void uninitialize()
 	{
 		classLoader = null;
+		plugins = null;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -463,6 +470,8 @@ public class Dependencies
 	private ResolvedDependencies resolvedDependencies;
 
 	private ClassLoader classLoader;
+
+	private Plugins plugins;
 
 	private void save() throws SincerityException
 	{

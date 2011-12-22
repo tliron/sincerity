@@ -86,8 +86,6 @@ if [ -z "$SINCERITY_HOME" ]; then
 	SINCERITY_HOME=$(get-parent-path "$0")
 fi
 
-echo "Sincerity home: $SINCERITY_HOME"
-
 #
 # Libraries
 #

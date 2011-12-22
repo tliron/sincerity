@@ -78,7 +78,6 @@ public class Sincerity implements Runnable
 		{
 			container = sincerity.container;
 			containerRoot = sincerity.containerRoot;
-			plugins = sincerity.plugins;
 			sincerityHome = sincerity.sincerityHome;
 		}
 		commands = parseCommands( arguments );
@@ -117,20 +116,6 @@ public class Sincerity implements Runnable
 	public PrintWriter getErr()
 	{
 		return err;
-	}
-
-	public Plugins getPlugins() throws SincerityException
-	{
-		if( plugins != null )
-		{
-			if( plugins.getClassLoader() != getContainer().getDependencies().getClassLoader() )
-				plugins = null;
-		}
-
-		if( plugins == null )
-			plugins = new Plugins( this );
-
-		return plugins;
 	}
 
 	public Container getContainer() throws SincerityException
@@ -224,9 +209,9 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			container = new Container( containerRoot, debugLevel );
+			container = new Container( this, containerRoot, debugLevel );
 
-			System.out.println( "Using Sincerity container at: " + containerRoot );
+			out.println( "Using Sincerity container at: " + containerRoot );
 		}
 
 		return container;
@@ -244,7 +229,7 @@ public class Sincerity implements Runnable
 		{
 			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
 			{
-				System.out.println( "The path is already a Sincerity container: " + containerRoot );
+				out.println( "The path is already a Sincerity container: " + containerRoot );
 				setContainerRoot( containerRoot );
 				return;
 			}
@@ -403,6 +388,8 @@ public class Sincerity implements Runnable
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
+
 	private final List<Command> commands;
 
 	private File sincerityHome;
@@ -417,5 +404,18 @@ public class Sincerity implements Runnable
 
 	private PrintWriter err = new PrintWriter( new OutputStreamWriter( System.err ), true );
 
-	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
+	private Plugins getPlugins() throws SincerityException
+	{
+		try
+		{
+			return getContainer().getDependencies().getPlugins();
+		}
+		catch( NoContainerException x )
+		{
+			if( plugins == null )
+				plugins = new Plugins( this );
+
+			return plugins;
+		}
+	}
 }

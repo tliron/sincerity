@@ -50,7 +50,7 @@ public class NativeUtil
 		}
 
 		String javaLibraryPath = System.getProperty( "java.library.path" );
-		String[] paths = javaLibraryPath.split( ":" );
+		String[] paths = javaLibraryPath.split( File.pathSeparator );
 		boolean exists = false;
 		for( String path : paths )
 		{
@@ -62,7 +62,7 @@ public class NativeUtil
 		}
 		if( !exists )
 		{
-			javaLibraryPath += ":" + nativePath;
+			javaLibraryPath += File.pathSeparator + nativePath;
 			System.setProperty( "java.library.path", javaLibraryPath );
 		}
 	}

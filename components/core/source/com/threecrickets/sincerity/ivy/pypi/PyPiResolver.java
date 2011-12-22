@@ -566,16 +566,14 @@ public class PyPiResolver extends BasicResolver
 	{
 		// Notes:
 		//
-		// 1. setup.py often expects to be in the current
-		// directory
+		// 1. setup.py often expects to be in the current directory
 		//
-		// 2. bdist_egg only works for a setup.py based on
-		// setuptools, not on distutils, but by importing
-		// setuptools we let it install its extensions so
-		// that distutils can use them
+		// 2. bdist_egg is not included in distutils, but by importing
+		// setuptools we let it install its extensions so that distutils can use
+		// them
 
 		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
-		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "./setup.py", "bdist_egg", "--dist-dir=" + eggDir.getAbsolutePath() );
+		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggDir.getPath() );
 	}
 
 	private static File buildEgg( File archiveFile, File eggDir, File unpackedArchiveDir )

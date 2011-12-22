@@ -563,28 +563,837 @@ Community Plugins
 Skeletons
 \end_layout
 
-\begin_layout Subsubsection
-Web Server Skeleton
+\begin_layout Standard
+You've most likely come to Sincerity for the skeletons: they provide the
+ easiest way to get started with all kinds of frameworks, servers and libraries,
+ while Sincerity lets you easily add more features, more libraries and more
+ languages as your project grows.
 \end_layout
 
 \begin_layout Subsubsection
-Servlet Skeleton
+Web Server
+\end_layout
+
+\begin_layout Standard
+Need a web server for static files? No problem:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install jetty.web
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Jetty is a very robust, modular web server with excellent asynchronous performan
+ce, and lots of features and extensions.
+ With this skeleton we've provided you with the lightweight, bare minimum
+ dependencies to serve just static files for a single web site.
+\end_layout
+
+\begin_layout Standard
+To start you server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start jetty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8080, so point your browser to http://localhost:8080
+ to see the default welcoming page.
+\end_layout
+
+\begin_layout Standard
+Jetty allows for much more sophistication than just serving a single web
+ site, and for that we've provided a separate skeleton: 
+\begin_inset Quotes eld
+\end_inset
+
+jetty.servlet
+\begin_inset Quotes erd
+\end_inset
+
+.
+ That skeleton supports multiple 
+\begin_inset Quotes eld
+\end_inset
+
+contexts
+\begin_inset Quotes erd
+\end_inset
+
+ under the server, as well as configuration of connectors, and of course
+ servlets and web applications packaged as WAR files.
+\end_layout
+
+\begin_layout Standard
+Additionally, Jetty is a recommended connector for Restlet.
+ It's available as 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.jetty
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+Just put your files under the container's 
+\begin_inset Quotes eld
+\end_inset
+
+/web/
+\begin_inset Quotes erd
+\end_inset
+
+ directory, using the usual rules for web servers: URLs are mapped to file
+ paths under 
+\begin_inset Quotes eld
+\end_inset
+
+/web/
+\begin_inset Quotes erd
+\end_inset
+
+, and directory URLs are mapped to 
+\begin_inset Quotes eld
+\end_inset
+
+index.html
+\begin_inset Quotes erd
+\end_inset
+
+ files in that directory.
+ MIME types are automatically guessed according to the common filename extension
+s.
+\end_layout
+
+\begin_layout Standard
+You can configure the server by editing 
+\begin_inset Quotes eld
+\end_inset
+
+/programs/jetty.js
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For example, you can change the port, add an SSL connector (for https URLs)
+ and configure new MIME types.
+\end_layout
+
+\begin_layout Paragraph
+Extras
+\end_layout
+
+\begin_layout Standard
+Two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install logging : install service
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install a web server with the recommended plugins
+ into a Sincerity container created in the current directory, and then start
+ it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create web : install jetty.web : install logging : install service
+ : service jetty start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use web : service jetty stop
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
-Restlet Skeleton
+Servlet
+\end_layout
+
+\begin_layout Standard
+Servlets let you generate dynamic content for a web site, usually using
+ the Java language.
+ There is a very large ecosystem of free servlets out there, including complete
+ frameworks, that can help you develop dynamic applications.
+\end_layout
+
+\begin_layout Standard
+To install a barebones servlet skeleton, based on Jetty:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install jetty.servlet
+\end_layout
+
+\end_inset
+
+To start you server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start jetty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8080, so point your browser to http://localhost:8080.
+ But, you won't see anything yet: this is a barebones skeleton waiting for
+ you to add your application.
+ You might want to start with 
+\begin_inset Quotes eld
+\end_inset
+
+jetty.servlet.example
+\begin_inset Quotes erd
+\end_inset
+
+ first.
+\end_layout
+
+\begin_layout Standard
+As useful as servlets are, we recommend you take a look at the 
+\begin_inset Quotes eld
+\end_inset
+
+restlet
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton if you want to build a dynamic web application in Java.
+ And Restlet can use Jetty as its underlying connector.
+\end_layout
+
+\begin_layout Standard
+And why stop there? Prudence (the 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton) builds on Restlet, letting you do all of that with your choice
+ of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+Jetty's official distribution (which doesn't rely on Sincerity...
+ yet) is a perfect example of why Sincerity needs to exist.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Official Jetty
+\begin_inset Quotes erd
+\end_inset
+
+ is a morass of XML files that effectively duplicate what a lightweight
+ scripting language, like JavaScript does far more comprehensibly and with
+ far greater power.
+ If you're switching from 
+\begin_inset Quotes eld
+\end_inset
+
+Official Jetty,
+\begin_inset Quotes erd
+\end_inset
+
+ then you're in for a treat, as well as a sigh of relief.
+\end_layout
+
+\begin_layout Paragraph
+Extras
+\end_layout
+
+\begin_layout Standard
+A nice example of a Jetty server with multiple contexts is provided: a static
+ web server, a servlet container, and a web application installed as a WAR
+ file:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install jetty.servlet.example
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(You can install this on its own, and it will pull in the basic skeleton
+ as a dependency.)
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+/server/contexts/servlet-example/
+\begin_inset Quotes erd
+\end_inset
+
+ is most elaborate: it shows you how you can drop in Java source code for
+ your servlets and have them compiled as the server starts.
+\end_layout
+
+\begin_layout Standard
+Additionally, two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install logging : install service
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install the servlet examples with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create servlet : install jetty.servlet.example : install logging
+ : install service : service jetty start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use servlet : service jetty stop
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
-Prudence Skeleton
+Restlet
+\end_layout
+
+\begin_layout Standard
+Restlet lets you dynamically generate web content, but it goes beyond just
+ responding to client requests: it lets you map RESTful resources to URIs,
+ while abstracting away the tricky HTTP mechanics involved (content negotiation,
+ conditional HTTP) and providing rich tools for routing, filtering and data.
+\end_layout
+
+\begin_layout Standard
+Restlet, on its own, requires Java, but Prudence (the 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton) builds on Restlet, letting you do all of that with your choice
+ of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+\end_layout
+
+\begin_layout Standard
+To install the minimal skeleton:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install restlet
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start you server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start restlet
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8080, so point your browser to http://localhost:8080.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+While Restlet requires you to write your resources in Java (see Prudence
+ for an alternative that supports other languages), there is no reason for
+ your bootstrapping code---the code that assembles your component, servers,
+ clients, hosts and routes---to be so rigid.
+ Restlet ships as a library, not as a deployable.
+ The API for boostrapping your component is simple and elegant, but normally
+ you would have to access it in Java.
+\end_layout
+
+\begin_layout Standard
+JavaScript, Sincerity's natural language, provides a much more lightweight
+ solution, and one that does not require you to recompile anything when
+ all you want to change is your configuration.
+ Of course, once your component is up and running, JavaScript plays no more
+ role.
+ (We mention that in case you're worried about performance, though you shouldn't
+ be: the language engine is likely not the source of any bottlenecks in
+ your application's performance.
+ If you're ready to leave Java behind, take a look at the Prudence skeleton.)
+\end_layout
+
+\begin_layout Paragraph
+Extras
+\end_layout
+
+\begin_layout Standard
+A simple example Restlet application, with a custom resource as well as
+ static content:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install restlet.example
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(You can install this on its own, and it will pull in the basic skeleton
+ as a dependency.)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+/component/applications/example/
+\begin_inset Quotes erd
+\end_inset
+
+ shows you how you can drop in Java source code for your resources and have
+ them compiled as the component starts.
+\end_layout
+
+\begin_layout Standard
+Additionally, two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install logging : install service
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install the Restlet example with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create restlet : install restlet.example : install logging : install
+ service : service restlet start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use restlet : service restlet stop
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
-Savory Skeleton
+Prudence
 \end_layout
 
 \begin_layout Subsubsection
-Game Skeleton
+The Savory Framework
+\end_layout
+
+\begin_layout Standard
+The Savory Framework lets you develop scalable data-driven web applications
+ in server-side JavaScript, centering on MongoDB as its data provider and
+ Prudence as its RESTful base.
+ It features strong integration with client-side 
+\begin_inset Quotes eld
+\end_inset
+
+AJAX,
+\begin_inset Quotes erd
+\end_inset
+
+ notably Ext JS and Sencha Touch, and clean-room integration with Facebook,
+ Twitter, Google, etc..
+ Services include a scalable email notification system, robust sitemap generatio
+n (with special support for 
+\emph on
+very 
+\emph default
+large sites), authentication and authorization, and support for several
+ markup languages.
+\end_layout
+
+\begin_layout Standard
+(Like Sincerity and Prudence, the Savory Framework is developed by Three
+ Crickets.
+ The three products form a powerful stack!)
+\end_layout
+
+\begin_layout Subsubsection
+Django
+\end_layout
+
+\begin_layout Standard
+Django is a popular web development framework for Python.
+ It relies on a traditional MVC approach and relational database stores
+ (MySQL, Postgres).
+ Django enjoys a strong ecosystem of drop-in features and snippets, but
+ also provides a lot of features right in the box.
+\end_layout
+
+\begin_layout Standard
+There are many advantages in running Django on the JVM, instead of the CPython
+ reference platform: much improved scalability (there is no GIL in Jython),
+ as well as access to any JVM library 
+\emph on
+in addition 
+\emph default
+to Python libraries.
+ Of course, Sincerity makes it extremely easy and transparent to add both
+ kinds of libraries as dependencies.
+\end_layout
+
+\begin_layout Standard
+Django can be difficult to install and get running on Jython, but of course
+ it's trivial with Sincerity.
+ To install it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will pull in the 
+\begin_inset Quotes eld
+\end_inset
+
+python
+\begin_inset Quotes erd
+\end_inset
+
+ plugin as a dependency, so you don't need to anything else to get started
+ with Django.
+\end_layout
+
+\begin_layout Standard
+To start you server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8000, so point your browser to http://localhost:8000.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Subsubsection
+Game
+\end_layout
+
+\begin_layout Standard
+The JVM is growing in popularity as a platform for game designers, due to
+ its ability to easily work on many operating systems, as well as in browsers.
+ Much of this growth is due to the excellent LWJGL library: it makes easy
+ to use advanced native features, such as 3D graphics, 3D sound, and to
+ accept input from gaming controllers.
+ While it does rely on native extensions to the JVM, they are supported
+ on Linux, Windows, Mac OS X and Solaris.
+\end_layout
+
+\begin_layout Standard
+The author's favorite game, Minecraft, is based on it.
+\end_layout
+
+\begin_layout Standard
+To install the barebones skeleton:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install lwjgl
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start you game:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start lwjgl
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will detect your operating system, install the relevant native binaries
+ into the container (if they aren't already installed), and then start your
+ game...
+ except that with this barebones skeleton, there is no game.
+ For sometimes to play with, see the 
+\begin_inset Quotes eld
+\end_inset
+
+lwjgl.example
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+/programs/game.js
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
