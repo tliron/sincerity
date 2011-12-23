@@ -22,8 +22,10 @@ function run(command) {
 }
 
 function ruby(command, preArguments, postArguments) {
-	// The Ruby standard library is here (JRuby expects a "lib" subdirectory underneath)
 	System.setProperty('jruby.home', command.sincerity.container.getLibrariesFile('ruby'))
+
+	// The Ruby standard library is here
+	System.setProperty('jruby.lib', command.sincerity.container.getLibrariesFile('ruby', 'lib'))
 
 	// JFFI
 	System.setProperty('jffi.boot.library.path', command.sincerity.container.getLibrariesFile('ruby', 'native'))
