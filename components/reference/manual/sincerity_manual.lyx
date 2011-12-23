@@ -1340,7 +1340,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install django
+sincerity install install django
 \end_layout
 
 \end_inset
@@ -1349,16 +1349,7 @@ sincerity install django
 \end_layout
 
 \begin_layout Standard
-This will pull in the 
-\begin_inset Quotes eld
-\end_inset
-
-python
-\begin_inset Quotes erd
-\end_inset
-
- plugin as a dependency, so you don't need to anything else to get started
- with Django.
+This may take a minute or two: Django is massive.
 \end_layout
 
 \begin_layout Standard
@@ -1571,8 +1562,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create django : install python : install django : install service
- : service django start
+sincerity create django : install django : install service : service django
+ start
 \end_layout
 
 \end_inset
