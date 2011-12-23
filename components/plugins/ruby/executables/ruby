@@ -1,0 +1,6 @@
+#!/bin/bash
+
+HERE=$(dirname "$0")
+ROOT="$HERE/.."
+
+sincerity container:use "$ROOT" : ruby:ruby ${@:1}

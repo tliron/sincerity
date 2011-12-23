@@ -8,7 +8,7 @@ importClass(
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getCommands() {
-	return ['python']
+	return ['python', 'easy_install']
 }
 
 function run(command) {
@@ -16,10 +16,13 @@ function run(command) {
 		case 'python':
 			python(command)
 			break
+		case 'easy_install':
+			easy_install(command)
+			break
 	}
 }
 
-function python(command) {
+function python(command, preArguments) {
 	// The Python standard library is here (Jython expects a "Lib" subdirectory underneath)
 	System.setProperty('python.home', command.sincerity.container.getLibrariesFile('python'))
 
@@ -52,11 +55,21 @@ function python(command) {
 	sys.argv.clear()
 
 	var mainArguments = [MAIN_CLASS]
+	if (preArguments) {
+		for (var i in preArguments) {
+			mainArguments.push(preArguments[i])
+			sys.argv.add(new PyString(preArguments[i]))
+		}
+	}
 	var arguments = command.arguments
-	for (var i in command.arguments) {
-		mainArguments.push(command.arguments[i])
-		sys.argv.add(command.arguments[i])
+	for (var i in arguments) {
+		mainArguments.push(arguments[i])
+		sys.argv.add(new PyString(arguments[i]))
 	}
 
 	command.sincerity.run('delegate:main', mainArguments)
+}
+
+function easy_install(command) {
+	python(command, [command.sincerity.container.getProgramsFile('easy_install.py'), '--script-dir=' + command.sincerity.container.getExecutablesFile()])
 }

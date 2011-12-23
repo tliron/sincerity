@@ -1474,7 +1474,22 @@ sincerity manage
 \end_layout
 
 \begin_layout Standard
-From there, it's all standard Django goodness.
+A quick note: Python is a bit sluggish to start up on the JVM, which you
+ will notice when running 
+\begin_inset Quotes eld
+\end_inset
+
+manage
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, don't let this worry you: once it's up and running, your Django
+ application will perform marvelously.
+\end_layout
+
+\begin_layout Standard
+And that's it: from here on, it's all standard Django goodness.
  You can go ahead with the tutorial at https://docs.djangoproject.com/en/dev/intro
 /tutorial01/, skipping the short 
 \begin_inset Quotes eld
@@ -1488,9 +1503,9 @@ Creating a project
 \end_layout
 
 \begin_layout Standard
-Well, just one more comment: the database backend use JDBC drivers (the
- JVM's relational database interface) instead of Python drivers, so the
- database engine names in your 
+Well, just one quick note: the database backend uses JDBC drivers (the JVM's
+ relational database interface) instead of Python drivers, so the database
+ engine names in your 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1594,7 +1609,7 @@ sincerity use django : service django stop
 Note that Sincerity's logging plugin won't do you much good out of the box,
  because Django uses Python's logging system, not the JVM's.
  However, it should be easy implement your own Python logger that delegates
- to standard JVM logging.
+ to standard JVM logging if that seems exciting to you.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1603,10 +1618,11 @@ Game
 
 \begin_layout Standard
 The JVM is growing in popularity as a platform for game designers, due to
- its ability to easily work on many operating systems, as well as in browsers.
- Much of this growth is due to the excellent LWJGL library: it makes easy
- to use advanced native features, such as 3D graphics, 3D sound, and to
- accept input from gaming controllers.
+ its ability to easily have the game run on many operating systems, as well
+ as in browsers.
+ Much of this growth is due to the excellent LWJGL library, which makes
+ easy to use hardware-accelerated features, such as 3D graphics and 3D sound,
+ and to accept input from gaming controllers.
  While it does rely on native extensions to the JVM, they are supported
  on Linux, Windows, Mac OS X and Solaris.
  The author's favorite game, Minecraft, is based on it.
@@ -1632,7 +1648,7 @@ sincerity install lwjgl
 \end_layout
 
 \begin_layout Standard
-To start you game:
+To start your game:
 \end_layout
 
 \begin_layout Standard
@@ -1651,11 +1667,27 @@ sincerity start lwjgl
 \end_layout
 
 \begin_layout Standard
-This will detect your operating system, install the relevant native binaries
- into the container (if they aren't already installed), and then start your
- game\SpecialChar \ldots{}
- except that with this barebones skeleton, there is no game.
- For sometimes to play with, see the 
+This 
+\begin_inset Quotes eld
+\end_inset
+
+lwjgl
+\begin_inset Quotes erd
+\end_inset
+
+ program will detect your operating system, install the relevant native
+ binaries into the container (if they aren't already installed), and then
+ start the 
+\begin_inset Quotes eld
+\end_inset
+
+game
+\begin_inset Quotes erd
+\end_inset
+
+ program\SpecialChar \ldots{}
+ except that with this barebones skeleton, there is no game to start.
+ For something to play with, see the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1664,6 +1696,7 @@ lwjgl.example
 \end_inset
 
  skeleton.
+ It includes a simple Space Invaders clone.
 \end_layout
 
 \begin_layout Paragraph
@@ -1671,6 +1704,7 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
+Create a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1678,7 +1712,48 @@ Fleshing Out
 \begin_inset Quotes erd
 \end_inset
 
+ that starts up your game.
+ If you want your game to be written only in Java, this likely means entering
+ your main class, like this:
+\end_layout
 
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity.run('delegate:main', ['org.mycoolgame.Main'])
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+However, don't rule out writing your game in JavaScript, or the host of
+ other languages easily installable in Sincerity! You can even 
+\begin_inset Quotes eld
+\end_inset
+
+drop down
+\begin_inset Quotes erd
+\end_inset
+
+ to Java when you some low-level work, and keep the main game logic in a
+ higher-level language.
+\end_layout
+
+\begin_layout Standard
+This is especially useful if you want to provide a way for the community
+ to provide plugins for your game: it would make it easier for novice programmer
+s to contribute, and also allow such plugins to be distributed as simple
+ text files.
+ If you go this route, consider using Scripturian to allow high-performance,
+ muli-threaded integration of the language engines.
+ (Scripturian is the same library Sincerity uses for its plugins.)
 \end_layout
 
 \begin_layout Subsection
