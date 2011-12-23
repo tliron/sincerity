@@ -519,6 +519,58 @@ Programming Language Plugins
 JavaScript
 \end_layout
 
+\begin_layout Standard
+JavaScript is the Sincerity's 
+\begin_inset Quotes eld
+\end_inset
+
+native
+\begin_inset Quotes erd
+\end_inset
+
+ language, so this plugin is especially lightweight:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install javascript
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All it does is provide you with a command with easy access to a JavaScript
+ shell:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity javascript
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The JavaScript shell provides a great way to test out code for developing
+ plugins.
+\end_layout
+
 \begin_layout Paragraph
 Python
 \end_layout
@@ -537,6 +589,11 @@ Groovy
 
 \begin_layout Paragraph
 Clojure
+\end_layout
+
+\begin_layout Standard
+Clojure is a modern Lisp designed from the ground up to provide excellent
+ concurrency and high performance.
 \end_layout
 
 \begin_layout Paragraph
@@ -865,8 +922,9 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
-Jetty's official distribution (which doesn't rely on Sincerity...
- yet) is a perfect example of why Sincerity needs to exist.
+Jetty's official distribution (which doesn't rely on Sincerity\SpecialChar \ldots{}
+ yet) is a
+ perfect example of why Sincerity needs to exist.
  
 \begin_inset Quotes eld
 \end_inset
@@ -1013,8 +1071,8 @@ prudence
 \begin_inset Quotes erd
 \end_inset
 
- skeleton) builds on Restlet, letting you do all of that with your choice
- of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ skeleton) builds on Restlet, letting you do all of the above with your
+ choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
 \begin_layout Standard
@@ -1249,8 +1307,29 @@ to Python libraries.
 \end_layout
 
 \begin_layout Standard
+For a RESTful Python alternative to Django, take a look at Prudence (the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton).
+\end_layout
+
+\begin_layout Standard
 Django can be difficult to install and get running on Jython, but of course
  it's trivial with Sincerity.
+ In fact, you might find it easier than working with 
+\begin_inset Quotes eld
+\end_inset
+
+official Django.
+\begin_inset Quotes erd
+\end_inset
+
  To install it:
 \end_layout
 
@@ -1309,6 +1388,224 @@ The default port is 8000, so point your browser to http://localhost:8000.
 Fleshing Out
 \end_layout
 
+\begin_layout Standard
+The skeleton already has a minimal project ready for you under 
+\begin_inset Quotes eld
+\end_inset
+
+/project/
+\begin_inset Quotes erd
+\end_inset
+
+, so you don't have to run 
+\begin_inset Quotes eld
+\end_inset
+
+django-admin.py startproject
+\begin_inset Quotes erd
+\end_inset
+
+ to create one.
+ Indeed, the correct way to start a new Django project in Sincerity is simply
+ to create a new container for it.
+ That's the whole point of Sincerity!
+\end_layout
+
+\begin_layout Standard
+However, if you need to access 
+\begin_inset Quotes eld
+\end_inset
+
+django-admin.py
+\begin_inset Quotes erd
+\end_inset
+
+, it is located under your 
+\begin_inset Quotes eld
+\end_inset
+
+/executables/
+\begin_inset Quotes erd
+\end_inset
+
+ directory, so:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity execute django-admin.py
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Much of the work with Django involves running 
+\begin_inset Quotes eld
+\end_inset
+
+manage.py
+\begin_inset Quotes erd
+\end_inset
+
+, which in this skeleton is located under 
+\begin_inset Quotes eld
+\end_inset
+
+/project/manage.py
+\begin_inset Quotes erd
+\end_inset
+
+.
+ You can run it easily, from anywhere in the container, with a handy plugin:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity manage
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+From there, it's all standard Django goodness.
+ You can go ahead with the tutorial at https://docs.djangoproject.com/en/dev/intro
+/tutorial01/, skipping the short 
+\begin_inset Quotes eld
+\end_inset
+
+Creating a project
+\begin_inset Quotes erd
+\end_inset
+
+ step.
+\end_layout
+
+\begin_layout Standard
+Well, just one more comment: the database backend use JDBC drivers (the
+ JVM's relational database interface) instead of Python drivers, so the
+ database engine names in your 
+\begin_inset Quotes eld
+\end_inset
+
+settings.py
+\begin_inset Quotes erd
+\end_inset
+
+ are a little bit different than in the official tutorial.
+ You'll see the supported options commented in 
+\begin_inset Quotes eld
+\end_inset
+
+settings.py
+\begin_inset Quotes erd
+\end_inset
+
+.
+ JDBC drivers for MySQL and PostgreSQL are included in the skeleton, but
+ you must install the Oracle JDBC driver on your own.
+ Also note that SQLite is not supported at this time.
+\end_layout
+
+\begin_layout Standard
+If you need to access the Django source code, you'll find it under 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/python/Lib/site-packages/
+\begin_inset Quotes erd
+\end_inset
+
+, which is where all Python libraries will be installed in your container.
+\end_layout
+
+\begin_layout Paragraph
+Extras
+\end_layout
+
+\begin_layout Standard
+Adding the service plugin is strongly recommended.
+ To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install service
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install the Django skeleton with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create django : install python : install django : install service
+ : service django start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use django : service django stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Sincerity's logging plugin won't do you much good out of the box,
+ because Django uses Python's logging system, not the JVM's.
+ However, it should be easy implement your own Python logger that delegates
+ to standard JVM logging.
+\end_layout
+
 \begin_layout Subsubsection
 Game
 \end_layout
@@ -1321,10 +1618,7 @@ The JVM is growing in popularity as a platform for game designers, due to
  accept input from gaming controllers.
  While it does rely on native extensions to the JVM, they are supported
  on Linux, Windows, Mac OS X and Solaris.
-\end_layout
-
-\begin_layout Standard
-The author's favorite game, Minecraft, is based on it.
+ The author's favorite game, Minecraft, is based on it.
 \end_layout
 
 \begin_layout Standard
@@ -1368,7 +1662,7 @@ sincerity start lwjgl
 \begin_layout Standard
 This will detect your operating system, install the relevant native binaries
  into the container (if they aren't already installed), and then start your
- game...
+ game\SpecialChar \ldots{}
  except that with this barebones skeleton, there is no game.
  For sometimes to play with, see the 
 \begin_inset Quotes eld
@@ -1413,7 +1707,16 @@ Maven Repositories
 \end_layout
 
 \begin_layout Subsubsection
-Python and PyPI
+Python and PyPI (a.k.a.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+The Cheese Factory
+\begin_inset Quotes erd
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Subsubsection

@@ -50,7 +50,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 					}
 					catch( Exception x )
 					{
-						x.printStackTrace();
+						x.printStackTrace( sincerity.getErr() );
 					}
 				}
 			}

@@ -1,5 +1,2 @@
 
-
-var manageFile = sincerity.container.getFile('project', 'manage.py')
-
-sincerity.run('python:python', [manageFile, 'runserver'])
+sincerity.run('django:manage', ['runserver'])

@@ -27,78 +27,67 @@ import org.apache.commons.vfs.provider.zip.ZipFileProvider;
 
 public class FileUtil
 {
-	public static boolean unpack( File archiveFile, File destinationDir, File workdDir )
+	public static void unpack( File archiveFile, File destinationDir, File workdDir ) throws IOException
 	{
+		String scheme = null;
+		String name = archiveFile.getName();
+		DefaultFileSystemManager manager = new DefaultFileSystemManager();
 		try
 		{
-			String scheme = null;
-			String name = archiveFile.getName();
-			DefaultFileSystemManager manager = new DefaultFileSystemManager();
-			try
+			boolean untar = false;
+			if( name.endsWith( ".zip" ) )
 			{
-				boolean untar = false;
-				if( name.endsWith( ".zip" ) )
-				{
-					scheme = "zip:";
-					manager.addProvider( "zip", new ZipFileProvider() );
-				}
-				else if( name.endsWith( ".tar.gz" ) || name.endsWith( ".tgz" ) )
-				{
-					scheme = "gz:";
-					untar = true;
-					manager.addProvider( "tar", new TarFileProvider() );
-					manager.addProvider( "gz", new GzipFileProvider() );
-					manager.addProvider( "tgz", new TgzFileProvider() );
-				}
-				else if( name.endsWith( ".tar.bz2" ) )
-				{
-					scheme = "bz2:";
-					untar = true;
-					manager.addProvider( "tar", new TarFileProvider() );
-					manager.addProvider( "bz2", new Bzip2FileProvider() );
-					manager.addProvider( "tbz2", new Tbz2FileProvider() );
-				}
-
-				if( scheme != null )
-				{
-					DefaultFileReplicator replicator = new DefaultFileReplicator( workdDir );
-					replicator.init();
-					manager.setReplicator( replicator );
-					manager.setTemporaryFileStore( replicator );
-					DefaultLocalFileProvider fileProvider = new DefaultLocalFileProvider();
-					manager.addProvider( "file", fileProvider );
-					manager.setDefaultProvider( fileProvider );
-					manager.setFilesCache( new DefaultFilesCache() );
-					manager.init();
-
-					String path = scheme + archiveFile.toURI();
-					FileObject fileObject = manager.resolveFile( path );
-					FileObject[] children = fileObject.getChildren();
-					if( untar && children.length > 0 )
-					{
-						FileObject tar = manager.resolveFile( new File( workdDir, children[0].getName().getBaseName() ).toURI().toString() );
-						org.apache.commons.vfs.FileUtil.copyContent( children[0], tar );
-						tar = manager.resolveFile( "tar:" + tar.getName() );
-						children = tar.getChildren();
-					}
-
-					for( FileObject child : children )
-						copyRecursive( manager, child, manager.resolveFile( destinationDir.toURI().toString() ) );
-
-					return true;
-				}
+				scheme = "zip:";
+				manager.addProvider( "zip", new ZipFileProvider() );
 			}
-			finally
+			else if( name.endsWith( ".tar.gz" ) || name.endsWith( ".tgz" ) )
 			{
-				manager.close();
+				scheme = "gz:";
+				untar = true;
+				manager.addProvider( "tar", new TarFileProvider() );
+				manager.addProvider( "gz", new GzipFileProvider() );
+				manager.addProvider( "tgz", new TgzFileProvider() );
+			}
+			else if( name.endsWith( ".tar.bz2" ) )
+			{
+				scheme = "bz2:";
+				untar = true;
+				manager.addProvider( "tar", new TarFileProvider() );
+				manager.addProvider( "bz2", new Bzip2FileProvider() );
+				manager.addProvider( "tbz2", new Tbz2FileProvider() );
+			}
+
+			if( scheme != null )
+			{
+				DefaultFileReplicator replicator = new DefaultFileReplicator( workdDir );
+				replicator.init();
+				manager.setReplicator( replicator );
+				manager.setTemporaryFileStore( replicator );
+				DefaultLocalFileProvider fileProvider = new DefaultLocalFileProvider();
+				manager.addProvider( "file", fileProvider );
+				manager.setDefaultProvider( fileProvider );
+				manager.setFilesCache( new DefaultFilesCache() );
+				manager.init();
+
+				String path = scheme + archiveFile.toURI();
+				FileObject fileObject = manager.resolveFile( path );
+				FileObject[] children = fileObject.getChildren();
+				if( untar && children.length > 0 )
+				{
+					FileObject tar = manager.resolveFile( new File( workdDir, children[0].getName().getBaseName() ).toURI().toString() );
+					org.apache.commons.vfs.FileUtil.copyContent( children[0], tar );
+					tar = manager.resolveFile( "tar:" + tar.getName() );
+					children = tar.getChildren();
+				}
+
+				for( FileObject child : children )
+					copyRecursive( manager, child, manager.resolveFile( destinationDir.toURI().toString() ) );
 			}
 		}
-		catch( Exception x )
+		finally
 		{
-			x.printStackTrace();
+			manager.close();
 		}
-
-		return false;
 	}
 
 	public static final void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
@@ -118,12 +107,19 @@ public class FileUtil
 	public static final void copyRecursive( File fromDir, File toDir ) throws IOException
 	{
 		DefaultFileSystemManager manager = new DefaultFileSystemManager();
-		DefaultLocalFileProvider fileProvider = new DefaultLocalFileProvider();
-		manager.addProvider( "file", fileProvider );
-		manager.setDefaultProvider( fileProvider );
-		manager.setFilesCache( new DefaultFilesCache() );
-		manager.init();
-		copyRecursive( manager, manager.resolveFile( fromDir.toURI().toString() ), manager.resolveFile( toDir.toURI().toString() ) );
+		try
+		{
+			DefaultLocalFileProvider fileProvider = new DefaultLocalFileProvider();
+			manager.addProvider( "file", fileProvider );
+			manager.setDefaultProvider( fileProvider );
+			manager.setFilesCache( new DefaultFilesCache() );
+			manager.init();
+			copyRecursive( manager, manager.resolveFile( fromDir.toURI().toString() ), manager.resolveFile( toDir.toURI().toString() ) );
+		}
+		finally
+		{
+			manager.close();
+		}
 	}
 
 	public static void deleteRecursive( File file ) throws IOException

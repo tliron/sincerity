@@ -232,7 +232,7 @@ public class Sincerity implements Runnable
 
 			container = new Container( this, containerRoot, debugLevel );
 
-			if( getVerbosity() >= 1 )
+			if( getVerbosity() >= 2 )
 				out.println( "Using Sincerity container at: " + containerRoot );
 		}
 
@@ -295,12 +295,12 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			err.println( x.getMessage() );
-			// x.printStackTrace();
+			x.printStackTrace( err );
 			System.exit( 1 );
 		}
 		catch( Throwable x )
 		{
-			x.printStackTrace();
+			x.printStackTrace( err );
 			System.exit( 1 );
 		}
 	}

@@ -592,7 +592,7 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private static File build( File archiveFile, File unpackedArchiveDir, File eggsDir )
+	private static File build( File archiveFile, File unpackedArchiveDir, File eggsDir ) throws IOException
 	{
 		// Do we have a cached built egg?
 		if( ( eggsDir != null ) && eggsDir.isDirectory() )
@@ -600,66 +600,67 @@ public class PyPiResolver extends BasicResolver
 				return file;
 
 		// Unpack only if we haven't already unpacked into the cache
-		if( unpackedArchiveDir.isDirectory() || FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir ) )
+		if( !unpackedArchiveDir.isDirectory() )
+			FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir );
+
+		// Find setup.py
+		File setupFile = null;
+		if( unpackedArchiveDir.isDirectory() )
 		{
-			// Find setup.py
-			File setupFile = null;
-			if( unpackedArchiveDir.isDirectory() )
+			for( File dir : unpackedArchiveDir.listFiles() )
 			{
-				for( File dir : unpackedArchiveDir.listFiles() )
+				if( dir.isDirectory() )
 				{
-					if( dir.isDirectory() )
+					for( File file : dir.listFiles() )
 					{
-						for( File file : dir.listFiles() )
+						if( SETUP_FILENAME.equals( file.getName() ) )
 						{
-							if( SETUP_FILENAME.equals( file.getName() ) )
-							{
-								setupFile = file;
-								break;
-							}
+							setupFile = file;
+							break;
 						}
 					}
-					if( setupFile != null )
-						break;
 				}
-			}
-
-			if( setupFile != null )
-			{
-				Sincerity sincerity = Sincerity.getCurrent();
-				if( sincerity != null )
-				{
-					try
-					{
-						// Notes:
-						//
-						// 1. setup.py often expects to be in the current
-						// directory
-						//
-						// 2. bdist_egg is not included in distutils, but by
-						// importing setuptools we let it install its extensions
-						// so that distutils can use them
-
-						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
-
-						if( eggsDir != null )
-							sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggsDir.getPath() );
-						else
-							sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
-					}
-					catch( SincerityException x )
-					{
-						x.printStackTrace();
-					}
-				}
-
-				// Return the built egg
-				if( ( eggsDir != null ) && eggsDir.isDirectory() )
-					for( File file : eggsDir.listFiles() )
-						if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
-							return file;
+				if( setupFile != null )
+					break;
 			}
 		}
+
+		if( setupFile != null )
+		{
+			Sincerity sincerity = Sincerity.getCurrent();
+			if( sincerity != null )
+			{
+				try
+				{
+					// Notes:
+					//
+					// 1. setup.py often expects to be in the current
+					// directory
+					//
+					// 2. bdist_egg is not included in distutils, but by
+					// importing setuptools we let it install its extensions
+					// so that distutils can use them
+
+					sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
+
+					if( eggsDir != null )
+						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggsDir.getPath() );
+					else
+						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
+				}
+				catch( SincerityException x )
+				{
+					x.printStackTrace();
+				}
+			}
+
+			// Return the built egg
+			if( ( eggsDir != null ) && eggsDir.isDirectory() )
+				for( File file : eggsDir.listFiles() )
+					if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
+						return file;
+		}
+
 		return null;
 	}
 }
