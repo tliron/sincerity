@@ -65,7 +65,7 @@ public class LoggingPlugin implements Plugin
 
 			try
 			{
-				sincerity.getContainer().getDependencies().uninitialize();
+				sincerity.getContainer().getDependencies().updateClasspath();
 				System.out.println(sincerity.getContainer().getDependencies().getClassLoader().loadClass( "org.apache.log4j.xml.DOMConfigurator" ));
 				org.apache.log4j.xml.DOMConfigurator.configureAndWatch( configurationFile.getPath() );
 			}

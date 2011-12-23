@@ -101,7 +101,8 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.add( group, name, version ) )
-				command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + ":" + version );
+				if( command.getSincerity().getVerbosity() >= 2 )
+					command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + ":" + version );
 		}
 		else if( "revise".equals( commandName ) )
 		{
@@ -119,8 +120,8 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.revise( group, name, version ) )
-				command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + ":" + version );
-
+				if( command.getSincerity().getVerbosity() >= 2 )
+					command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + ":" + version );
 		}
 		else if( "remove".equals( commandName ) )
 		{
@@ -134,7 +135,8 @@ public class DependenciesPlugin implements Plugin
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.remove( group, name ) )
-				command.getSincerity().getErr().println( "Dependency was not in container: " + group + ":" + name );
+				if( command.getSincerity().getVerbosity() >= 2 )
+					command.getSincerity().getErr().println( "Dependency was not in container: " + group + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

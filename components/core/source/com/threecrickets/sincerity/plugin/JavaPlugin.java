@@ -73,7 +73,7 @@ public class JavaPlugin implements Plugin
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
 
-				dependencies.uninitialize();
+				dependencies.updateClasspath();
 			}
 			catch( ClassNotFoundException x )
 			{

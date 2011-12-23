@@ -17,6 +17,7 @@ public class Artifact implements Comparable<Artifact>
 	{
 		this.file = file;
 		this.url = url;
+		this.container = container;
 		path = container.getRelativePath( file );
 	}
 
@@ -62,16 +63,22 @@ public class Artifact implements Comparable<Artifact>
 			// TODO: back up in cache if overwriting!!!
 
 			if( overwrite )
-				System.out.println( "Installing artifact (overwriting): " + path );
+			{
+				if( container.getSincerity().getVerbosity() >= 2 )
+					container.getSincerity().getOut().println( "Installing artifact (overwriting): " + path );
+			}
 			else
 			{
-				// System.out.println( "Not installing modified artifact: " +
-				// path );
+				if( container.getSincerity().getVerbosity() >= 2 )
+					container.getSincerity().getOut().println( "Not installing modified artifact: " + path );
 				return;
 			}
 		}
 		else
-			System.out.println( "Installing artifact: " + path );
+		{
+			if( container.getSincerity().getVerbosity() >= 2 )
+				container.getSincerity().getOut().println( "Installing artifact: " + path );
+		}
 
 		try
 		{
@@ -118,6 +125,8 @@ public class Artifact implements Comparable<Artifact>
 	private final File file;
 
 	private final URL url;
+
+	private final Container container;
 
 	private final String path;
 }

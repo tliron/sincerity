@@ -218,7 +218,7 @@ public class Dependencies
 		{
 			for( Artifact artifact : pack )
 			{
-				if( install && !installedArtifacts.isMarkedAsPresent( artifact ) )
+				if( install && !installedArtifacts.isKept( artifact ) )
 					artifact.unpack( null, overwrite );
 
 				artifacts.add( artifact );
@@ -407,15 +407,15 @@ public class Dependencies
 
 	public void prune() throws SincerityException
 	{
-		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_PRUNE );
-		uninitialize();
+		installedArtifacts.update( getArtifacts() );
+		updateClasspath();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
-		installedArtifacts.update( getArtifacts(), InstalledArtifacts.MODE_CLEAN );
-		uninitialize();
+		installedArtifacts.clean();
+		updateClasspath();
 	}
 
 	public void install( boolean overwrite ) throws SincerityException
@@ -448,20 +448,20 @@ public class Dependencies
 			throw new SincerityException( "Some dependencies could not be installed" );
 
 		if( report.hasChanged() )
-		{
-			printDisclaimer( container.getSincerity().getOut() );
-			uninitialize();
-		}
+			updateClasspath();
 		else
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
-		installedArtifacts.update( getArtifacts( true, overwrite ), InstalledArtifacts.MODE_PRUNE );
+		installedArtifacts.update( getArtifacts( true, overwrite ) );
 
 		if( report.hasChanged() )
-			uninitialize();
+		{
+			printDisclaimer( container.getSincerity().getOut() );
+			updateClasspath();
+		}
 	}
 
-	public void uninitialize()
+	public void updateClasspath()
 	{
 		classLoader = null;
 		plugins = null;

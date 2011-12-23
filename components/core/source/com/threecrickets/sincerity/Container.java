@@ -267,6 +267,9 @@ public class Container implements IvyListener, TransferListener
 
 	public void progress( IvyEvent event )
 	{
+		if( sincerity.getVerbosity() < 1 )
+			return;
+
 		String name = event.getName();
 		Map<?, ?> attributes = event.getAttributes();
 		if( StartArtifactDownloadEvent.NAME.equals( name ) )
@@ -275,24 +278,16 @@ public class Container implements IvyListener, TransferListener
 			// System.out.println(o + ": " + attributes.get(o));
 			if( "false".equals( attributes.get( "metadata" ) ) )
 			{
-				String organization = (String) attributes.get( "organisation" );
-				String module = (String) attributes.get( "module" );
-				String artifact = (String) attributes.get( "artifact" );
-				String revision = (String) attributes.get( "revision" );
-				String type = (String) attributes.get( "type" );
 				String origin = (String) attributes.get( "origin" );
-				if( name == null )
-					message( "Fetching file:\n  type: " + type + "\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision + "\n  from: " + origin );
-				message( "Downloading " + origin );
+				sincerity.getOut().println( "Downloading " + origin );
 			}
-
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
 		{
 			if( "false".equals( attributes.get( "metadata" ) ) && "successful".equals( attributes.get( "status" ) ) )
 			{
 				String file = (String) attributes.get( "file" );
-				message( "Installing artifact: " + getRelativePath( file ) );
+				sincerity.getOut().println( "Installing artifact: " + getRelativePath( file ) );
 			}
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )
@@ -304,7 +299,7 @@ public class Container implements IvyListener, TransferListener
 				String module = (String) attributes.get( "module" );
 				String artifact = (String) attributes.get( "artifact" );
 				String revision = (String) attributes.get( "revision" );
-				message( "Could not find in repositories:\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision );
+				sincerity.getOut().println( "Could not find in repositories:\n  package: " + organization + ":" + module + ":" + artifact + ":" + revision );
 			}
 		}
 		else
@@ -336,11 +331,6 @@ public class Container implements IvyListener, TransferListener
 	private final Dependencies dependencies;
 
 	private final Shortcuts shortcuts;
-
-	private void message( String message )
-	{
-		System.out.println( message );
-	}
 
 	private void configure()
 	{

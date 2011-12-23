@@ -49,7 +49,8 @@ public class RepositoriesPlugin implements Plugin
 
 				Repositories repositories = command.getSincerity().getContainer().getRepositories();
 				if( !repositories.addMaven( section, name, url ) )
-					command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
+					if( command.getSincerity().getVerbosity() >= 2 )
+						command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
 			}
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
@@ -60,7 +61,8 @@ public class RepositoriesPlugin implements Plugin
 
 				Repositories repositories = command.getSincerity().getContainer().getRepositories();
 				if( !repositories.addPyPi( section, name, url ) )
-					command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
+					if( command.getSincerity().getVerbosity() >= 2 )
+						command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
 			}
 			else
 				command.getSincerity().getErr().println( "Unknown repository type: " + type );
@@ -77,7 +79,8 @@ public class RepositoriesPlugin implements Plugin
 
 			Repositories repositories = command.getSincerity().getContainer().getRepositories();
 			if( !repositories.remove( section, name ) )
-				command.getSincerity().getErr().println( "Repository was not in use: " + section + ":" + name );
+				if( command.getSincerity().getVerbosity() >= 2 )
+					command.getSincerity().getErr().println( "Repository was not in use: " + section + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

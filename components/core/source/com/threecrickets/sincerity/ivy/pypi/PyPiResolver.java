@@ -63,7 +63,19 @@ public class PyPiResolver extends BasicResolver
 
 	public static final String DEFAULT_ROOT = "http://pypi.python.org/simple";
 
-	public static final String PYTHON_ARCHIVE_EGG = "python-archive-egg";
+	public static final String ARCHIVE_TYPE = "python-archive";
+
+	public static final String ARCHIVE_EGG_TYPE = "python-archive-egg";
+
+	public static final String EGG_TYPE = "python-egg";
+
+	public static final String EGG_EXTENSION = "egg";
+
+	public static final String EGG_FULL_EXTENSION = "." + EGG_EXTENSION;
+
+	public static final String REQUIRES_FILENAME = "EGG-INFO/requires.txt";
+
+	public static final String SETUP_FILENAME = "setup.py";
 
 	//
 	// Construction
@@ -261,7 +273,7 @@ public class PyPiResolver extends BasicResolver
 					for( String[] artifact : artifacts )
 					{
 						String extension = artifact[4];
-						if( "egg".equals( extension ) )
+						if( EGG_EXTENSION.equals( extension ) )
 							eggs.add( artifact );
 					}
 					if( !eggs.isEmpty() )
@@ -288,22 +300,18 @@ public class PyPiResolver extends BasicResolver
 						artifactName = artifactName.substring( 0, artifactName.length() - extension.length() - 1 );
 					String type = null;
 					String archiveType;
-					if( "egg".equals( extension ) )
+					if( EGG_EXTENSION.equals( extension ) )
 					{
-						type = "python-egg";
-						archiveType = PYTHON_ARCHIVE_EGG;
+						type = EGG_TYPE;
+						archiveType = ARCHIVE_EGG_TYPE;
 					}
 					else
 					{
-						type = "python-archive";
+						type = ARCHIVE_TYPE;
 						archiveType = type;
 					}
 
 					id = ModuleRevisionId.newInstance( id, version );
-
-					// Add artifact
-					DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
-					artifactDescriptors.add( artifactDescriptor );
 
 					// In order to find our dependencies, we're going to have to
 					// download the artifact to get the dependency list within.
@@ -315,34 +323,52 @@ public class PyPiResolver extends BasicResolver
 					File archiveFile = getFile( archiveArtifact );
 
 					File eggFile = null;
-					if( PYTHON_ARCHIVE_EGG.equals( archiveType ) )
+					if( ARCHIVE_EGG_TYPE.equals( archiveType ) )
 					{
 						eggFile = archiveFile;
-					}
-					else if( "python-archive".equals( archiveType ) )
-					{
-						// We'll try to build an egg from the archive
-						eggFile = buildEgg( archiveFile, getCreatedEggFile( id ), getUnpackedArchiveFile( id ) );
-						if( eggFile != null )
-						{
-							// Make sure the built egg is archived, too
-							URL eggUrl = eggFile.toURI().toURL();
-							DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, PYTHON_ARCHIVE_EGG, "egg", eggUrl, null );
-							getFile( eggArtifact );
 
-							// Add built egg as artifact
-							DefaultDependencyArtifactDescriptor eggDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, "python-egg", "egg", null, null );
-							artifactDescriptors.add( eggDescriptor );
+						// Add egg artifact
+						DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
+						artifactDescriptors.add( artifactDescriptor );
+
+						// TODO: install the egg!
+					}
+					else if( ARCHIVE_TYPE.equals( archiveType ) )
+					{
+						if( install )
+						{
+							// Install it
+							build( archiveFile, getUnpackedArchiveDir( id ), null );
+
+							// Add archive artifact
+							DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
+							artifactDescriptors.add( artifactDescriptor );
+						}
+						else
+						{
+							// We'll try to build an egg from the archive
+							eggFile = build( archiveFile, getUnpackedArchiveDir( id ), getCreatedEggDir( id ) );
+							if( eggFile != null )
+							{
+								// Make sure the built egg is archived
+								URL eggUrl = eggFile.toURI().toURL();
+								DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, ARCHIVE_EGG_TYPE, EGG_EXTENSION, eggUrl, null );
+								getFile( eggArtifact );
+
+								// Add built egg as artifact
+								DefaultDependencyArtifactDescriptor eggDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, EGG_TYPE, EGG_EXTENSION, null, null );
+								artifactDescriptors.add( eggDescriptor );
+							}
 						}
 					}
 
 					if( eggFile != null )
 					{
-						// Let's crack open the egg to see its dependencies
+						// Let's crack open the egg to examine its dependencies
 						System.out.println( "Finding dependencies in Python egg: " + artifactName + " " + eggFile );
 
 						ZipFile zip = new ZipFile( eggFile );
-						ZipEntry requiresEntry = zip.getEntry( "EGG-INFO/requires.txt" );
+						ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
 						if( requiresEntry != null )
 						{
 							BufferedReader reader = new BufferedReader( new InputStreamReader( zip.getInputStream( requiresEntry ) ) );
@@ -371,6 +397,8 @@ public class PyPiResolver extends BasicResolver
 										ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
 										dependencyIds.add( dependencyId );
 									}
+
+									// TODO: licenses!!!!
 								}
 							}
 							finally
@@ -427,9 +455,9 @@ public class PyPiResolver extends BasicResolver
 		// System.out.println( "findArtifactRef " + artifact );
 
 		// We might already have it archived
-		if( "python-egg".equals( artifact.getType() ) )
+		if( EGG_TYPE.equals( artifact.getType() ) )
 		{
-			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), PYTHON_ARCHIVE_EGG, artifact.getExt() );
+			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), ARCHIVE_EGG_TYPE, artifact.getExt() );
 			File archivedEggFile = getCachedFile( archivedEggArtifact );
 			if( archivedEggFile != null )
 			{
@@ -496,6 +524,8 @@ public class PyPiResolver extends BasicResolver
 
 	private String pythonVersion = "2.5";
 
+	private boolean install = true;
+
 	private PyPi pyPi;
 
 	private PyPi getPyPi()
@@ -540,7 +570,7 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private File getCreatedEggFile( ModuleRevisionId id )
+	private File getCreatedEggDir( ModuleRevisionId id )
 	{
 		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
 		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
@@ -551,7 +581,7 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private File getUnpackedArchiveFile( ModuleRevisionId id )
+	private File getUnpackedArchiveDir( ModuleRevisionId id )
 	{
 		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
 		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
@@ -562,25 +592,11 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private static void setup( File setupFile, File eggDir, Sincerity sincerity ) throws SincerityException
-	{
-		// Notes:
-		//
-		// 1. setup.py often expects to be in the current directory
-		//
-		// 2. bdist_egg is not included in distutils, but by importing
-		// setuptools we let it install its extensions so that distutils can use
-		// them
-
-		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
-		sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggDir.getPath() );
-	}
-
-	private static File buildEgg( File archiveFile, File eggDir, File unpackedArchiveDir )
+	private static File build( File archiveFile, File unpackedArchiveDir, File eggsDir )
 	{
 		// Do we have a cached built egg?
-		if( eggDir.isDirectory() )
-			for( File file : eggDir.listFiles() )
+		if( ( eggsDir != null ) && eggsDir.isDirectory() )
+			for( File file : eggsDir.listFiles() )
 				return file;
 
 		// Unpack only if we haven't already unpacked into the cache
@@ -596,7 +612,7 @@ public class PyPiResolver extends BasicResolver
 					{
 						for( File file : dir.listFiles() )
 						{
-							if( "setup.py".equals( file.getName() ) )
+							if( SETUP_FILENAME.equals( file.getName() ) )
 							{
 								setupFile = file;
 								break;
@@ -615,7 +631,21 @@ public class PyPiResolver extends BasicResolver
 				{
 					try
 					{
-						setup( setupFile, eggDir, sincerity );
+						// Notes:
+						//
+						// 1. setup.py often expects to be in the current
+						// directory
+						//
+						// 2. bdist_egg is not included in distutils, but by
+						// importing setuptools we let it install its extensions
+						// so that distutils can use them
+
+						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
+
+						if( eggsDir != null )
+							sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggsDir.getPath() );
+						else
+							sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
 					}
 					catch( SincerityException x )
 					{
@@ -624,9 +654,9 @@ public class PyPiResolver extends BasicResolver
 				}
 
 				// Return the built egg
-				if( eggDir.isDirectory() )
-					for( File file : eggDir.listFiles() )
-						if( file.getName().endsWith( ".egg" ) )
+				if( ( eggsDir != null ) && eggsDir.isDirectory() )
+					for( File file : eggsDir.listFiles() )
+						if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
 							return file;
 			}
 		}

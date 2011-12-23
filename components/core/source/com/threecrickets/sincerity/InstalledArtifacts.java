@@ -15,16 +15,6 @@ import com.threecrickets.sincerity.exception.SincerityException;
 public class InstalledArtifacts
 {
 	//
-	// Constants
-	//
-
-	public final static int MODE_UPDATE_ONLY = 0;
-
-	public final static int MODE_PRUNE = 1;
-
-	public final static int MODE_CLEAN = 2;
-
-	//
 	// Construction
 	//
 
@@ -38,7 +28,7 @@ public class InstalledArtifacts
 	// Attributes
 	//
 
-	public boolean isMarkedAsPresent( Artifact artifact ) throws SincerityException
+	public boolean isKept( Artifact artifact ) throws SincerityException
 	{
 		validate();
 
@@ -56,94 +46,29 @@ public class InstalledArtifacts
 	// Operations
 	//
 
-	public void update( Iterable<Artifact> artifacts, int mode ) throws SincerityException
+	public void update( Iterable<Artifact> artifacts ) throws SincerityException
 	{
-		validate();
+		update( artifacts, MODE_UPDATE );
+	}
 
-		// Mark all artifacts for removal
-		for( Object key : properties.keySet() )
-		{
-			String path = key.toString();
-			String[] values = properties.get( path ).toString().split( ",", 2 );
-			String url = values.length > 1 ? values[1] : null;
-			String value = url == null ? "false" : "false," + url;
-			properties.put( path, value );
-		}
+	public void add( Iterable<Artifact> artifacts ) throws SincerityException
+	{
+		update( artifacts, MODE_ADD );
+	}
 
-		if( ( mode == MODE_UPDATE_ONLY ) || ( mode == MODE_PRUNE ) )
-		{
-			// Mark all existing artifacts as present
-			for( Artifact artifact : artifacts )
-			{
-				URL url = artifact.getUrl();
-				String value = url == null ? "true" : "true," + url;
-				properties.put( artifact.getPath(), value );
-			}
-		}
-
-		if( ( mode == MODE_CLEAN ) || ( mode == MODE_PRUNE ) )
-		{
-			for( Object key : new HashSet<Object>( properties.keySet() ) )
-			{
-				String path = key.toString();
-				String[] values = properties.get( path ).toString().split( ",", 2 );
-				boolean keep = "true".equals( values[0] );
-				String url = values.length > 1 ? values[1] : null;
-
-				if( !keep )
-				{
-					properties.remove( path );
-
-					File file = new File( path );
-					if( !file.isAbsolute() )
-						file = container.getFile( path );
-					if( !file.exists() )
-						continue;
-
-					if( url != null )
-					{
-						// Keep changed artifacts
-						try
-						{
-							Artifact artifact = new Artifact( file, new URL( url ), container );
-							if( artifact.isDifferent() )
-							{
-								System.out.println( "Keeping changed artifact: " + path );
-								continue;
-							}
-						}
-						catch( MalformedURLException x )
-						{
-							throw new SincerityException( "Could not parse artifacts configuration: " + file, x );
-						}
-					}
-
-					System.out.println( "Deleting: " + path );
-					file.delete();
-				}
-			}
-		}
-
-		try
-		{
-			FileOutputStream stream = new FileOutputStream( file );
-			try
-			{
-				properties.store( stream, "Managed by Sincerity" );
-			}
-			finally
-			{
-				stream.close();
-			}
-		}
-		catch( IOException x )
-		{
-			throw new SincerityException( "Could not write artifacts configuration", x );
-		}
+	public void clean() throws SincerityException
+	{
+		update( null, MODE_CLEAN );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private final static int MODE_UPDATE = 0;
+
+	private final static int MODE_ADD = 1;
+
+	private final static int MODE_CLEAN = 2;
 
 	private final File file;
 
@@ -178,6 +103,95 @@ public class InstalledArtifacts
 			catch( FileNotFoundException x )
 			{
 			}
+		}
+	}
+
+	private void update( Iterable<Artifact> artifacts, int mode ) throws SincerityException
+	{
+		validate();
+
+		// The format is "container_path = kept,source_url"
+
+		// Mark all current artifacts as not kept
+		for( Object key : properties.keySet() )
+		{
+			String path = key.toString();
+			String[] values = properties.get( path ).toString().split( ",", 2 );
+			String url = values.length > 1 ? values[1] : null;
+			String value = url == null ? "false" : "false," + url;
+			properties.put( path, value );
+		}
+
+		if( ( mode == MODE_ADD ) || ( mode == MODE_UPDATE ) )
+		{
+			// Mark the new set of artifacts as kept
+			for( Artifact artifact : artifacts )
+			{
+				URL url = artifact.getUrl();
+				String value = url == null ? "true" : "true," + url;
+				properties.put( artifact.getPath(), value );
+			}
+		}
+
+		if( ( mode == MODE_CLEAN ) || ( mode == MODE_UPDATE ) )
+		{
+			for( Object key : new HashSet<Object>( properties.keySet() ) )
+			{
+				String path = key.toString();
+				String[] values = properties.get( path ).toString().split( ",", 2 );
+				boolean kept = "true".equals( values[0] );
+				String url = values.length > 1 ? values[1] : null;
+
+				if( !kept )
+				{
+					properties.remove( path );
+
+					File file = new File( path );
+					if( !file.isAbsolute() )
+						file = container.getFile( path );
+
+					if( !file.exists() )
+						continue;
+
+					if( url != null )
+					{
+						// Keep changed artifacts
+						try
+						{
+							Artifact artifact = new Artifact( file, new URL( url ), container );
+							if( artifact.isDifferent() )
+							{
+								container.getSincerity().getOut().println( "Keeping changed artifact: " + path );
+								continue;
+							}
+						}
+						catch( MalformedURLException x )
+						{
+							throw new SincerityException( "Could not parse artifacts configuration: " + file, x );
+						}
+					}
+
+					container.getSincerity().getOut().println( "Deleting artifact: " + path );
+					file.delete();
+				}
+			}
+		}
+
+		try
+		{
+			FileOutputStream stream = new FileOutputStream( file );
+			try
+			{
+				properties.store( stream, "Managed by Sincerity" );
+			}
+			finally
+			{
+				stream.close();
+			}
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not write artifacts configuration", x );
 		}
 	}
 }

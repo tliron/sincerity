@@ -15,6 +15,9 @@ import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ParserSettings;
 import org.apache.ivy.plugins.repository.Resource;
 
+/**
+ * Unused.
+ */
 public class PyPiModuleDescriptorParser implements ModuleDescriptorParser
 {
 	public ModuleDescriptor parseDescriptor( ParserSettings ivySettings, URL descriptorURL, boolean validate ) throws ParseException, IOException

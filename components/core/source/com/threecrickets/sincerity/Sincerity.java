@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -113,9 +114,29 @@ public class Sincerity implements Runnable
 		return out;
 	}
 
+	public void setOut( Writer out )
+	{
+		this.out = out instanceof PrintWriter ? (PrintWriter) out : new PrintWriter( out, true );
+	}
+
 	public PrintWriter getErr()
 	{
 		return err;
+	}
+
+	public void setErr( Writer err )
+	{
+		this.err = err instanceof PrintWriter ? (PrintWriter) err : new PrintWriter( err, true );
+	}
+
+	public int getVerbosity()
+	{
+		return verbosity;
+	}
+
+	public void setVerbsotiy( int verbosity )
+	{
+		this.verbosity = verbosity;
 	}
 
 	public Container getContainer() throws SincerityException
@@ -211,7 +232,8 @@ public class Sincerity implements Runnable
 
 			container = new Container( this, containerRoot, debugLevel );
 
-			out.println( "Using Sincerity container at: " + containerRoot );
+			if( getVerbosity() >= 1 )
+				out.println( "Using Sincerity container at: " + containerRoot );
 		}
 
 		return container;
@@ -229,7 +251,8 @@ public class Sincerity implements Runnable
 		{
 			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
 			{
-				out.println( "The path is already a Sincerity container: " + containerRoot );
+				if( getVerbosity() >= 1 )
+					out.println( "The path is already a Sincerity container: " + containerRoot );
 				setContainerRoot( containerRoot );
 				return;
 			}
@@ -403,6 +426,8 @@ public class Sincerity implements Runnable
 	private PrintWriter out = new PrintWriter( new OutputStreamWriter( System.out ), true );
 
 	private PrintWriter err = new PrintWriter( new OutputStreamWriter( System.err ), true );
+
+	private int verbosity = 1;
 
 	private Plugins getPlugins() throws SincerityException
 	{

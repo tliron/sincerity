@@ -5,6 +5,9 @@ import java.io.InputStream;
 
 import org.apache.ivy.plugins.repository.BasicResource;
 
+/**
+ * Unused.
+ */
 public class ReferenceResource extends BasicResource
 {
 	//
