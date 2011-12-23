@@ -158,6 +158,18 @@ could
 Lather, Rinse, Repeat
 \end_layout
 
+\begin_layout Standard
+Shell scripts, environment variables
+\end_layout
+
+\begin_layout Standard
+Install as service/daemon
+\end_layout
+
+\begin_layout Standard
+Logging
+\end_layout
+
 \begin_layout Subsubsection
 Reinventing Wheels
 \end_layout
@@ -199,6 +211,30 @@ Comparison with OSGi
 
 \begin_layout Standard
 There are more straightforward solutions to DLL hell.
+\end_layout
+
+\begin_layout Subsubsection
+Shell Scripting vs.
+ JavaScript in Sincerity
+\end_layout
+
+\begin_layout Standard
+It's a much, much richer language.
+\end_layout
+
+\begin_layout Standard
+It's as portable as the JVM is, which is fine, because if the JVM can't
+ run, neither can your app.
+ The idea is for the JVM to be the 
+\emph on
+only 
+\emph default
+requirement.
+\end_layout
+
+\begin_layout Standard
+Shell scripts treat your program as an opaque, black box.
+ JavaScript can access your JVM classes and properly bootstrap.
 \end_layout
 
 \begin_layout Section
@@ -1292,12 +1328,15 @@ Django is a popular web development framework for Python.
  (MySQL, Postgres).
  Django enjoys a strong ecosystem of drop-in features and snippets, but
  also provides a lot of features right in the box.
+ Much the appeal of Django is the Python programming language: elegant,
+ clean and supported by what must be the friendliest and most welcoming
+ community of any programming language.
 \end_layout
 
 \begin_layout Standard
-There are many advantages in running Django on the JVM, instead of the CPython
- reference platform: much improved scalability (there is no GIL in Jython),
- as well as access to any JVM library 
+There are many advantages in running Django on the JVM instead of on the
+ CPython reference platform: great performance, much improved scalability
+ (there is no GIL in Jython), as well as access to any JVM library 
 \emph on
 in addition 
 \emph default
@@ -1307,8 +1346,8 @@ to Python libraries.
 \end_layout
 
 \begin_layout Standard
-For a RESTful Python alternative to Django, take a look at Prudence (the
- 
+If you're looking for RESTful, minimalist alternative to Django, while sticking
+ to Python, take a look at Prudence (the 
 \begin_inset Quotes eld
 \end_inset
 

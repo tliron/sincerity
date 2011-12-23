@@ -4,7 +4,7 @@ importClass(java.lang.System)
 var MAIN_CLASS = 'org.jruby.Main'
 
 function getCommands() {
-	return ['ruby', 'rubyc', 'irb', 'gem', 'rdoc', 'ri', 'rake', 'testrb']
+	return ['ruby', 'gem', 'ast', 'irb', 'rake', 'rdoc', 'ri', 'testrb']
 }
 
 function run(command) {
@@ -15,6 +15,9 @@ function run(command) {
 		case 'gem':
 			gem(command)
 			break
+		default:
+			ruby(command, [sincerity.container.getExecutablesFile(command.name)])
+			break
 	}
 }
 
@@ -22,6 +25,9 @@ function ruby(command, preArguments, postArguments) {
 	// The Ruby standard library is here (JRuby expects a "lib" subdirectory underneath)
 	System.setProperty('jruby.home', command.sincerity.container.getLibrariesFile('ruby'))
 
+	// JFFI
+	System.setProperty('jffi.boot.library.path', command.sincerity.container.getLibrariesFile('ruby', 'native'))
+	
 	var mainArguments = [MAIN_CLASS]
 	if (preArguments) {
 		for (var i in preArguments) {
@@ -37,14 +43,20 @@ function ruby(command, preArguments, postArguments) {
 			mainArguments.push(postArguments[i])
 		}
 	}
+	
 	command.sincerity.run('delegate:main', mainArguments)
 }
 
 function gem(command) {
-	if ((command.arguments.length) > 0 && (command.arguments[0] == 'install')) {
-		ruby(command, ['-S', 'gem'], ['--bindir', sincerity.container.getExecutablesFile()])
+	// We are executing gem in a separate process, because otherwise it will exit our process when done :(
+	var executeArguments = ['gem']
+	var arguments = command.arguments
+	for (var i in arguments) {
+		executeArguments.push(arguments[i])
+		if ((i == 0) && (arguments[i] == 'install')) {
+			executeArguments.push('--bindir')
+			executeArguments.push(sincerity.container.getExecutablesFile())
+		}
 	}
-	else {
-		ruby(command, ['-S', 'gem'])
-	}
+	sincerity.run('delegate:execute', executeArguments)
 }

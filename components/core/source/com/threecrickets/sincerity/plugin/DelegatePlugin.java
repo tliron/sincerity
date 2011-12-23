@@ -3,6 +3,7 @@ package com.threecrickets.sincerity.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.LanguageManager;
@@ -79,10 +80,10 @@ public class DelegatePlugin implements Plugin
 
 			try
 			{
-				boolean block = false;
-				if( "--block".equals( arguments[0] ) )
+				boolean background = false;
+				if( "--background".equals( arguments[0] ) )
 				{
-					block = true;
+					background = true;
 					String[] newArguments = new String[arguments.length - 1];
 					System.arraycopy( arguments, 1, newArguments, 0, newArguments.length );
 					arguments = newArguments;
@@ -92,13 +93,23 @@ public class DelegatePlugin implements Plugin
 				if( executable.exists() )
 					arguments[0] = executable.getPath();
 
-				Runtime runtime = Runtime.getRuntime();
-				Process process = runtime.exec( arguments );
-				if( !block )
-					runtime.addShutdownHook( new ProcessDestroyer( process ) );
+				ProcessBuilder processBuilder = new ProcessBuilder( arguments );
+				Map<String, String> environment = processBuilder.environment();
+				String path = environment.get( "PATH" );
+				String sincerityPath = command.getSincerity().getContainer().getExecutablesFile().getPath();
+				if( path != null )
+					environment.put( "PATH", sincerityPath + File.pathSeparator + path );
+				else
+					environment.put( "PATH", sincerityPath );
+				Process process = processBuilder.start();
+
+				if( !background )
+					Runtime.getRuntime().addShutdownHook( new ProcessDestroyer( process ) );
+
 				new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), command.getSincerity().getOut() ) ).start();
 				new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), command.getSincerity().getErr() ) ).start();
-				if( block )
+
+				if( !background )
 				{
 					try
 					{

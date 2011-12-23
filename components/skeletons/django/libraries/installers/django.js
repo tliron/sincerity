@@ -1,5 +1,5 @@
 
-//sincerity.run('delegate:execute', ['--block', 'easy_install', 'Django==1.2.7', 'django-jython==1.2.0'])
+//sincerity.run('delegate:execute', ['easy_install', 'Django==1.2.7', 'django-jython==1.2.0'])
 
 print('\nTo start your Django server, run: "sincerity start django"\n')
 print('To manage your Django project, run: "sincerity django:manage"\n\n')

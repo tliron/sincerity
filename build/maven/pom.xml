@@ -60,6 +60,7 @@
 		<module>plugins/service</module>
 		<module>plugins/service-remote-jmx</module>
 		<module>skeletons/prudence</module>
+		<module>skeletons/rails</module>
 		<module>skeletons/restlet</module>
 		<module>skeletons/restlet-example</module>
 		<module>skeletons/restlet-jetty</module>
