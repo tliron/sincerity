@@ -1,2 +1,2 @@
 
-// TODO
+//component.defaultHost.name = 'default'

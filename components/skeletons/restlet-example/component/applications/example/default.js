@@ -21,4 +21,4 @@ var router = new Router(app.context)
 app.inboundRoot = router
 
 // Restlets
-executeAll(new File(here, 'restlets'))
+executeAll('restlets')

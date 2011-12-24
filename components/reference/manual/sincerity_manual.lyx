@@ -839,8 +839,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create web : install jetty.web : install logging : install service
- : service jetty start
+sincerity create mycontainer : install jetty.web : install logging : install
+ service : service jetty start
 \end_layout
 
 \end_inset
@@ -859,7 +859,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use web : service jetty stop
+sincerity use mycontainer : service jetty stop
 \end_layout
 
 \end_inset
@@ -1059,7 +1059,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create servlet : install jetty.servlet.example : install logging
+sincerity create mycontainer : install jetty.servlet.example : install logging
  : install service : service jetty start
 \end_layout
 
@@ -1079,7 +1079,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use servlet : service jetty stop
+sincerity use mycontainer : service jetty stop
 \end_layout
 
 \end_inset
@@ -1253,8 +1253,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create restlet : install restlet.example : install logging : install
- service : service restlet start
+sincerity create mycontainer : install restlet.example : install logging
+ : install service : service restlet start
 \end_layout
 
 \end_inset
@@ -1273,7 +1273,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use restlet : service restlet stop
+sincerity use mycontainer : service restlet stop
 \end_layout
 
 \end_inset
@@ -1316,6 +1316,354 @@ large sites), authentication and authorization, and support for several
 (Like Sincerity and Prudence, the Savory Framework is developed by Three
  Crickets.
  The three products form a powerful stack!)
+\end_layout
+
+\begin_layout Subsubsection
+Rails
+\end_layout
+
+\begin_layout Standard
+Rails, better known as 
+\begin_inset Quotes eld
+\end_inset
+
+Ruby on Rails,
+\begin_inset Quotes erd
+\end_inset
+
+ is a popular web development framework for Ruby.
+ It combines a traditional MVC approach with a RESTful orientation and relies
+ on relational database stores (MySQL, Postgres).
+ Rails enjoys the elegant, often-imitated, ActiveRecord ORM, and a powerful
+ 
+\begin_inset Quotes eld
+\end_inset
+
+scaffolding
+\begin_inset Quotes erd
+\end_inset
+
+ feature that automatically generates models, views and controllers to which
+ you can add your code.
+ 
+\end_layout
+
+\begin_layout Standard
+If you're looking for a more strictly RESTful, minimalist alternative to
+ Rails, while sticking to Ruby, take a look at Prudence (the 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton).
+\end_layout
+
+\begin_layout Standard
+Rails is known to work very well on the JVM, but it can sometimes be painful
+ to install everything and get it running.
+ The Sincerity skeleton can do it all for you with one command:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install rails
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This may take a minute or two: Rails is massive.
+\end_layout
+
+\begin_layout Standard
+To start you server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start rails
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 3000, so point your browser to http://localhost:3000.
+\end_layout
+
+\begin_layout Paragraph
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The skeleton will create an application for you under 
+\begin_inset Quotes eld
+\end_inset
+
+/app/
+\begin_inset Quotes erd
+\end_inset
+
+, so you don't have to run 
+\begin_inset Quotes eld
+\end_inset
+
+rails new
+\begin_inset Quotes erd
+\end_inset
+
+ to create one.
+ Indeed, the correct way to start a new Rails project in Sincerity is simply
+ to create a new container for it.
+ That's the whole point of Sincerity!
+\end_layout
+
+\begin_layout Standard
+The skeleton comes with a plugin to handle the 
+\begin_inset Quotes eld
+\end_inset
+
+rails
+\begin_inset Quotes erd
+\end_inset
+
+ tool for you, similarly to how Sincerity's Ruby plugin adds commands for
+ common Ruby tools, such as 
+\begin_inset Quotes eld
+\end_inset
+
+gem
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+rake
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The benefit of this approach is that you do not have to explicitly change
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+/app/
+\begin_inset Quotes erd
+\end_inset
+
+ directory to run the tool, and indeed you can chain it as is usual with
+ Sincerity commands.
+ It should work identically to the usual 
+\begin_inset Quotes eld
+\end_inset
+
+rails
+\begin_inset Quotes erd
+\end_inset
+
+ command: simple prefix 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity
+\begin_inset Quotes erd
+\end_inset
+
+ to it.
+ Examples:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity rails generate controller home index
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity rails generate scaffold Post name:string title:string content:text
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity rake db:migrate
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or as one Sincerity command:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : rails generate controller home index : rails
+ generate scaffold Post name:string title:string content:text : rake db:migrate
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A quick note: Ruby is a bit sluggish to start up on the JVM, which you will
+ notice when running 
+\begin_inset Quotes eld
+\end_inset
+
+rails
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, don't let this worry you: once it's up and running, your Rails
+ application will perform marvelously.
+\end_layout
+
+\begin_layout Standard
+And that's it: from here on, it's all standard Rails goodness.
+ You can go ahead with the tutorial at http://guides.rubyonrails.org/getting_start
+ed.html, skipping step 3.2 (
+\begin_inset Quotes eld
+\end_inset
+
+Creating the Blog Application
+\begin_inset Quotes erd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+MySQL, PostgreSQL and SQLite are all supported out of the box, identically
+ to how Rails works on other platforms.
+\end_layout
+
+\begin_layout Standard
+If you need to access the Rails source code, you'll find it under 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/ruby/lib/ruby/gems/1.8/gems/
+\begin_inset Quotes erd
+\end_inset
+
+, which is where all Ruby gems will be installed in your container.
+\end_layout
+
+\begin_layout Paragraph
+Extras
+\end_layout
+
+\begin_layout Standard
+Though the 
+\begin_inset Quotes eld
+\end_inset
+
+rails
+\begin_inset Quotes erd
+\end_inset
+
+ tool does support a daemon mode, Sincerity's service plugin is far more
+ powerful and is strongly recommended.
+ To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity install service
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install the Rails skeleton with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create mycontainer : install rails : install service : service
+ rails start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : service rails stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Sincerity's logging plugin won't do you much good out of the box,
+ because Rails uses Ruby's logging system, not the JVM's.
+ However, it should be easy implement your own Ruby logger that delegates
+ to standard JVM logging if that seems exciting to you.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1379,7 +1727,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install install django
+sincerity install django
 \end_layout
 
 \end_inset
@@ -1616,8 +1964,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create django : install django : install service : service django
- start
+sincerity create mycontainer : install django : install service : service
+ django start
 \end_layout
 
 \end_inset
@@ -1636,7 +1984,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use django : service django stop
+sincerity use mycontainer : service django stop
 \end_layout
 
 \end_inset
