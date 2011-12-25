@@ -352,7 +352,7 @@ public class PyPiResolver extends BasicResolver
 								// (See findArtifactRef for its retrieval)
 								URL eggUrl = eggFile.toURI().toURL();
 								DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, BUILDER_EGG_TYPE, EGG_EXTENSION, eggUrl, null );
-								getFile( eggArtifact );
+								eggFile = getFile( eggArtifact );
 
 								type = EGG_TYPE;
 								extension = EGG_EXTENSION;
@@ -670,6 +670,7 @@ public class PyPiResolver extends BasicResolver
 			}
 
 			// Return the built egg
+			// (there might be more than one!)
 			if( ( eggsDir != null ) && eggsDir.isDirectory() )
 				for( File file : eggsDir.listFiles() )
 					if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
