@@ -1,4 +1,8 @@
 
+document.executeOnce('/sincerity/files/')
+document.executeOnce('/sincerity/jvm/')
+document.executeOnce('/sincerity/objects/')
+
 importClass(
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException,
 	com.threecrickets.sincerity.exception.SincerityException,
@@ -23,7 +27,7 @@ function run(command) {
 
 function service(command) {
 	if (command.arguments.length < 2) {
-		throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "run", or "status")')
+		throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "console", or "status")')
 	}
 
 	var uri = command.arguments[0]
@@ -32,7 +36,7 @@ function service(command) {
 	var name = uri.replace('/', '_')
 	var displayName = name
 
-	var cacheDir = sincerity.container.getCacheFile('service')
+	var cacheDir = command.sincerity.container.getCacheFile('service')
 	cacheDir.mkdirs()
 	
 	var pidFile = new File(cacheDir, name + '.pid')
@@ -62,7 +66,7 @@ function service(command) {
 		}
 		
 		command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
-		kill(pid)
+		Sincerity.JVM.kill(pid)
 		pid = getPid(pidFile)
 		if (null !== pid) {
 			command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
@@ -77,7 +81,7 @@ function service(command) {
 		}
 	}
 	
-	if ((verb == 'start') || (verb == 'restart') || (verb == 'run')) {
+	if ((verb == 'start') || (verb == 'restart') || (verb == 'console')) {
 		var status = getStatus(statusFile)
 		if (isRunning(status)) {
 			command.sincerity.out.println(displayName + ' is already running (' + status + ')')
@@ -85,11 +89,21 @@ function service(command) {
 		}
 
 		var binary = 'wrapper-' + os.name + '-' + os.architecture + '-' + os.bits
-		binary = sincerity.container.getLibrariesFile('native', binary)
+		binary = command.sincerity.container.getLibrariesFile('native', binary)
 		if (!binary.exists()) {
 			if (isSupported(os)) {
 				sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, '3.5.13'])
 				sincerity.run('dependencies:install')
+				var nativeDir = command.sincerity.container.getLibrariesFile('native')
+				if (nativeDir.directory) {
+					var files = nativeDir.listFiles()
+					for (var f in files) {
+						var file = files[f]
+						if (file.name.startsWith('wrapper-')) {
+							Sincerity.Files.makeExecutable(file)
+						}
+					}
+				}
 			}
 			if (!binary.exists()) {
 				throw new SincerityException('The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
@@ -99,26 +113,43 @@ function service(command) {
 		// This configuration will override anything in service.conf
 		// See: http://wrapper.tanukisoftware.com/doc/english/properties.html
 		var configuration = {
-			'wrapper.working.dir': sincerity.container.root,
-			'wrapper.pidfile': pidFile,
-			'wrapper.java.statusfile': statusFile,
-			'wrapper.name': name,
-			'wrapper.displayname': displayName,
-			'wrapper.ntservice.name': name,
-			'wrapper.ntservice.displayname': displayName,
-			'wrapper.console.title': displayName,
-			'wrapper.syslog.ident': name,
-			'wrapper.logfile': sincerity.container.getLogsFile('service.log'),
-			'wrapper.java.library.path.1': sincerity.container.getLibrariesFile('native'),
-			'wrapper.java.mainclass': 'org.tanukisoftware.wrapper.WrapperSimpleApp',
-			'wrapper.app.parameter.1': 'com.threecrickets.sincerity.Sincerity',
-			'wrapper.app.parameter.2': 'delegate:start',
-			'wrapper.app.parameter.3': uri
+			wrapper: {
+				name: name,
+				displayname: displayName,
+				pidfile: pidFile,
+				logfile: command.sincerity.container.getLogsFile('service.log'),
+				working: {
+					dir: command.sincerity.container.root
+				},
+				ntservice: {
+					name: name,
+					displayname: displayName
+				},
+				console: {
+					title: displayName
+				},
+				sysLog: {
+					ident: name
+				},
+				java: {
+					statusfile: statusFile,
+					mainclass: 'org.tanukisoftware.wrapper.WrapperSimpleApp',
+					library: {
+						'path.1': command.sincerity.container.getLibrariesFile('native')
+					}
+				},
+				app: {
+					'parameter.1': 'com.threecrickets.sincerity.Sincerity',
+					'parameter.2': 'delegate:start',
+					'parameter.3': uri
+				}
+			}
 		}
 		
 		// JVM switches
-		var jvmDir = sincerity.container.getConfigurationFile('service', 'jvm')
+		var jvmDir = command.sincerity.container.getConfigurationFile('service', 'jvm')
 		var index = 1
+		configuration.wrapper.java['additional.' + index++] = '-Dsincerity.home=' + command.sincerity.home
 		if (jvmDir.directory) {
 			var files = jvmDir.listFiles()
 			for (var f in files) {
@@ -130,7 +161,7 @@ function service(command) {
 							if ((line.length() == 0) || line.startsWith('#')) {
 								continue
 							}
-							configuration['wrapper.java.additional.' + index++] = line
+							configuration.wrapper.java['additional.' + index++] = line
 						}
 					}
 					finally {
@@ -142,17 +173,18 @@ function service(command) {
 		
 		// Classpath
 		index = 1
-		for (var i = sincerity.container.dependencies.getClasspaths(true).iterator(); i.hasNext(); ) {
-			configuration['wrapper.java.classpath.' + index++] = i.next()
+		for (var i = command.sincerity.container.dependencies.getClasspaths(true).iterator(); i.hasNext(); ) {
+			configuration.wrapper.java['classpath.' + index++] = i.next()
 		}
 
 		// Daemonize?
 		if ((verb == 'start') || (verb == 'restart')) {
-			configuration['wrapper.daemonize'] = 'TRUE'
+			configuration.wrapper.daemonize = 'TRUE'
 		}
 
 		// Assemble arguments
-		var arguments = [binary, sincerity.container.getConfigurationFile('service', 'service.conf')]
+		var arguments = [binary, command.sincerity.container.getConfigurationFile('service', 'service.conf')]
+		configuration = Sincerity.Objects.flatten(configuration)
 		for (var c in configuration) {
 			arguments.push(c + '=' + configuration[c])
 		}
@@ -163,7 +195,7 @@ function service(command) {
 		}*/
 
 		// Launch native wrapper binary
-		if (verb == 'run') {
+		if (verb == 'console') {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
 		sincerity.run('delegate:execute', arguments)
@@ -173,7 +205,7 @@ function service(command) {
 		return
 	}
 
-	throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "run", or "status")')
+	throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "console", or "status")')
 }
 
 function getOs() {
@@ -224,6 +256,8 @@ function getOs() {
 			architecture = 'sparc'
 		}
 	}
+	
+	// TODO: Windows
 
 	return {
 		name: name,
@@ -233,29 +267,11 @@ function getOs() {
 }
 
 function getPid(pidFile) {
-	if (!pidFile.exists()) {
-		return null
-	}
-	var reader = new BufferedReader(new FileReader(pidFile))
-	try {
-		return reader.readLine()
-	}
-	finally {
-		reader.close()
-	}
+	return pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)) : null
 }
 
 function getStatus(statusFile) {
-	if (!statusFile.exists()) {
-		return null
-	}
-	var reader = new BufferedReader(new FileReader(statusFile))
-	try {
-		return reader.readLine()
-	}
-	finally {
-		reader.close()
-	}
+	return statusFile.exists() ? String(Sincerity.Files.loadText(statusFile)) : null
 }
 
 function isRunning(status) {
@@ -268,13 +284,4 @@ function isStopped(status) {
 
 function isSupported(os) {
 	return (os.name == 'aix') || (os.name == 'freebsd') || (os.name == 'hpux') || (os.name == 'linux') || (os.name == 'macosx') || (os.name == 'solaris') || (os.name == 'windows')
-}
-
-function kill(pid) {
-	if (os.name == 'Windows') {
-		// TODO
-	}
-	else {
-		sincerity.run('delegate:execute', 'kill', pid)
-	}
 }

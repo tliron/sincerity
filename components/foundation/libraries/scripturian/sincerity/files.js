@@ -141,6 +141,23 @@ Sincerity.Files = Sincerity.Files || function() {
 		return Public.remove(fromFile, recursive)
 	}
 	
+	Public.erase = function(file) {
+		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		new java.io.FileWriter(file).close()		
+	}
+	
+	Public.makeExecutable = function(file) {
+		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		if (file.exists()) {
+			if (undefined !== file.executable) { // JVM6+ only
+				file.executable = true
+			}
+			else {
+				Sincerity.JVM.exec('chmod', ['+x', file])
+			}
+		}
+	}
+	
 	/**
 	 * Creates a temporary file in the operating system's default temporary file directory using
 	 * a nonce. The file will be deleted when the JVM shuts down.

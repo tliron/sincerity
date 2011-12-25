@@ -7,9 +7,9 @@ importClass(
 var settings = {}
 var routes = {}
 
-executeAll('types')
-executeAll('settings')
-executeAll('routes')
+Sincerity.Sincerity.executeAll('types')
+Sincerity.Sincerity.executeAll('settings')
+Sincerity.Sincerity.executeAll('routes')
 
 // The application
 var app = new Application(component.context.createChildContext())
@@ -48,4 +48,4 @@ for (var uri in routes) {
 }
 
 // Restlets
-executeAll('restlets')
+Sincerity.Sincerity.executeAll('restlets')

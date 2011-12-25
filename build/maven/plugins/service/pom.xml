@@ -76,7 +76,6 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/installers/service/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

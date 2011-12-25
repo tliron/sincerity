@@ -403,6 +403,16 @@ Sincerity.JVM = Sincerity.JVM || function() {
 		return lines
 	}
 	
+	Public.kill = function(pid) {
+		var os = java.lang.System.getProperty('os.name')
+		if (os == 'Windows') {
+			// TODO
+		}
+		else {
+			Public.exec('kill', [pid])
+		}
+	}
+	
 	//
 	// Initialization
 	//

@@ -33,7 +33,7 @@ public class ScripturianShell implements Shell
 		System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
 		languageManager = new LanguageManager( container.getDependencies().getClassLoader() );
 		source = new DocumentFileSource<Executable>( sourceDir, "default", "js", 1000 );
-		librarySources.add( new DocumentFileSource<Executable>( container.getLibrariesFile(), "default", "js", -1 ) );
+		librarySources.add( new DocumentFileSource<Executable>( container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
 		librarySources.add( new DocumentFileSource<Executable>( container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );
 		this.prepare = prepare;
 		this.arguments = arguments;

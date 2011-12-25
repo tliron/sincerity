@@ -109,9 +109,9 @@ public class Sincerity implements Runnable
 		return sincerityHome;
 	}
 
-	public File getHomeFile( String... parts )
+	public File getHomeFile( String... parts ) throws SincerityException
 	{
-		File file = sincerityHome;
+		File file = getHome();
 		for( String part : parts )
 			file = new File( file, part );
 		return file;

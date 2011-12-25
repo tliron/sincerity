@@ -5,8 +5,7 @@ importClass(
 
 var Static = function(path, listingAllowed) {
 	this.create = function(context) {
-		print('Directory: ' + new File(here, this.path) + '\n')
-		var directory = new Directory(context, new File(here, this.path).absoluteFile.toURI())
+		var directory = new Directory(context, new File(Sincerity.Sincerity.here, this.path).absoluteFile.toURI())
 		directory.listingAllowed = listingAllowed || false
 		return directory
 	}
