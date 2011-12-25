@@ -3,4 +3,4 @@
 HERE=$(dirname "$0")
 ROOT="$HERE/.."
 
-sincerity container:use "$ROOT" : python:easy_install ${@:1}
+sincerity container:use "$ROOT" : python:python "$ROOT/programs/easy_install.py" --script-dir="$HERE" ${@:1}

@@ -1,15 +1,21 @@
 package com.threecrickets.sincerity.internal;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
@@ -181,6 +187,72 @@ public class FileUtil
 	public static String[] separateExtensionFromFilename( String filename )
 	{
 		return filename.split( "\\.(?=[^\\.]+$)", 2 );
+	}
+
+	public static List<String> readLines( File file ) throws IOException
+	{
+		try
+		{
+			return readLines( new FileInputStream( file ) );
+		}
+		catch( FileNotFoundException x )
+		{
+			return new ArrayList<String>();
+		}
+	}
+
+	public static List<String> readLines( InputStream stream ) throws IOException
+	{
+		ArrayList<String> lines = new ArrayList<String>();
+		BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+		try
+		{
+			String line;
+			while( ( line = reader.readLine() ) != null )
+				lines.add( line );
+		}
+		catch( IOException x )
+		{
+			throw x;
+		}
+		finally
+		{
+			try
+			{
+				reader.close();
+			}
+			catch( IOException x )
+			{
+			}
+		}
+		return lines;
+	}
+
+	public static void writeLines( File file, Iterable<String> lines ) throws IOException
+	{
+		BufferedWriter writer = new BufferedWriter( new FileWriter( file ) );
+		try
+		{
+			for( String line : lines )
+			{
+				writer.write( line );
+				writer.write( '\n' );
+			}
+		}
+		catch( IOException x )
+		{
+			throw x;
+		}
+		finally
+		{
+			try
+			{
+				writer.close();
+			}
+			catch( IOException x )
+			{
+			}
+		}
 	}
 
 	public static final int BUFFER_SIZE = 2048;

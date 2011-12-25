@@ -615,6 +615,46 @@ Python
 Ruby
 \end_layout
 
+\begin_layout Standard
+Ruby uses the following shebang:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#!/usr/bin/env jruby
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+But if you use Sincerity's 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:execute
+\begin_inset Quotes erd
+\end_inset
+
+ command, it will work fine, because 
+\begin_inset Quotes eld
+\end_inset
+
+/executables/jruby
+\begin_inset Quotes erd
+\end_inset
+
+ is included in the environment's path, and that script in turn properly
+ bootstraps the container's Ruby.
+\end_layout
+
 \begin_layout Paragraph
 PHP
 \end_layout

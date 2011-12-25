@@ -22,7 +22,7 @@ function run(command) {
 	}
 }
 
-function python(command, preArguments) {
+function python(command) {
 	// The Python standard library is here (Jython expects a "Lib" subdirectory underneath)
 	System.setProperty('python.home', command.sincerity.container.getLibrariesFile('python'))
 
@@ -39,7 +39,7 @@ function python(command, preArguments) {
 	sys.executable = new PyString(command.sincerity.container.getExecutablesFile('python'))
 	
 	// Put eggs into sys.path
-	var eggsDir = command.sincerity.container.getLibrariesFile('eggs')
+	/*var eggsDir = command.sincerity.container.getLibrariesFile('eggs')
 	if (eggsDir.directory) {
 		var files = eggsDir.listFiles()
 		for (var i in files) {
@@ -48,19 +48,13 @@ function python(command, preArguments) {
 				sys.path.add(String(file))
 			}
 		}
-	}
+	}*/
 	
 	// The Jython runtime does not reinitialize the 'sys' module singleton if it's already initialized,
 	// so we must explicitly set sys.argv if we want to run it more than once with different arguments
 	sys.argv.clear()
 
 	var mainArguments = [MAIN_CLASS]
-	if (preArguments) {
-		for (var i in preArguments) {
-			mainArguments.push(preArguments[i])
-			sys.argv.add(new PyString(preArguments[i]))
-		}
-	}
 	var arguments = command.arguments
 	for (var i in arguments) {
 		mainArguments.push(arguments[i])
@@ -71,5 +65,11 @@ function python(command, preArguments) {
 }
 
 function easy_install(command) {
-	python(command, [command.sincerity.container.getProgramsFile('easy_install.py'), '--script-dir=' + command.sincerity.container.getExecutablesFile()])
+	// We are executing easy_install in a separate process, because otherwise it will exit our process when done :(
+	var executeArguments = ['easy_install']
+	var arguments = command.arguments
+	for (var i in arguments) {
+		executeArguments.push(arguments[i])
+	}
+	sincerity.run('delegate:execute', executeArguments)
 }

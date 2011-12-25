@@ -14,34 +14,36 @@ public class SincerityRepositoryCacheManager extends DefaultRepositoryCacheManag
 	// Attributes
 	//
 
-	public String getCreatedIvyPattern()
+	// Note: Ivy injects the settings using standard bean setters
+
+	public String getBuilderIvyPattern()
 	{
-		return createdIvyPattern;
+		return builderIvyPattern;
 	}
 
-	public void setCreatedIvyPattern( String createdIvyPattern )
+	public void setBuilderIvyPattern( String builderIvyPattern )
 	{
-		this.createdIvyPattern = createdIvyPattern;
+		this.builderIvyPattern = builderIvyPattern;
 	}
 
-	public String getCreatedEggPattern()
+	public String getBuilderEggDirPattern()
 	{
-		return createdEggPattern;
+		return builderEggDirPattern;
 	}
 
-	public void setCreatedEggPattern( String createdEggPattern )
+	public void setBuilderEggDirPattern( String builderEggDirPattern )
 	{
-		this.createdEggPattern = createdEggPattern;
+		this.builderEggDirPattern = builderEggDirPattern;
 	}
 
-	public String getUnpackedArchivePattern()
+	public String getBuilderSourceDirPattern()
 	{
-		return unpackedArchivePattern;
+		return builderSourceDirPattern;
 	}
 
-	public void setUnpackedArchivePattern( String unpackedArchivePattern )
+	public void setBuilderSourceDirPattern( String builderSourceDirPattern )
 	{
-		this.unpackedArchivePattern = unpackedArchivePattern;
+		this.builderSourceDirPattern = builderSourceDirPattern;
 	}
 
 	public void addConfiguredArtifactPattern( Map<?, ?> attributes )
@@ -74,11 +76,11 @@ public class SincerityRepositoryCacheManager extends DefaultRepositoryCacheManag
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private String createdIvyPattern;
+	private String builderIvyPattern;
 
-	private String createdEggPattern;
+	private String builderEggDirPattern;
 
-	private String unpackedArchivePattern;
+	private String builderSourceDirPattern;
 
 	private Map<String, String> artifactPatterns = new HashMap<String, String>();
 

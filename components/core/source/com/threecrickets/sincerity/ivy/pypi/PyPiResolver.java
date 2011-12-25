@@ -1,9 +1,7 @@
 package com.threecrickets.sincerity.ivy.pypi;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,9 +61,9 @@ public class PyPiResolver extends BasicResolver
 
 	public static final String DEFAULT_ROOT = "http://pypi.python.org/simple";
 
-	public static final String ARCHIVE_TYPE = "python-archive";
+	public static final String BUILDER_ARCHIVE_TYPE = "builder-archive";
 
-	public static final String ARCHIVE_EGG_TYPE = "python-archive-egg";
+	public static final String BUILDER_EGG_TYPE = "builder-egg";
 
 	public static final String EGG_TYPE = "python-egg";
 
@@ -198,7 +196,7 @@ public class PyPiResolver extends BasicResolver
 	protected Resource getResource( String source ) throws IOException
 	{
 		// System.out.println( "getResource " + source );
-		return repository.getResource( source );
+		return getRepository().getResource( source );
 	}
 
 	@Override
@@ -214,6 +212,8 @@ public class PyPiResolver extends BasicResolver
 		ModuleRevisionId id = dependencyDescriptor.getDependencyRevisionId();
 		if( !getOrganisation().equals( id.getOrganisation() ) )
 			return null;
+
+		boolean install = !id.getName().startsWith( PyPi.LIBRARY_PREFIX );
 
 		// Search the PyPI repository
 		PyPi pyPi = getPyPi();
@@ -299,117 +299,99 @@ public class PyPiResolver extends BasicResolver
 					if( artifactName.endsWith( "." + extension ) )
 						artifactName = artifactName.substring( 0, artifactName.length() - extension.length() - 1 );
 					String type = null;
-					String archiveType;
+					String builderType;
 					if( EGG_EXTENSION.equals( extension ) )
 					{
-						type = EGG_TYPE;
-						archiveType = ARCHIVE_EGG_TYPE;
+						type = BUILDER_EGG_TYPE;
+						builderType = BUILDER_EGG_TYPE;
 					}
 					else
 					{
-						type = ARCHIVE_TYPE;
-						archiveType = type;
+						type = BUILDER_ARCHIVE_TYPE;
+						builderType = BUILDER_ARCHIVE_TYPE;
 					}
 
 					id = ModuleRevisionId.newInstance( id, version );
 
 					// In order to find our dependencies, we're going to have to
 					// download the artifact to get the dependency list within.
-					// We'll download it as an archive type so it won't get
-					// mixed with the "real" downloaded artifacts.
+					// We'll store them in the "builder" section of the cache.
 
-					// Get the artifact as an archive
-					DefaultArtifact archiveArtifact = new DefaultArtifact( id, null, artifactName, archiveType, extension, new URL( artifactUri ), null );
-					File archiveFile = getFile( archiveArtifact );
+					// Get the artifact
+					DefaultArtifact builderArtifact = new DefaultArtifact( id, null, artifactName, builderType, extension, new URL( artifactUri ), null );
+					File builderFile = getFile( builderArtifact );
 
 					File eggFile = null;
-					if( ARCHIVE_EGG_TYPE.equals( archiveType ) )
+					boolean installed = false;
+					if( BUILDER_EGG_TYPE.equals( type ) )
 					{
-						eggFile = archiveFile;
+						eggFile = builderFile;
 
-						// Add egg artifact
-						DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
-						artifactDescriptors.add( artifactDescriptor );
+						if( install )
+						{
+							easyInstall( eggFile );
+							installed = true;
+						}
+						else
+						{
+							type = EGG_TYPE;
 
-						// TODO: install the egg!
+							// Update sincerity.pth
+							addEggToPth( eggFile );
+						}
 					}
-					else if( ARCHIVE_TYPE.equals( archiveType ) )
+					else if( BUILDER_ARCHIVE_TYPE.equals( type ) )
 					{
 						if( install )
 						{
-							// Install it
-							build( archiveFile, getUnpackedArchiveDir( id ), null );
-
-							// Add archive artifact
-							DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
-							artifactDescriptors.add( artifactDescriptor );
+							// Install the archive
+							setupPy( builderFile, getBuilderSourceDir( id ), null );
+							installed = true;
 						}
 						else
 						{
 							// We'll try to build an egg from the archive
-							eggFile = build( archiveFile, getUnpackedArchiveDir( id ), getCreatedEggDir( id ) );
+							eggFile = setupPy( builderFile, getBuilderSourceDir( id ), getBuilderEggDir( id ) );
 							if( eggFile != null )
 							{
-								// Make sure the built egg is archived
+								// Cache the built egg
+								// (See findArtifactRef for its retrieval)
 								URL eggUrl = eggFile.toURI().toURL();
-								DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, ARCHIVE_EGG_TYPE, EGG_EXTENSION, eggUrl, null );
+								DefaultArtifact eggArtifact = new DefaultArtifact( id, null, artifactName, BUILDER_EGG_TYPE, EGG_EXTENSION, eggUrl, null );
 								getFile( eggArtifact );
 
-								// Add built egg as artifact
-								DefaultDependencyArtifactDescriptor eggDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, EGG_TYPE, EGG_EXTENSION, null, null );
-								artifactDescriptors.add( eggDescriptor );
+								type = EGG_TYPE;
+								extension = EGG_EXTENSION;
+
+								// Update sincerity.pth
+								addEggToPth( eggFile );
+							}
+							else
+							{
+								throw new RuntimeException( "Could not make an egg out of: " + builderFile );
 							}
 						}
 					}
 
-					if( eggFile != null )
+					if( eggFile != null && !installed )
 					{
 						// Let's crack open the egg to examine its dependencies
 						System.out.println( "Finding dependencies in Python egg: " + artifactName + " " + eggFile );
+						dependencyIds.addAll( getDependenciesFromEgg( eggFile ) );
 
-						ZipFile zip = new ZipFile( eggFile );
-						ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
-						if( requiresEntry != null )
-						{
-							BufferedReader reader = new BufferedReader( new InputStreamReader( zip.getInputStream( requiresEntry ) ) );
-							try
-							{
-								String line;
-								while( ( line = reader.readLine() ) != null )
-								{
-									String name = null, dependencyVersion = null;
-									if( line.contains( "==" ) )
-									{
-										String[] split = line.split( "==", 2 );
-										name = split[0];
-										dependencyVersion = split[1];
-									}
-									else if( line.contains( ">=" ) )
-									{
-										// See:
-										// https://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependency.html#revision
-										String[] split = line.split( ">=", 2 );
-										name = split[0];
-										dependencyVersion = "[" + split[1] + ",)";
-									}
-									if( name != null )
-									{
-										ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
-										dependencyIds.add( dependencyId );
-									}
-
-									// TODO: licenses!!!!
-								}
-							}
-							finally
-							{
-								reader.close();
-							}
-						}
+						// TODO: licenses!!!!
 					}
+
+					// Add artifact
+					DefaultDependencyArtifactDescriptor artifactDescriptor = new DefaultDependencyArtifactDescriptor( dependencyDescriptor, artifactName, type, extension, new URL( artifactUri ), null );
+					artifactDescriptors.add( artifactDescriptor );
 				}
 
-				// Construct the module descriptor
+				// Every has been OK so far, but we'll need a resource for the
+				// module descriptor. Of course, PyPI doesn't have one, so we'll
+				// construct one and put it in the builder section of our cache.
+
+				// The builder module descriptor
 				DefaultModuleDescriptor moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id, artifactDescriptors.toArray( new DependencyArtifactDescriptor[artifactDescriptors.size()] ) );
 				for( ModuleRevisionId dependencyId : dependencyIds )
 				{
@@ -419,14 +401,17 @@ public class PyPiResolver extends BasicResolver
 				}
 
 				// Write module descriptor to file
-				File descriptorFile = getCreatedIvyFile( id );
+				File descriptorFile = getBuilderIvyFile( id );
 				if( descriptorFile.getParentFile() != null )
 					descriptorFile.getParentFile().mkdirs();
 				XmlModuleDescriptorWriter.write( moduleDescriptor, descriptorFile );
 				descriptorFile.setLastModified( pyPi.getModuleLastModified( id.getName() ) );
 
-				// Resolve
+				// An artifact for the module descriptor file
 				DefaultArtifact moduleArtifact = new DefaultArtifact( id, null, descriptorFile.getName(), "ivy", "descriptor", descriptorFile.toURI().toURL(), null );
+
+				// A resolved resource for the artifact
+				// (Apparently, it has to be a UrlResource, not a FileResource)
 				return new ResolvedResource( new URLResource( moduleArtifact.getUrl() ), version );
 
 				// MetadataArtifactDownloadReport report = new
@@ -457,14 +442,14 @@ public class PyPiResolver extends BasicResolver
 		// We might already have it archived
 		if( EGG_TYPE.equals( artifact.getType() ) )
 		{
-			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), ARCHIVE_EGG_TYPE, artifact.getExt() );
+			DefaultArtifact archivedEggArtifact = new DefaultArtifact( id, null, artifact.getName(), BUILDER_EGG_TYPE, artifact.getExt() );
 			File archivedEggFile = getCachedFile( archivedEggArtifact );
 			if( archivedEggFile != null )
 			{
 				// System.out.println( "already found: " + archivedEggFile );
 				try
 				{
-					return new ResolvedResource( getRepository().getResource( archivedEggFile.toURI().toURL().toString() ), id.getRevision() );
+					return new ResolvedResource( getResource( archivedEggFile.toURI().toURL().toString() ), id.getRevision() );
 				}
 				catch( IOException x )
 				{
@@ -482,7 +467,7 @@ public class PyPiResolver extends BasicResolver
 		{
 			try
 			{
-				return new ResolvedResource( getRepository().getResource( artifactUri ), id.getRevision() );
+				return new ResolvedResource( getResource( artifactUri ), id.getRevision() );
 			}
 			catch( IOException x )
 			{
@@ -524,8 +509,6 @@ public class PyPiResolver extends BasicResolver
 
 	private String pythonVersion = "2.5";
 
-	private boolean install = true;
-
 	private PyPi pyPi;
 
 	private PyPi getPyPi()
@@ -559,40 +542,67 @@ public class PyPiResolver extends BasicResolver
 		return null;
 	}
 
-	private File getCreatedIvyFile( ModuleRevisionId id )
+	private File getPthFile()
 	{
 		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
 		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
 		{
 			SincerityRepositoryCacheManager sincerityRepositoryCacheManager = (SincerityRepositoryCacheManager) repositoryCacheManager;
-			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getCreatedIvyPattern(), id ) );
+			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), "libraries/python/Lib/site-packages/sincerity.pth" );
 		}
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private File getCreatedEggDir( ModuleRevisionId id )
+	private File getBuilderIvyFile( ModuleRevisionId id )
 	{
 		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
 		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
 		{
 			SincerityRepositoryCacheManager sincerityRepositoryCacheManager = (SincerityRepositoryCacheManager) repositoryCacheManager;
-			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getCreatedEggPattern(), id ) );
+			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getBuilderIvyPattern(), id ) );
 		}
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private File getUnpackedArchiveDir( ModuleRevisionId id )
+	private File getBuilderEggDir( ModuleRevisionId id )
 	{
 		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
 		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
 		{
 			SincerityRepositoryCacheManager sincerityRepositoryCacheManager = (SincerityRepositoryCacheManager) repositoryCacheManager;
-			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getUnpackedArchivePattern(), id ) );
+			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getBuilderEggDirPattern(), id ) );
 		}
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private static File build( File archiveFile, File unpackedArchiveDir, File eggsDir ) throws IOException
+	private File getBuilderSourceDir( ModuleRevisionId id )
+	{
+		RepositoryCacheManager repositoryCacheManager = getRepositoryCacheManager();
+		if( repositoryCacheManager instanceof SincerityRepositoryCacheManager )
+		{
+			SincerityRepositoryCacheManager sincerityRepositoryCacheManager = (SincerityRepositoryCacheManager) repositoryCacheManager;
+			return new File( sincerityRepositoryCacheManager.getRepositoryCacheRoot(), IvyPatternHelper.substitute( sincerityRepositoryCacheManager.getBuilderSourceDirPattern(), id ) );
+		}
+		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
+	}
+
+	private static void easyInstall( File eggFile ) throws IOException
+	{
+		Sincerity sincerity = Sincerity.getCurrent();
+		if( sincerity != null )
+		{
+			try
+			{
+				sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "easy_install", eggFile.getPath() );
+			}
+			catch( SincerityException x )
+			{
+				x.printStackTrace();
+			}
+		}
+	}
+
+	private static File setupPy( File archiveFile, File sourceDir, File eggsDir ) throws IOException
 	{
 		// Do we have a cached built egg?
 		if( ( eggsDir != null ) && eggsDir.isDirectory() )
@@ -600,14 +610,19 @@ public class PyPiResolver extends BasicResolver
 				return file;
 
 		// Unpack only if we haven't already unpacked into the cache
-		if( !unpackedArchiveDir.isDirectory() )
-			FileUtil.unpack( archiveFile, unpackedArchiveDir, unpackedArchiveDir );
+		if( !sourceDir.isDirectory() )
+			FileUtil.unpack( archiveFile, sourceDir, sourceDir );
 
+		return setupPy( sourceDir, eggsDir );
+	}
+
+	private static File setupPy( File sourceDir, File eggsDir ) throws IOException
+	{
 		// Find setup.py
 		File setupFile = null;
-		if( unpackedArchiveDir.isDirectory() )
+		if( sourceDir.isDirectory() )
 		{
-			for( File dir : unpackedArchiveDir.listFiles() )
+			for( File dir : sourceDir.listFiles() )
 			{
 				if( dir.isDirectory() )
 				{
@@ -662,5 +677,53 @@ public class PyPiResolver extends BasicResolver
 		}
 
 		return null;
+	}
+
+	private List<ModuleRevisionId> getDependenciesFromEgg( File eggFile ) throws IOException
+	{
+		ArrayList<ModuleRevisionId> dependencyIds = new ArrayList<ModuleRevisionId>();
+		ZipFile zip = new ZipFile( eggFile );
+		ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
+		if( requiresEntry != null )
+		{
+			List<String> lines = FileUtil.readLines( zip.getInputStream( requiresEntry ) );
+			for( String line : lines )
+			{
+				String name = null, dependencyVersion = null;
+				if( line.contains( "==" ) )
+				{
+					String[] split = line.split( "==", 2 );
+					name = split[0];
+					dependencyVersion = split[1];
+				}
+				else if( line.contains( ">=" ) )
+				{
+					// See:
+					// https://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependency.html#revision
+					String[] split = line.split( ">=", 2 );
+					name = split[0];
+					dependencyVersion = "[" + split[1] + ",)";
+				}
+				if( name != null )
+				{
+					name = PyPi.LIBRARY_PREFIX + name;
+					ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
+					dependencyIds.add( dependencyId );
+				}
+			}
+		}
+		return dependencyIds;
+	}
+
+	private void addEggToPth( File eggFile ) throws IOException
+	{
+		String pth = "./" + eggFile.getName();
+		File pthFile = getPthFile();
+		List<String> pths = FileUtil.readLines( pthFile );
+		if( !pths.contains( pths ) )
+		{
+			pths.add( pth );
+			FileUtil.writeLines( pthFile, pths );
+		}
 	}
 }
