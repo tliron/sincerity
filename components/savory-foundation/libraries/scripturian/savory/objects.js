@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,7 +11,7 @@
 // at http://threecrickets.com/
 //
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * Lots of utilities to work with JavaScript objects, arrays and
@@ -24,8 +24,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.2
  */
-Sincerity.Objects = Sincerity.Objects || function() {
-	/** @exports Public as Sincerity.Objects */
+Savory.Objects = Savory.Objects || function() {
+	/** @exports Public as Savory.Objects */
     var Public = {}
 
 	//
@@ -684,98 +684,98 @@ Sincerity.Objects = Sincerity.Objects || function() {
  * Removes whitespace from beginning and end of the string.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#trim
+ * @see Savory.Objects#trim
  * @returns {String}
  */ 
 String.prototype.trim = String.prototype.trim || function() {
-	return Sincerity.Objects.trim(this)
+	return Savory.Objects.trim(this)
 }
 
 /**
  * Escapes single quotes with a backslash. 
  * 
  * @methodOf String#
- * @see Sincerity.Objects#escapeSingleQuotes
+ * @see Savory.Objects#escapeSingleQuotes
  */ 
 String.prototype.escapeSingleQuotes = String.prototype.escapeSingleQuotes || function() {
-	return Sincerity.Objects.escapeSingleQuotes(this)
+	return Savory.Objects.escapeSingleQuotes(this)
 }
 
 /**
  * Escapes double quotes with a backslash. 
  * 
  * @methodOf String#
- * @see Sincerity.Objects#escapeDoubleQuotes
+ * @see Savory.Objects#escapeDoubleQuotes
  */ 
 String.prototype.escapeDoubleQuotes = String.prototype.escapeDoubleQuotes || function() {
-	return Sincerity.Objects.escapeDoubleQuotes(this)
+	return Savory.Objects.escapeDoubleQuotes(this)
 }
 
 /**
  * Escapes newlines with a backslash. 
  * 
  * @methodOf String#
- * @see Sincerity.Objects#escapeNewlines
+ * @see Savory.Objects#escapeNewlines
  */ 
 String.prototype.escapeNewlines = String.prototype.escapeNewlines || function() {
-	return Sincerity.Objects.escapeNewlines(this)
+	return Savory.Objects.escapeNewlines(this)
 }
 
 /**
  * True if the string starts with the prefix.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#startsWith
+ * @see Savory.Objects#startsWith
  * @param {String} prefix
  * @returns {Boolean}
  */ 
 String.prototype.startsWith = String.prototype.startsWith || function(prefix) {
-	return Sincerity.Objects.startsWith(this, prefix)
+	return Savory.Objects.startsWith(this, prefix)
 }
 
 /**
  * True if the string ends with the postfix.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#endsWith
+ * @see Savory.Objects#endsWith
  * @param {String} postfix
  * @returns {Boolean}
  */ 
 String.prototype.endsWith = String.prototype.endsWith || function(postfix) {
-	return Sincerity.Objects.endsWith(this, postfix)
+	return Savory.Objects.endsWith(this, postfix)
 }
 
 /**
  * Returns 0 if string are equal, 1 if a > b, and -1 if a < b.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#compareStrings
+ * @see Savory.Objects#compareStrings
  * @param {String} b
  * @returns {Number}
  */ 
 String.prototype.compare = String.prototype.compare || function(b) {
-	return Sincerity.Objects.compare(this, b)
+	return Savory.Objects.compare(this, b)
 }
 
 /**
  * Makes sure the first character of the string is in upper case.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#capitalize
+ * @see Savory.Objects#capitalize
  * @returns {String}
  */ 
 String.prototype.capitalize = String.prototype.capitalize || function() {
-	return Sincerity.Objects.capitalize(this)
+	return Savory.Objects.capitalize(this)
 }
 
 /**
  * Repeats the string. When 'times' is 0, returns an empty string.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#repeat
+ * @see Savory.Objects#repeat
  * @param {Number} times
  * @returns {String}
  */ 
 String.prototype.repeat = String.prototype.repeat || function(times) {
-	return Sincerity.Objects.repeat(this, times)
+	return Savory.Objects.repeat(this, times)
 }

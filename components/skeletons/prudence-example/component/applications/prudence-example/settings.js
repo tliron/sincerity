@@ -1,5 +1,7 @@
 
-settings = {
+document.executeOnce('/savory/objects/')
+
+Savory.Objects.merge(settings, {
 	application: {
 		name: 'Skeleton',
 		description: 'The example application for the Restlet skeleton',
@@ -10,4 +12,4 @@ settings = {
 	hosts: {
 		'default' : '/'
 	}
-}
+})

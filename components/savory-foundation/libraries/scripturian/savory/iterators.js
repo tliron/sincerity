@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,28 +11,23 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/classes/')
+document.executeOnce('/savory/classes/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * A whole bunch of useful iterators with a consistent API.
  * <p>
- * Inspired by sequences in functional languages, Sincerity iterators are used to traverse potentially very large series
+ * Inspired by sequences in functional languages, Savory iterators are used to traverse potentially very large series
  * of entries without advance knowledge of how many entries are in the series. These are somewhat similar
- * to JavaScript generator functions, but more generic. A wrapper ({@link Sincerity.Iterators.Generator})
+ * to JavaScript generator functions, but more generic. A wrapper ({@link Savory.Iterators.Generator})
  * exists to let you use JavaScript generator functions here. 
  * <p>
  * Generally, any code that traverses arrays can be made more scalable if
- * iterators are used instead (and {@link Sincerity.Iterators.Array} lets you easily consume arrays).
+ * iterators are used instead (and {@link Savory.Iterators.Array} lets you easily consume arrays).
  * The problem with arrays is that <i>all</i> entries exist in memory at once: so that
  * 1) it can take too much memory at once, and 2) it can waste resources, because we always fill
  * in the array entirely up-front, when we might only end up traversing a subset of the entries.
- * <p>
- * The iterator API has been intentionally designed for compatibility with {@link MongoDB.Cursor},
- * so that a MongoDB cursor can be used anywhere an iterator is expected. For
- * example, you can wrap a MongoDB cursor in a {@link Sincerity.Iterators.Transfomer}, include
- * it in a {@link Sincerity.Iterators.Chain}, etc.
  * <p>
  * You must always close an iterator. The recommended semantics:
  * <pre>
@@ -54,24 +49,24 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Iterators = Sincerity.Iterators || function() {
-	/** @exports Public as Sincerity.Iterators */
+Savory.Iterators = Savory.Iterators || function() {
+	/** @exports Public as Savory.Iterators */
     var Public = {}
     
     /**
-     * Makes sure to always return an iterator, converting arrays to {@link Sincerity.Iterators.Array}
+     * Makes sure to always return an iterator, converting arrays to {@link Savory.Iterators.Array}
      * if necessary.
      * 
-     * @param {Array|Sincerity.Iterators.Iterator} value An iterator or an array or null
-     * @returns {Sincerity.Iterators.Iterator}
+     * @param {Array|Savory.Iterators.Iterator} value An iterator or an array or null
+     * @returns {Savory.Iterators.Iterator}
      */
     Public.iterator = function(value) {
-    	if (!Sincerity.Objects.exists(value)) {
-    		return new Sincerity.Iterators.Iterator()
+    	if (!Savory.Objects.exists(value)) {
+    		return new Savory.Iterators.Iterator()
     	}
     	
-    	if (Sincerity.Objects.isArray(value)) {
-    		return new Sincerity.Iterators.Array(value)
+    	if (Savory.Objects.isArray(value)) {
+    		return new Savory.Iterators.Array(value)
     	}
     	
     	return value
@@ -80,7 +75,7 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	/**
 	 * Consumes an iterator into an array and closes it.
 	 *  
-	 * @param {Sincerity.Iterators.Iterator} iterator An iterator
+	 * @param {Savory.Iterators.Iterator} iterator An iterator
 	 * @param {Number} [start=0] How many entries to skip
 	 * @param {Number} [limit] Maximum number of entries to consume
 	 * @returns {Array}
@@ -116,7 +111,7 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
     /**
      * Calls a function on all entries of the iterator, closing it when finished.
      * 
-     * @param {Sincerity.Iterators.Iterato} iterator The iterator
+     * @param {Savory.Iterators.Iterato} iterator The iterator
      * @param {Function} fn A function that receives an entry; if it returns false the
      *        iteration is stopped (but the iterator will still be closed)
 	 * @param [scope] The scope to use for fn
@@ -138,10 +133,10 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * An iterator with no entries.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Iterator
+	 * @name Savory.Iterators.Iterator
 	 */
-	Public.Iterator = Sincerity.Classes.define(function() {
-		/** @exports Public as Sincerity.Iterators.Iterator */
+	Public.Iterator = Savory.Classes.define(function() {
+		/** @exports Public as Savory.Iterators.Iterator */
 	    var Public = {}
 
 	    /**
@@ -213,12 +208,12 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * Represents an array as an iterator.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Array
-	 * @augments Sincerity.Iterators.Iterator 
+	 * @name Savory.Iterators.Array
+	 * @augments Savory.Iterators.Iterator 
 	 * @param {Array} array The array
 	 */
-	Public.Array = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Array */
+	Public.Array = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Array */
 	    var Public = {}
 	    
 	    /** @ignore */
@@ -254,12 +249,12 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * Actually, this class can wrap any iterator that supports hasNext() and next().
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.JVM
-	 * @augments Sincerity.Iterators.Iterator
+	 * @name Savory.Iterators.JVM
+	 * @augments Savory.Iterators.Iterator
 	 * @param {java.util.Iterator} iterator The JVM iterator
 	 */
-	Public.JVM = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.JVM */
+	Public.JVM = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.JVM */
 	    var Public = {}
 
 	    /** @ignore */
@@ -290,17 +285,17 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * This also means that skip() cannot be efficient, as it examines each
 	 * and every entry.
 	 * <p>
-	 * See {@link Sincerity.Iterators.Fetcher} for an alternate way to use the generator
+	 * See {@link Savory.Iterators.Fetcher} for an alternate way to use the generator
 	 * pattern.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Generator
-	 * @augments Sincerity.Iterators.Iterator
+	 * @name Savory.Iterators.Generator
+	 * @augments Savory.Iterators.Iterator
 	 * @param generator A generator is created by calling a function that
 	 *        returns a next entry via the JavaScript "yield" keyword
 	 */
-	Public.Generator = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Generator */
+	Public.Generator = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Generator */
 	    var Public = {}
 
 	    /** @ignore */
@@ -342,7 +337,7 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * An iterator that fetches entries one by one on demand.
 	 * <p>
 	 * In some cases, a fetcher can work similarly to JavaScript's generator functions.
-	 * But, if you have a real generator function, use {@link Sincerity.Iterators.Generator}, instead. 
+	 * But, if you have a real generator function, use {@link Savory.Iterators.Generator}, instead. 
 	 * <p>
 	 * The iterator is always one step ahead: the next entry is generated before
 	 * next() is called, to make sure that we do indeed have more entries.
@@ -350,16 +345,16 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * and every entry.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Fetcher
-	 * @augments Sincerity.Iterators.Iterator
+	 * @name Savory.Iterators.Fetcher
+	 * @augments Savory.Iterators.Iterator
 	 * @param {Function} fetchFn A function that receives (options, index) as
 	 *        arguments, and must return the next entry or set options.hasNext
 	 *        to false
 	 * @param [scope] The scope to use for fetchFn and closeFn
 	 * @param {Function} [closeFn] An optional close function
 	 */
-	Public.Fetcher = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Fetcher */
+	Public.Fetcher = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Fetcher */
 	    var Public = {}
 
 	    /** @ignore */
@@ -398,15 +393,15 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * A wrapper that allows transforming entries in an iterator. 
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Transformer
-	 * @augments Sincerity.Iterators.Iterator 
-	 * @param {Sincerity.Iterators.Iterator} iterator The iterator to wrap
+	 * @name Savory.Iterators.Transformer
+	 * @augments Savory.Iterators.Iterator 
+	 * @param {Savory.Iterators.Iterator} iterator The iterator to wrap
 	 * @param {Function} transformFn Function that accepts an entry as an argument and should return
 	 *        the transformed entry
 	 * @param [scope] The scope to use for transformFn
 	 */
-	Public.Transformer = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Transformer */
+	Public.Transformer = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Transformer */
 	    var Public = {}
 
 	    /** @ignore */
@@ -461,15 +456,15 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * and every entry.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Eliminator
-	 * @augments Sincerity.Iterators.Iterator 
-	 * @param {Sincerity.Iterators.Iterator} iterator The iterator to wrap
+	 * @name Savory.Iterators.Eliminator
+	 * @augments Savory.Iterators.Iterator 
+	 * @param {Savory.Iterators.Iterator} iterator The iterator to wrap
 	 * @param {Function} testFn Function that receive an entry as an argument and returns
 	 *        false if it is to be eliminated
 	 * @param [scope] The scope to use for testFn
 	 */
-	Public.Eliminator = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Eliminator */
+	Public.Eliminator = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Eliminator */
 	    var Public = {}
 
 	    /** @ignore */
@@ -525,12 +520,12 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * entries one by one in order to count them.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Chain
-	 * @augments Sincerity.Iterators.Iterator
-	 * @param {Sincerity.Iterators.Iterator[]} iterators An array of iterators to chain
+	 * @name Savory.Iterators.Chain
+	 * @augments Savory.Iterators.Iterator
+	 * @param {Savory.Iterators.Iterator[]} iterators An array of iterators to chain
 	 */
-	Public.Chain = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Chain */
+	Public.Chain = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Chain */
 	    var Public = {}
 
 	    /** @ignore */
@@ -619,11 +614,11 @@ Sincerity.Iterators = Sincerity.Iterators || function() {
 	 * entries one by one in order to count them, if they have not already been buffered.
 	 * 
 	 * @class
-	 * @name Sincerity.Iterators.Buffer
-	 * @augments Sincerity.Iterators.Iterator
+	 * @name Savory.Iterators.Buffer
+	 * @augments Savory.Iterators.Iterator
 	 */
-	Public.Buffer = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Iterators.Buffer */
+	Public.Buffer = Savory.Classes.define(function(Module) {
+		/** @exports Public as Savory.Iterators.Buffer */
 	    var Public = {}
 
 	    /** @ignore */

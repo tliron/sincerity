@@ -1,4 +1,6 @@
 
+document.executeOnce('/savory/sincerity/')
+
 importClass(
 	org.restlet.Application,
 	org.restlet.routing.Router,
@@ -7,9 +9,9 @@ importClass(
 var settings = {}
 var routes = {}
 
-Sincerity.Sincerity.executeAll('types')
-Sincerity.Sincerity.executeAll('settings')
-Sincerity.Sincerity.executeAll('routes')
+Savory.Sincerity.executeAll('types')
+Savory.Sincerity.executeAll('settings')
+Savory.Sincerity.executeAll('routes')
 
 // The application
 var app = new Application(component.context.createChildContext())
@@ -48,4 +50,4 @@ for (var uri in routes) {
 }
 
 // Restlets
-Sincerity.Sincerity.executeAll('restlets')
+Savory.Sincerity.executeAll('restlets')

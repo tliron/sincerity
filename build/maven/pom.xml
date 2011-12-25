@@ -49,7 +49,7 @@
 
 	<modules>
 		<module>core</module>
-		<module>foundation</module>
+		<module>savory-foundation</module>
 		<module>plugins/logging</module>
 		<module>plugins/clojure</module>
 		<module>plugins/groovy</module>

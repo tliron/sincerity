@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,10 +11,10 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/objects/')
+document.executeOnce('/savory/jvm/')
+document.executeOnce('/savory/objects/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * High-performance, robust utilities to work with files.
@@ -24,8 +24,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Files = Sincerity.Files || function() {
-	/** @exports Public as Sincerity.Files */
+Savory.Files = Savory.Files || function() {
+	/** @exports Public as Savory.Files */
     var Public = {}
 
 	/**
@@ -38,7 +38,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the delete succeeded
 	 */
 	Public.remove = function(file, recursive) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = (Savory.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 
 		if (!file.exists()) {
 			return true
@@ -65,8 +65,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the copy succeeded
 	 */
 	Public.copy = function(fromFile, toFile) {
-		fromFile = (Sincerity.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
-		toFile = (Sincerity.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
+		fromFile = (Savory.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
+		toFile = (Savory.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
 
 		if (!fromFile.exists()) {
 			return false
@@ -122,8 +122,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the move succeeded
 	 */
 	Public.move = function(fromFile, toFile, recursive) {
-		fromFile = (Sincerity.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
-		toFile = (Sincerity.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
+		fromFile = (Savory.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
+		toFile = (Savory.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
 
 		if (!fromFile.exists()) {
 			return false
@@ -142,18 +142,18 @@ Sincerity.Files = Sincerity.Files || function() {
 	}
 	
 	Public.erase = function(file) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = (Savory.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 		new java.io.FileWriter(file).close()		
 	}
 	
 	Public.makeExecutable = function(file) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = (Savory.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 		if (file.exists()) {
 			if (undefined !== file.executable) { // JVM6+ only
 				file.executable = true
 			}
 			else {
-				Sincerity.JVM.exec('chmod', ['+x', file])
+				Savory.JVM.exec('chmod', ['+x', file])
 			}
 		}
 	}
@@ -180,7 +180,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {java.io.PrintWriter}
 	 */
 	Public.openForTextWriting = function(file, gzip) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = (Savory.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 
 		var stream = new java.io.FileOutputStream(file)
 		if (gzip) {
@@ -202,7 +202,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {java.io.Reader}
 	 */
 	Public.openForTextReading = function(file, gzip) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = (Savory.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 
 		var stream = new java.io.FileInputStream(file)
 		if (gzip) {
@@ -227,7 +227,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {java.nio.CharBuffer}
 	 */
 	Public.loadText = function(file, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
+		charset = Savory.Objects.isString(charset) ? Savory.JVM.getCharset(charset) : (Savory.Objects.exists(charset) ? charset : Savory.JVM.getCharset())
 		var input = new java.io.FileInputStream(file)
 		var channel = input.channel
 		try {
@@ -248,12 +248,12 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
 	 */
 	Public.grep = function(inputFile, outputFile, pattern, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
+		charset = Savory.Objects.isString(charset) ? Savory.JVM.getCharset(charset) : (Savory.Objects.exists(charset) ? charset : Savory.JVM.getCharset())
 
 		var buffer = Public.loadText(inputFile, charset)
 
 		var output = new java.io.FileOutputStream(outputFile)
-		output = Sincerity.Objects.exists(charset) ? new java.io.OutputStreamWriter(output, charset) : new java.io.OutputStreamWriter(output)
+		output = Savory.Objects.exists(charset) ? new java.io.OutputStreamWriter(output, charset) : new java.io.OutputStreamWriter(output)
 		output = new java.io.BufferedWriter(output)
 		try {
 			var lineMatcher = linePattern.matcher(buffer)
@@ -280,7 +280,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 */
 	Public.tail = function(file, position, forward, count, charset) {
 		var randomAccessFile = new java.io.RandomAccessFile(file, 'r')
-		var position = Sincerity.Objects.exists(position) ? position : randomAccessFile.length() - 1
+		var position = Savory.Objects.exists(position) ? position : randomAccessFile.length() - 1
 		var start, end
 
 		try {
@@ -342,10 +342,10 @@ Sincerity.Files = Sincerity.Files || function() {
 			}
 			
 			// Read bytes into text
-			var bytes = Sincerity.JVM.newArray(end - start + 1, 'byte')
+			var bytes = Savory.JVM.newArray(end - start + 1, 'byte')
 			randomAccessFile.seek(start)
 			randomAccessFile.read(bytes)
-			var text = Sincerity.JVM.fromBytes(bytes, charset)
+			var text = Savory.JVM.fromBytes(bytes, charset)
 			
 			return {
 				start: start,

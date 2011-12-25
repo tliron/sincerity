@@ -6,7 +6,7 @@ sincerity.run('delegate:execute', ['rails', 'new', sincerity.container.getFile('
 
 print('\nTo start your Rails server, run: "sincerity start rails"\n\n')
 
-document.executeOnce('/sincerity/files/')
+document.executeOnce('/savory/files/')
 
 // Let's clear out this file so that we don't get the message again
-Sincerity.Files.erase(sincerity.container.getLibrariesFile('installers', 'rails.js'))
+Savory.Files.erase(sincerity.container.getLibrariesFile('installers', 'rails.js'))

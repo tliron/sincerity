@@ -4,7 +4,7 @@ importClass(
 	org.restlet.routing.Template,
 	java.io.File)
 
-var directory = new Directory(app.context, new File(here.parentFile.parentFile, 'static').absoluteFile.toURI())
+var directory = new Directory(app.context, new File(Savory.Sincerity.here.parentFile.parentFile, 'static').absoluteFile.toURI())
 directory.listingAllowed = true
 router.attach('static/', directory)
 

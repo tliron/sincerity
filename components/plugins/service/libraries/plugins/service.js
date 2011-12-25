@@ -1,7 +1,7 @@
 
-document.executeOnce('/sincerity/files/')
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/objects/')
+document.executeOnce('/savory/files/')
+document.executeOnce('/savory/jvm/')
+document.executeOnce('/savory/objects/')
 
 importClass(
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException,
@@ -66,7 +66,7 @@ function service(command) {
 		}
 		
 		command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
-		Sincerity.JVM.kill(pid)
+		Savory.JVM.kill(pid)
 		pid = getPid(pidFile)
 		if (null !== pid) {
 			command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
@@ -100,7 +100,7 @@ function service(command) {
 					for (var f in files) {
 						var file = files[f]
 						if (file.name.startsWith('wrapper-')) {
-							Sincerity.Files.makeExecutable(file)
+							Savory.Files.makeExecutable(file)
 						}
 					}
 				}
@@ -184,7 +184,7 @@ function service(command) {
 
 		// Assemble arguments
 		var arguments = [binary, command.sincerity.container.getConfigurationFile('service', 'service.conf')]
-		configuration = Sincerity.Objects.flatten(configuration)
+		configuration = Savory.Objects.flatten(configuration)
 		for (var c in configuration) {
 			arguments.push(c + '=' + configuration[c])
 		}
@@ -267,11 +267,11 @@ function getOs() {
 }
 
 function getPid(pidFile) {
-	return pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)) : null
+	return pidFile.exists() ? String(Savory.Files.loadText(pidFile)) : null
 }
 
 function getStatus(statusFile) {
-	return statusFile.exists() ? String(Sincerity.Files.loadText(statusFile)) : null
+	return statusFile.exists() ? String(Savory.Files.loadText(statusFile)) : null
 }
 
 function isRunning(status) {

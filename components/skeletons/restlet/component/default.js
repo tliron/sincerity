@@ -1,21 +1,19 @@
 
-document.executeOnce('/sincerity/sincerity/')
+document.executeOnce('/savory/sincerity/')
 
 importClass(
 	org.restlet.Component,
 	java.io.File)
-
-var here
 	
 // The component
 var component = new Component()
 
 // Assemble the component
-Sincerity.Sincerity.here = sincerity.container.getFile('component')
-Sincerity.Sincerity.executeAll('clients')
-Sincerity.Sincerity.executeAll('servers')
-Sincerity.Sincerity.executeAll('hosts')
-Sincerity.Sincerity.executeAll('applications')
+Savory.Sincerity.here = sincerity.container.getFile('component')
+Savory.Sincerity.executeAll('clients')
+Savory.Sincerity.executeAll('servers')
+Savory.Sincerity.executeAll('hosts')
+Savory.Sincerity.executeAll('applications')
 
 // Start it!
 component.start()

@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,10 +11,10 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/json/')
+document.executeOnce('/savory/jvm/')
+document.executeOnce('/savory/json/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * Useful shortcuts to Rhino-specific services and utilities.
@@ -24,8 +24,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Rhino = Sincerity.Rhino || function() {
-	/** @exports Public as Sincerity.Rhino */
+Savory.Rhino = Savory.Rhino || function() {
+	/** @exports Public as Savory.Rhino */
     var Public = {}
 
 	/**
@@ -65,13 +65,13 @@ Sincerity.Rhino = Sincerity.Rhino || function() {
 	 * @returns An object with .message and .stackTrace properties, both strings
 	 */
 	Public.getExceptionDetails = function(exception, skip) {
-		if (Sincerity.Objects.exists(exception.javaException)) {
+		if (Savory.Objects.exists(exception.javaException)) {
 			return {
 				message: String(exception.javaException),
-				stackTrace: Sincerity.JVM.getStackTrace(exception.javaException)
+				stackTrace: Savory.JVM.getStackTrace(exception.javaException)
 			}
 		}
-		else if (Sincerity.Objects.exists(exception.rhinoException)) {
+		else if (Savory.Objects.exists(exception.rhinoException)) {
 			return {
 				message: String(exception.rhinoException),
 				stackTrace: Public.getStackTrace(exception, skip)
@@ -79,7 +79,7 @@ Sincerity.Rhino = Sincerity.Rhino || function() {
 		}
 		else {
 			return {
-				message: Sincerity.Objects.isObject(exception) ? Sincerity.JSON.to(exception) : String(exception),
+				message: Savory.Objects.isObject(exception) ? Savory.JSON.to(exception) : String(exception),
 				stackTrace: Public.getStackTrace(exception, skip)
 			}
 		}

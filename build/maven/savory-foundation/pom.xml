@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity</groupId>
-	<artifactId>foundation</artifactId>
+	<artifactId>savory-foundation</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Foundation Library</name>
+	<name>Savory Foundation Library</name>
 	<description>A collection of utility code that greatly enhances the use of JavaScript on the JVM.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>

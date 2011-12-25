@@ -4,7 +4,7 @@
 print('\nTo start your Django server, run: "sincerity start django"\n')
 print('To manage your Django project, run: "sincerity django:manage"\n\n')
 
-document.executeOnce('/sincerity/files/')
+document.executeOnce('/savory/files/')
 
 // Let's clear out this file so that we don't get the message again
-Sincerity.Files.erase(sincerity.container.getLibrariesFile('installers', 'django.js'))
+Savory.Files.erase(sincerity.container.getLibrariesFile('installers', 'django.js'))

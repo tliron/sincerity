@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,11 +11,11 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/classes/')
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/templates/')
+document.executeOnce('/savory/classes/')
+document.executeOnce('/savory/jvm/')
+document.executeOnce('/savory/templates/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * Utilities for formatting and parsing dates, currency, etc.
@@ -27,8 +27,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.2
  */
-Sincerity.Localization = Sincerity.Localization || function() {
-	/** @exports Public as Sincerity.Localization */
+Savory.Localization = Savory.Localization || function() {
+	/** @exports Public as Savory.Localization */
     var Public = {}
 
 	Public.round = function(number, decimals) {
@@ -62,13 +62,13 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/**
 	 * Parses a string into a date.
 	 * 
-	 * @param {String|Sincerity.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
+	 * @param {String|Savory.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
 	 * @param {String} [timeZone]
 	 * @returns {Date}
-	 * @see Sincerity.Localization.DateTimeFormat#parse
+	 * @see Savory.Localization.DateTimeFormat#parse
 	 */
 	Public.parseDateTime = function(string, format, timeZone) {
-		if (Sincerity.Objects.isString(format)) {
+		if (Savory.Objects.isString(format)) {
 			return new Public.DateTimeFormat(format).parse(string, timeZone)
 		}
 		else {
@@ -80,13 +80,13 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * Formats a date as a string.
 	 * 
 	 * @param {Date} date The date
-	 * @param {String|Sincerity.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
+	 * @param {String|Savory.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
 	 * @param {String} [timeZone]
 	 * @returns {String}
-	 * @see Sincerity.Localization.DateTimeFormat#format
+	 * @see Savory.Localization.DateTimeFormat#format
 	 */
 	Public.formatDateTime = function(date, format, timeZone) {
-		if (Sincerity.Objects.isString(format)) {
+		if (Savory.Objects.isString(format)) {
 			return new Public.DateTimeFormat(format).format(date, timeZone)
 		}
 		else {
@@ -97,12 +97,12 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/**
 	 * @param {String} [dateStyle] 'short', 'medium', 'long' or 'full'
 	 * @param {String} [timeStyle] 'short', 'medium', 'long' or 'full'
-	 * @param [locale] See {@link Sincerity.JVM#getLocale} for format
-	 * @returns Sincerity.Localization.DateTimeFormat
+	 * @param [locale] See {@link Savory.JVM#getLocale} for format
+	 * @returns Savory.Localization.DateTimeFormat
 	 */
 	Public.getDateTimeFormat = function(dateStyle, timeStyle, locale) {
 		if (locale) {
-			return new Public.DateTimeFormat(java.text.DateFormat.getDateTimeInstance(dateTimeFormatStyles[dateStyle], dateTimeFormatStyles[timeStyle], Sincerity.JVM.toLocale(locale)))
+			return new Public.DateTimeFormat(java.text.DateFormat.getDateTimeInstance(dateTimeFormatStyles[dateStyle], dateTimeFormatStyles[timeStyle], Savory.JVM.toLocale(locale)))
 		}
 		else {
 			if (dateStyle) {
@@ -116,12 +116,12 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	
 	/**
 	 * @param {String} [style] 'short', 'medium', 'long' or 'full'
-	 * @param [locale] See {@link Sincerity.JVM#getLocale} for format
-	 * @returns Sincerity.Localization.DateTimeFormat
+	 * @param [locale] See {@link Savory.JVM#getLocale} for format
+	 * @returns Savory.Localization.DateTimeFormat
 	 */
 	Public.getDateFormat = function(style, locale) {
 		if (locale) {
-			return new Public.DateTimeFormat(java.text.DateFormat.getDateInstance(dateTimeFormatStyles[style], Sincerity.JVM.toLocale(locale)))
+			return new Public.DateTimeFormat(java.text.DateFormat.getDateInstance(dateTimeFormatStyles[style], Savory.JVM.toLocale(locale)))
 		}
 		else {
 			if (style) {
@@ -135,12 +135,12 @@ Sincerity.Localization = Sincerity.Localization || function() {
 
 	/**
 	 * @param {String} [style] 'short', 'medium', 'long' or 'full'
-	 * @param [locale] See {@link Sincerity.JVM#getLocale} for format
-	 * @returns Sincerity.Localization.DateTimeFormat
+	 * @param [locale] See {@link Savory.JVM#getLocale} for format
+	 * @returns Savory.Localization.DateTimeFormat
 	 */
 	Public.getTimeFormat = function(style, locale) {
 		if (locale) {
-			return new Public.DateTimeFormat(java.text.DateFormat.getTimeInstance(dateTimeFormatStyles[style], Sincerity.JVM.toLocale(locale)))
+			return new Public.DateTimeFormat(java.text.DateFormat.getTimeInstance(dateTimeFormatStyles[style], Savory.JVM.toLocale(locale)))
 		}
 		else {
 			if (style) {
@@ -155,7 +155,7 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/**
 	 * @param {String} code The currency code
 	 * @param {String} [template='{symbol}{amount}'] Template to cast, filled with 'symbol' and 'amount' 
-	 * @returns Sincerity.Localization.CurrencyFormat
+	 * @returns Savory.Localization.CurrencyFormat
 	 */
 	Public.getCurrencyFormat = function(code, template) {
 		var currency = java.util.Currency.getInstance(code)
@@ -163,12 +163,12 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	}
 
 	/**
-	 * @param locale See {@link Sincerity.JVM#getLocale} for format
+	 * @param locale See {@link Savory.JVM#getLocale} for format
 	 * @param {String} [template='{symbol}{amount}'] Template to cast, filled with 'symbol' and 'amount' 
-	 * @returns Sincerity.Localization.CurrencyFormat
+	 * @returns Savory.Localization.CurrencyFormat
 	 */
 	Public.getCurrencyFormatForLocale = function(locale, template) {
-		var currency = java.util.Currency.getInstance(locale ? Sincerity.JVM.toLocale(locale) : java.util.Locale.getDefault())
+		var currency = java.util.Currency.getInstance(locale ? Savory.JVM.toLocale(locale) : java.util.Locale.getDefault())
 		return currency ? new Public.CurrencyFormat(currency, template, locale) : null
 	}
 
@@ -179,16 +179,16 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * share instances between Prudence requests.
 	 * 
 	 * @class
-	 * @name Sincerity.Localization.DateTimeFormat
+	 * @name Savory.Localization.DateTimeFormat
 	 * @param {String} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
 	 */
-	Public.DateTimeFormat = Sincerity.Classes.define(function() {
-		/** @exports Public as Sincerity.Localization.DateTimeFormat */
+	Public.DateTimeFormat = Savory.Classes.define(function() {
+		/** @exports Public as Savory.Localization.DateTimeFormat */
 	    var Public = {}
 	    
 	    /** @ignore */
 	    Public._construct = function(format) {
-			this.theFormat = Sincerity.Objects.isString(format) ? new java.text.SimpleDateFormat(format) : format
+			this.theFormat = Savory.Objects.isString(format) ? new java.text.SimpleDateFormat(format) : format
 	    }
 
 	    /**
@@ -232,16 +232,16 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * Represents a currency format based on a template.
 	 * 
 	 * @class
-	 * @name Sincerity.Localization.CurrencyFormat
+	 * @name Savory.Localization.CurrencyFormat
 	 * 
 	 * @param {Currency} currency
 	 * @param {String} [template='{symbol}{amount}'] Template to cast, filled with 'symbol' and 'amount' 
-	 * @param [locale] Default locale to use (see {@link Sincerity.JVM#getLocale} for format)
+	 * @param [locale] Default locale to use (see {@link Savory.JVM#getLocale} for format)
 	 * 
-	 * @see Sincerity.Localization#getCurrencyFormat
+	 * @see Savory.Localization#getCurrencyFormat
 	 */
-	Public.CurrencyFormat = Sincerity.Classes.define(function() {
-		/** @exports Public as Sincerity.Localization.CurrencyFormat */
+	Public.CurrencyFormat = Savory.Classes.define(function() {
+		/** @exports Public as Savory.Localization.CurrencyFormat */
 	    var Public = {}
 	    
 	    /** @ignore */
@@ -249,15 +249,15 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	    	this.currency = currency
 			this.template = template || '{symbol}{amount}'
 			this.digits = currency.defaultFractionDigits
-			this.symbol = Sincerity.Objects.exists(locale) ? currency.getSymbol(Sincerity.JVM.toLocale(locale)) : currency.symbol
+			this.symbol = Savory.Objects.exists(locale) ? currency.getSymbol(Savory.JVM.toLocale(locale)) : currency.symbol
 	    }
 	    
 		/**
 		 * @param {Number} amount
-		 * @param [locale] See {@link Sincerity.JVM#getLocale} for format
+		 * @param [locale] See {@link Savory.JVM#getLocale} for format
 		 */
 		Public.format = function(amount, locale) {
-			var symbol = Sincerity.Objects.exists(locale) ? this.currency.getSymbol(Sincerity.JVM.toLocale(locale)) : this.symbol
+			var symbol = Savory.Objects.exists(locale) ? this.currency.getSymbol(Savory.JVM.toLocale(locale)) : this.symbol
 			return this.template.cast({symbol: symbol, amount: amount.toFixed(this.digits)})
 		}
 		
@@ -284,24 +284,24 @@ Sincerity.Localization = Sincerity.Localization || function() {
  * Formats a date as a string.
  * 
  * @methodOf Date#
- * @see Sincerity.Localization#formatDateTime
- * @param {String|Sincerity.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
+ * @see Savory.Localization#formatDateTime
+ * @param {String|Savory.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
  * @param {String} [timeZone]
  * @returns {String}
  */
 Date.prototype.format = Date.prototype.format || function(format, timeZone) {
-	return Sincerity.Localization.formatDateTime(this, format, timeZone)
+	return Savory.Localization.formatDateTime(this, format, timeZone)
 }
 
 /**
  * Parses a string into a date.
  * 
  * @methodOf String#
- * @see Sincerity.Localization#parseDateTime
- * @param {String|Sincerity.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
+ * @see Savory.Localization#parseDateTime
+ * @param {String|Savory.Localization.DateTimeFormat} format See <a href="http://download.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">pattern rules</a>
  * @param {String} [timeZone]
  * @returns {Date}
  */
 String.prototype.parseDateTime = String.prototype.parseDateTime || function(format, timeZone) {
-	return Sincerity.Localization.parseDateTime(this, format, timeZone)
+	return Savory.Localization.parseDateTime(this, format, timeZone)
 }

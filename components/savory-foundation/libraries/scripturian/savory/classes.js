@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 
 // Copyright 2011 Three Crickets LLC.
@@ -12,29 +12,29 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/objects/')
+document.executeOnce('/savory/objects/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
- * Object Oriented Programming for JavaScript, Sincerity style.
+ * Object Oriented Programming for JavaScript, Savory style.
  * <p>
  * Though JavaScript does not in itself have most OOP constructs, it provides all the essentials for
- * building an OOP framework. And this is Sincerity's take on it: we've opted for an especially lightweight
+ * building an OOP framework. And this is Savory's take on it: we've opted for an especially lightweight
  * approach to provide the bare minimum required for an OOP development experience that promotes
  * clarity, consistency and functionality. If you've come from heavily OOP languages, such as Java or
  * Python, we'd like to encourage you to avoid automatically turning everything into a "class," and 
  * instead and choose more horizontal ways of code organization and reuse, via closures, raw prototypes
  * and duck typing. Use OOP only when it adds coherence to your code.
  * <p>
- * That said, Sincerity supports all OOP principles:
+ * That said, Savory supports all OOP principles:
  * <ol>
  * <li>Encapsulation: This is already available, because functions are first-class citizens in JavaScript.
  * A dict can contain both data properties and functions. Additionally, the "this" keyword is automatically
  * linked to a new dict via the "new" keyword. The result is that data and functions are encapsulated
  * into a single instance.</li>
  * <li>Inheritance: There are two obvious ways to implement this in JavaScript -- by simply copying functions
- * over from another dict (which we could have done with {@link Sincerity.Objects#merge}) or at once by
+ * over from another dict (which we could have done with {@link Savory.Objects#merge}) or at once by
  * setting the constructor's prototype. The latter offers better performance and more coherence, which is
  * why we chose it.</li>
  * <li>Polymorphism: Loose polymorphism is provided naturally via JavaScript's duck typing, which is
@@ -57,7 +57,7 @@ var Sincerity = Sincerity || {}
  * <pre>
  * // We are not providing a literal dict, but instead creating an "ad hoc" anonymous function,
  * // which we then immediately call, so that it only ever used this once for purposes of closure
- * var Person = Sincerity.Classes.define(function() {
+ * var Person = Savory.Classes.define(function() {
  *   // We will be returning this dict to the outside world
  *   var Public = {}
  *   
@@ -119,8 +119,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Classes = Sincerity.Classes || function() {
-	/** @exports Public as Sincerity.Classes */
+Savory.Classes = Savory.Classes || function() {
+	/** @exports Public as Savory.Classes */
     var Public = {}
     
     /**
@@ -191,7 +191,7 @@ Sincerity.Classes = Sincerity.Classes || function() {
     		// Inherit the parent _configure if it exists
 			var parentConfigure = definition._inherit.prototype.definition._configure
     		if (parentConfigure) {
-    			definition._configure = Sincerity.Objects.concatUnique(definition._configure || [], parentConfigure)
+    			definition._configure = Savory.Objects.concatUnique(definition._configure || [], parentConfigure)
     		}
     	}
     	
@@ -199,7 +199,7 @@ Sincerity.Classes = Sincerity.Classes || function() {
     		// Wrap the constructor with one that merges the configuration
     		var OriginalClass = TheClass
     		TheClass = function(config) {
-    			Sincerity.Objects.merge(this, config, TheClass.prototype.definition._configure)
+    			Savory.Objects.merge(this, config, TheClass.prototype.definition._configure)
     			OriginalClass.call(this, this)
     		}
     	}

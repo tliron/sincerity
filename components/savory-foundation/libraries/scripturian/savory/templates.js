@@ -1,5 +1,5 @@
 //
-// This file is part of the Sincerity Foundation Library for JavaScript
+// This file is part of the Savory Foundation Library for JavaScript
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -31,9 +31,9 @@
 // Version 1.0
 //
 
-document.executeOnce('/sincerity/objects/')
+document.executeOnce('/savory/objects/')
 
-var Sincerity = Sincerity || {}
+var Savory = Savory || {}
 
 /**
  * A simple-yet-powerful string interpolator.
@@ -45,8 +45,8 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Templates = Sincerity.Templates || function() {
-	/** @exports Public as Sincerity.Templates */
+Savory.Templates = Savory.Templates || function() {
+	/** @exports Public as Savory.Templates */
     var Public = {}
 
 	/**
@@ -77,7 +77,7 @@ Sincerity.Templates = Sincerity.Templates || function() {
 	Public.cast = function(template, filling/*, arguments */) {
 		template = template || ''
 
-		if (!Sincerity.Objects.exists(filling)) {
+		if (!Savory.Objects.exists(filling)) {
 			return template
 		}
 		
@@ -87,11 +87,11 @@ Sincerity.Templates = Sincerity.Templates || function() {
 		
 		if (filling instanceof java.util.Map) {
 			return template.replace(templateRegExp, function(original, key) {
-				return Sincerity.Objects.ensure(filling.get(key), original)
+				return Savory.Objects.ensure(filling.get(key), original)
 			})
 		}
 		
-		if (!Sincerity.Objects.isDict(filling, true)) {
+		if (!Savory.Objects.isDict(filling, true)) {
 			// Convert extra arguments to a dict
 			var convertedFilling = {}
 			for (var a = 1, length = arguments.length; a < length; a++) {
@@ -101,7 +101,7 @@ Sincerity.Templates = Sincerity.Templates || function() {
 		}
 		
 		return template.replace(templateRegExp, function(original, key) {
-			return Sincerity.Objects.ensure(filling[key], original)
+			return Savory.Objects.ensure(filling[key], original)
 		})
 	}
 
@@ -122,9 +122,9 @@ Sincerity.Templates = Sincerity.Templates || function() {
  * 
  * @methodOf String#
  * @returns {String}
- * @see Sincerity.Templates#cast
+ * @see Savory.Templates#cast
  */ 
 String.prototype.cast = String.prototype.cast || function(/* arguments */) {
-	var args = [this].concat(Sincerity.Objects.slice(arguments))
-	return Sincerity.Templates.cast.apply(null, args)
+	var args = [this].concat(Savory.Objects.slice(arguments))
+	return Savory.Templates.cast.apply(null, args)
 }
