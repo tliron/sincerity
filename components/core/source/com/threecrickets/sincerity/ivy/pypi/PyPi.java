@@ -37,7 +37,7 @@ public class PyPi
 	 * Group 3: file extension<br/>
 	 * 
 	 * @param moduleName
-	 * @return
+	 * @return pattern
 	 */
 	public static Pattern getArtifactPattern( String moduleName )
 	{
@@ -152,7 +152,7 @@ public class PyPi
 	 * @param id
 	 * @param versionMatcher
 	 * @param pythonVersion
-	 * @return
+	 * @return artifacts
 	 */
 	public List<String[]> findArtifacts( ModuleRevisionId id, VersionMatcher versionMatcher, String pythonVersion )
 	{

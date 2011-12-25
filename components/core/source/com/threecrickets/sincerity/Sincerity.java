@@ -109,6 +109,14 @@ public class Sincerity implements Runnable
 		return sincerityHome;
 	}
 
+	public File getHomeFile( String... parts )
+	{
+		File file = sincerityHome;
+		for( String part : parts )
+			file = new File( file, part );
+		return file;
+	}
+
 	public PrintWriter getOut()
 	{
 		return out;
@@ -279,33 +287,6 @@ public class Sincerity implements Runnable
 	}
 
 	//
-	// Runnable
-	//
-
-	public void run()
-	{
-		if( commands.isEmpty() )
-			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", this ) );
-
-		try
-		{
-			for( Command command : commands )
-				run( command );
-		}
-		catch( SincerityException x )
-		{
-			err.println( x.getMessage() );
-			x.printStackTrace( err );
-			System.exit( 1 );
-		}
-		catch( Throwable x )
-		{
-			x.printStackTrace( err );
-			System.exit( 1 );
-		}
-	}
-
-	//
 	// Operations
 	//
 
@@ -406,6 +387,33 @@ public class Sincerity implements Runnable
 		for( String argument : arguments )
 			command.rawArguments.add( argument );
 		run( command );
+	}
+
+	//
+	// Runnable
+	//
+
+	public void run()
+	{
+		if( commands.isEmpty() )
+			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", this ) );
+
+		try
+		{
+			for( Command command : commands )
+				run( command );
+		}
+		catch( SincerityException x )
+		{
+			err.println( x.getMessage() );
+			x.printStackTrace( err );
+			System.exit( 1 );
+		}
+		catch( Throwable x )
+		{
+			x.printStackTrace( err );
+			System.exit( 1 );
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

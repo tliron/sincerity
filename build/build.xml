@@ -14,6 +14,7 @@
 	-->
 	<property name="reference" value="../components/reference" />
 	<property name="scripts" value="../components/scripts" />
+	<property name="foundation" value="../components/foundation" />
 	<property name="templates" value="../components/templates" />
 	<property name="dependencies" value="../dependencies" />
 
@@ -23,7 +24,9 @@
 
 	<property name="distribution" value="./distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
-	<property name="distribution.jars" value="${distribution.content}/libraries/jars" />
+	<property name="distribution.libraries" value="${distribution.content}/libraries" />
+	<property name="distribution.scripturian" value="${distribution.libraries}/scripturian" />
+	<property name="distribution.jars" value="${distribution.libraries}/jars" />
 	<property name="distribution.jars.pattern" value="${distribution.jars}/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
 	<property name="distribution.manual" value="${distribution.reference}/documentation/manual" />
@@ -160,8 +163,8 @@
 			<fileset dir="${reference}" excludes="**/.svn/" includes="*.txt" />
 			<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
 			<fileset dir="${dependencies}" excludes="**/.svn/" />
+			<fileset dir="${foundation}" excludes="**/.svn/" />
 		</copy>
-		<mkdir dir="${distribution.content}/templates" />
 		<copy todir="${distribution.content}/templates">
 			<fileset dir="${templates}" excludes="**/.svn/" />
 		</copy>
