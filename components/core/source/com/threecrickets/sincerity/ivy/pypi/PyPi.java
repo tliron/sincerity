@@ -23,9 +23,9 @@ public class PyPi
 	// Constants
 	//
 
-	public static final String LIBRARY_PREFIX = "^";
+	public static final String EGG_MODE_PREFIX = "~";
 
-	public static final int LIBRARY_PREFIX_LENGTH = LIBRARY_PREFIX.length();
+	public static final int EGG_MODE_PREFIX_LENGTH = EGG_MODE_PREFIX.length();
 
 	//
 	// Static operations
@@ -159,8 +159,8 @@ public class PyPi
 		ArrayList<String[]> artifacts = new ArrayList<String[]>();
 
 		String moduleName = id.getName();
-		if( moduleName.startsWith( LIBRARY_PREFIX ) )
-			moduleName = moduleName.substring( LIBRARY_PREFIX_LENGTH );
+		if( moduleName.startsWith( EGG_MODE_PREFIX ) )
+			moduleName = moduleName.substring( EGG_MODE_PREFIX_LENGTH );
 		Document moduleDocument = getModuleDocument( moduleName );
 		if( moduleDocument != null )
 		{

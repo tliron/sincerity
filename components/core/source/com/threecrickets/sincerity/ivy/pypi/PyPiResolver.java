@@ -213,7 +213,7 @@ public class PyPiResolver extends BasicResolver
 		if( !getOrganisation().equals( id.getOrganisation() ) )
 			return null;
 
-		boolean install = !id.getName().startsWith( PyPi.LIBRARY_PREFIX );
+		boolean eggMode = id.getName().startsWith( PyPi.EGG_MODE_PREFIX );
 
 		// Search the PyPI repository
 		PyPi pyPi = getPyPi();
@@ -327,28 +327,22 @@ public class PyPiResolver extends BasicResolver
 					{
 						eggFile = builderFile;
 
-						if( install )
-						{
-							easyInstall( eggFile );
-							installed = true;
-						}
-						else
+						if( eggMode )
 						{
 							type = EGG_TYPE;
 
 							// Update sincerity.pth
 							addEggToPth( eggFile );
 						}
+						else
+						{
+							easyInstall( eggFile );
+							installed = true;
+						}
 					}
 					else if( BUILDER_ARCHIVE_TYPE.equals( type ) )
 					{
-						if( install )
-						{
-							// Install the archive
-							setupPy( builderFile, getBuilderSourceDir( id ), null );
-							installed = true;
-						}
-						else
+						if( eggMode )
 						{
 							// We'll try to build an egg from the archive
 							eggFile = setupPy( builderFile, getBuilderSourceDir( id ), getBuilderEggDir( id ) );
@@ -370,6 +364,12 @@ public class PyPiResolver extends BasicResolver
 							{
 								throw new RuntimeException( "Could not make an egg out of: " + builderFile );
 							}
+						}
+						else
+						{
+							// Install the archive
+							setupPy( builderFile, getBuilderSourceDir( id ), null );
+							installed = true;
 						}
 					}
 
@@ -706,7 +706,7 @@ public class PyPiResolver extends BasicResolver
 				}
 				if( name != null )
 				{
-					name = PyPi.LIBRARY_PREFIX + name;
+					name = PyPi.EGG_MODE_PREFIX + name;
 					ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
 					dependencyIds.add( dependencyId );
 				}
