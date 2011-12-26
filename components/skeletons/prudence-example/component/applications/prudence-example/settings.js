@@ -1,7 +1,7 @@
 
 document.executeOnce('/savory/objects/')
 
-Savory.Objects.merge(settings, {
+Savory.Objects.merge(app.settings, {
 	application: {
 		name: 'Skeleton',
 		description: 'The example application for the Restlet skeleton',
