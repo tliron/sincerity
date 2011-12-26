@@ -189,6 +189,10 @@ DLL Hell
 OSGi is a decent solution, but boy is it intricate.
 \end_layout
 
+\begin_layout Subsection
+No DSL
+\end_layout
+
 \begin_layout Subsubsection
 Goal 1: Self-Containment
 \end_layout

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-	<info organisation="com.threecrickets.sincerity" module="sincerity"
-		revision="working" status="release" default="true" />
+	<info
+		organisation="com.threecrickets.sincerity.plugin"
+		module="logging"
+		revision="working"
+		status="release"
+		default="true" />
 	<configurations>
 		<conf name="default" visibility="public" />
 	</configurations>
 	<dependencies>
-		<dependency org="org.apache.logging" name="log4j" rev="1.2.16"
-			conf="default->*" />
-		<dependency org="org.slf4j" name="jul-to-slf4j" rev="1.6.4"
-			conf="default->*" />
+		<dependency org="org.apache.logging" name="log4j" rev="1.2.16" conf="default->*" />
+		<dependency org="org.slf4j" name="jul-to-slf4j" rev="1.6.4" conf="default->*" />
 	</dependencies>
 </ivy-module>

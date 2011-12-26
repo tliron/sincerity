@@ -6,8 +6,7 @@ importClass(
 	org.restlet.routing.Router,
 	org.restlet.routing.Template)
 
-var settings = {}
-var routes = {}
+var settings = {routes: {}}
 
 Savory.Sincerity.executeAll('types')
 Savory.Sincerity.executeAll('settings')
@@ -15,10 +14,7 @@ Savory.Sincerity.executeAll('routes')
 
 // The application
 var app = new Application(component.context.createChildContext())
-app.name = settings.application.name
-app.description = settings.application.description
-app.author = settings.application.author
-app.owner = settings.application.owner
+Savory.Objects.merge(app, settings.application)
 
 function getHost(name) {
 	if (name == 'default') {
@@ -33,6 +29,13 @@ function getHost(name) {
 	return null
 }
 
+function cleanUri(uri) {
+	if ((uri.length > 0) && (uri[0] == '/')) {
+		uri = uri.substring(1)
+	}
+	return uri
+}
+
 // Attach to hosts
 for (var name in settings.hosts) {
 	getHost(name).attach(settings.hosts[name], app)
@@ -43,10 +46,16 @@ var router = new Router(app.context)
 app.inboundRoot = router
 
 // Attach routes
-for (var uri in routes) {
-	var restlet = routes[uri].create(app.context)
+for (var uri in settings.routes) {
+	var restlet = settings.routes[uri].create(app.context)
 	print('Attaching ' + uri + ' to ' + restlet + '\n')
-	router.attach(uri, restlet)
+	if (uri[0] == '=') {
+		uri = uri.substring(1)
+		router.attach(cleanUri(uri), restlet, Template.MODE_EQUALS)
+	}
+	else {
+		router.attach(cleanUri(uri), restlet)
+	}
 }
 
 // Restlets

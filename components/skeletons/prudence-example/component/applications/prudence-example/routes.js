@@ -1,6 +1,7 @@
 
 document.executeOnce('/savory/objects/')
 
-Savory.Objects.merge(routes, {
-	'static/': new Static('static')
+Savory.Objects.merge(settings.routes, {
+	'/static/': new Static('static'),
+	'=/': new Static('static')
 })

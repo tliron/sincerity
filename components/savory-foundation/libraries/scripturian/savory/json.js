@@ -14,25 +14,16 @@
 var Savory = Savory || {}
 
 /**
- * JSON encoding and decoding. Uses the high-performance JSON
- * library included in the MongoDB driver if available, otherwise
- * falls back to a 100%-JavaScript version. In either case, supports
- * decoding of MongoDB's extended JSON format:
- * <ul>
- * <li>{$date: timestamp} <-> Date</li>
- * <li>{$regex: 'pattern', $options: 'options'} <-> RegExp</li>
- * <li>{$oid: 'objectid'} <-> ObjectId</li>
- * <li>{$binary: 'base64', $type: 'hex'} <-> byte array</li>
- * <li>{$ref: 'collection', $id: 'objectid'} <-> DBRef</li>
- * <li>{$long: 'integer'} <-> java.lang.Long (this is our addition to MongoDB extended JSON)</li>
- * </ul>
+ * JSON encoding and decoding. Uses the high-performance JSON Rhino
+ * library if available, otherwise falls back to a 100%-JavaScript
+ * version.
  * 
  * @namespace
  * 
  * @author Tal Liron
  * @version 1.0
  */
-Savory.JSON = Savory.JSON || com.mongodb.rhino.JSON
+Savory.JSON = Savory.JSON || com.threecrickets.rhino.JSON
 
 if (Object.prototype.toString.call(Savory.JSON) == '[object JavaClass]') {
 	
@@ -123,9 +114,9 @@ if (Object.prototype.toString.call(Savory.JSON) == '[object JavaClass]') {
 	}())
 }
 else {
-	// Fallback to JavaScript JSON library if the MongoDB Rhino driver isn't found
+	// Fallback to JSON JavaScript library if the JSON Rhino library isn't found
 	
-	document.executeOnce('/savory/foundation/internal/json2/')
+	document.executeOnce('/savory/internal/json2/')
 	
 	Savory.JSON = {}
 	

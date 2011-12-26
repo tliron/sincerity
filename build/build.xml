@@ -1,21 +1,16 @@
 <?xml version="1.0"?>
 <project name="Sincerity" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-	<property name="version" value="0.9" />
-
-	<property name="jvm.version" value="1.5" />
-	<property name="jvm.docs" value="http://download.oracle.com/javase/1.5.0/docs/api/" />
-
-	<property name="core.source" value="../components/core/source" />
-	<property name="core.resources" value="../components/core/resources" />
-	<!--
-	<property name="logging.source" value="../components/plugins/logging/source" />
-	<property name="logging.resources" value="../components/plugins/logging/resources" />
-	-->
+	<property file="component.properties" />
+	
+	<property name="component.source" value="../components/${component}/source" />
+	<property name="component.resources" value="../components/${component}/resources" />
+	<property name="component.notices" value="../components/notices" />
 	<property name="reference" value="../components/reference" />
 	<property name="scripts" value="../components/scripts" />
-	<property name="foundation" value="../components/savory-foundation" />
+	<property name="savory-foundation" value="../components/savory-foundation" />
 	<property name="templates" value="../components/templates" />
+
 	<property name="dependencies" value="../dependencies" />
 
 	<property name="cache" value="./cache" />
@@ -25,147 +20,106 @@
 	<property name="distribution" value="./distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
 	<property name="distribution.libraries" value="${distribution.content}/libraries" />
-	<property name="distribution.scripturian" value="${distribution.libraries}/scripturian" />
 	<property name="distribution.jars" value="${distribution.libraries}/jars" />
 	<property name="distribution.jars.pattern" value="${distribution.jars}/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
-	<property name="distribution.manual" value="${distribution.reference}/documentation/manual" />
 	<property name="distribution.api" value="${distribution.reference}/documentation/api" />
+	<property name="distribution.manual" value="${distribution.reference}/documentation/manual" />
 	<property name="distribution.source" value="${distribution.content}/reference/source" />
+	<property name="distribution.templates" value="${distribution.content}/templates" />
 
-	<!-- We'll use Ivy to resolve and fetch our dependencies -->
-
-	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/2.2.0/ivy.jar" />
+	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
 
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
 	</target>
 
-	<!-- Core -->
-
-	<target name="dependencies-core" depends="ivy" description="Resolve dependencies for core">
-		<ivy:resolve file="ivy/core.xml" log="download-only" resolveId="core" />
-		<ivy:cachepath pathid="dependencies-core-ivy" type="jar" resolveId="core" />
-		<path id="dependencies-core">
-			<path refid="dependencies-core-ivy" />
+	<target name="dependencies" depends="ivy" description="Resolve dependencies">
+		<ivy:resolve file="ivy/${component}.xml" type="jar" log="download-only" resolveId="${component}" />
+		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" />
+		<path id="dependencies">
+			<path refid="dependencies-ivy" />
 			<fileset dir="${dependencies}" />
 		</path>
-		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="core" />
 	</target>
 
-	<target name="compile-core" depends="dependencies-core" description="Compile Java code for core">
-		<mkdir dir="${cache.classes}/core" />
-		<javac srcdir="${core.source}" destdir="${cache.classes}/core" target="${jvm.version}" includeAntRuntime="false" debug="true">
-			<classpath refid="dependencies-core" />
+	<target name="classes" depends="dependencies" description="Compile Java code">
+		<mkdir dir="${cache.classes}" />
+		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="false" debug="${compile.debug}">
+			<classpath refid="dependencies" />
 		</javac>
-		<copy todir="${cache.classes}/core">
-			<fileset dir="${core.resources}" excludes="**/.svn/" />
-		</copy>
 	</target>
 
-	<target name="jar-core" depends="compile-core" description="Create core jar">
-		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/com.threecrickets.sincerity/sincerity/${version}/sincerity.jar" basedir="${cache.classes}/core" />
+	<target name="javadocs" description="Create API documentation if not present">
+		<available file="${distribution.api}" property="javadocs-present" />
+		<antcall target="javadocs-overwrite" />
 	</target>
 
-	<!-- Logging Plugin -->
-	<!--
-	<target name="dependencies-logging" depends="ivy, compile-core" description="Resolve dependencies for logging plugin">
-		<ivy:resolve file="ivy/logging.xml" log="download-only" resolveId="logging" />
-		<ivy:cachepath pathid="dependencies-logging-ivy" type="jar" resolveId="logging" />
-		<path id="dependencies-logging">
-			<path refid="dependencies-logging-ivy" />
-			<file file="${cache.classes}/core" />
-		</path>
-	</target>
+	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
+		<javadoc
+			destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*"
+			access="protected" source="${jvm.version}"
+			windowtitle="${documentation.title} ${version}" doctitle="${documentation.title} ${version}"
+			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
-	<target name="compile-logging" depends="dependencies-logging" description="Compile Java code for logging">
-		<mkdir dir="${cache.classes}/logging" />
-		<javac srcdir="${logging.source}" destdir="${cache.classes}/logging" target="${jvm.version}" includeAntRuntime="false" debug="true">
-			<classpath refid="dependencies-logging" />
-		</javac>
-		<copy todir="${cache.classes}/logging">
-			<fileset dir="${logging.resources}" excludes="**/.svn/" />
-		</copy>
-	</target>
-
-	<target name="jar-logging" depends="compile-logging" description="Create logging jar">
-		<mkdir dir="${cache.jars}" />
-		<jar destfile="${cache.jars}/logging.jar" basedir="${cache.classes}/logging" filesetmanifest="merge" />
-	</target>
-	-->
-	<!-- General -->
-
-	<target name="compile" depends="compile-core" description="Compile Java code" />
-
-	<target name="libraries" depends="jar-core, dependencies-core" description="Resolve dependencies" />
-
-	<target name="javadoc" description="Create Sincerity API docs">
-		<available file="${distribution.api}" property="javadoc-present" />
-		<antcall target="javadoc-unless" />
-	</target>
-	
-	<target name="clean-javadoc" description="Clean Sinceity API docs">
-		<delete dir="${distribution.api}" />
-	</target>
-
-	<target name="javadoc-unless" depends="dependencies-core" description="Create Sincerity API docs" unless="javadoc-present">
-		<javadoc access="protected" author="true" excludepackagenames="**.internal.*" destdir="${distribution.api}" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="${jvm.version}" sourcepath="${core.source}" splitindex="true" use="true" version="true" windowtitle="Sincerity ${version}" doctitle="Sincerity ${version}">
 			<link href="${jvm.docs}" />
-			<classpath refid="dependencies-core" />
+			<!-- Apache Commons VFS 1.0 as no online javadocs -->
+			<link href="http://jsoup.org/apidocs/" />
+			<link href="http://threecrickets.com/scripturian/api/" />
+			<link href="http://www.mozilla.org/rhino/apidocs/" />
+			<classpath refid="dependencies" />
 			<bottom>
-				<![CDATA[<i>Copyright &#169; 2011 <a target="_top" href="http://threecrickets.com/">Three Crickets LLC</a>.</i>]]>
+				<![CDATA[<i>${documentation.copyright}</i>]]>
 			</bottom>
 		</javadoc>
 	</target>
 
-	<target name="manual" description="Create Sincerity Manual">
+	<target name="manual" description="Create manual if not present">
 		<available file="${distribution.manual}" property="manual-present" />
-		<antcall target="manual-unless" />
+		<antcall target="manual-overwrite" />
 	</target>
 	
-	<target name="clean-manual" description="Clean Sincerity Manual">
+	<target name="clean-manual" description="Clean manual">
 		<delete dir="${distribution.manual}" />
 	</target>
 
-	<target name="manual-unless" description="Create Sincerity Manual" unless="manual-present">
+	<target name="manual-overwrite" description="Create manual" unless="manual-present">
 		<mkdir dir="${distribution.manual}" />
 		<copy todir="${distribution.manual}">
 			<fileset dir="${reference}/manual" excludes="*~, **/.svn/" />
 		</copy>
-		<replace dir="${distribution.manual}" includes="sincerity_manual.lyx" token="%VERSION%" value="${version}" />
+		<replace dir="${distribution.manual}" includes="${component}_manual.lyx" token="%VERSION%" value="${version}" />
 		<exec executable="lyx" failifexecutionfails="false">
 			<arg value="--export" />
 			<arg value="pdf" />
-			<arg value="${distribution.manual}/sincerity_manual.lyx" />
+			<arg value="${distribution.manual}/${component}_manual.lyx" />
 		</exec>
 		<exec executable="elyxer" failifexecutionfails="false">
 			<arg value="--unicode" />
 			<arg value="--title" />
-			<arg value="Sincerity Manual" />
-			<arg value="${distribution.manual}/sincerity_manual.lyx" />
-			<arg value="${distribution.manual}/sincerity_manual.html" />
+			<arg value="${documentation.title} Manual" />
+			<arg value="${distribution.manual}/${component}_manual.lyx" />
+			<arg value="${distribution.manual}/${component}_manual.html" />
 		</exec>
 	</target>
-	
-	<target name="source" description="Fetch Sincerity source">
-		<copy todir="${distribution.source}/com.threecrickets.sincerity/sincerity/${version}">
-			<fileset dir="${core.source}" excludes="**/.svn/" />
-		</copy>
-		<!--
-		<copy todir="${distribution.source}/com.threecrickets.sincerity.plugin/logging/${version}">
-			<fileset dir="${logging.source}" excludes="**/.svn/" />
-		</copy>-->
+
+	<target name="libraries" depends="classes" description="Create jar">
+		<mkdir dir="${distribution.jars}" />
+		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" />
 	</target>
-	
-	<target name="distribution" depends="libraries, source, javadoc, manual" description="Create distribution">
+
+	<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
+		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
+		<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
+			<fileset dir="${component.source}" excludes="**/.svn/" />
+		</copy>
 		<copy todir="${distribution.content}">
-			<fileset dir="${reference}" excludes="**/.svn/" includes="*.txt" />
+			<fileset dir="${component.notices}" excludes="**/.svn/" />
 			<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
 			<fileset dir="${dependencies}" excludes="**/.svn/" />
-			<fileset dir="${foundation}" excludes="**/.svn/" />
+			<fileset dir="${savory-foundation}" excludes="**/.svn/" />
 		</copy>
-		<copy todir="${distribution.content}/templates">
+		<copy todir="${distribution.templates}">
 			<fileset dir="${templates}" excludes="**/.svn/" />
 		</copy>
 		<chmod perm="ugo+rx">
@@ -173,20 +127,19 @@
 		</chmod>
 	</target>
 	
-	<target name="package" depends="distribution" description="Create Sincerity zip">
-		<zip destfile="${distribution}/sincerity-${version}.zip" level="9">
-			<zipfileset prefix="sincerity" dir="${distribution.content}" excludes="sincerity" />
-			<zipfileset prefix="sincerity" dir="${distribution.content}" filemode="755" includes="sincerity" />
+	<target name="package" depends="distribution" description="Create distribution package">
+		<zip destfile="${distribution}/${component}-${version}.zip">
+			<fileset dir="${distribution.content}" excludes="src/" />
 		</zip>
 	</target>
 	
-	<target name="build" depends="package" description="Build Sincerity" />
+	<target name="build" depends="package" description="Build distribution" />
 	
 	<target name="clean" description="Clean">
 		<delete dir="${cache}" />
 		<delete dir="${distribution}" />
 	</target>
 	
-	<target name="rebuild" depends="clean, build" description="Clean and build Sincerity" />
-
+	<target name="rebuild" depends="clean, build" description="First clean and then build distribution" />
+	
 </project>

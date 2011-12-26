@@ -47,6 +47,14 @@
 		</mailingList>
 	</mailingLists>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.threecrickets.rhino</groupId>
+			<artifactId>json-rhino</artifactId>
+			<version>1.0</version>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<directory>../../cache/maven</directory>
 
