@@ -48,6 +48,9 @@
 		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="false" debug="${compile.debug}">
 			<classpath refid="dependencies" />
 		</javac>
+		<copy todir="${cache.classes}">
+			<fileset dir="${component.resources}" />
+		</copy>
 	</target>
 
 	<target name="javadocs" description="Create API documentation if not present">
@@ -86,7 +89,7 @@
 	<target name="manual-overwrite" description="Create manual" unless="manual-present">
 		<mkdir dir="${distribution.manual}" />
 		<copy todir="${distribution.manual}">
-			<fileset dir="${reference}/manual" excludes="*~, **/.svn/" />
+			<fileset dir="${reference}/manual" excludes="*~" />
 		</copy>
 		<replace dir="${distribution.manual}" includes="${component}_manual.lyx" token="%VERSION%" value="${version}" />
 		<exec executable="lyx" failifexecutionfails="false">
@@ -111,16 +114,16 @@
 	<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
 		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
 		<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
-			<fileset dir="${component.source}" excludes="**/.svn/" />
+			<fileset dir="${component.source}" />
 		</copy>
 		<copy todir="${distribution.content}">
-			<fileset dir="${component.notices}" excludes="**/.svn/" />
-			<fileset dir="${scripts}" excludes="**/.svn/, *.old" />
-			<fileset dir="${dependencies}" excludes="**/.svn/" />
-			<fileset dir="${savory-foundation}" excludes="**/.svn/" />
+			<fileset dir="${component.notices}" />
+			<fileset dir="${scripts}" excludes="*.old" />
+			<fileset dir="${dependencies}" />
+			<fileset dir="${savory-foundation}" />
 		</copy>
 		<copy todir="${distribution.templates}">
-			<fileset dir="${templates}" excludes="**/.svn/" />
+			<fileset dir="${templates}" />
 		</copy>
 		<chmod perm="ugo+rx">
 			<fileset dir="${distribution.content}" includes="sincerity" />
@@ -129,7 +132,7 @@
 	
 	<target name="package" depends="distribution" description="Create distribution package">
 		<zip destfile="${distribution}/${component}-${version}.zip">
-			<fileset dir="${distribution.content}" excludes="src/" />
+			<fileset dir="${distribution.content}" />
 		</zip>
 	</target>
 	
