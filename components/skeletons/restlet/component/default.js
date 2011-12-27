@@ -10,10 +10,10 @@ var component = new Component()
 
 // Assemble the component
 Savory.Sincerity.here = sincerity.container.getFile('component')
-Savory.Sincerity.executeAll('clients')
-Savory.Sincerity.executeAll('servers')
-Savory.Sincerity.executeAll('hosts')
-Savory.Sincerity.executeAll('applications')
+Savory.Sincerity.include('clients')
+Savory.Sincerity.include('servers')
+Savory.Sincerity.include('hosts')
+Savory.Sincerity.include('applications')
 
 // Start it!
 component.start()

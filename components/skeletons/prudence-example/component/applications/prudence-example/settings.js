@@ -2,9 +2,9 @@
 document.executeOnce('/savory/objects/')
 
 Savory.Objects.merge(app.settings, {
-	application: {
+	description: {
 		name: 'Skeleton',
-		description: 'The example application for the Restlet skeleton',
+		description: 'The example application for the Prudence skeleton',
 		author: 'Three Crickets',
 		owner: 'Free Software'
 	},

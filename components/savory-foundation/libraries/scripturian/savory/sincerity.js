@@ -32,7 +32,7 @@ Savory.Sincerity = Savory.Sincerity || function() {
 	 * 
 	 * @param {String|java.io.File} The path to execute, relative to the container's root
 	 */
-	Public.executeAll = function(file) {
+	Public.include = function(file) {
     	if (!(file instanceof java.io.File)) {
     		file = new java.io.File(Public.here, file)
     	}

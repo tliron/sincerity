@@ -4,11 +4,11 @@ document.executeOnce('/prudence/')
 
 var app = new Prudence.Application()
 
-Savory.Sincerity.executeAll('types')
-Savory.Sincerity.executeAll('settings')
-Savory.Sincerity.executeAll('routes')
+Savory.Sincerity.include('types')
+Savory.Sincerity.include('settings')
+Savory.Sincerity.include('uri-space')
 
 app.create(component)
 
 // Additional restlets
-Savory.Sincerity.executeAll('restlets')
+Savory.Sincerity.include('restlets')

@@ -7,7 +7,8 @@ document.executeOnce('/prudence/')
 var staticWeb = new Prudence.StaticWeb({root: 'static'})
 
 Savory.Objects.merge(app.routes, {
-	'/static/': staticWeb,
 	'=/': staticWeb,
-	'/dynamic/': new Prudence.DynamicWeb({root: 'dynamic'})
+	'/static/': staticWeb,
+	'/dynamic/': new Prudence.DynamicWeb({root: 'dynamic'}),
+	'/resources/': new Prudence.Resources({root: 'resources'})
 })

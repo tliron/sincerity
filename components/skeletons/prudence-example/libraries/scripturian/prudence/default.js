@@ -15,10 +15,12 @@ var Prudence = Prudence || function() {
 		return uri
     }
     
-    Public.createApplication = function(settings, component) {
-    }
-
+	/**
+	 * @class
+	 * @name Prudence.Application
+	 */
     Public.Application = Savory.Classes.define(function(Module) {
+		/** @exports Public as Prudence.Application */
     	var Public = {}
     	
     	Public.settings = {}
@@ -28,32 +30,51 @@ var Prudence = Prudence || function() {
     	Public.globals = {}
 
     	Public.create = function(component) {
+    		importClass(
+    			com.threecrickets.prudence.PrudenceApplication,
+    			com.threecrickets.prudence.PrudenceRouter,
+    			org.restlet.routing.Template)
+
     		// The context
     		this.context = component.context.createChildContext()
     		
         	// The application
-        	this.instance = new com.threecrickets.prudence.PrudenceApplication(this.context)
-        	Savory.Objects.merge(this.instance, this.settings.application)
+        	this.instance = new PrudenceApplication(this.context)
+    		
+    		// Descriptions
+    		if (this.settings.description) {
+    			Savory.Objects.merge(this.instance, this.settings.description)
+    		}
 
         	// Attach to hosts
         	for (var name in this.settings.hosts) {
-        		Restlet.getHost(component, name).attach(this.settings.hosts[name], this.instance)
+        		var host = Restlet.getHost(component, name)
+        		if (!Savory.Objects.exists(host)) {
+        			print('Unknown host: ' + name + '\n')
+        		}
+        		host.attach(this.settings.hosts[name], this.instance)
         	}
 
         	// Inbound root
-        	this.instance.inboundRoot = new com.threecrickets.prudence.PrudenceRouter(app.context)
+        	this.instance.inboundRoot = new PrudenceRouter(this.context)
 
         	// Attach routes
         	for (var uri in this.routes) {
         		var restlet = this.routes[uri].create(this)
         		
-        		print('Attaching ' + uri + ' to ' + restlet + '\n')
+        		var mode = null
         		if (uri[0] == '=') {
         			uri = uri.substring(1)
-        			this.instance.inboundRoot.attach(Module.cleanUri(uri), restlet, org.restlet.routing.Template.MODE_EQUALS)
+        			mode = Template.MODE_EQUALS
+        		}
+        		
+        		uri = Module.cleanUri(uri)
+        		print('Attaching ' + uri + ' to ' + restlet + '\n')
+        		if (null !== mode) {
+        			this.instance.inboundRoot.attach(uri, restlet, mode)
         		}
         		else {
-        			this.instance.inboundRoot.attach(Module.cleanUri(uri), restlet)
+        			this.instance.inboundRoot.attach(uri, restlet)
         		}
         	}
         	
@@ -98,11 +119,11 @@ var Prudence = Prudence || function() {
     	Public._configure = ['root', 'listingAllowed']
 
 	    Public._construct = function(config) {
-    		print ('root: ' + this.root + '\n')
-    		if (!(this.root instanceof java.io.File)) {
-    			this.root = new java.io.File(Savory.Sincerity.here.parentFile, this.root).absoluteFile
+    		importClass(java.io.File)
+    		
+    		if (!(this.root instanceof File)) {
+    			this.root = new File(Savory.Sincerity.here.parentFile, this.root).absoluteFile
     		}
-    		print ('root: ' + this.root + '\n')
     	}
 
     	Public.create = function(app) {
@@ -128,42 +149,107 @@ var Prudence = Prudence || function() {
     	Public._inherit = Module.Resource
 
 		/** @ignore */
-    	Public._configure = ['root', 'fragmentsRoot', 'defaultDocument', 'defaultExtension', 'minimumTimeBetweenValidityChecks']
+    	Public._configure = ['root', 'fragmentsRoot', 'passThroughs', 'defaultDocument', 'defaultExtension', 'minimumTimeBetweenValidityChecks']
 
 	    /** @ignore */
 	    Public._construct = function(config) {
-    		if (!(this.root instanceof java.io.File)) {
-    			this.root = new java.io.File(Savory.Sincerity.here.parentFile, this.root).absoluteFile
+    		importClass(java.io.File)
+    		
+    		if (!(this.root instanceof File)) {
+    			this.root = new File(Savory.Sincerity.here.parentFile, this.root).absoluteFile
     		}
-    		if (!(this.fragmentsRoot instanceof java.io.File)) {
-    			this.fragmentsRoot = new java.io.File(Savory.Sincerity.here.parentFile, this.fragmentsRoot).absoluteFile
+    		if (!(this.fragmentsRoot instanceof File)) {
+    			this.fragmentsRoot = new File(Savory.Sincerity.here.parentFile, this.fragmentsRoot).absoluteFile
     		}
+
     		this.defaultDocument = this.defaultDocument || 'index'
     		this.defaultExtension = this.defaultExtension || 'html'
     		this.minimumTimeBetweenValidityChecks = this.minimumTimeBetweenValidityChecks || 1000
     	}
 
     	Public.create = function(app) {
+    		importClass(
+    			org.restlet.resource.Finder,
+    			com.threecrickets.scripturian.document.DocumentFileSource,
+    			com.threecrickets.prudence.util.PhpExecutionController,
+    			java.util.concurrent.CopyOnWriteArrayList,
+    			java.util.concurrent.CopyOnWriteArraySet,
+    			java.util.concurrent.ConcurrentHashMap)
+
     		var generatedTextResource = app.globals['com.threecrickets.prudence.GeneratedTextResource'] = {
-	    		extraDocumentSources: new java.util.concurrent.CopyOnWriteArrayList(),
+    			documentSource: new DocumentFileSource(this.root, this.root, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks),
+	    		extraDocumentSources: new CopyOnWriteArrayList(),
 	    		//clientCachingMode: dynamicWebClientCachingMode,
-	    		cacheKeyPatternHandlers: new java.util.concurrent.ConcurrentHashMap(),
-	    		scriptletPlugins: new java.util.concurrent.ConcurrentHashMap(),
-	    		passThroughDocuments: new java.util.concurrent.CopyOnWriteArraySet(),
+	    		cacheKeyPatternHandlers: new ConcurrentHashMap(),
+	    		scriptletPlugins: new ConcurrentHashMap(),
+	    		passThroughDocuments: new CopyOnWriteArraySet(),
 	    		defaultIncludedName: this.defaultDocument,
-	    		executionController: new com.threecrickets.prudence.util.PhpExecutionController() // Adds PHP predefined variables
+	    		executionController: new PhpExecutionController() // Adds PHP predefined variables
     		}
 
-    		generatedTextResource.documentSource = new com.threecrickets.scripturian.document.DocumentFileSource(this.root, this.root, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks)
-    		generatedTextResource.extraDocumentSources.add(new com.threecrickets.scripturian.document.DocumentFileSource(this.fragmentsRoot, this.fragmentsRoot, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks))
+    		generatedTextResource.extraDocumentSources.add(new DocumentFileSource(this.fragmentsRoot, this.fragmentsRoot, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks))
 
     		//ourSettings.extraDocumentSources.add(commonFragmentsDocumentSource)
     		
-    		/*for (var i in dynamicWebPassThrough) {
-    			passThroughDocuments.add(dynamicWebPassThrough[i])
-    		}*/
+    		if (this.passThroughs) {
+	    		for (var i in this.passThroughs) {
+	    			generatedTextResource.passThroughDocuments.add(this.passThroughs[i])
+	    		}
+    		}
     		
-    		return new org.restlet.resource.Finder(app.context, sincerity.container.dependencies.classLoader.loadClass('com.threecrickets.prudence.GeneratedTextResource'))
+    		return new Finder(app.context, sincerity.container.dependencies.classLoader.loadClass('com.threecrickets.prudence.GeneratedTextResource'))
+    	}
+    	
+    	return Public
+    }(Public))
+
+	/**
+	 * @class
+	 * @name Prudence.Resources
+	 * @augments Prudence.Resources 
+	 * @param {Array} array The array
+	 */
+    Public.Resources = Savory.Classes.define(function(Module) {
+		/** @exports Public as Prudence.Resources */
+    	var Public = {}
+    	
+	    /** @ignore */
+    	Public._inherit = Module.Resource
+
+		/** @ignore */
+    	Public._configure = ['root', 'passThroughs', 'defaultDocument', 'defaultExtension', 'minimumTimeBetweenValidityChecks']
+
+	    /** @ignore */
+	    Public._construct = function(config) {
+    		importClass(java.io.File)
+    		
+    		if (!(this.root instanceof File)) {
+    			this.root = new File(Savory.Sincerity.here.parentFile, this.root).absoluteFile
+    		}
+
+    		this.defaultDocument = this.defaultDocument || 'default'
+    		this.defaultExtension = this.defaultExtension || 'js'
+    		this.minimumTimeBetweenValidityChecks = this.minimumTimeBetweenValidityChecks || 1000
+    	}
+
+    	Public.create = function(app) {
+    		importClass(
+    			org.restlet.resource.Finder,
+    			com.threecrickets.scripturian.document.DocumentFileSource,
+    			java.util.concurrent.CopyOnWriteArraySet)
+
+    		var delegatedResource = app.globals['com.threecrickets.prudence.DelegatedResource'] = {
+    			documentSource: new DocumentFileSource(this.root, this.root, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks),
+	    		passThroughDocuments: new CopyOnWriteArraySet()
+    		}
+
+    		if (this.passThroughs) {
+	    		for (var i in this.passThroughs) {
+	    			delegatedResource.passThroughDocuments.add(this.passThroughs[i])
+	    		}
+    		}
+    		
+    		return new Finder(app.context, sincerity.container.dependencies.classLoader.loadClass('com.threecrickets.prudence.DelegatedResource'))
     	}
     	
     	return Public
@@ -190,7 +276,6 @@ var Prudence = Prudence || function() {
     	
     	return Public
     }(Public))
-	
 	
     return Public
 }()

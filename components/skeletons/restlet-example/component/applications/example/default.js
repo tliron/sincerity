@@ -21,4 +21,4 @@ var router = new Router(app.context)
 app.inboundRoot = router
 
 // Restlets
-Savory.Sincerity.executeAll('restlets')
+Savory.Sincerity.include('restlets')

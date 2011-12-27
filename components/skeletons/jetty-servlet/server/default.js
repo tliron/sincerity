@@ -1,4 +1,6 @@
 
+document.executeOnce('/savory/sincerity/')
+
 importClass(
 	org.eclipse.jetty.server.Server,
 	org.eclipse.jetty.server.handler.ContextHandlerCollection,
@@ -6,19 +8,6 @@ importClass(
 	org.eclipse.jetty.security.HashLoginService,
 	java.io.File)
 
-var here
-
-function executeAll(dir) {
-	if (dir.directory) {
-		var files = dir.listFiles()
-		for (var f in files) {
-			here = files[f]
-			var path = sincerity.container.getRelativePath(here)
-			document.execute('/' + path)
-		}
-	}
-}
-	
 var server = new Server()
 
 // JMX (if available)
@@ -37,13 +26,13 @@ try {
 catch (x) {}
 
 // Assemble server
-var serverDir = sincerity.container.getFile('server')
-executeAll(new File(serverDir, 'connectors'))
+Savory.Sincerity.here = sincerity.container.getFile('server')
+Savory.Sincerity.include('connectors')
 server.handler = new ContextHandlerCollection()
-executeAll(new File(serverDir, 'contexts'))
+Savory.Sincerity.include('contexts')
 
 // Add wars
-var warsDir = new File(serverDir, 'wars')
+var warsDir = new File(Savory.Sincerity.here, 'wars')
 if (warsDir.directory) {
 	var cacheDir = sincerity.container.getCacheFile('jetty', 'wars')
 	var files = warsDir.listFiles()
