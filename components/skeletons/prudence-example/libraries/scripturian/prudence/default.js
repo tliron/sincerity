@@ -9,10 +9,14 @@ var Prudence = Prudence || function() {
     var Public = {}
     
     Public.cleanUri = function(uri) {
-		if ((uri.length > 0) && (uri[0] == '/')) {
-			uri = uri.substring(1)
-		}
-		return uri
+    	uri = uri.replace(/\/\//g, '/') // no doubles
+    	if(uri == '' || uri[0] != '/') { // always at the beginning
+    		uri = '/' + uri
+    	}
+    	if((uri != '/') && (uri[uri.length - 1] != '/')) { // always at the end
+    		uri += '/'
+    	}
+    	return uri
     }
     
 	/**
@@ -45,14 +49,23 @@ var Prudence = Prudence || function() {
     		if (this.settings.description) {
     			Savory.Objects.merge(this.instance, this.settings.description)
     		}
-
+    		
+    		// Attach to internal router
+    		component.internalRouter.attach('/example', this.instance).matchingMode = Template.MODE_STARTS_WITH
+    		
         	// Attach to hosts
         	for (var name in this.settings.hosts) {
         		var host = Restlet.getHost(component, name)
         		if (!Savory.Objects.exists(host)) {
         			print('Unknown host: ' + name + '\n')
         		}
-        		host.attach(this.settings.hosts[name], this.instance)
+        		var uri = this.settings.hosts[name]
+        		if((uri != '') && (uri[uri.length - 1] == '/')) {
+        			// No trailing slash
+        			uri = uri.slice(0, -1)
+        		}
+        		print('Attaching to ' + uri + ' on ' + name + '\n')
+        		host.attach(uri, this.instance)
         	}
 
         	// Inbound root
@@ -183,6 +196,10 @@ var Prudence = Prudence || function() {
     	}
 
     	Public.create = function(app) {
+    		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.GeneratedTextResource'])) {
+    			throw 'There can be only one DynamicWeb per application'
+    		}
+
     		importClass(
     			org.restlet.resource.Finder,
     			com.threecrickets.scripturian.document.DocumentFileSource,
@@ -190,7 +207,7 @@ var Prudence = Prudence || function() {
     			java.util.concurrent.CopyOnWriteArrayList,
     			java.util.concurrent.CopyOnWriteArraySet,
     			java.util.concurrent.ConcurrentHashMap)
-
+    			
     		var generatedTextResource = app.globals['com.threecrickets.prudence.GeneratedTextResource'] = {
     			documentSource: new DocumentFileSource(this.root, this.root, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks),
 	    		extraDocumentSources: new CopyOnWriteArrayList(),
@@ -248,6 +265,10 @@ var Prudence = Prudence || function() {
     	}
 
     	Public.create = function(app) {
+    		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.DelegatedResource'])) {
+    			throw 'There can be only one Resources per application'
+    		}
+
     		importClass(
     			org.restlet.resource.Finder,
     			com.threecrickets.scripturian.document.DocumentFileSource,
@@ -272,21 +293,30 @@ var Prudence = Prudence || function() {
 
 	/**
 	 * @class
-	 * @name Prudence.Chain
+	 * @name Prudence.Custom
 	 * @augments Prudence.Resource 
 	 * @param {Array} array The array
 	 */
-    Public.Chain = Savory.Classes.define(function(Module) {
-		/** @exports Public as Prudence.Chain */
+    Public.Custom = Savory.Classes.define(function(Module) {
+		/** @exports Public as Prudence.Custom */
     	var Public = {}
     	
 	    /** @ignore */
     	Public._inherit = Module.Resource
 
 		/** @ignore */
-    	Public._configure = []
+    	Public._configure = ['type']
 
     	Public.create = function(app) {
+    		importClass(
+    			com.threecrickets.prudence.util.Injector,
+    			com.threecrickets.prudence.util.CapturingRedirector)
+    		
+			var capture = new CapturingRedirector(app.context, 'riap://application/resources/router/?{rq}', false)
+    		var injector = new Injector(app.context, capture)
+    		injector.values.put('type', this.type)
+    		
+    		return injector
     	}
     	
     	return Public

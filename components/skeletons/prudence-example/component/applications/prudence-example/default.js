@@ -4,7 +4,6 @@ document.executeOnce('/prudence/')
 
 var app = new Prudence.Application()
 
-Savory.Sincerity.include('types')
 Savory.Sincerity.include('settings')
 Savory.Sincerity.include('uri-space')
 

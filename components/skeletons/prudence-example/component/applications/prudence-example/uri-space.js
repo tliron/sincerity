@@ -10,5 +10,6 @@ Savory.Objects.merge(app.routes, {
 	'=/': staticWeb,
 	'/static/': staticWeb,
 	'/dynamic/': new Prudence.DynamicWeb({root: 'dynamic'}),
-	'/resources/': new Prudence.Resources({root: 'resources'})
+	'/resources/': new Prudence.Resources({root: 'resources'}),
+	'/person/': new Prudence.Custom({type: 'person'})
 })

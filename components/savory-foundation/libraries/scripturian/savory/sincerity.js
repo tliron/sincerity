@@ -38,13 +38,16 @@ Savory.Sincerity = Savory.Sincerity || function() {
     	if (!(file instanceof File)) {
     		file = new File(Public.here, file)
     	}
+    	
     	if (file.directory) {
-    		var files = file.listFiles()
-    		for (var f in files) {
-    			hereStack.push(Public.here)
-    			Public.here = files[f]
-    			document.execute('/' + sincerity.container.getRelativePath(Public.here))
-    			Public.here = hereStack.pop()
+    		if (!file.hidden) {
+	    		var files = file.listFiles()
+	    		for (var f in files) {
+	    			hereStack.push(Public.here)
+	    			Public.here = files[f]
+	    			document.execute('/' + sincerity.container.getRelativePath(Public.here))
+	    			Public.here = hereStack.pop()
+	    		}
     		}
     	}
     	else {
