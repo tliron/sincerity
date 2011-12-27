@@ -75,10 +75,18 @@ var Prudence = Prudence || function() {
         	for (var uri in this.routes) {
         		var restlet = this.routes[uri].create(this)
         		
-        		var mode = null
-        		if (uri[0] == '=') {
-        			uri = uri.substring(1)
-        			mode = Template.MODE_EQUALS
+        		var mode = Template.MODE_EQUALS
+        		var length = uri.length
+        		if (length > 1) {
+        			var last = uri[length - 1]
+	        		if (last == '!') {
+	        			uri = uri.substring(0, length - 1)
+	        			mode = Template.MODE_EQUALS
+	        		}
+	        		else if (last == '*') {
+	        			uri = uri.substring(0, length - 1)
+	        			mode = Template.MODE_STARTS_WITH
+	        		}
         		}
         		
         		uri = Module.cleanUri(uri)
@@ -142,6 +150,7 @@ var Prudence = Prudence || function() {
     	Public.create = function(app) {
     		var directory = new org.restlet.resource.Directory(app.context, this.root.toURI())
     		directory.listingAllowed = this.listingAllowed || false
+    		directory.negotiatingContent = true
     		return directory
     	}
     	
