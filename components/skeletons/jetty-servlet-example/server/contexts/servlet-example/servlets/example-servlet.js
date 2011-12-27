@@ -6,7 +6,7 @@ importClass(
 try {
 	sincerity.run('java:compile', [new File(Savory.Sincerity.here.parentFile.parentFile, 'java')])
 
-	var servlet = sincerity.container.dependencies.classLoader.loadClass('example.ExampleServlet').newInstance()
+	var servlet = Savory.Sincerity.getClass('example.ExampleServlet').newInstance()
 	context.addServlet(new ServletHolder(servlet), '/example/*')
 }
 catch (x) {

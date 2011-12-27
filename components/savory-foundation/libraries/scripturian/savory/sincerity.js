@@ -33,32 +33,41 @@ Savory.Sincerity = Savory.Sincerity || function() {
 	 * @param {String|java.io.File} The path to execute, relative to the container's root
 	 */
 	Public.include = function(file) {
-    	if (!(file instanceof java.io.File)) {
-    		file = new java.io.File(Public.here, file)
+    	importClass(java.io.File)
+    	
+    	if (!(file instanceof File)) {
+    		file = new File(Public.here, file)
     	}
     	if (file.directory) {
     		var files = file.listFiles()
     		for (var f in files) {
-    			var oldHere = Public.here
+    			hereStack.push(Public.here)
     			Public.here = files[f]
     			document.execute('/' + sincerity.container.getRelativePath(Public.here))
-    			Public.here = oldHere
+    			Public.here = hereStack.pop()
     		}
     	}
     	else {
     		var name = file.name.split('\\.', 2)[0]
     		var files = file.parentFile.listFiles()
     		for (var f in files) {
-    			var oldHere = Public.here
-    			Public.here = files[f]
-    			var hereName = Public.here.name.split('\\.', 2)[0]
+    			var here = files[f]
+    			var hereName = here.name.split('\\.', 2)[0]
     			if (name == hereName) {
+        			hereStack.push(Public.here)
+    				Public.here = here
     				document.execute('/' + sincerity.container.getRelativePath(Public.here))
+        			Public.here = hereStack.pop()
     			}
-    			Public.here = oldHere
     		}
     	}
 	}
+    
+    Public.getClass = function(name) {
+    	return sincerity.container.dependencies.classLoader.loadClass(name)
+    }
+    
+    var hereStack = []
 	
 	return Public
 }()

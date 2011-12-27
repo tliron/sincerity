@@ -149,7 +149,7 @@ var Prudence = Prudence || function() {
     	Public._inherit = Module.Resource
 
 		/** @ignore */
-    	Public._configure = ['root', 'fragmentsRoot', 'passThroughs', 'defaultDocument', 'defaultExtension', 'minimumTimeBetweenValidityChecks']
+    	Public._configure = ['root', 'fragmentsRoot', 'clientCachingMode', 'passThroughs', 'defaultDocument', 'defaultExtension', 'minimumTimeBetweenValidityChecks']
 
 	    /** @ignore */
 	    Public._construct = function(config) {
@@ -160,6 +160,21 @@ var Prudence = Prudence || function() {
     		}
     		if (!(this.fragmentsRoot instanceof File)) {
     			this.fragmentsRoot = new File(Savory.Sincerity.here.parentFile, this.fragmentsRoot).absoluteFile
+    		}
+
+    		if (Savory.Objects.isString(this.clientCachingMode)) {
+	    		if (this.clientCachingMode == 'disabled') {
+	    			this.clientCachingMode = 0
+	    		}
+	    		else if (this.clientCachingMode == 'conditional') {
+	    			this.clientCachingMode = 1
+	    		}
+	    		else if (this.clientCachingMode == 'offline') {
+	    			this.clientCachingMode = 2
+	    		}
+    		}
+    		else if (!Savory.Objects.exists(this.clientCachingMode)) {
+    			this.clientCachingMode = 1
     		}
 
     		this.defaultDocument = this.defaultDocument || 'index'
@@ -179,10 +194,10 @@ var Prudence = Prudence || function() {
     		var generatedTextResource = app.globals['com.threecrickets.prudence.GeneratedTextResource'] = {
     			documentSource: new DocumentFileSource(this.root, this.root, this.defaultDocument, this.defaultExtenion, this.minimumTimeBetweenValidityChecks),
 	    		extraDocumentSources: new CopyOnWriteArrayList(),
-	    		//clientCachingMode: dynamicWebClientCachingMode,
 	    		cacheKeyPatternHandlers: new ConcurrentHashMap(),
 	    		scriptletPlugins: new ConcurrentHashMap(),
 	    		passThroughDocuments: new CopyOnWriteArraySet(),
+	    		clientCachingMode: this.clientCachingMode,
 	    		defaultIncludedName: this.defaultDocument,
 	    		executionController: new PhpExecutionController() // Adds PHP predefined variables
     		}
@@ -197,7 +212,7 @@ var Prudence = Prudence || function() {
 	    		}
     		}
     		
-    		return new Finder(app.context, sincerity.container.dependencies.classLoader.loadClass('com.threecrickets.prudence.GeneratedTextResource'))
+    		return new Finder(app.context, Savory.Sincerity.getClass('com.threecrickets.prudence.GeneratedTextResource'))
     	}
     	
     	return Public
@@ -249,7 +264,7 @@ var Prudence = Prudence || function() {
 	    		}
     		}
     		
-    		return new Finder(app.context, sincerity.container.dependencies.classLoader.loadClass('com.threecrickets.prudence.DelegatedResource'))
+    		return new Finder(app.context, Savory.Sincerity.getClass('com.threecrickets.prudence.DelegatedResource'))
     	}
     	
     	return Public
