@@ -1,10 +1,11 @@
 
 var resources = {}
 
-document.executeOnce(application.globals.get('prudence.internal'))
+document.executeOnce(application.globals.get('prudence.implicit.resourcesDocumentName'))
 
 function handle(conversation, method) {
-	var resource = resources[conversation.locals.get('id')]
+	var id = conversation.locals.get('prudence.id')
+	var resource = resources[id]
 	if (undefined === resource) {
 		conversation.statusCode = 404
 		return null

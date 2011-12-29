@@ -1,8 +1,9 @@
 
-
 document.executeOnce('/savory/classes/')
 document.executeOnce('/savory/objects/')
 document.executeOnce('/restlet/')
+
+importClass(com.threecrickets.sincerity.exception.SincerityException)
 
 var Prudence = Prudence || function() {
 	/** @exports Public as Prudence */
@@ -10,15 +11,15 @@ var Prudence = Prudence || function() {
     
     Public.cleanUri = function(uri) {
     	uri = uri.replace(/\/\//g, '/') // no doubles
-    	if(uri == '' || uri[0] != '/') { // always at the beginning
+    	if (uri == '' || uri[0] != '/') { // always at the beginning
     		uri = '/' + uri
     	}
-    	if((uri != '/') && (uri[uri.length - 1] != '/')) { // always at the end
+    	if ((uri != '/') && (uri[uri.length - 1] != '/')) { // always at the end
     		uri += '/'
     	}
     	return uri
     }
-    
+
 	/**
 	 * @class
 	 * @name Prudence.Application
@@ -27,17 +28,14 @@ var Prudence = Prudence || function() {
 		/** @exports Public as Prudence.Application */
     	var Public = {}
     	
-    	Public.settings = {}
-    	
-    	Public.routes = {}
-
-    	Public.resources = {}
-
-    	Public.globals = {}
-
 	    /** @ignore */
 	    Public._construct = function() {
     		this.root = Savory.Sincerity.here
+        	this.settings = {}
+    		this.hosts = {}
+        	this.routes = {}
+        	this.resources = {}
+        	this.globals = {}
     	}
 
     	Public.create = function(component) {
@@ -55,26 +53,27 @@ var Prudence = Prudence || function() {
         	// The application
         	this.instance = new PrudenceApplication(this.context)
     		
-    		// Descriptions
-    		if (this.settings.description) {
-    			Savory.Objects.merge(this.instance, this.settings.description)
+    		// Description
+    		if (Savory.Objects.exists(this.settings.description)) {
+    			Savory.Objects.merge(this.instance, this.settings.description, ['name', 'description', 'author', 'owner'])
     		}
     		
-    		// Attach to internal router
-    		component.internalRouter.attach('/example', this.instance).matchingMode = Template.MODE_STARTS_WITH
+    		if (!Savory.Objects.exists(this.hosts.internal)) {
+    			this.hosts.internal = this.root.name
+    		}
     		
         	// Attach to hosts
-        	for (var name in this.settings.hosts) {
+        	for (var name in this.hosts) {
         		var host = Restlet.getHost(component, name)
         		if (!Savory.Objects.exists(host)) {
-        			print('Unknown host: ' + name + '\n')
+        			throw new SavoryException('Unknown host: ' + name)
         		}
-        		var uri = this.settings.hosts[name]
-        		if((uri != '') && (uri[uri.length - 1] == '/')) {
+        		var uri = this.hosts[name]
+        		if ((uri != '') && (uri[uri.length - 1] == '/')) {
         			// No trailing slash
         			uri = uri.slice(0, -1)
         		}
-        		print('Attaching to ' + uri + ' on ' + name + '\n')
+        		print('Attaching to "' + uri + '/" on host ' + name + '\n')
         		host.attach(uri, this.instance)
         	}
 
@@ -92,19 +91,31 @@ var Prudence = Prudence || function() {
     	    			library = new File(this.root, library).absoluteFile
     	    		}
     				
-    				print('Adding library: ' + library + '\n')
+    				print('Adding library: "' + library + '"\n')
     				
-    				this.libraryDocumentSources.add(new DocumentFileSource(library, library, this.settings.code.defaultDocumentName, this.settings.code.defaultExtension, this.settings.code.minimumTimeBetweenValidityChecks))
+    				this.libraryDocumentSources.add(new DocumentFileSource(
+    					library,
+    					library,
+    					this.settings.code.defaultDocumentName,
+    					this.settings.code.defaultExtension,
+    					this.settings.code.minimumTimeBetweenValidityChecks
+    				))
     			}
         	}
 
     		var library = sincerity.container.getLibrariesFile('scripturian')
-			print('Adding library: ' + library + '\n')
-			this.libraryDocumentSources.add(new DocumentFileSource(library, library, this.settings.code.defaultDocumentName, this.settings.code.defaultExtension, this.settings.code.minimumTimeBetweenValidityChecks))
+			print('Adding library: "' + library + '"\n')
+			this.libraryDocumentSources.add(new DocumentFileSource(
+				library,
+				library,
+				this.settings.code.defaultDocumentName,
+				this.settings.code.defaultExtension,
+				this.settings.code.minimumTimeBetweenValidityChecks
+			))
 
         	// Attach restlets
-        	for (var uri in this.routes) {
-        		var restlet = this.routes[uri]
+        	for (var uri in this.uris) {
+        		var restlet = this.uris[uri]
         		
         		var mode = Template.MODE_EQUALS
         		var length = uri.length
@@ -120,30 +131,30 @@ var Prudence = Prudence || function() {
 
         		if (Savory.Objects.isString(restlet)) {
         			if (restlet == 'hidden') {
-                		print('Hiding ' + uri + '\n')
+                		print('Hiding "' + uri + '"\n')
         				this.instance.inboundRoot.hide(uri)
         				continue
         			}
         			else {
             			var type = Module[Savory.Objects.capitalize(restlet)]
         				if (Savory.Objects.exists(type)) {
-        					restlet = new type().create(this)
+        					restlet = new type().create(this, uri)
         				}
         				else {
-        					restlet = new Module.Internal({id: restlet}).create(this)
+        					restlet = new Module.Implicit({id: restlet}).create(this, uri)
         				}
         			}
         		}
         		else if (Savory.Objects.isString(restlet.type)) {
         			var type = Module[Savory.Objects.capitalize(restlet.type)]
         			delete restlet.type
-        			restlet = new type(restlet).create(this)        			
+        			restlet = new type(restlet).create(this, uri)        			
         		}
         		else {
-        			restlet = restlet.create(this)
+        			restlet = restlet.create(this, uri)
         		}
         		
-        		print('Attaching ' + uri + ' to ' + restlet + '\n')
+        		print('Attaching "' + uri + '" to ' + restlet + '\n')
         		if (null !== mode) {
         			this.instance.inboundRoot.attach(uri, restlet, mode)
         		}
@@ -152,18 +163,8 @@ var Prudence = Prudence || function() {
         		}
         	}
 
-        	// Globals
-        	var globals = Savory.Objects.flatten(this.globals)
-        	
-        	// Router for internal resources
-        	if (Savory.Objects.exists(globals['com.threecrickets.prudence.DelegatedResource.passThroughDocuments'])) {
-        		print('Adding internal router\n')
-        		globals['com.threecrickets.prudence.DelegatedResource.passThroughDocuments'].add('/prudence/internal/')
-            	globals['prudence.internal'] = this.resources.internal.resources
-        		this.instance.inboundRoot.hide(app.resources.internal.explicit + 'prudence/internal/')
-        	}
-
         	// Apply globals
+        	var globals = Savory.Objects.flatten(this.globals)
         	for (var g in globals) {
         		this.context.attributes.put(g, globals[g])
         	}
@@ -180,7 +181,7 @@ var Prudence = Prudence || function() {
 		/** @exports Public as Prudence.Resource */
     	var Public = {}
     	
-    	Public.create = function(settings, context) {
+    	Public.create = function(app, uri) {
     	}
     	
     	return Public
@@ -202,7 +203,7 @@ var Prudence = Prudence || function() {
 		/** @ignore */
     	Public._configure = ['root', 'listingAllowed']
 
-    	Public.create = function(app) {
+    	Public.create = function(app, uri) {
     		importClass(
     			org.restlet.resource.Directory,
     			java.io.File)
@@ -233,9 +234,9 @@ var Prudence = Prudence || function() {
 	    /** @ignore */
     	Public._inherit = Module.Resource
 
-    	Public.create = function(app) {
+    	Public.create = function(app, uri) {
     		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.GeneratedTextResource'])) {
-    			throw 'There can be only one DynamicWeb per application'
+    			throw new SincerityException('There can be only one DynamicWeb per application')
     		}
 
     		importClass(
@@ -269,6 +270,9 @@ var Prudence = Prudence || function() {
 	    		else if (settings.clientCachingMode == 'offline') {
 	    			settings.clientCachingMode = 2
 	    		}
+	    		else {
+        			throw new SavoryException('Unsupported clientCachingMode: ' + settings.clientCachingMode)
+	    		}
     		}
     		else if (!Savory.Objects.exists(settings.clientCachingMode)) {
     			settings.clientCachingMode = 1
@@ -278,7 +282,13 @@ var Prudence = Prudence || function() {
     		settings.defaultExtension = settings.defaultExtension || 'html'
 
     		var generatedTextResource = app.globals['com.threecrickets.prudence.GeneratedTextResource'] = {
-    			documentSource: new DocumentFileSource(settings.root, settings.root, settings.defaultDocumentName, settings.defaultExtenion, app.settings.code.minimumTimeBetweenValidityChecks),
+    			documentSource: new DocumentFileSource(
+    				settings.root,
+    				settings.root,
+    				settings.defaultDocumentName,
+    				settings.defaultExtenion,
+    				app.settings.code.minimumTimeBetweenValidityChecks
+    			),
 	    		extraDocumentSources: new CopyOnWriteArrayList(),
 	    		libraryDocumentSources: app.libraryDocumentSources,
 	    		passThroughDocuments: new CopyOnWriteArraySet(),
@@ -291,7 +301,13 @@ var Prudence = Prudence || function() {
     		}
 
     		if (Savory.Objects.exists(settings.fragmentsRoot)) {
-    			generatedTextResource.extraDocumentSources.add(new DocumentFileSource(settings.fragmentsRoot, settings.fragmentsRoot, settings.defaultDocumentName, settings.defaultExtenion, app.settings.code.minimumTimeBetweenValidityChecks))
+    			generatedTextResource.extraDocumentSources.add(new DocumentFileSource(
+    				settings.fragmentsRoot,
+    				settings.fragmentsRoot,
+    				settings.defaultDocumentName,
+    				settings.defaultExtenion,
+    				app.settings.code.minimumTimeBetweenValidityChecks
+    			))
     		}
 
     		//ourSettings.extraDocumentSources.add(commonFragmentsDocumentSource)
@@ -321,9 +337,9 @@ var Prudence = Prudence || function() {
 	    /** @ignore */
     	Public._inherit = Module.Resource
 
-    	Public.create = function(app) {
+    	Public.create = function(app, uri) {
     		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.DelegatedResource'])) {
-    			throw 'There can be only one Resources per application'
+    			throw new SincerityException('There can be only one Explicit per application')
     		}
 
     		importClass(
@@ -337,9 +353,17 @@ var Prudence = Prudence || function() {
     		if (!(settings.root instanceof File)) {
     			settings.root = new File(app.root, settings.root).absoluteFile
     		}
+    		
+    		settings.implicitRouterDocumentName = settings.implicitRouterDocumentName || '/prudence/implicit/'
 
     		var delegatedResource = app.globals['com.threecrickets.prudence.DelegatedResource'] = {
-    			documentSource: new DocumentFileSource(settings.root, settings.root, app.settings.code.defaultDocumentName, app.settings.code.defaultExtenion, app.settings.code.minimumTimeBetweenValidityChecks),
+    			documentSource: new DocumentFileSource(
+    				settings.root,
+    				settings.root,
+    				app.settings.code.defaultDocumentName,
+    				app.settings.code.defaultExtenion,
+    				app.settings.code.minimumTimeBetweenValidityChecks
+    			),
 	    		libraryDocumentSources: app.libraryDocumentSources,
 	    		passThroughDocuments: new CopyOnWriteArraySet(),
 	    		defaultName: app.settings.code.defaultDocumentName,
@@ -353,7 +377,12 @@ var Prudence = Prudence || function() {
 	    			delegatedResource.passThroughDocuments.add(settings.passThroughs[i])
 	    		}
     		}
-    		
+
+    		// Implicit router
+    		delegatedResource.passThroughDocuments.add(settings.implicitRouterDocumentName)
+       		settings.implicitRouterUri = Module.cleanUri(uri + settings.implicitRouterDocumentName)
+    		app.instance.inboundRoot.hide(settings.implicitRouterUri)
+
     		return new Finder(app.context, Savory.Sincerity.getClass('com.threecrickets.prudence.DelegatedResource'))
     	}
     	
@@ -362,31 +391,45 @@ var Prudence = Prudence || function() {
 
 	/**
 	 * @class
-	 * @name Prudence.Internal
+	 * @name Prudence.Implicit
 	 * @augments Prudence.Resource 
 	 * @param {Array} array The array
 	 */
-    Public.Internal = Savory.Classes.define(function(Module) {
-		/** @exports Public as Prudence.Internal */
+    Public.Implicit = Savory.Classes.define(function(Module) {
+		/** @exports Public as Prudence.Implicit */
     	var Public = {}
     	
 	    /** @ignore */
     	Public._inherit = Module.Resource
 
 		/** @ignore */
-    	Public._configure = ['id']
+    	Public._configure = ['id', 'locals']
 
-    	Public.create = function(app) {
+    	Public.create = function(app, uri) {
     		importClass(
     			com.threecrickets.prudence.util.Injector,
     			com.threecrickets.prudence.util.CapturingRedirector)
     			
-       		var settings = app.resources.internal
+       		var settings = app.resources.implicit
+       		var explicitSettings = app.resources.explicit
        		
-       		var capture = new CapturingRedirector(app.context, 'riap://application' + settings.explicit + 'prudence/internal/?{rq}', false)
-    		var injector = new Injector(app.context, capture)
-    		injector.values.put('id', this.id)
+       		if (!Savory.Objects.exists(explicitSettings.implicitRouterUri)) {
+    			throw new SincerityException('An Explicit must be attached before an Implicit can be created')
+       		}
     		
+    		settings.resourcesDocumentName = settings.resourcesDocumentName || '/resources/'
+
+       		var capture = new CapturingRedirector(app.context, 'riap://application' + explicitSettings.implicitRouterUri + '?{rq}', false)
+    		var injector = new Injector(app.context, capture)
+    		injector.values.put('prudence.id', this.id)
+    		if (Savory.Objects.exists(this.locals)) {
+    			for (var i in this.locals) {
+    				injector.values.put(i, this.locals[i])
+    			}
+    		}
+   
+        	app.globals['prudence.implicit.resourcesDocumentName'] = settings.resourcesDocumentName
+   
     		return injector
     	}
     	

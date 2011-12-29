@@ -9,10 +9,6 @@ Savory.Objects.merge(app.settings, {
 		owner: 'Free Software'
 	},
 
-	hosts: {
-		'default' : '/'
-	},
-	
 	code: {
 		defaultLanguageTag: 'javascript',
 		defaultExtension: 'js',

@@ -2,17 +2,20 @@
 document.executeOnce('/savory/objects/')
 document.executeOnce('/prudence/')
 
-// A dict of URI patterns mapped to Prudence.Resource instances
-
 var staticWeb = new Prudence.StaticWeb({root: 'static'})
 
-app.routes = {
+app.uris = {
 	'/': staticWeb,
 	'/static/*': staticWeb,
 	'/dynamic/*': 'dynamicWeb',
 	'/explicit/*': 'explicit',
 	//'/prudence/router/': 'hidden',
 	'/person/{person}/': 'person'
+}
+
+app.hosts = {
+	'default': '/',
+	internal: '/skeleton/'
 }
 
 app.resources = {
@@ -22,10 +25,10 @@ app.resources = {
 	},
 	explicit: {
 		root: 'explicit',
-		passThroughs: ['/prudence/fish/']
+		implicitRouterDocumentName: '/prudence/implicit/',
+		passThroughs: ['/prudence/fish/'],
 	},
-	internal: {
-		resources: '/resources/',
-		explicit: '/explicit/'
+	implicit: {
+		resourcesDocumentName: '/resources/'
 	}
 }
