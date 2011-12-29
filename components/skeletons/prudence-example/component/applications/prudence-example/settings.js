@@ -11,5 +11,13 @@ Savory.Objects.merge(app.settings, {
 
 	hosts: {
 		'default' : '/'
+	},
+	
+	code: {
+		defaultLanguageTag: 'javascript',
+		defaultExtension: 'js',
+		defaultDocumentName: 'default',
+		minimumTimeBetweenValidityChecks: 1000,
+		libraries: ['libraries']
 	}
 })

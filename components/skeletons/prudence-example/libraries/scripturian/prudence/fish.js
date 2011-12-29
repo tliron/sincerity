@@ -4,5 +4,5 @@ function handleInit(conversation) {
 }
 ​
 function handleGet(conversation) {
-	return conversation.locals.get('type') + ' ' + conversation.locals.get('person')
+	return 'fishy fish'
 }

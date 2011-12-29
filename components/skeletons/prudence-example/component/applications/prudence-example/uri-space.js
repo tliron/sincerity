@@ -6,11 +6,26 @@ document.executeOnce('/prudence/')
 
 var staticWeb = new Prudence.StaticWeb({root: 'static'})
 
-Savory.Objects.merge(app.routes, {
+app.routes = {
 	'/': staticWeb,
 	'/static/*': staticWeb,
-	'/dynamic/*': new Prudence.DynamicWeb({root: 'dynamic'}),
-	'/resources/*': new Prudence.Resources({root: 'resources'}),
-	'/resources/router/': 'hidden',
-	'/person/{person}/': new Prudence.Custom({type: 'person'})
-})
+	'/dynamic/*': 'dynamicWeb',
+	'/explicit/*': 'explicit',
+	//'/prudence/router/': 'hidden',
+	'/person/{person}/': 'person'
+}
+
+app.resources = {
+	dynamicWeb: {
+		root: 'dynamic',
+		fragmentsRoot: 'fragments'
+	},
+	explicit: {
+		root: 'explicit',
+		passThroughs: ['/prudence/fish/']
+	},
+	internal: {
+		resources: '/resources/',
+		explicit: '/explicit/'
+	}
+}
