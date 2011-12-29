@@ -29,7 +29,7 @@ public class Packages extends ArrayList<Package>
 			while( manifestUrls.hasMoreElements() )
 			{
 				URL manifestUrl = manifestUrls.nextElement();
-				Package pack = Package.createPackage( manifestUrl, container );
+				Package pack = Package.parsePackage( manifestUrl, container );
 				if( pack != null )
 					add( pack );
 			}
@@ -65,11 +65,11 @@ public class Packages extends ArrayList<Package>
 	// Operations
 	//
 
-	public void unpack( String filter, boolean overwrite ) throws SincerityException
+	public void install( String filter, boolean overwrite ) throws SincerityException
 	{
 		for( Package pack : this )
 		{
-			pack.unpack( filter, overwrite );
+			pack.install( filter, overwrite );
 			pack.install();
 		}
 	}

@@ -243,6 +243,14 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	public File getAbsoluteFile( File file )
+	{
+		if( !file.isAbsolute() )
+			return new File( root, file.getPath() );
+		else
+			return file;
+	}
+
 	public File getRelativeFile( File file )
 	{
 		return new File( getRelativePath( file.getPath() ) );

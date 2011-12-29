@@ -48,7 +48,7 @@ public class Dependencies
 		this.ivyFile = ivyFile;
 		this.container = container;
 		ivy = container.getIvy();
-		installedArtifacts = new InstalledArtifacts( artifactsFile, container );
+		managedArtifacts = new ManagedArtifacts( artifactsFile, container );
 
 		// Module
 		if( ivyFile.exists() )
@@ -211,15 +211,15 @@ public class Dependencies
 		for( ArtifactDownloadReport downloadReport : getDownloadReports() )
 		{
 			if( downloadReport.getLocalFile() != null )
-				artifacts.add( new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, container ) );
+				artifacts.add( new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container ) );
 		}
 
 		for( Package pack : getPackages() )
 		{
 			for( Artifact artifact : pack )
 			{
-				if( install && !installedArtifacts.isKept( artifact ) )
-					artifact.unpack( null, overwrite );
+				if( install && !( artifact.isVolatile() && managedArtifacts.wasInstalled( artifact ) ) )
+					artifact.install( null, overwrite );
 
 				artifacts.add( artifact );
 			}
@@ -407,14 +407,14 @@ public class Dependencies
 
 	public void prune() throws SincerityException
 	{
-		installedArtifacts.update( getArtifacts() );
+		managedArtifacts.update( getArtifacts() );
 		updateClasspath();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
-		installedArtifacts.clean();
+		managedArtifacts.clean();
 		updateClasspath();
 	}
 
@@ -452,7 +452,7 @@ public class Dependencies
 		else
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
-		installedArtifacts.update( getArtifacts( true, overwrite ) );
+		managedArtifacts.update( getArtifacts( true, overwrite ) );
 
 		if( report.hasChanged() )
 		{
@@ -472,7 +472,7 @@ public class Dependencies
 
 	private final File ivyFile;
 
-	private final InstalledArtifacts installedArtifacts;
+	private final ManagedArtifacts managedArtifacts;
 
 	private final Container container;
 

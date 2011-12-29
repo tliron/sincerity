@@ -41,7 +41,7 @@ public class PackagesPlugin implements Plugin
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
 			Packages packages = command.getSincerity().getContainer().getDependencies().getPackages();
-			packages.unpack( filter, overwrite );
+			packages.install( filter, overwrite );
 		}
 		else
 			throw new UnknownCommandException( command );

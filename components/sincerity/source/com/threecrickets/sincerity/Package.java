@@ -30,7 +30,11 @@ public class Package extends AbstractList<Artifact>
 
 	public static final String PACKAGE_FOLDERS = "Package-Folders";
 
+	public static final String PACKAGE_VOLATILE_FOLDERS = "Package-Volatile-Folders";
+
 	public static final String PACKAGE_FILES = "Package-Files";
+
+	public static final String PACKAGE_VOLATILE_FILES = "Package-Volatile-Files";
 
 	public static final String PACKAGE_RESOURCES = "Package-Resources";
 
@@ -42,7 +46,7 @@ public class Package extends AbstractList<Artifact>
 	// Construction
 	//
 
-	public static Package createPackage( URL manifestUrl, Container container ) throws SincerityException
+	public static Package parsePackage( URL manifestUrl, Container container ) throws SincerityException
 	{
 		String installer = null;
 		String uninstaller = null;
@@ -66,15 +70,21 @@ public class Package extends AbstractList<Artifact>
 				if( packageUninstallerAttribute != null )
 					uninstaller = packageUninstallerAttribute.toString();
 
+				Volatiles volatiles = null;
+
 				Object packageFoldersAttribute = manifest.getValue( PACKAGE_FOLDERS );
 				if( packageFoldersAttribute != null )
 				{
 					if( jar == null )
 						jar = new Jar( manifestUrl, container, "Package folders " + packageFoldersAttribute );
+					if( volatiles == null )
+						volatiles = new Volatiles( manifest );
 
 					for( String packageFolder : packageFoldersAttribute.toString().split( "," ) )
 					{
-						String prefix = packageFolder + "/";
+						String prefix = packageFolder;
+						if( !prefix.endsWith( "/" ) )
+							prefix += "/";
 						int prefixLength = prefix.length();
 
 						URL urlContext = new URL( "jar:" + jar.url + "!/" + packageFolder );
@@ -84,7 +94,7 @@ public class Package extends AbstractList<Artifact>
 							if( name.startsWith( prefix ) && name.length() > prefixLength )
 							{
 								URL url = new URL( urlContext, name );
-								artifacts.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, container ) );
+								artifacts.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, volatiles.contains( name ), container ) );
 							}
 						}
 					}
@@ -95,6 +105,8 @@ public class Package extends AbstractList<Artifact>
 				{
 					if( jar == null )
 						jar = new Jar( manifestUrl, container, "Package files " + packageFilesAttribute );
+					if( volatiles == null )
+						volatiles = new Volatiles( manifest );
 
 					for( String packageFile : packageFilesAttribute.toString().split( "," ) )
 					{
@@ -104,7 +116,7 @@ public class Package extends AbstractList<Artifact>
 							if( packageFile.equals( entry.getName() ) )
 							{
 								URL url = new URL( "jar:" + jar.url + "!/" + packageFile );
-								artifacts.add( new Artifact( new File( root, packageFile ), url, container ) );
+								artifacts.add( new Artifact( new File( root, packageFile ), url, volatiles.contains( packageFile ), container ) );
 								found = true;
 								break;
 							}
@@ -119,6 +131,8 @@ public class Package extends AbstractList<Artifact>
 				{
 					if( jar == null )
 						jar = new Jar( manifestUrl, container, "Package resources " + packageResourcesAttribute );
+					if( volatiles == null )
+						volatiles = new Volatiles( manifest );
 
 					ClassLoader classLoader = container.getDependencies().getClassLoader();
 					for( String name : packageResourcesAttribute.toString().split( "," ) )
@@ -127,7 +141,7 @@ public class Package extends AbstractList<Artifact>
 						if( url == null )
 							throw new UnpackingException( "Could not find packaged resource " + name + " from " + jar.file );
 
-						artifacts.add( new Artifact( new File( root, name ), url, container ) );
+						artifacts.add( new Artifact( new File( root, name ), url, volatiles.contains( name ), container ) );
 					}
 				}
 			}
@@ -199,10 +213,10 @@ public class Package extends AbstractList<Artifact>
 		}
 	}
 
-	public void unpack( String filter, boolean overwrite ) throws UnpackingException
+	public void install( String filter, boolean overwrite ) throws UnpackingException
 	{
 		for( Artifact artifact : this )
-			artifact.unpack( filter, overwrite );
+			artifact.install( filter, overwrite );
 	}
 
 	//
@@ -246,6 +260,40 @@ public class Package extends AbstractList<Artifact>
 		this.uninstaller = uninstaller;
 		this.file = file;
 		this.artifacts = artifacts;
+	}
+
+	private static class Volatiles
+	{
+		public Volatiles( Attributes manifest )
+		{
+			Object packageVolatileFoldersAttribute = manifest.getValue( PACKAGE_VOLATILE_FOLDERS );
+			folders = packageVolatileFoldersAttribute != null ? packageVolatileFoldersAttribute.toString().split( "," ) : null;
+
+			Object packageVolatileFilesAttribute = manifest.getValue( PACKAGE_VOLATILE_FILES );
+			files = packageVolatileFilesAttribute != null ? packageVolatileFilesAttribute.toString().split( "," ) : null;
+
+			if( folders != null )
+				for( int i = folders.length - 1; i >= 0; i-- )
+					if( !folders[i].endsWith( "/" ) )
+						folders[i] += "/";
+		}
+
+		public boolean contains( String name )
+		{
+			if( folders != null )
+				for( String folder : folders )
+					if( name.startsWith( folder ) )
+						return true;
+			if( files != null )
+				for( String file : files )
+					if( name.equals( file ) )
+						return true;
+			return false;
+		}
+
+		private final String[] folders;
+
+		private final String[] files;
 	}
 
 	private static class Jar

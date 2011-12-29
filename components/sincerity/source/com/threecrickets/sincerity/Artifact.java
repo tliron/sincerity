@@ -13,10 +13,11 @@ public class Artifact implements Comparable<Artifact>
 	// Construction
 	//
 
-	public Artifact( File file, URL url, Container container )
+	public Artifact( File file, URL url, boolean isVolatile, Container container )
 	{
 		this.file = file;
 		this.url = url;
+		this.isVolatile = isVolatile;
 		this.container = container;
 		path = container.getRelativePath( file );
 	}
@@ -40,6 +41,11 @@ public class Artifact implements Comparable<Artifact>
 		return url;
 	}
 
+	public boolean isVolatile()
+	{
+		return isVolatile;
+	}
+
 	public boolean isDifferent() throws UnpackingException
 	{
 		try
@@ -56,7 +62,7 @@ public class Artifact implements Comparable<Artifact>
 	// Operations
 	//
 
-	public void unpack( String filter, boolean overwrite ) throws UnpackingException
+	public void install( String filter, boolean overwrite ) throws UnpackingException
 	{
 		if( file.exists() )
 		{
@@ -125,6 +131,8 @@ public class Artifact implements Comparable<Artifact>
 	private final File file;
 
 	private final URL url;
+
+	private final boolean isVolatile;
 
 	private final Container container;
 

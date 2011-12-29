@@ -71,25 +71,36 @@ var Prudence = Prudence || function() {
         	// Inbound root
         	this.instance.inboundRoot = new PrudenceRouter(this.context)
 
-        	// Attach routes
+        	// Attach restlets
         	for (var uri in this.routes) {
-        		var restlet = this.routes[uri].create(this)
+        		var restlet = this.routes[uri]
         		
         		var mode = Template.MODE_EQUALS
         		var length = uri.length
         		if (length > 1) {
         			var last = uri[length - 1]
-	        		if (last == '!') {
-	        			uri = uri.substring(0, length - 1)
-	        			mode = Template.MODE_EQUALS
-	        		}
-	        		else if (last == '*') {
+	        		if (last == '*') {
 	        			uri = uri.substring(0, length - 1)
 	        			mode = Template.MODE_STARTS_WITH
 	        		}
         		}
         		
         		uri = Module.cleanUri(uri)
+
+        		if (Savory.Objects.isString(restlet)) {
+        			if (restlet == 'hidden') {
+                		print('Hiding ' + uri + '\n')
+        				this.instance.inboundRoot.hide(uri)
+        				continue
+        			}
+        			else {
+        				restlet = new Module.Custom({type: restlet}).create(this)
+        			}
+        		}
+        		else {
+        			restlet = restlet.create(this)
+        		}
+        		
         		print('Attaching ' + uri + ' to ' + restlet + '\n')
         		if (null !== mode) {
         			this.instance.inboundRoot.attach(uri, restlet, mode)
