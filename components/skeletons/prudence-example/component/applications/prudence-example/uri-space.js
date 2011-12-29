@@ -10,7 +10,7 @@ app.uris = {
 	'/dynamic/*': 'dynamicWeb',
 	'/explicit/*': 'explicit',
 	//'/prudence/router/': 'hidden',
-	'/person/{person}/': 'person'
+	'/person/{name}/': 'person'
 }
 
 app.hosts = {

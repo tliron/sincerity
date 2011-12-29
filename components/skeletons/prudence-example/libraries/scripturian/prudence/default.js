@@ -47,10 +47,8 @@ var Prudence = Prudence || function() {
 				java.util.concurrent.CopyOnWriteArrayList,
     			java.io.File)
 
-    		// The context
+    		this.component = component
     		this.context = component.context.createChildContext()
-    		
-        	// The application
         	this.instance = new PrudenceApplication(this.context)
     		
     		// Description
@@ -73,7 +71,7 @@ var Prudence = Prudence || function() {
         			// No trailing slash
         			uri = uri.slice(0, -1)
         		}
-        		print('Attaching to "' + uri + '/" on host ' + name + '\n')
+        		print('Attaching application to "' + uri + '/" on host "' + name + '"\n')
         		host.attach(uri, this.instance)
         	}
 
@@ -102,28 +100,50 @@ var Prudence = Prudence || function() {
     				))
     			}
         	}
+        	
+        	// Common library
+        	var commonLibraryDocumentSource = component.context.attributes.get('prudence.commonLibraryDocumentSource')
+        	if (!Savory.Objects.exists(commonLibraryDocumentSource)) {
+	    		var library = sincerity.container.getLibrariesFile('scripturian')
+				commonLibraryDocumentSource = new DocumentFileSource(
+					library,
+					library,
+					this.settings.code.defaultDocumentName,
+					this.settings.code.defaultExtension,
+					this.settings.code.minimumTimeBetweenValidityChecks
+				)
+	    		component.context.attributes.put('prudence.commonLibraryDocumentSource', commonLibraryDocumentSource)
+        	}
+			print('Adding library: "' + commonLibraryDocumentSource.basePath + '"\n')
+			this.libraryDocumentSources.add(commonLibraryDocumentSource)
 
-    		var library = sincerity.container.getLibrariesFile('scripturian')
-			print('Adding library: "' + library + '"\n')
-			this.libraryDocumentSources.add(new DocumentFileSource(
-				library,
-				library,
-				this.settings.code.defaultDocumentName,
-				this.settings.code.defaultExtension,
-				this.settings.code.minimumTimeBetweenValidityChecks
-			))
+        	// Sincerity library
+        	var sincerityLibraryDocumentSource = component.context.attributes.get('prudence.sincerityLibraryDocumentSource')
+        	if (!Savory.Objects.exists(sincerityLibraryDocumentSource)) {
+	    		var library = sincerity.getHomeFile('libraries', 'scripturian')
+				sincerityLibraryDocumentSource = new DocumentFileSource(
+					library,
+					library,
+					this.settings.code.defaultDocumentName,
+					this.settings.code.defaultExtension,
+					this.settings.code.minimumTimeBetweenValidityChecks
+				)
+	    		component.context.attributes.put('prudence.sincerityLibraryDocumentSource', sincerityLibraryDocumentSource)
+        	}
+			print('Adding library: "' + sincerityLibraryDocumentSource.basePath + '"\n')
+			this.libraryDocumentSources.add(sincerityLibraryDocumentSource)
 
-        	// Attach restlets
+        	// Create and attach restlets
         	for (var uri in this.uris) {
         		var restlet = this.uris[uri]
         		
-        		var mode = Template.MODE_EQUALS
+        		var attachBase = false
         		var length = uri.length
         		if (length > 1) {
         			var last = uri[length - 1]
 	        		if (last == '*') {
 	        			uri = uri.substring(0, length - 1)
-	        			mode = Template.MODE_STARTS_WITH
+	        			attachBase = true
 	        		}
         		}
         		
@@ -154,12 +174,13 @@ var Prudence = Prudence || function() {
         			restlet = restlet.create(this, uri)
         		}
         		
-        		print('Attaching "' + uri + '" to ' + restlet + '\n')
-        		if (null !== mode) {
-        			this.instance.inboundRoot.attach(uri, restlet, mode)
+        		if (attachBase) {
+            		print('Attaching "' + uri + '*" to ' + restlet + '\n')
+        			this.instance.inboundRoot.attachBase(uri, restlet)
         		}
         		else {
-        			this.instance.inboundRoot.attach(uri, restlet)
+            		print('Attaching "' + uri + '" to ' + restlet + '\n')
+        			this.instance.inboundRoot.attach(uri, restlet, Template.MODE_EQUALS)
         		}
         	}
 
@@ -254,7 +275,7 @@ var Prudence = Prudence || function() {
     			settings.root = new File(app.root, settings.root).absoluteFile
     		}
     		
-    		print('DynamicWeb at ' + settings.root + '\n')
+    		print('DynamicWeb at "' + settings.root + '"\n')
     		
     		if (!(settings.fragmentsRoot instanceof File)) {
     			settings.fragmentsRoot = new File(app.root, settings.fragmentsRoot).absoluteFile
@@ -300,6 +321,7 @@ var Prudence = Prudence || function() {
     			languageManager: executable.manager
     		}
 
+    		// Fragments
     		if (Savory.Objects.exists(settings.fragmentsRoot)) {
     			generatedTextResource.extraDocumentSources.add(new DocumentFileSource(
     				settings.fragmentsRoot,
@@ -310,10 +332,25 @@ var Prudence = Prudence || function() {
     			))
     		}
 
-    		//ourSettings.extraDocumentSources.add(commonFragmentsDocumentSource)
+        	// Common fragments
+        	var commonFragmentsDocumentSource = app.component.context.attributes.get('prudence.fragmentsDocumentSource')
+        	if (!Savory.Objects.exists(commonFragmentsDocumentSource)) {
+	    		var library = sincerity.container.getFile('component', 'fragments')
+				commonFragmentsDocumentSource = new DocumentFileSource(
+					library,
+					library,
+    				settings.defaultDocumentName,
+    				settings.defaultExtenion,
+    				app.settings.code.minimumTimeBetweenValidityChecks
+				)
+	    		app.component.context.attributes.put('prudence.fragmentsDocumentSource', commonFragmentsDocumentSource)
+        	}
+
+        	generatedTextResource.extraDocumentSources.add(commonFragmentsDocumentSource)
     		
     		if (settings.passThroughs) {
 	    		for (var i in settings.passThroughs) {
+	    			print('Pass through: "' + settings.passThroughs[i] + '"\n')
 	    			generatedTextResource.passThroughDocuments.add(settings.passThroughs[i])
 	    		}
     		}
@@ -373,7 +410,7 @@ var Prudence = Prudence || function() {
 
     		if (settings.passThroughs) {
 	    		for (var i in settings.passThroughs) {
-	    			print('Pass through: ' + settings.passThroughs[i] + '\n')
+	    			print('Pass through: "' + settings.passThroughs[i] + '"\n')
 	    			delegatedResource.passThroughDocuments.add(settings.passThroughs[i])
 	    		}
     		}
