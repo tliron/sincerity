@@ -1,12 +1,12 @@
 
 importClass(
 	org.restlet.resource.Directory,
-	org.restlet.routing.Template,
-	java.io.File)
+	org.restlet.routing.Template)
 
-var staticDir = new File(Savory.Sincerity.here.parentFile.parentFile, 'static').absoluteFile
+var staticDir = Savory.Sincerity.getFileFromHere('..', 'static') 
 	
 var directory = new Directory(app.context, staticDir.toURI())
+directory.negotiatingContent = true
 directory.listingAllowed = true
 app.inboundRoot.attach('static/', directory)
 

@@ -6,6 +6,8 @@ importClass(
 	org.restlet.routing.Router,
 	java.io.File)
 
+print('APPPLICAIOTN\n')
+	
 // The application
 var app = new Application(component.context.createChildContext())
 app.name = 'Skeleton'

@@ -1,18 +1,16 @@
 
 importClass(
 	org.eclipse.jetty.webapp.WebAppContext,
-	org.eclipse.jetty.security.HashLoginService,
-	java.io.File)
+	org.eclipse.jetty.security.HashLoginService)
 
 try {
-	var webInfDir = new File(new File(Savory.Sincerity.here, 'web'), 'WEB-INF')
-	sincerity.run('java:compile', [new File(webInfDir, 'src'), new File(webInfDir, 'classes')])
+	sincerity.run('java:compile', [Savory.Sincerity.getFileFromHere('web', 'WEB-INF', 'src'), Savory.Sincerity.getFileFromHere('web', 'WEB-INF', 'classes')])
 
 	// The context
 	var context = new WebAppContext()
 	context.contextPath = '/webapp'
-	context.resourceBase = new File(Savory.Sincerity.here, 'web')
-	context.tempDirectory = new File(Savory.Sincerity.here, 'work')
+	context.resourceBase = Savory.Sincerity.getFileFromHere('web')
+	context.tempDirectory = Savory.Sincerity.getFileFromHere('work')
 	server.handler.addHandler(context)
 }
 catch (x) {

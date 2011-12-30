@@ -1,12 +1,11 @@
 
-importClass(java.io.File)
-
-var javaSourceDir = new File(Savory.Sincerity.here.parentFile.parentFile, 'java')
+var javaSourceDir = Savory.Sincerity.getFileFromHere('..', 'java')
+print(javaSourceDir+'\n')
 
 try {
 	sincerity.run('java:compile', [javaSourceDir])
 	app.inboundRoot.attach('resource/', Savory.Sincerity.getClass('example.ExampleResource'))
 }
-catch(x) {
+catch (x) {
 	x.javaException.printStackTrace()
 }

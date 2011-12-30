@@ -1,10 +1,9 @@
 
 importClass(
-	org.eclipse.jetty.servlet.ServletHolder,
-	java.io.File)
+	org.eclipse.jetty.servlet.ServletHolder)
 
 try {
-	sincerity.run('java:compile', [new File(Savory.Sincerity.here.parentFile.parentFile, 'java')])
+	sincerity.run('java:compile', [Savory.Sincerity.getFileFromHere('..', 'java')])
 
 	var servlet = Savory.Sincerity.getClass('example.ExampleServlet').newInstance()
 	context.addServlet(new ServletHolder(servlet), '/example/*')

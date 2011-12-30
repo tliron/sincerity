@@ -24,52 +24,88 @@ var Savory = Savory || {}
 Savory.Sincerity = Savory.Sincerity || function() {
 	/** @exports Public as Savory.Sincerity */
     var Public = {}
-    
-    Public.here = null
 
+    Public.getClass = function(name) {
+    	return sincerity.container.dependencies.classLoader.loadClass(name)
+    }
+
+    Public.here = null
+    
+    Public.getFileFromHere = function(/* arguments */) {
+    	importClass(java.io.File)
+
+    	var file = Public.here
+    	for (var i in arguments) {
+    		var part = arguments[i]
+    		if ('..' == part) {
+    			file = file.parentFile
+    		}
+    		else if ('.' != part) {
+    			file = new File(file, part).absoluteFile
+    		}
+    	}
+    	
+    	return file
+    }
+
+	Public.pushHere = function(dir) {
+		hereStack.push(Public.here)
+		Public.here = dir
+	}
+	
+	Public.popHere = function() {
+		Public.here = hereStack.pop()
+	}
+    
 	/**
-	 * Executes all 
+	 * Executes all documents represented by the file, while keeping track of the current
 	 * 
-	 * @param {String|java.io.File} The path to execute, relative to the container's root
+	 * @param {String|java.io.File} The path to execute, relative to the 'here' location.
 	 */
 	Public.include = function(file) {
     	importClass(java.io.File)
     	
     	if (!(file instanceof File)) {
-    		file = new File(Public.here, file)
+    		file = Public.getFileFromHere(file)
     	}
     	
     	if (file.directory) {
-    		if (!file.hidden) {
-	    		var files = file.listFiles()
-	    		for (var f in files) {
-	    			hereStack.push(Public.here)
-	    			Public.here = files[f]
-	    			document.execute('/' + sincerity.container.getRelativePath(Public.here))
-	    			Public.here = hereStack.pop()
-	    		}
+			// Execute all non-hidden files and subdirectories in the directory
+    		var children = file.listFiles()
+    		for (var c in children) {
+    			var child = children[c]
+        		if (!child.hidden) {
+        			if (child.directory) {
+        				Public.pushHere(child)
+        				document.execute('/' + sincerity.container.getRelativePath(child) + '/')
+        				Public.popHere()
+        			}
+        			else {
+        				Public.pushHere(file)
+        				document.execute('/' + sincerity.container.getRelativePath(child))
+        				Public.popHere()
+        			}
+        		}
     		}
     	}
     	else {
+    		// Execute the first file with this name in the directory
+    		var dir = file.parentFile
     		var name = file.name.split('\\.', 2)[0]
-    		var files = file.parentFile.listFiles()
-    		for (var f in files) {
-    			var here = files[f]
-    			var hereName = here.name.split('\\.', 2)[0]
-    			if (name == hereName) {
-        			hereStack.push(Public.here)
-    				Public.here = here
-    				document.execute('/' + sincerity.container.getRelativePath(Public.here))
-        			Public.here = hereStack.pop()
+    		var children = dir.listFiles()
+    		for (var c in children) {
+    			var child = children[c]
+    			var childName = child.name.split('\\.', 2)[0]
+    			if (name == childName) {
+        			Public.pushHere(dir)
+    				document.execute('/' + sincerity.container.getRelativePath(child))
+    				Public.popHere()
+    				break
     			}
     		}
     	}
 	}
-    
-    Public.getClass = function(name) {
-    	return sincerity.container.dependencies.classLoader.loadClass(name)
-    }
-    
+	
     var hereStack = []
 	
 	return Public
