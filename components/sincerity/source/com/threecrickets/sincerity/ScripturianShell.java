@@ -47,6 +47,7 @@ public class ScripturianShell implements Shell
 	{
 		ExecutionContext executionContext = new ExecutionContext( container.getSincerity().getOut(), container.getSincerity().getErr() );
 		DocumentService documentService = new DocumentService( this, executionContext );
+		documentService.setDefaultLanguageTag( "javascript" );
 		executionContext.getServices().put( "document", documentService );
 		executionContext.getServices().put( "application", new ApplicationService( this ) );
 		executionContext.getServices().put( "sincerity", container.getSincerity() );
@@ -91,6 +92,7 @@ public class ScripturianShell implements Shell
 		ParsingContext parsingContext = new ParsingContext();
 		parsingContext.setLanguageManager( languageManager );
 		parsingContext.setDocumentSource( source );
+		parsingContext.setDefaultLanguageTag( "javascript" );
 		parsingContext.setPrepare( prepare );
 
 		boolean enterable = false;

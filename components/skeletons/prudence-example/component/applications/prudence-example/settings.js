@@ -14,6 +14,7 @@ Savory.Objects.merge(app.settings, {
 		defaultExtension: 'js',
 		defaultDocumentName: 'default',
 		minimumTimeBetweenValidityChecks: 1000,
-		libraries: ['libraries']
+		libraries: ['libraries'],
+		sourceVisible: true //TODO
 	}
 })

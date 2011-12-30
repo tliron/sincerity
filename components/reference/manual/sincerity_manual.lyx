@@ -159,7 +159,40 @@ Lather, Rinse, Repeat
 \end_layout
 
 \begin_layout Standard
-Shell scripts, environment variables
+Bootstrapping
+\end_layout
+
+\begin_layout Standard
+Shell scripts
+\end_layout
+
+\begin_layout Standard
+Evironment variables
+\end_layout
+
+\begin_layout Standard
+Find java.
+ Find JAVA_HOME.
+\end_layout
+
+\begin_layout Standard
+Bootstrapping the tools (
+\begin_inset Quotes eld
+\end_inset
+
+gem
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+rake
+\begin_inset Quotes erd
+\end_inset
+
+, etc.)
 \end_layout
 
 \begin_layout Standard

@@ -5,9 +5,6 @@ document.executeOnce('/prudence/')
 var app = new Prudence.Application()
 
 Savory.Sincerity.include('settings')
-Savory.Sincerity.include('uri-space')
+Savory.Sincerity.include('routing')
 
 app.create(component)
-
-// Additional restlets
-Savory.Sincerity.include('restlets')
