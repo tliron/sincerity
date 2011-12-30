@@ -7,4 +7,7 @@ var app = new Prudence.Application()
 Savory.Sincerity.include('settings')
 Savory.Sincerity.include('routing')
 
-app.create(component)
+app = app.create(component)
+
+// Restlets
+Savory.Sincerity.include('restlets')

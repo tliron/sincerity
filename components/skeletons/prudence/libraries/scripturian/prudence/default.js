@@ -148,6 +148,8 @@ var Prudence = Prudence || function() {
         	for (var g in globals) {
         		this.context.attributes.put(g, globals[g])
         	}
+        	
+        	return this.instance
     	}
     	
     	Public.createRestlet = function(restlet, uri) {
@@ -479,11 +481,13 @@ var Prudence = Prudence || function() {
     		
     		var fallback = new Fallback(app.context, app.settings.code.minimumTimeBetweenValidityChecks)
     		
-    		for (var i in this.restlets) {
-    			var restlet = app.createRestlet(this.restlets[i], uri)
-    			if (Savory.Objects.exists(restlet)) {
-    				fallback.addTarget(restlet)    				
-    			}
+    		if (Savory.Objects.exists(this.restlets)) {
+	    		for (var i in this.restlets) {
+	    			var restlet = app.createRestlet(this.restlets[i], uri)
+	    			if (Savory.Objects.exists(restlet)) {
+	    				fallback.addTarget(restlet)    				
+	    			}
+	    		}
     		}
     		
     		return fallback
