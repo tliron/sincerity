@@ -51,6 +51,7 @@
 		<module>core</module>
 		<module>savory-foundation</module>
 		<module>plugins/logging</module>
+		<module>plugins/logging-mongodb</module>
 		<module>plugins/clojure</module>
 		<module>plugins/groovy</module>
 		<module>plugins/javascript</module>

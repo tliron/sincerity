@@ -1,0 +1,22 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="/style/ext-js/style/css/ext-all-gray.css" id="ext-theme" />
+	<script type="text/javascript" src="/scripts/ext-js/ext-all.js"></script>
+</head>
+<body>
+</body>
+<script>
+function helloWorld() {
+	var win = new Ext.create('Ext.Window', {
+		id : 'mywin',
+		title  : 'Hello',
+		width  : 300,
+		height : 150,
+		layout : 'fit'
+	});
+	win.show();
+}
+
+Ext.onReady(helloWorld);
+</script>
+</html>
