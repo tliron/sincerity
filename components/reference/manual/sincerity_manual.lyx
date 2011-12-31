@@ -203,6 +203,10 @@ Install as service/daemon
 Logging
 \end_layout
 
+\begin_layout Standard
+Configuration by XML (worst offenders: Jetty, log4j)
+\end_layout
+
 \begin_layout Subsubsection
 Reinventing Wheels
 \end_layout
@@ -611,7 +615,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install javascript
+sincerity add javascript : install
 \end_layout
 
 \end_inset
@@ -755,7 +759,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install jetty.web
+sincerity add jetty.web : install
 \end_layout
 
 \end_inset
@@ -895,7 +899,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install logging : install service
+sincerity add logging : add service : install
 \end_layout
 
 \end_inset
@@ -916,8 +920,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : install jetty.web : install logging : install
- service : service jetty start
+sincerity create mycontainer : add jetty.web : add logging : add service
+ : install : service jetty start
 \end_layout
 
 \end_inset
@@ -966,7 +970,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install jetty.servlet
+sincerity add jetty.servlet : install
 \end_layout
 
 \end_inset
@@ -1077,7 +1081,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install jetty.servlet.example
+sincerity add jetty.servlet.example : install
 \end_layout
 
 \end_inset
@@ -1115,7 +1119,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install logging : install service
+sincerity add logging : add service : install
 \end_layout
 
 \end_inset
@@ -1136,8 +1140,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : install jetty.servlet.example : install logging
- : install service : service jetty start
+sincerity create mycontainer : add jetty.servlet.example : add logging : add
+ service : install : service jetty start
 \end_layout
 
 \end_inset
@@ -1199,7 +1203,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install restlet
+sincerity add restlet : install
 \end_layout
 
 \end_inset
@@ -1272,7 +1276,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install restlet.example
+sincerity add restlet.example : install
 \end_layout
 
 \end_inset
@@ -1309,7 +1313,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install logging : install service
+sincerity add logging : add service : install
 \end_layout
 
 \end_inset
@@ -1330,8 +1334,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : install restlet.example : install logging
- : install service : service restlet start
+sincerity create mycontainer : add restlet.example : add logging : add service
+ : install : service restlet start
 \end_layout
 
 \end_inset
@@ -1451,7 +1455,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install rails
+sincerity add rails : install
 \end_layout
 
 \end_inset
@@ -1687,7 +1691,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install service
+sincerity add service : install
 \end_layout
 
 \end_inset
@@ -1708,7 +1712,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : install rails : install service : service
+sincerity create mycontainer : add rails : add service : install : service
  rails start
 \end_layout
 
@@ -1804,7 +1808,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install django
+sincerity add django : install
 \end_layout
 
 \end_inset
@@ -2020,7 +2024,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install service
+sincerity add service : install
 \end_layout
 
 \end_inset
@@ -2041,7 +2045,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : install django : install service : service
+sincerity create mycontainer : add django : add service : install : service
  django start
 \end_layout
 
@@ -2103,7 +2107,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity install lwjgl
+sincerity add lwjgl : install
 \end_layout
 
 \end_inset
