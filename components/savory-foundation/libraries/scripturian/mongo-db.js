@@ -28,7 +28,7 @@
  * @see Visit the <a href="https://github.com/geir/mongo-java-driver">MongoDB Java driver</a> 
  * 
  * @author Tal Liron
- * @version 1.68
+ * @version 1.69
  */
 var MongoDB = MongoDB || function() {
 	/** @exports Public as MongoDB */
@@ -164,7 +164,7 @@ var MongoDB = MongoDB || function() {
 			uris = new com.mongodb.ServerAddress(uris)
 		}
 		
-		if (options) {
+		if (exists(options)) {
 			var mongoOptions = new com.mongodb.MongoOptions()
 			for (var key in options) {
 				mongoOptions[key] = options[key]
@@ -173,8 +173,8 @@ var MongoDB = MongoDB || function() {
 		}
 		
 		var connection
-		if (uris) {
-			if (options) {
+		if (exists(uris)) {
+			if (exists(options)) {
 				connection = new com.mongodb.Mongo(uris, options)
 			}
 			else {
@@ -185,7 +185,7 @@ var MongoDB = MongoDB || function() {
 			connection = new com.mongodb.Mongo()
 		}
 		
-		if (exists(connection) && username && password) {
+		if (exists(connection) && exists(username) && exists(password)) {
 			// Authenticate the 'admin' database
 			Public.getDB(connection, 'admin', username, password)
 		}
