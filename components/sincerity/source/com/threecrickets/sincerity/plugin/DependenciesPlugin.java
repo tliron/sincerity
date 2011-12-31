@@ -55,21 +55,10 @@ public class DependenciesPlugin implements Plugin
 		else if( "install".equals( commandName ) )
 		{
 			command.setParse( true );
-			String[] arguments = command.getArguments();
-			String name;
-			if( arguments.length < 1 )
-				name = null;
-			else
-				name = arguments[0];
+			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
-			if( name == null )
-			{
-				boolean overwrite = command.getSwitches().contains( "overwrite" );
-				Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-				dependencies.install( overwrite );
-			}
-			else
-				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "install." + name );
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			dependencies.install( overwrite );
 		}
 		else if( "uninstall".equals( commandName ) )
 		{
@@ -85,8 +74,15 @@ public class DependenciesPlugin implements Plugin
 		{
 			command.setParse( true );
 			String[] arguments = command.getArguments();
-			if( arguments.length < 2 )
-				throw new BadArgumentsCommandException( command, "group", "name", "[version]" );
+			if( arguments.length < 1 )
+				throw new BadArgumentsCommandException( command, "group (or shortcut)", "name", "[version]" );
+
+			if( arguments.length == 1 )
+			{
+				String shortcut = arguments[0];
+				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "add." + shortcut );
+				return;
+			}
 
 			String group = arguments[0];
 			String name = arguments[1];
