@@ -10,6 +10,7 @@ import java.util.Set;
 import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.internal.FileUtil;
 
 public class Plugins extends AbstractMap<String, Plugin>
 {
@@ -31,12 +32,13 @@ public class Plugins extends AbstractMap<String, Plugin>
 			File pluginsDir = sincerity.getContainer().getLibrariesFile( "plugins" );
 			if( pluginsDir.isDirectory() )
 			{
-				ScripturianShell shell = new ScripturianShell( sincerity.getContainer(), pluginsDir, true );
-				for( String pluginFile : pluginsDir.list() )
+				ScripturianShell shell = new ScripturianShell( sincerity.getContainer(), null, true );
+				for( String pluginFilename : pluginsDir.list() )
 				{
 					try
 					{
-						Plugin plugin = new DelegatedPlugin( pluginFile, shell );
+						String pluginName = FileUtil.separateExtensionFromFilename( pluginFilename )[0];
+						Plugin plugin = new DelegatedPlugin( pluginName, shell );
 						plugins.put( plugin.getName(), plugin );
 					}
 					catch( Exception x )

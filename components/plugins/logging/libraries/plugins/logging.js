@@ -2,8 +2,6 @@
 importClass(
 	java.lang.System,
 	java.lang.ClassNotFoundException,
-	java.util.logging.LogManager,
-	java.util.logging.Logger,
 	com.threecrickets.sincerity.exception.SincerityException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
@@ -23,8 +21,11 @@ function run(command) {
 }
 
 function logging(command) {
+	// Configure log4j
 	var configurationFile = command.sincerity.container.getConfigurationFile('logging.conf')
 	if (configurationFile.exists()) {
+		// Configure by traditional log4j configuration file
+		
 		var logsDir = command.sincerity.container.getLogsFile()
 		logsDir.mkdirs()
 
@@ -32,18 +33,21 @@ function logging(command) {
 		System.setProperty('sincerity.logs', logsDir)
 
 		try {
+			//org.apache.log4j.PropertyConfigurator.configureAndWatch(configurationFile)
 			org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
 		}
 		catch (x if x.javaException instanceof ClassNotFoundException) {
 			throw new SincerityException('Could not find log4j in classpath', x.javaException)
 		}
 	}
-
-	// Makes sure some servers (such as Jetty) don't log to console
-	System.setProperty('java.util.logging.config.file', 'none')
+	else {
+		// Configure by script
+		document.execute('/configuration/logging/')
+	}
 
 	// Remove any pre-existing configuration from JULI
-	LogManager.logManager.reset()
+	System.setProperty('java.util.logging.config.file', 'none')
+	java.util.logging.LogManager.logManager.reset()
 
 	// Bridge JULI to SLF4J, which will in turn use log4j as its engine
 	try {
@@ -59,5 +63,5 @@ function log(command) {
 		throw new BadArgumentsCommandException(command, 'message')
 	}
 
-	Logger.getLogger('sincerity').info(command.arguments[0]);
+	java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0]);
 }

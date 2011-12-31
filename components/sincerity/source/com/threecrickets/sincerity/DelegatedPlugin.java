@@ -6,7 +6,6 @@ import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
 
 public class DelegatedPlugin implements Plugin
 {
@@ -14,10 +13,10 @@ public class DelegatedPlugin implements Plugin
 	// Construction
 	//
 
-	public DelegatedPlugin( String pluginFilename, ScripturianShell shell ) throws SincerityException
+	public DelegatedPlugin( String pluginName, ScripturianShell shell ) throws SincerityException
 	{
-		executable = shell.makeEnterable( pluginFilename, ENTERING_KEY );
-		defaultName = FileUtil.separateExtensionFromFilename( pluginFilename )[0];
+		defaultName = pluginName;
+		executable = shell.makeEnterable( "/libraries/plugins/" + pluginName + "/", ENTERING_KEY );
 	}
 
 	//

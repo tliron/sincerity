@@ -1,22 +1,41 @@
 
+var TEMPLATE = '{timestamp} {level} {host.ip} [{loggerName.fullyQualifiedClassName}] {message}'
+
+/*
+Available template values:
+
+timestamp
+level
+thread
+host.process
+message
+loggerName.fullyQualifiedClassName
+filename
+lineNumber
+method
+class.fullyQualifiedClassName
+host.ip
+host.name
+*/
+
 document.executeOnce('/mongo-db/')
 document.executeOnce('/savory/templates/')
 document.executeOnce('/savory/objects/')
 document.executeOnce('/savory/localization/')
 
 function getCommands() {
-	return ['mtail']
+	return ['logtail']
 }
 
 function run(command) {
 	switch (String(command.name)) {
-		case 'mtail':
-			mtail(command)
+		case 'logtail':
+			logtail(command)
 			break
 	}
 }
 
-function mtail(command) {
+function logtail(command) {
 	var connection = MongoDB.connect()
 	var collection = new MongoDB.Collection('common', {connection: connection, db: 'logs'})
 	var c = collection.find().addOption('tailable').addOption('awaitData')
@@ -25,24 +44,14 @@ function mtail(command) {
 	
 	while (true) {
 		var record = c.next()
+		
 		record = Savory.Objects.flatten(record)
+		
 		record.timestamp = format.format(record.timestamp)
+		
 		while (record.level.length < 5) {
 			record.level += ' '
 		}
-		/*
-		record.timestamp
-		record.level
-		record.thread
-		record.host.process
-		record.message
-		record.loggerName.fullyQualifiedClassName
-		record.filename
-		recrod.lineNumber
-		record.method
-		record['class'].fullyQualifiedClassName
-		*/
-		var line = '{timestamp}: {level} [{loggerName.fullyQualifiedClassName}] {message}'.cast(record)
-		print(line + '\n')
+		print(TEMPLATE.cast(record) + '\n')
 	}
 }

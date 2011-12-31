@@ -60,7 +60,7 @@ public class DelegatePlugin implements Plugin
 			if( !arguments[0].startsWith( "/" ) )
 				arguments[0] = "/programs/" + arguments[0];
 
-			ScripturianShell shell = new ScripturianShell( container, container.getRoot(), true, arguments );
+			ScripturianShell shell = new ScripturianShell( container, null, true, arguments );
 			shell.execute( arguments[0] );
 		}
 		else if( "execute".equals( commandName ) )
