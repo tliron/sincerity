@@ -153,6 +153,7 @@ Savory.Files = Savory.Files || function() {
 				file.executable = true
 			}
 			else {
+				// TODO: can we be more non-portable? :(
 				Savory.JVM.exec('chmod', ['+x', file])
 			}
 		}

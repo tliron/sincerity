@@ -1,4 +1,7 @@
 
+document.execute('/savory/files/')
+document.execute('/savory/objects/')
+
 importClass(
 	java.lang.System,
 	java.lang.ClassNotFoundException,
@@ -26,6 +29,7 @@ function logging(command) {
 	if (configurationFile.exists()) {
 		// Configure by traditional log4j configuration file
 		
+		// Make sure we have a /logs/ directory
 		var logsDir = command.sincerity.container.getLogsFile()
 		logsDir.mkdirs()
 
@@ -33,8 +37,13 @@ function logging(command) {
 		System.setProperty('sincerity.logs', logsDir)
 
 		try {
-			//org.apache.log4j.PropertyConfigurator.configureAndWatch(configurationFile)
-			org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
+			var contents = Savory.Files.loadText(configurationFile)
+			if (Savory.Objects.startsWith(contents, '<?xml')) {
+				org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
+			}
+			else {
+				org.apache.log4j.PropertyConfigurator.configureAndWatch(configurationFile)
+			}
 		}
 		catch (x if x.javaException instanceof ClassNotFoundException) {
 			throw new SincerityException('Could not find log4j in classpath', x.javaException)
