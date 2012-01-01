@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,10 +11,10 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/jvm/')
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/jvm/')
+document.executeOnce('/sincerity/objects/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Encryption, decryption, hashing, cryptographically-strong randoms,
@@ -27,8 +27,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Cryptography = Savory.Cryptography || function() {
-	/** @exports Public as Savory.Cryptography */
+Sincerity.Cryptography = Sincerity.Cryptography || function() {
+	/** @exports Public as Sincerity.Cryptography */
     var Public = {}
 
 	/**
@@ -41,9 +41,9 @@ Savory.Cryptography = Savory.Cryptography || function() {
 	Public.toBytes = function(string, saltBytes) {
 		var bytes = String(string).toBytes()
 		
-		if (Savory.Objects.exists(saltBytes)) {
+		if (Sincerity.Objects.exists(saltBytes)) {
 			// Add salt before the bytes
-			var bytesWithSalt = Savory.JVM.newArray(saltBytes.length + bytes.length, 'byte')
+			var bytesWithSalt = Sincerity.JVM.newArray(saltBytes.length + bytes.length, 'byte')
 			java.lang.System.arraycopy(saltBytes, 0, bytesWithSalt, 0, saltBytes.length)
 			java.lang.System.arraycopy(bytes, 0, bytesWithSalt, saltBytes.length, bytes.length)
 			bytes = bytesWithSalt
@@ -70,7 +70,7 @@ Savory.Cryptography = Savory.Cryptography || function() {
 	 */
 	Public.toBase64 = function(bytes) {
 		bytes = org.apache.commons.codec.binary.Base64.encodeBase64(bytes)
-		return Savory.JVM.fromBytes(bytes)
+		return Sincerity.JVM.fromBytes(bytes)
 	}
 	
 	/**
@@ -189,7 +189,7 @@ Savory.Cryptography = Savory.Cryptography || function() {
 			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key, iv)
 			var decrypted = cipher.doFinal(payloadBytes)
 
-			return Savory.JVM.fromBytes(decrypted)
+			return Sincerity.JVM.fromBytes(decrypted)
 		}
 		
 		return null
@@ -211,7 +211,7 @@ Savory.Cryptography = Savory.Cryptography || function() {
 		// AESCounterRNG - 10x faster than SHA1PRNG (from Uncommon Math project)
 		
 		var secureRandom = algorithm ? java.security.SecureRandom.getInstance(algorithm) : new java.security.SecureRandom()
-		var random = Savory.JVM.newArray(length, 'byte')
+		var random = Sincerity.JVM.newArray(length, 'byte')
 		secureRandom.nextBytes(random)
 
 		return Public.toString(random, encoding)

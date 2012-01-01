@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,12 +11,12 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/classes/')
-document.executeOnce('/savory/templates/')
-document.executeOnce('/savory/objects/')
-document.executeOnce('/savory/jvm/')
+document.executeOnce('/sincerity/classes/')
+document.executeOnce('/sincerity/templates/')
+document.executeOnce('/sincerity/objects/')
+document.executeOnce('/sincerity/jvm/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Email utilities. Supports mixed-media HTML/plain-text emails.
@@ -30,8 +30,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Mail = Savory.Mail || function() {
-	/** @exports Public as Savory.Mail */
+Sincerity.Mail = Sincerity.Mail || function() {
+	/** @exports Public as Sincerity.Mail */
     var Public = {}
 
 	/**
@@ -41,15 +41,15 @@ Savory.Mail = Savory.Mail || function() {
 	 * Arguments can be either:
 	 * a dict of templates: {subject:'', text:'', html:''},
 	 * or (textPack, prefix): where subject, text and html will be taken from the
-	 * {@link Savory.Internationalization.Pack} as prefix+'.subject', prefix+'.text' and prefix+'.html'.
+	 * {@link Sincerity.Internationalization.Pack} as prefix+'.subject', prefix+'.text' and prefix+'.html'.
 	 * <p>
 	 * In both cases the 'html' template is optional.
 	 * 
 	 * @class
-	 * @name Savory.Mail.MessageTemplate
+	 * @name Sincerity.Mail.MessageTemplate
 	 */
-	Public.MessageTemplate = Savory.Classes.define(function() {
-		/** @exports Public as Savory.Mail.MessageTemplate */
+	Public.MessageTemplate = Sincerity.Classes.define(function() {
+		/** @exports Public as Sincerity.Mail.MessageTemplate */
 	    var Public = {}
 	    
 	    /** @ignore */
@@ -70,11 +70,11 @@ Savory.Mail = Savory.Mail || function() {
 	    
 		/**
 		 * Casts the subject, text and html templates with the filling.
-		 * The result can be used as the 'message' param in {@link Savory.Mail.SMTP#send}.
+		 * The result can be used as the 'message' param in {@link Sincerity.Mail.SMTP#send}.
 		 * 
 		 * @returns A dict in the form {subject: '...', text: '...'} or
 		 *          {subject: '...', text: '...', html: '...'}
-		 * @see Savory.Templates#cast
+		 * @see Sincerity.Templates#cast
 		 */
 		Public.cast = function(filling) {
 			var message = {
@@ -100,21 +100,21 @@ Savory.Mail = Savory.Mail || function() {
 	 * Intranet applications may require more specialized delivery and storage within your organization's infrastructure. 
 	 * 
 	 * @class
-	 * @name Savory.Mail.SMTP
+	 * @name Sincerity.Mail.SMTP
 	 * 
 	 * @param {Object|String} [params=application.globals.get('savory.foundation.mail.smtp.host') || '127.0.0.1'] Params to be applied
 	 *        to javax.mail.Session.getInstance; if it is a string, will be considered as the 'mail.smtp.host' param
 	 */
-	Public.SMTP = Savory.Classes.define(function() {
-		/** @exports Public as Savory.Mail.SMTP */
+	Public.SMTP = Sincerity.Classes.define(function() {
+		/** @exports Public as Sincerity.Mail.SMTP */
 	    var Public = {}
 	    
 	    /** @ignore */
 	    Public._construct = function(params) {
-	    	params = Savory.Objects.isString(params) ? {'mail.smtp.host': String(params)} : (Savory.Objects.exists(params) ? Savory.Objects.clone(params) : {})
+	    	params = Sincerity.Objects.isString(params) ? {'mail.smtp.host': String(params)} : (Sincerity.Objects.exists(params) ? Sincerity.Objects.clone(params) : {})
 	    	params['mail.transport.protocol'] = 'smtp'
     		params['mail.smtp.host'] = params['mail.smtp.host'] || application.globals.get('savory.foundation.mail.smtp.host') || '127.0.0.1'
-			this.session = javax.mail.Session.getInstance(Savory.JVM.toProperties(params))
+			this.session = javax.mail.Session.getInstance(Sincerity.JVM.toProperties(params))
 	    }
 
 	    /**
@@ -135,18 +135,18 @@ Savory.Mail = Savory.Mail || function() {
 			mimeMessage.setFrom(new javax.mail.internet.InternetAddress(params.from))
 			mimeMessage.subject = message.subject
 
-			params.to = Savory.Objects.array(params.to)
+			params.to = Sincerity.Objects.array(params.to)
 			for (var t in params.to) {
 				mimeMessage.addRecipient(javax.mail.Message.RecipientType.TO, new javax.mail.internet.InternetAddress(params.to[t]))
 			}
 
-			params.replyTo = Savory.Objects.array(params.replyTo)
+			params.replyTo = Sincerity.Objects.array(params.replyTo)
 			var replyTo = []
 			for (var r in params.replyTo) {
 				replyTo.push(new javax.mail.internet.InternetAddress(params.replyTo[r]))
 			}
 			if (replyTo.length) {
-				mimeMessage.replyTo = Savory.JVM.toArray(replyTo, 'javax.mail.Address')
+				mimeMessage.replyTo = Sincerity.JVM.toArray(replyTo, 'javax.mail.Address')
 			}
 			
 			if (!message.html) {

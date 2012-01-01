@@ -1,7 +1,7 @@
 
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/objects/')
 
-Savory.Objects.merge(app.settings, {
+Sincerity.Objects.merge(app.settings, {
 	description: {
 		name: 'Skeleton',
 		description: 'The example application for the Prudence skeleton',

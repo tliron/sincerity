@@ -1,5 +1,5 @@
 
-document.executeOnce('/savory/sincerity/')
+document.executeOnce('/sincerity/container/')
 
 importClass(
 	org.restlet.Application,
@@ -23,4 +23,4 @@ var router = new Router(app.context)
 app.inboundRoot = router
 
 // Restlets
-Savory.Sincerity.include('restlets')
+Sincerity.Container.include('restlets')

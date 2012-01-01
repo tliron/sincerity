@@ -1,9 +1,9 @@
 
-document.execute('/savory/objects/')
+document.execute('/sincerity/objects/')
 
 var logger = repository.rootLogger
 
-if (Savory.Objects.exists(appenders.commonMongoDb)) {
+if (Sincerity.Objects.exists(appenders.commonMongoDb)) {
 	logger.addAppender(appenders.commonMongoDb)
 }
 else {

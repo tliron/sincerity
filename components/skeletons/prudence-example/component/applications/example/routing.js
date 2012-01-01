@@ -1,5 +1,5 @@
 
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/objects/')
 document.executeOnce('/prudence/')
 
 //var staticWeb = new Prudence.StaticWeb({root: 'static'})

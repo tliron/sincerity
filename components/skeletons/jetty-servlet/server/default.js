@@ -1,5 +1,5 @@
 
-document.executeOnce('/savory/sincerity/')
+document.executeOnce('/sincerity/container/')
 
 importClass(
 	org.eclipse.jetty.server.Server,
@@ -26,13 +26,13 @@ try {
 catch (x) {}
 
 // Assemble server
-Savory.Sincerity.here = sincerity.container.getFile('server')
-Savory.Sincerity.include('connectors')
+Sincerity.Container.here = sincerity.container.getFile('server')
+Sincerity.Container.include('connectors')
 server.handler = new ContextHandlerCollection()
-Savory.Sincerity.include('contexts')
+Sincerity.Container.include('contexts')
 
 // Add wars
-var warsDir = new File(Savory.Sincerity.here, 'wars')
+var warsDir = new File(Sincerity.Container.here, 'wars')
 if (warsDir.directory) {
 	var cacheDir = sincerity.container.getCacheFile('jetty', 'wars')
 	var files = warsDir.listFiles()

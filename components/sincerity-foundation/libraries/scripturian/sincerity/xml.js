@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,11 +11,11 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/classes/')
-document.executeOnce('/savory/jvm/')
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/classes/')
+document.executeOnce('/sincerity/jvm/')
+document.executeOnce('/sincerity/objects/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * JavaScript-friendly wrapper over the JVM's XML DOM parsing and rendering services.
@@ -30,15 +30,15 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.XML = Savory.XML || function() {
-	/** @exports Public as Savory.XML */
+Sincerity.XML = Sincerity.XML || function() {
+	/** @exports Public as Sincerity.XML */
     var Public = {}
 
 	/**
 	 * Converts an XML representation into a hierarchy of nodes.
 	 * 
 	 * @param {String} xml The XML representation 
-	 * @returns {Savory.XML.Node}
+	 * @returns {Sincerity.XML.Node}
 	 */
 	Public.from = function(xml) {
 		var source = new org.xml.sax.InputSource(new java.io.StringReader(xml))
@@ -92,7 +92,7 @@ Savory.XML = Savory.XML || function() {
 	 * @returns {String}
 	 */
 	Public.escapeElements = function(string) {
-		return Savory.Objects.exists(string) ? String(string).replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''
+		return Sincerity.Objects.exists(string) ? String(string).replace(/</g, '&lt;').replace(/>/g, '&gt;') : ''
 	}
 
 	/**
@@ -102,7 +102,7 @@ Savory.XML = Savory.XML || function() {
 	 * @returns {String}
 	 */
 	Public.escapeDoubleQuotes = function(string) {
-		return Savory.Objects.exists(string) ? String(string).replace(/\"/g, '&quot;') : ''
+		return Sincerity.Objects.exists(string) ? String(string).replace(/\"/g, '&quot;') : ''
 	}
 
 	/**
@@ -112,7 +112,7 @@ Savory.XML = Savory.XML || function() {
 	 * @returns {String}
 	 */
 	Public.escapeText = function(string) {
-		return Savory.Objects.exists(string) ? String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&apos;') : ''
+		return Sincerity.Objects.exists(string) ? String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&apos;') : ''
 	}
 
 	/**
@@ -129,7 +129,7 @@ Savory.XML = Savory.XML || function() {
 	 * @param {String} [params._key] If present, fetches params._content (or params.value)
 	 *                 from the params._textPack with this key
 	 * @param {String[]} [params._classes] Turns into a params.class attribute
-	 * @param {Savory.Internationalization.Pack} [params._textPack] The text pack to use for params._key
+	 * @param {Sincerity.Internationalization.Pack} [params._textPack] The text pack to use for params._key
 	 * @param {Object|Array} [params._children] One or more children elements (as params)  
 	 * @param {Boolean} [params._human] True if to build the element as human-readable,
 	 *        multi-line and indented
@@ -137,19 +137,19 @@ Savory.XML = Savory.XML || function() {
 	 * @returns {String} The element
 	 */
 	Public.build = function(params) {
-		params = params ? Savory.Objects.clone(params) : {}
+		params = params ? Sincerity.Objects.clone(params) : {}
 
 		if (params._merge) {
-			var merge = Savory.Objects.array(params._merge)
+			var merge = Sincerity.Objects.array(params._merge)
 			for (var m in merge) {
-				Savory.Objects.merge(params, merge[m])
+				Sincerity.Objects.merge(params, merge[m])
 			}
 		}
 
 		params._human = params._human ? Number(params._human) : null
-		params._children = params._children ? Savory.Objects.array(params._children) : null
+		params._children = params._children ? Sincerity.Objects.array(params._children) : null
 				
-		var humanize = Savory.Objects.exists(params._human)
+		var humanize = Sincerity.Objects.exists(params._human)
 
 		if (params._key && params._textPack) {
 			if (params._value) {
@@ -170,7 +170,7 @@ Savory.XML = Savory.XML || function() {
 		}
 
 		if (params._classes) {
-			params['class'] = Savory.Objects.array(params._classes).join(' ')
+			params['class'] = Sincerity.Objects.array(params._classes).join(' ')
 		}
 		
 		var indent = '\t'.repeat(params._human)
@@ -179,7 +179,7 @@ Savory.XML = Savory.XML || function() {
 		for (var p in params) {
 			if (p[0] != '_') {
 				var param = params[p]
-				if (Savory.Objects.exists(param)) {
+				if (Sincerity.Objects.exists(param)) {
 					output += ' ' + p + '="' + Public.escapeDoubleQuotes(param) + '"'
 				}
 			}
@@ -192,7 +192,7 @@ Savory.XML = Savory.XML || function() {
 			}
 			
 			for (var c in params._children) {
-				var child = Savory.Objects.clone(params._children[c])
+				var child = Sincerity.Objects.clone(params._children[c])
 				if (params._html) {
 					child._html = params._html
 				}
@@ -242,15 +242,15 @@ Savory.XML = Savory.XML || function() {
 	 * Represents an XML node (JavaScript wrapper over teh JVM org.w3c.dom.Node).
 	 * 
 	 * @class
-	 * @name Savory.XML.Node
+	 * @name Sincerity.XML.Node
 	 * 
 	 * @param {org.w3c.dom.Node} node The JVM node
-	 * @param {Savory.XML.Node} [parent] The node's parent
+	 * @param {Sincerity.XML.Node} [parent] The node's parent
 	 * 
-	 * @see Savory.XML#from
+	 * @see Sincerity.XML#from
 	 */
-	Public.Node = Savory.Classes.define(function() {
-		/** @exports Public as Savory.XML.Node */
+	Public.Node = Sincerity.Classes.define(function() {
+		/** @exports Public as Sincerity.XML.Node */
 	    var Public = {}
 	    
 	    /** @ignore */
@@ -262,7 +262,7 @@ Savory.XML = Savory.XML || function() {
 	    /**
 		 * The parent node, or null if we are the root node.
 		 * 
-		 * @returns {Savory.XML.Node}
+		 * @returns {Sincerity.XML.Node}
 		 */
 		Public.getParent = function() {
 			return this.parent
@@ -330,7 +330,7 @@ Savory.XML = Savory.XML || function() {
 			var attributes = this.node.attributes
 			if (attributes) {
 				for (var c = 0, length = attributes.length; c < length; c++) {
-					var attribute = new Savory.XML.Node(attributes.item(c))
+					var attribute = new Sincerity.XML.Node(attributes.item(c))
 					r[attribute.getName()] = attribute.getValue()
 				}
 			}
@@ -342,15 +342,15 @@ Savory.XML = Savory.XML || function() {
 		 * Gathers all child nodes, optionally by name and/or type.
 		 * 
 		 * @param {String} [name]
-		 * @param {String} [type] See {@link Savory.XML.Node#getType}
-		 * @returns {Savory.XML.Node[]}
+		 * @param {String} [type] See {@link Sincerity.XML.Node#getType}
+		 * @returns {Sincerity.XML.Node[]}
 		 */
 		Public.getChildren = function(name, type) {
 			var children = []
 
 			var childNodes = this.node.childNodes
 			for (var c = 0, length = childNodes.length; c < length; c++) {
-				var childNode = new Savory.XML.Node(childNodes.item(c), this)
+				var childNode = new Sincerity.XML.Node(childNodes.item(c), this)
 				if (name) {
 					if (type) {
 						if ((name == childNode.getName()) && (type == childNode.getType())) {
@@ -380,7 +380,7 @@ Savory.XML = Savory.XML || function() {
 		 * Shortcut to gather all child nodes of type 'element'.
 		 * 
 		 * @param {String} [name]
-		 * @returns {Savory.XML.Node[]}
+		 * @returns {Sincerity.XML.Node[]}
 		 * @see #getChildren 
 		 */
 		Public.getElements = function(name) {
@@ -391,7 +391,7 @@ Savory.XML = Savory.XML || function() {
 		 * Deeply gathers nodes of type 'element'.
 		 * Arguments are names to be pursued in order of depth.
 		 * 
-		 * @returns {Savory.XML.Node[]}
+		 * @returns {Sincerity.XML.Node[]}
 		 */
 		Public.gatherElements = function(/* arguments */) {
 			var elements = []
@@ -460,18 +460,18 @@ Savory.XML = Savory.XML || function() {
 	}
 	
 	function doWrite(value, writer) {
-		if (Savory.Objects.isObject(value)) {
-			if (Savory.Objects.isDate(value)) {
+		if (Sincerity.Objects.isObject(value)) {
+			if (Sincerity.Objects.isDate(value)) {
 				writer.writeCharacters(value.getTime())
 				return
 			}
-			else if (Savory.Objects.isArray(value)) {
+			else if (Sincerity.Objects.isArray(value)) {
 				doWriteArray(value, writer)
 				return
 			}
-			else if (Savory.Objects.isDict(value, true)) {
+			else if (Sincerity.Objects.isDict(value, true)) {
 				for (var v in value) {
-					if (Savory.Objects.isArray(value[v])) {
+					if (Sincerity.Objects.isArray(value[v])) {
 						doWriteArray(value[v], writer, v)
 					}
 					else {
@@ -535,10 +535,10 @@ Savory.XML = Savory.XML || function() {
  * 
  * @methodOf String#
  * @returns {String}
- * @see Savory.XML#escapeElements
+ * @see Sincerity.XML#escapeElements
  */ 
 String.prototype.escapeElements = String.prototype.escapeElements || function() {
-	return Savory.XML.escapeElements(this)
+	return Sincerity.XML.escapeElements(this)
 }
 
 /**
@@ -546,8 +546,8 @@ String.prototype.escapeElements = String.prototype.escapeElements || function() 
  * 
  * @methodOf String#
  * @returns {String}
- * @see Savory.XML#escapeText
+ * @see Sincerity.XML#escapeText
  */ 
 String.prototype.escapeText = String.prototype.escapeText || function() {
-	return Savory.XML.escapeText(this)
+	return Sincerity.XML.escapeText(this)
 }

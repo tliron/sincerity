@@ -1,6 +1,6 @@
 
-document.executeOnce('/savory/classes/')
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/classes/')
+document.executeOnce('/sincerity/objects/')
 document.executeOnce('/restlet/')
 
 importClass(com.threecrickets.sincerity.exception.SincerityException)
@@ -24,13 +24,13 @@ var Prudence = Prudence || function() {
 	 * @class
 	 * @name Prudence.Application
 	 */
-    Public.Application = Savory.Classes.define(function(Module) {
+    Public.Application = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.Application */
     	var Public = {}
     	
 	    /** @ignore */
 	    Public._construct = function() {
-    		this.root = Savory.Sincerity.here
+    		this.root = Sincerity.Container.here
         	this.settings = {}
         	this.globals = {}
     		this.hosts = {}
@@ -51,18 +51,18 @@ var Prudence = Prudence || function() {
         	this.instance = new PrudenceApplication(this.context)
     		
     		// Description
-    		if (Savory.Objects.exists(this.settings.description)) {
-    			Savory.Objects.merge(this.instance, this.settings.description, ['name', 'description', 'author', 'owner'])
+    		if (Sincerity.Objects.exists(this.settings.description)) {
+    			Sincerity.Objects.merge(this.instance, this.settings.description, ['name', 'description', 'author', 'owner'])
     		}
     		
-    		if (!Savory.Objects.exists(this.hosts.internal)) {
+    		if (!Sincerity.Objects.exists(this.hosts.internal)) {
     			this.hosts.internal = this.root.name
     		}
     		
         	// Attach to hosts
         	for (var name in this.hosts) {
         		var host = Restlet.getHost(component, name)
-        		if (!Savory.Objects.exists(host)) {
+        		if (!Sincerity.Objects.exists(host)) {
         			throw new SavoryException('Unknown host: ' + name)
         		}
         		var uri = this.hosts[name]
@@ -81,7 +81,7 @@ var Prudence = Prudence || function() {
         	// Libraries
 			this.libraryDocumentSources = new CopyOnWriteArrayList()
 
-        	if (Savory.Objects.exists(this.settings.code.libraries)) {
+        	if (Sincerity.Objects.exists(this.settings.code.libraries)) {
     			for (var i in this.settings.code.libraries) {
     				var library = this.settings.code.libraries[i]
     				
@@ -96,7 +96,7 @@ var Prudence = Prudence || function() {
         	
         	// Common library
         	var commonLibraryDocumentSource = component.context.attributes.get('prudence.commonLibraryDocumentSource')
-        	if (!Savory.Objects.exists(commonLibraryDocumentSource)) {
+        	if (!Sincerity.Objects.exists(commonLibraryDocumentSource)) {
 	    		var library = sincerity.container.getLibrariesFile('scripturian')
 				commonLibraryDocumentSource = this.createDocumentSource(library)
 	    		component.context.attributes.put('prudence.commonLibraryDocumentSource', commonLibraryDocumentSource)
@@ -106,7 +106,7 @@ var Prudence = Prudence || function() {
 
         	// Sincerity library
         	var sincerityLibraryDocumentSource = component.context.attributes.get('prudence.sincerityLibraryDocumentSource')
-        	if (!Savory.Objects.exists(sincerityLibraryDocumentSource)) {
+        	if (!Sincerity.Objects.exists(sincerityLibraryDocumentSource)) {
 	    		var library = sincerity.getHomeFile('libraries', 'scripturian')
 				sincerityLibraryDocumentSource = this.createDocumentSource(library)
 	    		component.context.attributes.put('prudence.sincerityLibraryDocumentSource', sincerityLibraryDocumentSource)
@@ -131,7 +131,7 @@ var Prudence = Prudence || function() {
         		uri = Module.cleanUri(uri)
 
         		restlet = this.createRestlet(restlet, uri)
-        		if (Savory.Objects.exists(restlet)) {
+        		if (Sincerity.Objects.exists(restlet)) {
 	        		if (attachBase) {
 	            		print('Attaching "' + uri + '*" to ' + restlet + '\n')
 	        			this.instance.inboundRoot.attachBase(uri, restlet)
@@ -144,7 +144,7 @@ var Prudence = Prudence || function() {
         	}
 
         	// Apply globals
-        	var globals = Savory.Objects.flatten(this.globals)
+        	var globals = Sincerity.Objects.flatten(this.globals)
         	for (var g in globals) {
         		this.context.attributes.put(g, globals[g])
         	}
@@ -153,18 +153,18 @@ var Prudence = Prudence || function() {
     	}
     	
     	Public.createRestlet = function(restlet, uri) {
-    		if (Savory.Objects.isArray(restlet)) {
+    		if (Sincerity.Objects.isArray(restlet)) {
     			return new Module.Chain({restlets: restlet}).create(this, uri)
     		}
-    		else if (Savory.Objects.isString(restlet)) {
+    		else if (Sincerity.Objects.isString(restlet)) {
     			if (restlet == 'hidden') {
             		print('Hiding "' + uri + '"\n')
     				this.instance.inboundRoot.hide(uri)
     				return null
     			}
     			else {
-        			var type = Module[Savory.Objects.capitalize(restlet)]
-    				if (Savory.Objects.exists(type)) {
+        			var type = Module[Sincerity.Objects.capitalize(restlet)]
+    				if (Sincerity.Objects.exists(type)) {
     					return new type().create(this, uri)
     				}
     				else {
@@ -172,8 +172,8 @@ var Prudence = Prudence || function() {
     				}
     			}
     		}
-    		else if (Savory.Objects.isString(restlet.type)) {
-    			var type = Module[Savory.Objects.capitalize(restlet.type)]
+    		else if (Sincerity.Objects.isString(restlet.type)) {
+    			var type = Module[Sincerity.Objects.capitalize(restlet.type)]
     			delete restlet.type
     			return new type(restlet).create(this, uri)        			
     		}
@@ -191,7 +191,7 @@ var Prudence = Prudence || function() {
 				root,
 				defaultDocumentName || this.settings.code.defaultDocumentName,
 				defaultExtension || this.settings.code.defaultExtension,
-				Savory.Objects.ensure(preExtension, null),
+				Sincerity.Objects.ensure(preExtension, null),
 				this.settings.code.minimumTimeBetweenValidityChecks
 			)
     	}
@@ -203,7 +203,7 @@ var Prudence = Prudence || function() {
 	 * @class
 	 * @name Prudence.Resource
 	 */
-    Public.Resource = Savory.Classes.define(function() {
+    Public.Resource = Sincerity.Classes.define(function() {
 		/** @exports Public as Prudence.Resource */
     	var Public = {}
     	
@@ -218,7 +218,7 @@ var Prudence = Prudence || function() {
 	 * @name Prudence.StaticWeb
 	 * @augments Prudence.Resource
 	 */
-    Public.StaticWeb = Savory.Classes.define(function(Module) {
+    Public.StaticWeb = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.StaticWeb */
     	var Public = {}
     	
@@ -233,7 +233,7 @@ var Prudence = Prudence || function() {
     			org.restlet.resource.Directory,
     			java.io.File)
     		
-    		this.root = Savory.Objects.ensure(this.root, 'mapped')
+    		this.root = Sincerity.Objects.ensure(this.root, 'mapped')
     		if (!(this.root instanceof File)) {
     			this.root = new File(app.root, this.root).absoluteFile
     		}
@@ -252,7 +252,7 @@ var Prudence = Prudence || function() {
 	 * @name Prudence.DynamicWeb
 	 * @augments Prudence.Resource
 	 */
-    Public.DynamicWeb = Savory.Classes.define(function(Module) {
+    Public.DynamicWeb = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.DynamicWeb */
     	var Public = {}
     	
@@ -263,7 +263,7 @@ var Prudence = Prudence || function() {
     	Public._configure = ['root', 'fragmentsRoot', 'passThroughs', 'preExtension', 'defaultDocumentName', 'defaultExtension', 'clientCachingMode']
 
     	Public.create = function(app, uri) {
-    		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.GeneratedTextResource'])) {
+    		if (Sincerity.Objects.exists(app.globals['com.threecrickets.prudence.GeneratedTextResource'])) {
     			throw new SincerityException('There can be only one DynamicWeb per application')
     		}
 
@@ -275,19 +275,19 @@ var Prudence = Prudence || function() {
     			java.util.concurrent.ConcurrentHashMap,
     			java.io.File)
     			
-    		this.root = Savory.Objects.ensure(this.root, 'mapped')
+    		this.root = Sincerity.Objects.ensure(this.root, 'mapped')
     		if (!(this.root instanceof File)) {
     			this.root = new File(app.root, this.root).absoluteFile
     		}
     		
     		print('DynamicWeb at "' + this.root + '"\n')
     		
-    		this.fragmentsRoot = Savory.Objects.ensure(this.fragmentsRoot, 'fragments')
+    		this.fragmentsRoot = Sincerity.Objects.ensure(this.fragmentsRoot, 'fragments')
     		if (!(this.fragmentsRoot instanceof File)) {
     			this.fragmentsRoot = new File(app.root, this.fragmentsRoot).absoluteFile
     		}
 
-    		if (Savory.Objects.isString(this.clientCachingMode)) {
+    		if (Sincerity.Objects.isString(this.clientCachingMode)) {
 	    		if (this.clientCachingMode == 'disabled') {
 	    			this.clientCachingMode = 0
 	    		}
@@ -301,7 +301,7 @@ var Prudence = Prudence || function() {
         			throw new SavoryException('Unsupported clientCachingMode: ' + this.clientCachingMode)
 	    		}
     		}
-    		else if (!Savory.Objects.exists(this.clientCachingMode)) {
+    		else if (!Sincerity.Objects.exists(this.clientCachingMode)) {
     			this.clientCachingMode = 1
     		}
 
@@ -326,13 +326,13 @@ var Prudence = Prudence || function() {
     		}
 
     		// Fragments
-    		if (Savory.Objects.exists(this.fragmentsRoot)) {
+    		if (Sincerity.Objects.exists(this.fragmentsRoot)) {
     			generatedTextResource.extraDocumentSources.add(app.createDocumentSource(this.fragmentsRoot, null, this.defaultDocumentName, this.defaultExtenion))
     		}
 
         	// Common fragments
         	var commonFragmentsDocumentSource = app.component.context.attributes.get('prudence.fragmentsDocumentSource')
-        	if (!Savory.Objects.exists(commonFragmentsDocumentSource)) {
+        	if (!Sincerity.Objects.exists(commonFragmentsDocumentSource)) {
 	    		var library = sincerity.container.getFile('component', 'fragments')
 				commonFragmentsDocumentSource = app.createDocumentSource(library, null, this.defaultDocumentName, this.defaultExtenion)
 	    		app.component.context.attributes.put('prudence.fragmentsDocumentSource', commonFragmentsDocumentSource)
@@ -340,14 +340,14 @@ var Prudence = Prudence || function() {
 
         	generatedTextResource.extraDocumentSources.add(commonFragmentsDocumentSource)
     		
-    		if (Savory.Objects.exists(this.passThroughs)) {
+    		if (Sincerity.Objects.exists(this.passThroughs)) {
 	    		for (var i in this.passThroughs) {
 	    			print('Pass through: "' + this.passThroughs[i] + '"\n')
 	    			generatedTextResource.passThroughDocuments.add(this.passThroughs[i])
 	    		}
     		}
     		
-    		return new Finder(app.context, Savory.Sincerity.getClass('com.threecrickets.prudence.GeneratedTextResource'))
+    		return new Finder(app.context, Sincerity.Container.getClass('com.threecrickets.prudence.GeneratedTextResource'))
     	}
     	
     	return Public
@@ -358,7 +358,7 @@ var Prudence = Prudence || function() {
 	 * @name Prudence.Explicit
 	 * @augments Prudence.Resource
 	 */
-    Public.Explicit = Savory.Classes.define(function(Module) {
+    Public.Explicit = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.Explicit */
     	var Public = {}
     	
@@ -369,7 +369,7 @@ var Prudence = Prudence || function() {
     	Public._configure = ['root', 'passThroughs', 'implicit', 'preExtension']
 
     	Public.create = function(app, uri) {
-    		if (Savory.Objects.exists(app.globals['com.threecrickets.prudence.DelegatedResource'])) {
+    		if (Sincerity.Objects.exists(app.globals['com.threecrickets.prudence.DelegatedResource'])) {
     			throw new SincerityException('There can be only one Explicit per application')
     		}
 
@@ -378,7 +378,7 @@ var Prudence = Prudence || function() {
     			java.util.concurrent.CopyOnWriteArraySet,
     			java.io.File)
 
-    		this.root = Savory.Objects.ensure(this.root, 'mapped')
+    		this.root = Sincerity.Objects.ensure(this.root, 'mapped')
     		if (!(this.root instanceof File)) {
     			this.root = new File(app.root, this.root).absoluteFile
     		}
@@ -399,7 +399,7 @@ var Prudence = Prudence || function() {
 	    		languageManager: executable.manager
     		}
 
-    		if (Savory.Objects.exists(this.passThroughs)) {
+    		if (Sincerity.Objects.exists(this.passThroughs)) {
 	    		for (var i in this.passThroughs) {
 	    			print('Pass through: "' + this.passThroughs[i] + '"\n')
 	    			delegatedResource.passThroughDocuments.add(this.passThroughs[i])
@@ -411,7 +411,7 @@ var Prudence = Prudence || function() {
        		app.implicit.routerUri = Module.cleanUri(uri + this.implicit.routerDocumentName)
     		app.instance.inboundRoot.hide(app.implicit.routerUri)
 
-    		return new Finder(app.context, Savory.Sincerity.getClass('com.threecrickets.prudence.DelegatedResource'))
+    		return new Finder(app.context, Sincerity.Container.getClass('com.threecrickets.prudence.DelegatedResource'))
     	}
     	
     	return Public
@@ -422,7 +422,7 @@ var Prudence = Prudence || function() {
 	 * @name Prudence.Implicit
 	 * @augments Prudence.Resource
 	 */
-    Public.Implicit = Savory.Classes.define(function(Module) {
+    Public.Implicit = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.Implicit */
     	var Public = {}
     	
@@ -437,7 +437,7 @@ var Prudence = Prudence || function() {
     			com.threecrickets.prudence.util.Injector,
     			com.threecrickets.prudence.util.CapturingRedirector)
     			
-       		if (!Savory.Objects.exists(app.implicit)) {
+       		if (!Sincerity.Objects.exists(app.implicit)) {
     			throw new SincerityException('An Explicit must be attached before an Implicit can be created')
        		}
     		
@@ -447,7 +447,7 @@ var Prudence = Prudence || function() {
     		var injector = new Injector(app.context, capture)
     		injector.values.put('prudence.id', this.id)
 
-    		if (Savory.Objects.exists(this.locals)) {
+    		if (Sincerity.Objects.exists(this.locals)) {
     			for (var i in this.locals) {
     				injector.values.put(i, this.locals[i])
     			}
@@ -466,7 +466,7 @@ var Prudence = Prudence || function() {
 	 * @name Prudence.Chain
 	 * @augments Prudence.Resource 
 	 */
-    Public.Chain = Savory.Classes.define(function(Module) {
+    Public.Chain = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Prudence.Chain */
     	var Public = {}
     	
@@ -481,10 +481,10 @@ var Prudence = Prudence || function() {
     		
     		var fallback = new Fallback(app.context, app.settings.code.minimumTimeBetweenValidityChecks)
     		
-    		if (Savory.Objects.exists(this.restlets)) {
+    		if (Sincerity.Objects.exists(this.restlets)) {
 	    		for (var i in this.restlets) {
 	    			var restlet = app.createRestlet(this.restlets[i], uri)
-	    			if (Savory.Objects.exists(restlet)) {
+	    			if (Sincerity.Objects.exists(restlet)) {
 	    				fallback.addTarget(restlet)    				
 	    			}
 	    		}

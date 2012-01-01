@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,11 +11,11 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/classes/')
-document.executeOnce('/savory/objects/')
-document.executeOnce('/savory/jvm/')
+document.executeOnce('/sincerity/classes/')
+document.executeOnce('/sincerity/objects/')
+document.executeOnce('/sincerity/jvm/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * JavaScript-friendly wrapper over Lucene.
@@ -27,8 +27,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Lucene = Savory.Lucene || function() {
-	/** @exports Public as Savory.Lucene */
+Sincerity.Lucene = Sincerity.Lucene || function() {
+	/** @exports Public as Sincerity.Lucene */
     var Public = {}
 
 	/**
@@ -43,7 +43,7 @@ Savory.Lucene = Savory.Lucene || function() {
 	 * @returns {org.apache.lucene.document.Field}
 	 */
 	Public.createField = function(name, o) {
-		if (Savory.Objects.isDict(o, true)) {
+		if (Sincerity.Objects.isDict(o, true)) {
 			var store = (typeof o.store == 'boolean' ? (o.store ? fieldStore.yes : fieldStore.no) : fieldStore[o.store]) || fieldStore.yes
 			var index = (typeof o.index == 'boolean' ? (o.index ? fieldIndex.analyzed : fieldIndex.no) : fieldIndex[o.index]) || fieldIndex.analyzed
 			return new org.apache.lucene.document.Field(name, String(o.value), store, index)
@@ -57,7 +57,7 @@ Savory.Lucene = Savory.Lucene || function() {
 	 * Converts a JavaScript dict into a Lucene document.
 	 * <p>
 	 * Note that Lucene documents are flat, with no hierarchical depth,
-	 * so you may want to call {@link Savory.Objects#flatten} first for more complex
+	 * so you may want to call {@link Sincerity.Objects#flatten} first for more complex
 	 * data structures.
 	 * 
 	 * @param o A flat dict
@@ -101,19 +101,19 @@ Savory.Lucene = Savory.Lucene || function() {
 	 * Of course, in-process memory directories must be stored globally.
 	 * 
 	 * @class
-	 * @name Savory.Lucene.Directory
+	 * @name Sincerity.Lucene.Directory
 	 * 
 	 * @param {String|java.io.File} file The file or path for the directory; will be created if it doesn't
 	 *        exist; leave empty to use an in-process memory directory
 	 */
-	Public.Directory = Savory.Classes.define(function(Module) {
-		/** @exports Public as Savory.Lucene.Directory */
+	Public.Directory = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Lucene.Directory */
 	    var Public = {}
 	    
 	    /** @ignore */
 	    Public._construct = function(file) {
-			this.file = Savory.Objects.isString(file) ? new java.io.File(file) : file
-			this.directory = Savory.Objects.exists(this.file) ? org.apache.lucene.store.FSDirectory.open(this.file) : new org.apache.lucene.store.RAMDirectory()
+			this.file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
+			this.directory = Sincerity.Objects.exists(this.file) ? org.apache.lucene.store.FSDirectory.open(this.file) : new org.apache.lucene.store.RAMDirectory()
 	    }
 
 	    /**
@@ -157,15 +157,15 @@ Savory.Lucene = Savory.Lucene || function() {
 	    /**
 	     * Writes documents to the directory.
 	     * 
-	     * @param {Array|Savory.Iterators.Iterator} iterator All entries will be passed through {@link Savory.Lucene#createDocument}
+	     * @param {Array|Sincerity.Iterators.Iterator} iterator All entries will be passed through {@link Sincerity.Lucene#createDocument}
 	     * @param [writerConfig] See {@link #createWriter}
 	     */
 	    Public.index = function(iterator, writerConfig) {
-	    	iterator = Savory.Iterators.iterator(iterator)
-			iterator = new Savory.Iterators.Transformer(iterator, Savory.Lucene.createDocument)
+	    	iterator = Sincerity.Iterators.iterator(iterator)
+			iterator = new Sincerity.Iterators.Transformer(iterator, Sincerity.Lucene.createDocument)
 			var writer = this.createWriter(writerConfig)
 			try {
-				Savory.Iterators.consume(iterator, writer.addDocument, writer)
+				Sincerity.Iterators.consume(iterator, writer.addDocument, writer)
 			}
 			finally {
 				writer.close()
@@ -175,13 +175,13 @@ Savory.Lucene = Savory.Lucene || function() {
 		/**
 		 * Performs a search in the directory.
 		 * 
-		 * @param {String|Object} config Either a query or a complete {@link Savory.Lucene.Search} config
-		 * @returns {Savory.Lucene.Search}
+		 * @param {String|Object} config Either a query or a complete {@link Sincerity.Lucene.Search} config
+		 * @returns {Sincerity.Lucene.Search}
 		 */
 	    Public.search = function(config) {
-	    	config = Savory.Objects.isString(config) ? {query: String(config)} : Savory.Objects.clone(config)
+	    	config = Sincerity.Objects.isString(config) ? {query: String(config)} : Sincerity.Objects.clone(config)
 	    	config.directory = this
-	    	return new Savory.Lucene.Search(config)
+	    	return new Sincerity.Lucene.Search(config)
 		}
 		
 		return Public
@@ -191,11 +191,11 @@ Savory.Lucene = Savory.Lucene || function() {
 	 * Represents Lucene search results.
 	 * 
 	 * @class
-	 * @name Savory.Lucene.Search
+	 * @name Sincerity.Lucene.Search
 	 * 
 	 * @param config
 	 * @param {String} config.query The Lucene query
-	 * @param {Savory.Lucene.Directory} config.directory The directory
+	 * @param {Sincerity.Lucene.Directory} config.directory The directory
 	 * @param {Number} [config.count=100] The maximum number of top documents to return
 	 * @param {String} [config.defaultField] The default query field
 	 * @param {String} [config.previewField] If present generates a short HTML preview of this field with
@@ -207,14 +207,14 @@ Savory.Lucene = Savory.Lucene || function() {
 	 * @param {String} [config.termPrefix='&lt;strong&gt'] The HTML code to appear before highlighted terms
 	 * @param {String} [config.termPostfix='&lt;/strong&gt'] The HTML code to appear after highlighted terms
 	 * 
-	 * @see Savory.Lucene#fromDocument
+	 * @see Sincerity.Lucene#fromDocument
 	 */
-    Public.Search = Savory.Classes.define(function(Module) {
-		/** @exports Public as Savory.Lucene.Directory */
+    Public.Search = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Lucene.Directory */
 	    var Public = {}
     	
 	    /** @ignore */
-	    Public._inherit = Savory.Iterators.Array
+	    Public._inherit = Sincerity.Iterators.Array
 
 	    /** @ignore */
 	    Public._construct = function(config) {
@@ -239,9 +239,9 @@ Savory.Lucene = Savory.Lucene || function() {
 	    }
 	    
 	    Public.hasNext = function() {
-	    	if (!Savory.Objects.exists(this.hits)) {
+	    	if (!Sincerity.Objects.exists(this.hits)) {
 				this.hits = this.searcher.search(this.query, null, this.count).scoreDocs
-		    	this.length = Savory.Objects.exists(this.hits) ? this.hits.length : 0
+		    	this.length = Sincerity.Objects.exists(this.hits) ? this.hits.length : 0
 				this.index = 0
 	    	}
 	    	
@@ -253,7 +253,7 @@ Savory.Lucene = Savory.Lucene || function() {
 			var doc = this.searcher.doc(id)
 			var value = Module.fromDocument(doc)
 			
-			if (Savory.Objects.exists(this.highlighter)) {
+			if (Sincerity.Objects.exists(this.highlighter)) {
 				// Add preview to value
 				try {
 					var tokens = org.apache.lucene.search.highlight.TokenSources.getAnyTokenStream(this.searcher.indexReader, id, this.previewField, analyzer)

@@ -49,7 +49,7 @@
 
 	<modules>
 		<module>core</module>
-		<module>savory-foundation</module>
+		<module>sincerity-foundation</module>
 		<module>plugins/logging</module>
 		<module>plugins/logging-mongodb</module>
 		<module>plugins/clojure</module>

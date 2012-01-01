@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,9 +11,9 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/objects/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Utilities to work with JVM types and classes.
@@ -25,8 +25,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.1
  */
-Savory.JVM = Savory.JVM || function() {
-	/** @exports Public as Savory.JVM */
+Sincerity.JVM = Sincerity.JVM || function() {
+	/** @exports Public as Sincerity.JVM */
     var Public = {}
 
 	/**
@@ -51,7 +51,7 @@ Savory.JVM = Savory.JVM || function() {
 	 */
 	Public.instanceOf = function(value, theClass) {
 		if (value.getClass) {
-			theClass = Savory.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
+			theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
 			return value.getClass() === theClass
 		}
 		return false
@@ -63,7 +63,7 @@ Savory.JVM = Savory.JVM || function() {
 	 * @param {String|java.lang.Class} The JVM class or its name
 	 */
 	Public.newInstance = function(theClass) {
-		theClass = Savory.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
+		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
 		return theClass ? theClass.newInstance() : null
 	}
 	
@@ -72,7 +72,7 @@ Savory.JVM = Savory.JVM || function() {
 	 */
 	Public.newArray = function(length, type) {
 		type = type || 'object'
-		if (Savory.Objects.isString(type)) {
+		if (Sincerity.Objects.isString(type)) {
 			var theClass = primitiveTypes[String(type)]
 			if (!theClass) {
 				theClass = Public.getClass(type)
@@ -214,7 +214,7 @@ Savory.JVM = Savory.JVM || function() {
 	 * @returns {java.nio.charset.Charset}
 	 */
 	Public.getCharset = function(name) {
-		return Savory.Objects.exists(name) ? java.nio.charset.Charset.forName(name) : java.nio.charset.Charset.defaultCharset()
+		return Sincerity.Objects.exists(name) ? java.nio.charset.Charset.forName(name) : java.nio.charset.Charset.defaultCharset()
 	}
 
 	/**
@@ -226,7 +226,7 @@ Savory.JVM = Savory.JVM || function() {
 	 * @see #getCharset
 	 */
 	Public.fromBytes = function(bytes, charset) {
-		charset = Savory.Objects.isString(charset) ? Public.getCharset(charset) : null
+		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
 		return null !== charset ? String(new java.lang.String(bytes, charset)) : String(new java.lang.String(bytes))
 	}
 	
@@ -239,7 +239,7 @@ Savory.JVM = Savory.JVM || function() {
 	 * @see #getCharset
 	 */
 	Public.linesFromBytes = function(bytes, charset) {
-		charset = Savory.Objects.isString(charset) ? Public.getCharset(charset) : null
+		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
 				
 		var input = new java.io.ByteArrayInputStream(bytes)
 		input = Objects.exists(charset) ? new java.io.InputStreamReader(input, charset) : new java.io.InputStreamReader(input)
@@ -262,7 +262,7 @@ Savory.JVM = Savory.JVM || function() {
 	 * @see #getCharset
 	 */
 	Public.toBytes = function(string, charset) {
-		charset = Savory.Objects.isString(charset) ? Public.getCharset(charset) : null
+		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
 		return null !== charset ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
 	}
 	
@@ -310,7 +310,7 @@ Savory.JVM = Savory.JVM || function() {
 	 */
 	Public.toLocale = function(value) {
 		if (value) {
-			if (Savory.Objects.isString(value)) {
+			if (Sincerity.Objects.isString(value)) {
 				return new java.util.Locale(value)
 			}
 			if (value.variant && value.country && value.language) {
@@ -366,11 +366,11 @@ Savory.JVM = Savory.JVM || function() {
 	 * @returns {String[]} The command's output, line by line
 	 */
 	Public.exec = function(command, args, environment, directory) {
-		if (Savory.Objects.exists(directory)) {
-			directory = (Savory.Objects.isString(directory) ? new java.io.File(directory) : directory).canonicalFile
+		if (Sincerity.Objects.exists(directory)) {
+			directory = (Sincerity.Objects.isString(directory) ? new java.io.File(directory) : directory).canonicalFile
 		}
 		
-		if (Savory.Objects.exists(environment)) {
+		if (Sincerity.Objects.exists(environment)) {
 			var environmentArray = []
 			for (var e in environment) {
 				environmentArray.push(e + '=' + environment[e])
@@ -390,7 +390,7 @@ Savory.JVM = Savory.JVM || function() {
 		try {
 			while (true) {
 				var line = reader.readLine()
-				if (!Savory.Objects.exists(line)) {
+				if (!Sincerity.Objects.exists(line)) {
 					break
 				}
 				lines.push(String(line))
@@ -439,9 +439,9 @@ Savory.JVM = Savory.JVM || function() {
  * 
  * @methodOf String#
  * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
- * @see Savory.JVM#getCharset
- * @see Savory.JVM#toBytes
+ * @see Sincerity.JVM#getCharset
+ * @see Sincerity.JVM#toBytes
  */ 
 String.prototype.toBytes = String.prototype.toBytes || function(charset) {
-	return Savory.JVM.toBytes(this, charset)
+	return Sincerity.JVM.toBytes(this, charset)
 }

@@ -3,7 +3,7 @@ importClass(
 	org.restlet.resource.Directory,
 	org.restlet.routing.Template)
 
-var staticDir = Savory.Sincerity.getFileFromHere('..', 'static') 
+var staticDir = Sincerity.Container.getFileFromHere('..', 'static') 
 	
 var directory = new Directory(app.context, staticDir.toURI())
 directory.negotiatingContent = true

@@ -1,10 +1,10 @@
 
-document.execute('/savory/objects/')
+document.execute('/sincerity/objects/')
 
 var logger = repository.getLogger('org.restlet.Component.LogService')
 logger.additivity = false
 
-if (Savory.Objects.exists(appenders.webMongoDb)) {
+if (Sincerity.Objects.exists(appenders.webMongoDb)) {
 	logger.addAppender(appenders.webMongoDb)
 }
 else {

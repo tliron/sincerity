@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,10 +11,10 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/classes/')
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/classes/')
+document.executeOnce('/sincerity/objects/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * @namespace
@@ -22,8 +22,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Validation = Savory.Validation || function() {
-	/** @exports Public as Savory.Validation */
+Sincerity.Validation = Sincerity.Validation || function() {
+	/** @exports Public as Sincerity.Validation */
     var Public = {}
 
 	Public.string = {

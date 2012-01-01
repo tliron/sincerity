@@ -1,13 +1,13 @@
 
-document.executeOnce('/savory/sincerity/')
+document.executeOnce('/sincerity/container/')
 document.executeOnce('/prudence/')
 
 var app = new Prudence.Application()
 
-Savory.Sincerity.include('settings')
-Savory.Sincerity.include('routing')
+Sincerity.Container.include('settings')
+Sincerity.Container.include('routing')
 
 app = app.create(component)
 
 // Restlets
-Savory.Sincerity.include('restlets')
+Sincerity.Container.include('restlets')

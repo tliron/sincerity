@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,7 +11,7 @@
 // at http://threecrickets.com/
 //
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Useful shortcuts to Savory-specific services and utilities.
@@ -21,8 +21,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Sincerity = Savory.Sincerity || function() {
-	/** @exports Public as Savory.Sincerity */
+Sincerity.Container = Sincerity.Container || function() {
+	/** @exports Public as Sincerity.Container */
     var Public = {}
 
     Public.getClass = function(name) {

@@ -1,6 +1,6 @@
 
-document.execute('/savory/files/')
-document.execute('/savory/objects/')
+document.execute('/sincerity/files/')
+document.execute('/sincerity/objects/')
 
 importClass(
 	java.lang.System,
@@ -37,8 +37,8 @@ function logging(command) {
 		System.setProperty('sincerity.logs', logsDir)
 
 		try {
-			var contents = Savory.Files.loadText(configurationFile)
-			if (Savory.Objects.startsWith(contents, '<?xml')) {
+			var contents = Sincerity.Files.loadText(configurationFile)
+			if (Sincerity.Objects.startsWith(contents, '<?xml')) {
 				org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
 			}
 			else {

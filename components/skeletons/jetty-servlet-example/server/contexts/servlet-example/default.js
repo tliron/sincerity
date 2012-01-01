@@ -5,7 +5,7 @@ importClass(
 // The context
 var context = new ServletContextHandler(server.handler, '/servlet')
 context.displayName = 'The servlet example for the servlet skeleton'
-context.resourceBase = Savory.Sincerity.getFileFromHere('static') // used by DefaultServlet
+context.resourceBase = Sincerity.Container.getFileFromHere('static') // used by DefaultServlet
 
 // Assemble context
-Savory.Sincerity.include('servlets')
+Sincerity.Container.include('servlets')

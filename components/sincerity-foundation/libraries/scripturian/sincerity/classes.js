@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 
 // Copyright 2011 Three Crickets LLC.
@@ -12,9 +12,9 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/savory/objects/')
+document.executeOnce('/sincerity/objects/')
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Object Oriented Programming for JavaScript, Savory style.
@@ -34,7 +34,7 @@ var Savory = Savory || {}
  * linked to a new dict via the "new" keyword. The result is that data and functions are encapsulated
  * into a single instance.</li>
  * <li>Inheritance: There are two obvious ways to implement this in JavaScript -- by simply copying functions
- * over from another dict (which we could have done with {@link Savory.Objects#merge}) or at once by
+ * over from another dict (which we could have done with {@link Sincerity.Objects#merge}) or at once by
  * setting the constructor's prototype. The latter offers better performance and more coherence, which is
  * why we chose it.</li>
  * <li>Polymorphism: Loose polymorphism is provided naturally via JavaScript's duck typing, which is
@@ -57,7 +57,7 @@ var Savory = Savory || {}
  * <pre>
  * // We are not providing a literal dict, but instead creating an "ad hoc" anonymous function,
  * // which we then immediately call, so that it only ever used this once for purposes of closure
- * var Person = Savory.Classes.define(function() {
+ * var Person = Sincerity.Classes.define(function() {
  *   // We will be returning this dict to the outside world
  *   var Public = {}
  *   
@@ -119,8 +119,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Classes = Savory.Classes || function() {
-	/** @exports Public as Savory.Classes */
+Sincerity.Classes = Sincerity.Classes || function() {
+	/** @exports Public as Sincerity.Classes */
     var Public = {}
     
     /**
@@ -191,7 +191,7 @@ Savory.Classes = Savory.Classes || function() {
     		// Inherit the parent _configure if it exists
 			var parentConfigure = definition._inherit.prototype.definition._configure
     		if (parentConfigure) {
-    			definition._configure = Savory.Objects.concatUnique(definition._configure || [], parentConfigure)
+    			definition._configure = Sincerity.Objects.concatUnique(definition._configure || [], parentConfigure)
     		}
     	}
     	
@@ -199,7 +199,7 @@ Savory.Classes = Savory.Classes || function() {
     		// Wrap the constructor with one that merges the configuration
     		var OriginalClass = TheClass
     		TheClass = function(config) {
-    			Savory.Objects.merge(this, config, TheClass.prototype.definition._configure)
+    			Sincerity.Objects.merge(this, config, TheClass.prototype.definition._configure)
     			OriginalClass.call(this, this)
     		}
     	}

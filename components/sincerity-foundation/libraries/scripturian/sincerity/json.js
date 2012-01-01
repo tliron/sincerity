@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,7 +11,7 @@
 // at http://threecrickets.com/
 //
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * JSON encoding and decoding. Uses the high-performance JSON Rhino
@@ -23,14 +23,14 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.JSON = Savory.JSON || com.threecrickets.rhino.JSON
+Sincerity.JSON = Sincerity.JSON || com.threecrickets.rhino.JSON
 
-if (Object.prototype.toString.call(Savory.JSON) == '[object JavaClass]') {
+if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 	
-	document.executeOnce('/savory/foundation/classes/')
-	document.executeOnce('/savory/foundation/iterators/')
-	document.executeOnce('/savory/foundation/objects/')
-	document.executeOnce('/savory/foundation/files/')
+	document.executeOnce('/sincerity/foundation/classes/')
+	document.executeOnce('/sincerity/foundation/iterators/')
+	document.executeOnce('/sincerity/foundation/objects/')
+	document.executeOnce('/sincerity/foundation/files/')
 
 	/**
 	 * Streaming JSON array parser.
@@ -39,25 +39,25 @@ if (Object.prototype.toString.call(Savory.JSON) == '[object JavaClass]') {
 	 * an efficient one for a file.
 	 * 
 	 * @class
-	 * @name Savory.Iterators.JsonArray
+	 * @name Sincerity.Iterators.JsonArray
 	 * @param params
 	 * @param {String|java.io.File} [params.file] The file or its path (ignore if params.reader is used)
 	 * @param {java.io.Reader} [params.reader] A reader
 	 */
-	Savory.Iterators.JsonArray = Savory.Classes.define(function() {
-		/** @exports Public as Savory.Iterators.JsonArray */
+	Sincerity.Iterators.JsonArray = Sincerity.Classes.define(function() {
+		/** @exports Public as Sincerity.Iterators.JsonArray */
 		var Public = {}
 		
 	    /** @ignore */
-		Public._inherit = Savory.Iterators.Iterator
+		Public._inherit = Sincerity.Iterators.Iterator
 		
 		/** @ignore */
 		Public._construct = function(params) {
-			if (Savory.Objects.exists(params.reader)) {
+			if (Sincerity.Objects.exists(params.reader)) {
 				this.reader = reader
 			}
 			else {
-				this.reader = Savory.Files.openForTextReading(params.file, params.gzip)
+				this.reader = Sincerity.Files.openForTextReading(params.file, params.gzip)
 			}
 			
 			this.tokener = new com.mongodb.rhino.util.JSONTokener(this.reader)
@@ -116,9 +116,9 @@ if (Object.prototype.toString.call(Savory.JSON) == '[object JavaClass]') {
 else {
 	// Fallback to JSON JavaScript library if the JSON Rhino library isn't found
 	
-	document.executeOnce('/savory/internal/json2/')
+	document.executeOnce('/sincerity/internal/json2/')
 	
-	Savory.JSON = {}
+	Sincerity.JSON = {}
 	
 	/**
 	 * Recursively converts MongoDB's extended JSON notation to
@@ -127,13 +127,13 @@ else {
 	 * @param {Object|Array} json The data
 	 * @returns {Object|Array}
 	 */
-	Savory.JSON.fromExtendedJSON = function(json) {
-		if (Savory.Objects.isArray(json)) {
+	Sincerity.JSON.fromExtendedJSON = function(json) {
+		if (Sincerity.Objects.isArray(json)) {
 			for (var j = 0, length = json.length; j < length; j++) {
-				json[j] = Savory.JSON.fromExtendedJSON(json[j])
+				json[j] = Sincerity.JSON.fromExtendedJSON(json[j])
 			}
 		}
-		else if (Savory.Objects.isObject(json)) {
+		else if (Sincerity.Objects.isObject(json)) {
 			if (json.$long !== undefined) {
 				// Note: Rhino will not let us use java.lang.Long instances! It will
 				// immediately convert them to JavaScript Number instances.
@@ -157,7 +157,7 @@ else {
 			}
 			
 			for (var k in json) {
-				json[k] = Savory.JSON.fromExtendedJSON(json[k])
+				json[k] = Sincerity.JSON.fromExtendedJSON(json[k])
 			}
 		}
 	}
@@ -170,7 +170,7 @@ else {
 	 * @param {Boolean} [javaScript=false] True to generate JavaScript source code where applicable (breaks JSON!)
 	 * @returns {String} The JSON representation of value
 	 */
-	Savory.JSON.to = function(value, human, javaScript) {
+	Sincerity.JSON.to = function(value, human, javaScript) {
 		return JSON.stringify(value)
 		
 		// TODO: extended JSON? JavaScript mode?
@@ -184,10 +184,10 @@ else {
 	 *        creating ObjectId, DBRef, Date, RegExp, java.lang.Long and byte array objects where noted
 	 * @returns {Object|Array}
 	 */
-	Savory.JSON.from = function(json, extendedJson) {
+	Sincerity.JSON.from = function(json, extendedJson) {
 		json = JSON.parse(json)
 		if (extendedJson) {
-			Savory.JSON.fromExtendedJSON(json)
+			Sincerity.JSON.fromExtendedJSON(json)
 		}
 		return json
 	}

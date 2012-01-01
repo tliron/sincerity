@@ -1,5 +1,5 @@
 
-document.executeOnce('/savory/files/')
+document.executeOnce('/sincerity/files/')
 
-Savory.Files.makeExecutable(sincerity.container.getExecutablesFile('python'))
-Savory.Files.makeExecutable(sincerity.container.getExecutablesFile('easy_install'))
+Sincerity.Files.makeExecutable(sincerity.container.getExecutablesFile('python'))
+Sincerity.Files.makeExecutable(sincerity.container.getExecutablesFile('easy_install'))

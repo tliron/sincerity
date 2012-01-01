@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,7 +11,7 @@
 // at http://threecrickets.com/
 //
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Lots of utilities to work with JavaScript objects, arrays and
@@ -24,8 +24,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.2
  */
-Savory.Objects = Savory.Objects || function() {
-	/** @exports Public as Savory.Objects */
+Sincerity.Objects = Sincerity.Objects || function() {
+	/** @exports Public as Sincerity.Objects */
     var Public = {}
 
 	//
@@ -684,98 +684,98 @@ Savory.Objects = Savory.Objects || function() {
  * Removes whitespace from beginning and end of the string.
  * 
  * @methodOf String#
- * @see Savory.Objects#trim
+ * @see Sincerity.Objects#trim
  * @returns {String}
  */ 
 String.prototype.trim = String.prototype.trim || function() {
-	return Savory.Objects.trim(this)
+	return Sincerity.Objects.trim(this)
 }
 
 /**
  * Escapes single quotes with a backslash. 
  * 
  * @methodOf String#
- * @see Savory.Objects#escapeSingleQuotes
+ * @see Sincerity.Objects#escapeSingleQuotes
  */ 
 String.prototype.escapeSingleQuotes = String.prototype.escapeSingleQuotes || function() {
-	return Savory.Objects.escapeSingleQuotes(this)
+	return Sincerity.Objects.escapeSingleQuotes(this)
 }
 
 /**
  * Escapes double quotes with a backslash. 
  * 
  * @methodOf String#
- * @see Savory.Objects#escapeDoubleQuotes
+ * @see Sincerity.Objects#escapeDoubleQuotes
  */ 
 String.prototype.escapeDoubleQuotes = String.prototype.escapeDoubleQuotes || function() {
-	return Savory.Objects.escapeDoubleQuotes(this)
+	return Sincerity.Objects.escapeDoubleQuotes(this)
 }
 
 /**
  * Escapes newlines with a backslash. 
  * 
  * @methodOf String#
- * @see Savory.Objects#escapeNewlines
+ * @see Sincerity.Objects#escapeNewlines
  */ 
 String.prototype.escapeNewlines = String.prototype.escapeNewlines || function() {
-	return Savory.Objects.escapeNewlines(this)
+	return Sincerity.Objects.escapeNewlines(this)
 }
 
 /**
  * True if the string starts with the prefix.
  * 
  * @methodOf String#
- * @see Savory.Objects#startsWith
+ * @see Sincerity.Objects#startsWith
  * @param {String} prefix
  * @returns {Boolean}
  */ 
 String.prototype.startsWith = String.prototype.startsWith || function(prefix) {
-	return Savory.Objects.startsWith(this, prefix)
+	return Sincerity.Objects.startsWith(this, prefix)
 }
 
 /**
  * True if the string ends with the postfix.
  * 
  * @methodOf String#
- * @see Savory.Objects#endsWith
+ * @see Sincerity.Objects#endsWith
  * @param {String} postfix
  * @returns {Boolean}
  */ 
 String.prototype.endsWith = String.prototype.endsWith || function(postfix) {
-	return Savory.Objects.endsWith(this, postfix)
+	return Sincerity.Objects.endsWith(this, postfix)
 }
 
 /**
  * Returns 0 if string are equal, 1 if a > b, and -1 if a < b.
  * 
  * @methodOf String#
- * @see Savory.Objects#compareStrings
+ * @see Sincerity.Objects#compareStrings
  * @param {String} b
  * @returns {Number}
  */ 
 String.prototype.compare = String.prototype.compare || function(b) {
-	return Savory.Objects.compare(this, b)
+	return Sincerity.Objects.compare(this, b)
 }
 
 /**
  * Makes sure the first character of the string is in upper case.
  * 
  * @methodOf String#
- * @see Savory.Objects#capitalize
+ * @see Sincerity.Objects#capitalize
  * @returns {String}
  */ 
 String.prototype.capitalize = String.prototype.capitalize || function() {
-	return Savory.Objects.capitalize(this)
+	return Sincerity.Objects.capitalize(this)
 }
 
 /**
  * Repeats the string. When 'times' is 0, returns an empty string.
  * 
  * @methodOf String#
- * @see Savory.Objects#repeat
+ * @see Sincerity.Objects#repeat
  * @param {Number} times
  * @returns {String}
  */ 
 String.prototype.repeat = String.prototype.repeat || function(times) {
-	return Savory.Objects.repeat(this, times)
+	return Sincerity.Objects.repeat(this, times)
 }

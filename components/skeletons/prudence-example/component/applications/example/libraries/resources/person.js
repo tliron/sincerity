@@ -1,7 +1,7 @@
 
-document.executeOnce('/savory/classes/')
+document.executeOnce('/sincerity/classes/')
 
-Person = Savory.Classes.define(function() {
+Person = Sincerity.Classes.define(function() {
 	var Public = {}
 	
 	Public.handleInit = function(conversation) {

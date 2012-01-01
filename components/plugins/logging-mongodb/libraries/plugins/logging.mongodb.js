@@ -20,9 +20,9 @@ host.name
 */
 
 document.executeOnce('/mongo-db/')
-document.executeOnce('/savory/templates/')
-document.executeOnce('/savory/objects/')
-document.executeOnce('/savory/localization/')
+document.executeOnce('/sincerity/templates/')
+document.executeOnce('/sincerity/objects/')
+document.executeOnce('/sincerity/localization/')
 
 function getCommands() {
 	return ['logtail']
@@ -43,8 +43,8 @@ function logtail(command) {
 	var connection = properties.get('connection')
 	var username = properties.get('username')
 	var password = properties.get('password')
-	var db = Savory.Objects.ensure(properties.get('db'), 'logs')
-	var collection = Savory.Objects.ensure(properties.get('collection'), 'common')
+	var db = Sincerity.Objects.ensure(properties.get('db'), 'logs')
+	var collection = Sincerity.Objects.ensure(properties.get('collection'), 'common')
 	
 	//print('db: ' + db + '\n')
 	//print('collection: ' + collection + '\n')
@@ -54,12 +54,12 @@ function logtail(command) {
 	collection = new MongoDB.Collection(collection, {connection: connection, db: db})
 	var c = collection.find().addOption('tailable').addOption('awaitData')
 	
-	var format = new Savory.Localization.DateTimeFormat(TIME_FORMAT)
+	var format = new Sincerity.Localization.DateTimeFormat(TIME_FORMAT)
 	
 	while (true) {
 		var record = c.next()
 		
-		record = Savory.Objects.flatten(record)
+		record = Sincerity.Objects.flatten(record)
 		
 		// Format timestamp
 		record.timestamp = format.format(record.timestamp)

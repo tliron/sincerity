@@ -8,7 +8,7 @@
 	<property name="component.notices" value="../components/notices" />
 	<property name="reference" value="../components/reference" />
 	<property name="scripts" value="../components/scripts" />
-	<property name="savory-foundation" value="../components/savory-foundation" />
+	<property name="sincerity-foundation" value="../components/sincerity-foundation" />
 	<property name="templates" value="../components/templates" />
 
 	<property name="dependencies" value="../dependencies" />
@@ -120,7 +120,7 @@
 			<fileset dir="${component.notices}" />
 			<fileset dir="${scripts}" excludes="*.old" />
 			<fileset dir="${dependencies}" />
-			<fileset dir="${savory-foundation}" />
+			<fileset dir="${sincerity-foundation}" />
 		</copy>
 		<copy todir="${distribution.templates}">
 			<fileset dir="${templates}" />

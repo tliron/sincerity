@@ -9,4 +9,4 @@ context.displayName = 'The static example context for the servlet skeleton'
 
 // Assemble context
 context.handler = new HandlerList()
-Savory.Sincerity.include('handlers')
+Sincerity.Container.include('handlers')

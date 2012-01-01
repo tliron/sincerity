@@ -1,5 +1,5 @@
 //
-// This file is part of the Savory Foundation Library for JavaScript
+// This file is part of the Sincerity Foundation Library
 //
 // Copyright 2011 Three Crickets LLC.
 //
@@ -11,7 +11,7 @@
 // at http://threecrickets.com/
 //
 
-var Savory = Savory || {}
+var Sincerity = Sincerity || {}
 
 /**
  * Date utilities.
@@ -23,8 +23,8 @@ var Savory = Savory || {}
  * @author Tal Liron
  * @version 1.0
  */
-Savory.Calendar = Savory.Calendar || function() {
-	/** @exports Public as Savory.Calendar */
+Sincerity.Calendar = Sincerity.Calendar || function() {
+	/** @exports Public as Sincerity.Calendar */
     var Public = {}
 
 	/**
@@ -122,10 +122,10 @@ Savory.Calendar = Savory.Calendar || function() {
  * @methodOf Date#
  * @param {Date} [now=new Date()]
  * @returns {Boolean}
- * @see Savory.Calendar#isToday
+ * @see Sincerity.Calendar#isToday
  */ 
 Date.prototype.isToday = Date.prototype.isToday || function(now) {
-	return Savory.Calendar.isToday(this, now)
+	return Sincerity.Calendar.isToday(this, now)
 }
 
 /**
@@ -134,10 +134,10 @@ Date.prototype.isToday = Date.prototype.isToday || function(now) {
  * @methodOf Date#
  * @param {Date} [now=new Date()]
  * @returns {Boolean}
- * @see Savory.Calendar#isYesterday
+ * @see Sincerity.Calendar#isYesterday
  */ 
 Date.prototype.isYesterday = Date.prototype.isYesterday || function(now) {
-	return Savory.Calendar.isYesterday(this, now)
+	return Sincerity.Calendar.isYesterday(this, now)
 }
 
 /**
@@ -146,10 +146,10 @@ Date.prototype.isYesterday = Date.prototype.isYesterday || function(now) {
  * @methodOf Date#
  * @param {Date} [now=new Date()]
  * @returns {Boolean}
- * @see Savory.Calendar#isTomorrow
+ * @see Sincerity.Calendar#isTomorrow
  */ 
 Date.prototype.isTomorrow = Date.prototype.isTomorrow || function(now) {
-	return Savory.Calendar.isTomorrow(this, now)
+	return Sincerity.Calendar.isTomorrow(this, now)
 }
 
 /**
@@ -158,8 +158,8 @@ Date.prototype.isTomorrow = Date.prototype.isTomorrow || function(now) {
  * @methodOf Date#
  * @param {Date} [now=new Date()]
  * @returns {Boolean}
- * @see Savory.Calendar#isThisYear
+ * @see Sincerity.Calendar#isThisYear
  */ 
 Date.prototype.isThisYear = Date.prototype.isThisYear || function(now) {
-	return Savory.Calendar.isThisYear(this, now)
+	return Sincerity.Calendar.isThisYear(this, now)
 }
