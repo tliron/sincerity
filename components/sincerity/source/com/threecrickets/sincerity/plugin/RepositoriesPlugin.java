@@ -3,6 +3,7 @@ package com.threecrickets.sincerity.plugin;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.Repositories;
+import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -33,8 +34,15 @@ public class RepositoriesPlugin implements Plugin
 		{
 			command.setParse( true );
 			String[] arguments = command.getArguments();
-			if( arguments.length < 3 )
-				throw new BadArgumentsCommandException( command, "section", "name", "type" );
+			if( arguments.length < 1 )
+				throw new BadArgumentsCommandException( command, "section (or shortcut)", "name", "type" );
+
+			if( arguments.length == 1 )
+			{
+				String shortcut = arguments[0];
+				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "repository." + shortcut );
+				return;
+			}
 
 			String section = arguments[0];
 			String name = arguments[1];

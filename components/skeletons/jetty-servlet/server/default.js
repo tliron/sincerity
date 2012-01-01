@@ -51,5 +51,5 @@ if (warsDir.directory) {
 
 // Start server
 server.start()
-sincerity.out.println('Started server')
+print('Started server\n')
 server.join()

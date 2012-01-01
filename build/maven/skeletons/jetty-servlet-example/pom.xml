@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
-			<artifactId>jetty-servlet</artifactId>
+			<artifactId>jetty-servlet-jsp</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
