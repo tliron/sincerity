@@ -66,7 +66,7 @@
 			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
 			<link href="${jvm.docs}" />
-			<!-- Apache Commons VFS 1.0 as no online javadocs -->
+			<!-- Apache Commons VFS 1.0 has no online javadocs -->
 			<link href="http://jsoup.org/apidocs/" />
 			<link href="http://threecrickets.com/scripturian/api/" />
 			<link href="http://www.mozilla.org/rhino/apidocs/" />

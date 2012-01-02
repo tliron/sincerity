@@ -75,9 +75,9 @@ The Sincerity Manual
 
 \begin_layout Author
 Version %VERSION%
-\end_layout
+\begin_inset Newline newline
+\end_inset
 
-\begin_layout Author
 Main text written by Tal Liron
 \end_layout
 
