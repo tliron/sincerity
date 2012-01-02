@@ -27,9 +27,9 @@ catch (x) {}
 
 // Assemble server
 Sincerity.Container.here = sincerity.container.getFile('server')
-Sincerity.Container.include('connectors')
+Sincerity.Container.executeAll('connectors')
 server.handler = new ContextHandlerCollection()
-Sincerity.Container.include('contexts')
+Sincerity.Container.executeAll('contexts')
 
 // Add wars
 var warsDir = new File(Sincerity.Container.here, 'wars')

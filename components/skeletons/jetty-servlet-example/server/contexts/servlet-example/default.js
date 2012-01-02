@@ -8,4 +8,4 @@ context.displayName = 'The servlet example for the servlet skeleton'
 context.resourceBase = Sincerity.Container.getFileFromHere('static') // used by DefaultServlet
 
 // Assemble context
-Sincerity.Container.include('servlets')
+Sincerity.Container.executeAll('servlets')

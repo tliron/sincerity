@@ -10,8 +10,8 @@ var repository = org.apache.log4j.LogManager.loggerRepository
 repository.resetConfiguration()
 
 Sincerity.Container.here = sincerity.container.getConfigurationFile('logging')
-Sincerity.Container.include('appenders')
-Sincerity.Container.include('loggers')
+Sincerity.Container.executeAll('appenders')
+Sincerity.Container.executeAll('loggers')
 
 for (var a in appenders) {
 	appenders[a].activateOptions()

@@ -9,4 +9,4 @@ context.displayName = 'The static example context for the servlet skeleton'
 
 // Assemble context
 context.handler = new HandlerList()
-Sincerity.Container.include('handlers')
+Sincerity.Container.executeAll('handlers')

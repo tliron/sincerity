@@ -14,7 +14,7 @@
 var Sincerity = Sincerity || {}
 
 /**
- * Useful shortcuts to Savory-specific services and utilities.
+ * Useful shortcuts to Sincerity-specific services and utilities.
  * 
  * @namespace
  * 
@@ -48,65 +48,80 @@ Sincerity.Container = Sincerity.Container || function() {
     	return file
     }
 
-	Public.pushHere = function(dir) {
-		hereStack.push(Public.here)
-		Public.here = dir
-	}
-	
-	Public.popHere = function() {
-		Public.here = hereStack.pop()
-	}
-    
 	/**
-	 * Executes all documents represented by the file, while keeping track of the current
+	 * Executes all documents represented by the file, while keeping track of the current TODO
 	 * 
 	 * @param {String|java.io.File} The path to execute, relative to the 'here' location.
 	 */
-	Public.include = function(file) {
+	Public.execute = function(file) {
     	importClass(java.io.File)
     	
     	if (!(file instanceof File)) {
     		file = Public.getFileFromHere(file)
     	}
-    	
-    	if (file.directory) {
-			// Execute all non-hidden files and subdirectories in the directory
-    		var children = file.listFiles()
-    		for (var c in children) {
-    			var child = children[c]
-        		if (!child.hidden) {
-        			if (child.directory) {
-        				Public.pushHere(child)
-        				document.execute('/' + sincerity.container.getRelativePath(child) + '/')
-        				Public.popHere()
-        			}
-        			else {
-        				Public.pushHere(file)
-        				document.execute('/' + sincerity.container.getRelativePath(child))
-        				Public.popHere()
-        			}
-        		}
-    		}
-    	}
-    	else {
-    		// Execute the first file with this name in the directory
-    		var dir = file.parentFile
-    		var name = file.name.split('\\.', 2)[0]
-    		var children = dir.listFiles()
-    		for (var c in children) {
-    			var child = children[c]
-    			var childName = child.name.split('\\.', 2)[0]
-    			if (name == childName) {
-        			Public.pushHere(dir)
-    				document.execute('/' + sincerity.container.getRelativePath(child))
-    				Public.popHere()
-    				break
-    			}
-    		}
-    	}
+
+		pushHere(file.directory ? file : file.parentFile)
+    	document.execute('/' + sincerity.container.getRelativePath(file))
+    	popHere()
 	}
+
+	Public.executeAll = function(file) {
+    	importClass(java.io.File)
+    	
+    	if (!(file instanceof File)) {
+    		file = Public.getFileFromHere(file)
+    	}
+
+    	if (!file.directory) {
+    		return
+    	}
+    	
+		var children = listFiles(file)
+		for (var c in children) {
+			Public.execute(children[c])
+		}
+	}
+
+	//
+	// Private
+	//
 	
     var hereStack = []
+
+	function pushHere (dir) {
+		hereStack.push(Public.here)
+		Public.here = dir
+	}
 	
+	function popHere() {
+		Public.here = hereStack.pop()
+	}
+	
+	function removeExtension(filename) {
+		var last = filename.lastIndexOf('.')
+		if (last != -1) {
+			return filename.substring(0, last)
+		}
+		return filename
+	}
+	
+	function listFiles(dir, filesOnly) {
+		var files = []
+		var jvmArray = dir.listFiles()
+		for (var i in jvmArray) {
+			var file = jvmArray[i]
+			if (file.hidden || (filesOnly && file.directory)) {
+				continue
+			}
+			files.push(file)
+		}
+		files.sort(function(a, b) {
+			var aName = removeExtension(a.name)
+			var bName = removeExtension(b.name)
+			return aName.compareTo(bName)
+		})
+		return files
+	}
+
 	return Public
 }()

@@ -3,10 +3,7 @@ document.executeOnce('/sincerity/container/')
 
 importClass(
 	org.restlet.Application,
-	org.restlet.routing.Router,
-	java.io.File)
-
-print('APPPLICAIOTN\n')
+	org.restlet.routing.Router)
 	
 // The application
 var app = new Application(component.context.createChildContext())
@@ -23,4 +20,4 @@ var router = new Router(app.context)
 app.inboundRoot = router
 
 // Restlets
-Sincerity.Container.include('restlets')
+Sincerity.Container.executeAll('restlets')

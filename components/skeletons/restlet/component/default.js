@@ -10,10 +10,11 @@ var component = new Component()
 
 // Assemble the component
 Sincerity.Container.here = sincerity.container.getFile('component')
-Sincerity.Container.include('clients')
-Sincerity.Container.include('servers')
-Sincerity.Container.include('hosts')
-Sincerity.Container.include('applications')
+Sincerity.Container.executeAll('services')
+Sincerity.Container.executeAll('clients')
+Sincerity.Container.executeAll('servers')
+Sincerity.Container.executeAll('hosts')
+Sincerity.Container.executeAll('applications')
 
 // Start it!
 component.start()
