@@ -15,13 +15,17 @@ import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.License;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
+import org.apache.ivy.plugins.resolver.DependencyResolver;
+import org.apache.ivy.plugins.resolver.IBiblioResolver;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
 public class GuiUtil
 {
@@ -222,6 +226,56 @@ public class GuiUtil
 		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
 	}
 
+	public static DefaultMutableTreeNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException
+	{
+		StringBuilder s = new StringBuilder();
+		s.append( "<html><b>" );
+
+		String name = resolver.getName();
+		String[] split = name.split( Repositories.REPOSITORY_SECTION_SEPARATOR, 2 );
+		if( split.length == 2 )
+			s.append( split[1] );
+		else
+			s.append( name );
+		s.append( "</b>" );
+
+		if( resolver instanceof IBiblioResolver )
+		{
+			s.append( ": maven:" );
+			s.append( ( (IBiblioResolver) resolver ).getRoot() );
+		}
+		else if( resolver instanceof PyPiResolver )
+		{
+			s.append( ": pypi:" );
+			s.append( ( (PyPiResolver) resolver ).getRoot() );
+		}
+
+		s.append( "</html>" );
+		return new EnhancedNode( resolver, s.toString(), PACKAGE_ICON );
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private static void expandAll( JTree tree, TreePath parent, boolean expand )
+	{
+		TreeNode node = (TreeNode) parent.getLastPathComponent();
+		if( node.getChildCount() >= 0 )
+		{
+			for( Enumeration<?> e = node.children(); e.hasMoreElements(); )
+			{
+				TreeNode n = (TreeNode) e.nextElement();
+				TreePath path = parent.pathByAddingChild( n );
+				expandAll( tree, path, expand );
+			}
+		}
+
+		if( expand )
+			tree.expandPath( parent );
+		else
+			tree.collapsePath( parent );
+	}
+
 	private static EnhancedNode findFileNode( File file, EnhancedNode from, EnhancedNode root )
 	{
 		if( file.equals( from.getUserObject() ) )
@@ -253,27 +307,5 @@ public class GuiUtil
 		EnhancedNode node = new EnhancedNode( file, file.getName(), icon );
 		parentNode.add( node );
 		return node;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	private static void expandAll( JTree tree, TreePath parent, boolean expand )
-	{
-		TreeNode node = (TreeNode) parent.getLastPathComponent();
-		if( node.getChildCount() >= 0 )
-		{
-			for( Enumeration<?> e = node.children(); e.hasMoreElements(); )
-			{
-				TreeNode n = (TreeNode) e.nextElement();
-				TreePath path = parent.pathByAddingChild( n );
-				expandAll( tree, path, expand );
-			}
-		}
-
-		if( expand )
-			tree.expandPath( parent );
-		else
-			tree.collapsePath( parent );
 	}
 }

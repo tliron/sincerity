@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.util.Collection;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -73,6 +74,19 @@ public class Repositories
 			if( names.length > 1 )
 				addResolver( names[0], resolver, false );
 		}
+	}
+
+	//
+	// Attributes
+	//
+
+	@SuppressWarnings("unchecked")
+	public Collection<DependencyResolver> getResolvers( String section )
+	{
+		DependencyResolver chain = ivy.getSettings().getResolver( section );
+		if( chain instanceof ChainResolver )
+			return ( (ChainResolver) chain ).getResolvers();
+		return null;
 	}
 
 	//

@@ -36,19 +36,6 @@ get-parent-path()
 	fi
 }
 
-get-jars()
-{
-	local THE_PATH=$1
-	local F
-	for F in "$THE_PATH"/*; do
-		if [ -d "$F" ];then
-			get-jars "$F"
-		elif [ -f "$F" ]; then
-			echo $F
-		fi
-	done
-}
-
 #
 # Find Java
 #
@@ -91,7 +78,6 @@ fi
 #
 
 JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
-"$(get-jars "$SINCERITY_HOME/libraries/jars")" \
 "$JAVA_HOME/lib/tools.jar")
 
 #
@@ -103,4 +89,4 @@ JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
 -Dfile.encoding=UTF-8 \
 -classpath "$(join ":" $JVM_LIBRARIES)")
 
-"$JAVA" $JVM_SWITCHES com.threecrickets.sincerity.Sincerity "$@"
+"$JAVA" $JVM_SWITCHES -jar "$SINCERITY_HOME/bootstrap.jar" "$@"

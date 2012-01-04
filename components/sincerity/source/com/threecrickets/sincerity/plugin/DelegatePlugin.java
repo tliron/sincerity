@@ -5,9 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import com.threecrickets.scripturian.LanguageManager;
+import com.threecrickets.scripturian.LanguageAdapter;
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin;
 import com.threecrickets.sincerity.ScripturianShell;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
@@ -33,7 +32,7 @@ public class DelegatePlugin implements Plugin
 	{
 		return new String[]
 		{
-			"main", "start", "execute"
+			"main", "start", "execute", "languages"
 		};
 	}
 
@@ -54,13 +53,10 @@ public class DelegatePlugin implements Plugin
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "uri" );
 
-			Container container = command.getSincerity().getContainer();
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
-
 			if( !arguments[0].startsWith( "/" ) )
 				arguments[0] = "/programs/" + arguments[0];
 
-			ScripturianShell shell = new ScripturianShell( container, null, true, arguments );
+			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true, arguments );
 			shell.execute( arguments[0] );
 		}
 		else if( "execute".equals( commandName ) )
@@ -117,6 +113,12 @@ public class DelegatePlugin implements Plugin
 				x.printStackTrace( command.getSincerity().getErr() );
 				throw new SincerityException( "Error executing system command: " + StringUtil.join( arguments, " " ), x );
 			}
+		}
+		else if( "languages".equals( commandName ) )
+		{
+			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true );
+			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
+				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( "name" ) );
 		}
 		else
 			throw new UnknownCommandException( command );

@@ -30,8 +30,7 @@ public class ScripturianShell implements Shell
 	public ScripturianShell( Container container, File sourceDir, boolean prepare, String... arguments ) throws SincerityException
 	{
 		this.container = container;
-		System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
-		languageManager = new LanguageManager( container.getDependencies().getClassLoader() );
+		languageManager = container.getDependencies().getLanguageManager();
 		source = new DocumentFileSource<Executable>( sourceDir == null ? container.getRoot() : sourceDir, "default", "js", 1000 );
 		librarySources.add( new DocumentFileSource<Executable>( container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
 		librarySources.add( new DocumentFileSource<Executable>( container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );

@@ -31,6 +31,7 @@ import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
 
+import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
@@ -146,7 +147,6 @@ public class Dependencies
 	{
 		if( plugins == null )
 			plugins = new Plugins( container.getSincerity() );
-
 		return plugins;
 	}
 
@@ -167,20 +167,45 @@ public class Dependencies
 				}
 			}
 
-			if( urls.isEmpty() )
-				classLoader = Thread.currentThread().getContextClassLoader();
-			else
+			classLoader = Dependencies.class.getClassLoader();
+
+			if( !urls.isEmpty() )
 			{
-				classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), Thread.currentThread().getContextClassLoader() );
-				Thread.currentThread().setContextClassLoader( classLoader );
+				if( classLoader instanceof Bootstrap )
+				{
+					// Add URLs to existing bootstrap
+					Bootstrap bootstrap = (Bootstrap) classLoader;
+					for( URL url : urls )
+						bootstrap.addUrl( url );
+				}
+				else
+				{
+					// New child classloader
+					classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), classLoader );
+				}
 			}
 
+			Thread.currentThread().setContextClassLoader( classLoader );
+
+			// Go native!
 			File nativeDir = container.getLibrariesFile( "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
 		}
 
 		return classLoader;
+	}
+
+	public LanguageManager getLanguageManager() throws SincerityException
+	{
+		if( languageManager == null )
+		{
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
+			languageManager = new LanguageManager( getClassLoader() );
+			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
+			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
+		}
+		return languageManager;
 	}
 
 	public File getResolutionReport()
@@ -465,6 +490,7 @@ public class Dependencies
 	{
 		classLoader = null;
 		plugins = null;
+		languageManager = null;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -487,6 +513,8 @@ public class Dependencies
 	private ClassLoader classLoader;
 
 	private Plugins plugins;
+
+	private LanguageManager languageManager;
 
 	private void save() throws SincerityException
 	{
