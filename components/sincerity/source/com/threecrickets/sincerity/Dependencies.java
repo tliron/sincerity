@@ -433,6 +433,8 @@ public class Dependencies
 		{
 			throw new SincerityException( "Parsing error while updating bootstrap", x );
 		}
+
+		plugins = null;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
