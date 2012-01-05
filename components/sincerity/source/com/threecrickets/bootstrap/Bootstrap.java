@@ -1,15 +1,17 @@
-package com.threecrickets.sincerity;
+package com.threecrickets.bootstrap;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * A hypervisor for the JVM.
@@ -18,16 +20,6 @@ import java.util.Map;
  */
 public class Bootstrap extends URLClassLoader
 {
-	//
-	// Constants
-	//
-
-	public static final String MAIN_CLASS = "com.threecrickets.sincerity.Sincerity";
-
-	public static final String HOME_PROPERTY = "sincerity.home";
-
-	public static final String HOME_VARIABLE = "SINCERITY_HOME";
-
 	//
 	// Static attributes
 	//
@@ -47,7 +39,7 @@ public class Bootstrap extends URLClassLoader
 		bootstraps.put( root, bootstrap );
 	}
 
-	public static Map<Object, Object> getAttributes()
+	public static ConcurrentMap<Object, Object> getAttributes()
 	{
 		return attributes;
 	}
@@ -134,9 +126,15 @@ public class Bootstrap extends URLClassLoader
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static HashMap<Object, Object> attributes = new HashMap<Object, Object>();
+	private static final String MAIN_CLASS;
 
-	private static Map<File, Bootstrap> bootstraps = new HashMap<File, Bootstrap>();
+	private static final String HOME_PROPERTY;
+
+	private static final String HOME_VARIABLE;
+
+	private static final ConcurrentMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();
+
+	private static final ConcurrentMap<File, Bootstrap> bootstraps = new ConcurrentHashMap<File, Bootstrap>();
 
 	private Bootstrap()
 	{
@@ -202,5 +200,34 @@ public class Bootstrap extends URLClassLoader
 			{
 			}
 		}
+	}
+
+	static
+	{
+		Properties properties = new Properties();
+		InputStream stream = Bootstrap.class.getResourceAsStream( "bootstrap.properties" );
+		try
+		{
+			properties.load( stream );
+		}
+		catch( IOException x )
+		{
+			System.err.println( "Could not read bootstrap.properties" );
+			System.exit( 1 );
+		}
+		finally
+		{
+			try
+			{
+				stream.close();
+			}
+			catch( IOException x )
+			{
+			}
+		}
+
+		MAIN_CLASS = (String) properties.get( "main.class" );
+		HOME_PROPERTY = (String) properties.get( "home.property" );
+		HOME_VARIABLE = (String) properties.get( "home.variable" );
 	}
 }

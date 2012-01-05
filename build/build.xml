@@ -108,10 +108,10 @@
 
 	<target name="libraries" depends="classes" description="Create jar">
 		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="**/Bootstrap.class" />
-		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="**/Bootstrap.class">
+		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
+		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
 			<manifest>
-				<attribute name="Main-Class" value="com.threecrickets.sincerity.Bootstrap"/>
+				<attribute name="Main-Class" value="com.threecrickets.bootstrap.Bootstrap"/>
 		    </manifest>
 		</jar>
 	</target>

@@ -20,6 +20,7 @@ import org.apache.ivy.plugins.trigger.Trigger;
 import org.apache.ivy.util.DefaultMessageLogger;
 import org.apache.ivy.util.Message;
 
+import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;

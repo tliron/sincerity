@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.RebootException;
@@ -43,11 +44,6 @@ public class Sincerity implements Runnable
 		return threadLocal.get();
 	}
 
-	public static void setCurrent( Sincerity sincerity )
-	{
-		threadLocal.set( sincerity );
-	}
-
 	//
 	// Main
 	//
@@ -56,11 +52,8 @@ public class Sincerity implements Runnable
 	{
 		try
 		{
-			Sincerity current = getCurrent();
-			Sincerity sincerity = new Sincerity( arguments, current );
-			setCurrent( sincerity );
+			Sincerity sincerity = new Sincerity( arguments, getCurrent() );
 			sincerity.run();
-			setCurrent( current );
 		}
 		catch( SincerityException x )
 		{
@@ -76,6 +69,7 @@ public class Sincerity implements Runnable
 	public Sincerity( String[] arguments ) throws SincerityException
 	{
 		this( arguments, null );
+		threadLocal.set( this );
 	}
 
 	public Sincerity( String[] arguments, Sincerity sincerity ) throws SincerityException
@@ -90,6 +84,7 @@ public class Sincerity implements Runnable
 			verbosity = sincerity.verbosity;
 		}
 		commands = parseCommands( arguments );
+		threadLocal.set( this );
 	}
 
 	//

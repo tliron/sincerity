@@ -30,6 +30,7 @@ import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
 
+import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
