@@ -25,7 +25,7 @@ public class Packages extends ArrayList<Package>
 	{
 		try
 		{
-			Enumeration<URL> manifestUrls = container.getClassLoader().getResources( MANIFEST );
+			Enumeration<URL> manifestUrls = container.getBoostrap().getResources( MANIFEST );
 			while( manifestUrls.hasMoreElements() )
 			{
 				URL manifestUrl = manifestUrls.nextElement();

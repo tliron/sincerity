@@ -26,10 +26,10 @@ public class Plugins extends AbstractMap<String, Plugin>
 		try
 		{
 
-			classLoader = sincerity.getContainer().getClassLoader();
+			classLoader = sincerity.getContainer().getBoostrap();
 
 			// Scripturian plugins
-			File pluginsDir = sincerity.getContainer().getLibrariesFile( "plugins" );
+			File pluginsDir = sincerity.getContainer().getLibrariesFile( "scripturian", "plugins" );
 			if( pluginsDir.isDirectory() )
 			{
 				ScripturianShell shell = new ScripturianShell( sincerity.getContainer(), null, true );

@@ -16,7 +16,7 @@ public class DelegatedPlugin implements Plugin
 	public DelegatedPlugin( String pluginName, ScripturianShell shell ) throws SincerityException
 	{
 		defaultName = pluginName;
-		executable = shell.makeEnterable( "/libraries/plugins/" + pluginName + "/", ENTERING_KEY );
+		executable = shell.makeEnterable( "/libraries/scripturian/plugins/" + pluginName + "/", ENTERING_KEY );
 	}
 
 	//

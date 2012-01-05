@@ -76,7 +76,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/installers/jetty-web/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/scripturian/installers/jetty-web/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

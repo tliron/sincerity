@@ -59,7 +59,7 @@ public class JavaPlugin implements Plugin
 
 			try
 			{
-				Class<?> javac = container.getClassLoader().loadClass( "com.sun.tools.javac.Main" );
+				Class<?> javac = container.getBoostrap().loadClass( "com.sun.tools.javac.Main" );
 				Method compileMethod = javac.getMethod( "compile", String[].class );
 
 				ArrayList<String> compileArguments = new ArrayList<String>();

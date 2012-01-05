@@ -24,19 +24,19 @@ public class Bootstrap extends URLClassLoader
 	// Static attributes
 	//
 
-	public static Bootstrap getBootstrap()
+	public static Bootstrap getMasterBootstrap()
 	{
-		return getBootstrap( null );
+		return getBootstrap( new File( "" ) );
 	}
 
-	public static Bootstrap getBootstrap( File root )
+	public static Bootstrap getBootstrap( Object key )
 	{
-		return bootstraps.get( root );
+		return bootstraps.get( key );
 	}
 
-	public static void setBootstrap( File root, Bootstrap bootstrap )
+	public static void setBootstrap( Object key, Bootstrap bootstrap )
 	{
-		bootstraps.put( root, bootstrap );
+		bootstraps.put( key, bootstrap );
 	}
 
 	public static ConcurrentMap<Object, Object> getAttributes()
@@ -46,35 +46,13 @@ public class Bootstrap extends URLClassLoader
 
 	public static File getHome()
 	{
-		File homeDir = (File) getAttributes().get( "home" );
-		if( homeDir == null )
+		File home = (File) getAttributes().get( "com.threecrickets.bootstrap.home" );
+		if( home == null )
 		{
-			String home = System.getProperty( HOME_PROPERTY );
-			if( home == null )
-				home = System.getenv( HOME_VARIABLE );
-			if( home == null )
-			{
-				System.err.println( "Either the " + HOME_PROPERTY + " property or the " + HOME_VARIABLE + " environment variable must be set" );
-				System.exit( 1 );
-			}
-			homeDir = new File( home );
-			if( !homeDir.isDirectory() )
-			{
-				System.err.println( homeDir + " does not point to a directory" );
-				System.exit( 1 );
-			}
-			try
-			{
-				homeDir = homeDir.getCanonicalFile();
-			}
-			catch( IOException x )
-			{
-				System.err.println( homeDir + " is not accessible" );
-				System.exit( 1 );
-			}
-			getAttributes().put( "home", homeDir );
+			home = findHome();
+			getAttributes().put( "com.threecrickets.bootstrap.home", home );
 		}
-		return homeDir;
+		return home;
 	}
 
 	//
@@ -84,27 +62,30 @@ public class Bootstrap extends URLClassLoader
 	public static void main( String[] arguments ) throws Exception
 	{
 		Bootstrap bootstrap = new Bootstrap();
-		setBootstrap( null, bootstrap );
+		setBootstrap( new File( "" ), bootstrap );
 		bootstrap( bootstrap, arguments );
 	}
 
-	public static void bootstrap( File root, String[] arguments ) throws Exception
+	public static void bootstrap( Object key, String[] arguments ) throws Exception
 	{
-		bootstrap( getBootstrap( root ), arguments );
+		bootstrap( getBootstrap( key ), arguments );
 	}
 
-	private static void bootstrap( ClassLoader classLoader, String[] arguments ) throws Exception
+	public static void bootstrap( Object key, Bootstrap bootstrap, String[] arguments ) throws Exception
 	{
-		Thread.currentThread().setContextClassLoader( classLoader );
-		Class<?> theClass = Class.forName( MAIN_CLASS, true, classLoader );
-		Method mainMethod = theClass.getMethod( "main", String[].class );
-		mainMethod.invoke( null, (Object) arguments );
+		setBootstrap( key, bootstrap );
+		bootstrap( bootstrap, arguments );
 	}
 
 	//
 	// Construction
 	//
 
+	/**
+	 * Constructor for child bootstraps.
+	 * 
+	 * @param urls
+	 */
 	public Bootstrap( Collection<URL> urls )
 	{
 		super( inheritUrls( urls ), Bootstrap.class.getClassLoader() );
@@ -134,17 +115,28 @@ public class Bootstrap extends URLClassLoader
 
 	private static final ConcurrentMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();
 
-	private static final ConcurrentMap<File, Bootstrap> bootstraps = new ConcurrentHashMap<File, Bootstrap>();
+	private static final ConcurrentMap<Object, Bootstrap> bootstraps = new ConcurrentHashMap<Object, Bootstrap>();
 
+	/**
+	 * Constructor for the master bootstrap.
+	 */
 	private Bootstrap()
 	{
 		super( getUrls(), Bootstrap.class.getClassLoader() );
 	}
 
+	private static void bootstrap( Bootstrap boostrap, String[] arguments ) throws Exception
+	{
+		Thread.currentThread().setContextClassLoader( boostrap );
+		Class<?> theClass = Class.forName( MAIN_CLASS, true, boostrap );
+		Method mainMethod = theClass.getMethod( "main", String[].class );
+		mainMethod.invoke( null, (Object) arguments );
+	}
+
 	private static URL[] inheritUrls( Collection<URL> urls )
 	{
 		ArrayList<URL> combined = new ArrayList<URL>( urls );
-		Bootstrap bootstrap = getBootstrap();
+		Bootstrap bootstrap = getMasterBootstrap();
 		for( URL url : bootstrap.getURLs() )
 			if( !combined.contains( url ) )
 				combined.add( url );
@@ -164,23 +156,13 @@ public class Bootstrap extends URLClassLoader
 		ArrayList<URL> urls = new ArrayList<URL>();
 		listJars( jarsDir, urls );
 
-		// Add JVM classpath (is this necessary?)
-		String system = System.getProperty( "java.class.path" );
-		if( system != null )
-		{
-			for( String path : system.split( File.pathSeparator ) )
-			{
-				try
-				{
-					URL url = new File( path ).toURI().toURL();
-					if( !urls.contains( url ) )
-						urls.add( url );
-				}
-				catch( MalformedURLException x )
-				{
-				}
-			}
-		}
+		/*
+		 * // Add JVM classpath String system = System.getProperty(
+		 * "java.class.path" ); if( system != null ) { for( String path :
+		 * system.split( File.pathSeparator ) ) { try { URL url = new File( path
+		 * ).toURI().toURL(); if( !urls.contains( url ) ) urls.add( url ); }
+		 * catch( MalformedURLException x ) { } } }
+		 */
 
 		return urls.toArray( new URL[urls.size()] );
 	}
@@ -200,6 +182,34 @@ public class Bootstrap extends URLClassLoader
 			{
 			}
 		}
+	}
+
+	private static File findHome()
+	{
+		String path = System.getProperty( HOME_PROPERTY );
+		if( path == null )
+			path = System.getenv( HOME_VARIABLE );
+		if( path == null )
+		{
+			System.err.println( "Either the " + HOME_PROPERTY + " property or the " + HOME_VARIABLE + " environment variable must be set" );
+			System.exit( 1 );
+		}
+		File home = new File( path );
+		if( !home.isDirectory() )
+		{
+			System.err.println( home + " does not point to a directory" );
+			System.exit( 1 );
+		}
+		try
+		{
+			home = home.getCanonicalFile();
+		}
+		catch( IOException x )
+		{
+			System.err.println( home + " is not accessible" );
+			System.exit( 1 );
+		}
+		return home;
 	}
 
 	static

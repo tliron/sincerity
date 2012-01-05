@@ -26,7 +26,7 @@ Sincerity.Container = Sincerity.Container || function() {
     var Public = {}
 
     Public.getClass = function(name) {
-    	return sincerity.container.classLoader.loadClass(name)
+    	return sincerity.container.boostrap.loadClass(name)
     }
 
     Public.here = null

@@ -86,7 +86,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/installers/rails/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/scripturian/installers/rails/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

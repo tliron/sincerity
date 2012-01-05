@@ -96,7 +96,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/installers/django/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/scripturian/installers/django/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

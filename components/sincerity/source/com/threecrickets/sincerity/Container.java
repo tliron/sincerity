@@ -184,7 +184,7 @@ public class Container implements IvyListener, TransferListener
 		return shortcuts;
 	}
 
-	public Bootstrap getClassLoader() throws SincerityException
+	public Bootstrap getBoostrap() throws SincerityException
 	{
 		return Bootstrap.getBootstrap( root );
 	}
@@ -194,7 +194,7 @@ public class Container implements IvyListener, TransferListener
 		if( languageManager == null )
 		{
 			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, getCacheFile().getPath() );
-			languageManager = new LanguageManager( getClassLoader() );
+			languageManager = new LanguageManager( getBoostrap() );
 			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
 			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
 		}

@@ -49,7 +49,7 @@ function python(command) {
 			}
 		}
 	}*/
-	
+
 	// The Jython runtime does not reinitialize the 'sys' module singleton if it's already initialized,
 	// so we must explicitly set sys.argv if we want to run it more than once with different arguments
 	sys.argv.clear()

@@ -423,7 +423,7 @@ public class Dependencies
 
 	public void updateBootstrap() throws SincerityException
 	{
-		Bootstrap bootstrap = container.getClassLoader();
+		Bootstrap bootstrap = container.getBoostrap();
 		try
 		{
 			for( File file : getClasspaths() )
@@ -431,7 +431,7 @@ public class Dependencies
 		}
 		catch( MalformedURLException x )
 		{
-			throw new SincerityException( "Parsing error while updating classpath", x );
+			throw new SincerityException( "Parsing error while updating bootstrap", x );
 		}
 	}
 

@@ -19,7 +19,6 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
-import com.threecrickets.sincerity.internal.StringUtil;
 
 public class Sincerity implements Runnable
 {
@@ -69,13 +68,13 @@ public class Sincerity implements Runnable
 	public Sincerity( String[] arguments ) throws SincerityException
 	{
 		this( arguments, null );
-		threadLocal.set( this );
 	}
 
 	public Sincerity( String[] arguments, Sincerity sincerity ) throws SincerityException
 	{
 		if( sincerity != null )
 		{
+			home = sincerity.home;
 			container = sincerity.container;
 			containerRoot = sincerity.containerRoot;
 			plugins = sincerity.plugins;
@@ -93,7 +92,9 @@ public class Sincerity implements Runnable
 
 	public File getHome() throws SincerityException
 	{
-		return Bootstrap.getHome();
+		if( home == null )
+			home = Bootstrap.getHome();
+		return home;
 	}
 
 	public File getHomeFile( String... parts ) throws SincerityException
@@ -106,23 +107,34 @@ public class Sincerity implements Runnable
 
 	public int getVerbosity()
 	{
+		if( verbosity == null )
+		{
+			verbosity = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.verbosity" );
+			if( verbosity == null )
+			{
+				verbosity = 1;
+				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
+			}
+		}
+
 		return verbosity;
 	}
 
 	public void setVerbsotiy( int verbosity )
 	{
 		this.verbosity = verbosity;
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", this.verbosity );
 	}
 
 	public PrintWriter getOut()
 	{
 		if( out == null )
 		{
-			out = (PrintWriter) Bootstrap.getAttributes().get( "sincerity.out" );
+			out = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.out" );
 			if( out == null )
 			{
 				out = new PrintWriter( new OutputStreamWriter( System.out ), true );
-				Bootstrap.getAttributes().put( "sincerity.out", out );
+				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
 			}
 		}
 
@@ -132,18 +144,18 @@ public class Sincerity implements Runnable
 	public void setOut( Writer out )
 	{
 		this.out = out instanceof PrintWriter ? (PrintWriter) out : new PrintWriter( out, true );
-		Bootstrap.getAttributes().put( "sincerity.out", this.out );
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", this.out );
 	}
 
 	public PrintWriter getErr()
 	{
 		if( err == null )
 		{
-			err = (PrintWriter) Bootstrap.getAttributes().get( "sincerity.err" );
+			err = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.err" );
 			if( err == null )
 			{
 				err = new PrintWriter( new OutputStreamWriter( System.err ), true );
-				Bootstrap.getAttributes().put( "sincerity.err", err );
+				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
 			}
 		}
 
@@ -160,11 +172,11 @@ public class Sincerity implements Runnable
 	{
 		if( containerRoot == null )
 		{
-			containerRoot = (File) Bootstrap.getAttributes().get( "sincerity.containerRoot" );
+			containerRoot = (File) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.containerRoot" );
 			if( containerRoot == null )
 			{
 				containerRoot = findContainerRoot();
-				Bootstrap.getAttributes().put( "sincerity.containerRoot", containerRoot );
+				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot );
 			}
 		}
 		return containerRoot;
@@ -172,7 +184,7 @@ public class Sincerity implements Runnable
 
 	public void setContainerRoot( File containerRoot ) throws SincerityException
 	{
-		Bootstrap.getAttributes().put( "sincerity.containerRoot", containerRoot );
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot );
 		reboot();
 	}
 
@@ -375,15 +387,13 @@ public class Sincerity implements Runnable
 
 		try
 		{
-			getOut().println( "rebooting: " + StringUtil.join( arguments, " " ) );
-			Bootstrap.setBootstrap( getContainer().getRoot(), getContainer().getDependencies().createBootstrap() );
-
 			// Go native!
 			File nativeDir = getContainer().getLibrariesFile( "native" );
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
 
-			Bootstrap.bootstrap( getContainer().getRoot(), arguments.toArray( new String[arguments.size()] ) );
+			// Boostrap into container
+			Bootstrap.bootstrap( getContainer().getRoot(), getContainer().getDependencies().createBootstrap(), arguments.toArray( new String[arguments.size()] ) );
 		}
 		catch( Exception x )
 		{
@@ -434,6 +444,8 @@ public class Sincerity implements Runnable
 
 	private final List<Command> commands;
 
+	private File home;
+
 	private File containerRoot;
 
 	private Container container;
@@ -444,7 +456,7 @@ public class Sincerity implements Runnable
 
 	private PrintWriter err;
 
-	private int verbosity = 1;
+	private Integer verbosity;
 
 	private Plugins getPlugins() throws SincerityException
 	{
