@@ -65,8 +65,8 @@ public class LoggingPlugin implements Plugin
 
 			try
 			{
-				sincerity.getContainer().getDependencies().updateClasspath();
-				System.out.println(sincerity.getContainer().getDependencies().getClassLoader().loadClass( "org.apache.log4j.xml.DOMConfigurator" ));
+				sincerity.getContainer().getDependencies().updateBootstrap();
+				System.out.println( sincerity.getContainer().getClassLoader().loadClass( "org.apache.log4j.xml.DOMConfigurator" ) );
 				org.apache.log4j.xml.DOMConfigurator.configureAndWatch( configurationFile.getPath() );
 			}
 			catch( NoClassDefFoundError x )

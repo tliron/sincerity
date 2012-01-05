@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,10 +30,8 @@ import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
 import org.apache.ivy.plugins.report.XmlReportParser;
 import org.apache.ivy.plugins.repository.url.URLResource;
 
-import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
-import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
@@ -150,64 +147,6 @@ public class Dependencies
 		return plugins;
 	}
 
-	public ClassLoader getClassLoader() throws SincerityException
-	{
-		if( classLoader == null )
-		{
-			Set<URL> urls = new HashSet<URL>();
-			for( File file : getClasspaths() )
-			{
-				try
-				{
-					urls.add( file.toURI().toURL() );
-				}
-				catch( MalformedURLException x )
-				{
-					throw new SincerityException( "Parsing error while initializing classloader", x );
-				}
-			}
-
-			classLoader = Dependencies.class.getClassLoader();
-
-			if( !urls.isEmpty() )
-			{
-				if( classLoader instanceof Bootstrap )
-				{
-					// Add URLs to existing bootstrap
-					Bootstrap bootstrap = (Bootstrap) classLoader;
-					for( URL url : urls )
-						bootstrap.addUrl( url );
-				}
-				else
-				{
-					// New child classloader
-					classLoader = new URLClassLoader( urls.toArray( new URL[urls.size()] ), classLoader );
-				}
-			}
-
-			Thread.currentThread().setContextClassLoader( classLoader );
-
-			// Go native!
-			File nativeDir = container.getLibrariesFile( "native" );
-			if( nativeDir.isDirectory() )
-				NativeUtil.addNativePath( nativeDir );
-		}
-
-		return classLoader;
-	}
-
-	public LanguageManager getLanguageManager() throws SincerityException
-	{
-		if( languageManager == null )
-		{
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, container.getCacheFile().getPath() );
-			languageManager = new LanguageManager( getClassLoader() );
-			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
-			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
-		}
-		return languageManager;
-	}
-
 	public File getResolutionReport()
 	{
 		ivy.pushContext();
@@ -273,11 +212,6 @@ public class Dependencies
 
 	public List<File> getClasspaths() throws SincerityException
 	{
-		return getClasspaths( false );
-	}
-
-	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
-	{
 		ArrayList<File> classpaths = new ArrayList<File>();
 
 		// Classes directory
@@ -298,20 +232,6 @@ public class Dependencies
 				if( file != null )
 				{
 					file = file.getAbsoluteFile();
-					if( !classpaths.contains( file ) )
-						classpaths.add( file );
-				}
-			}
-		}
-
-		if( includeSystem )
-		{
-			String system = System.getProperty( "java.class.path" );
-			if( system != null )
-			{
-				for( String path : system.split( File.pathSeparator ) )
-				{
-					File file = new File( path ).getAbsoluteFile();
 					if( !classpaths.contains( file ) )
 						classpaths.add( file );
 				}
@@ -433,22 +353,19 @@ public class Dependencies
 	public void prune() throws SincerityException
 	{
 		managedArtifacts.update( getArtifacts() );
-		updateClasspath();
+		updateBootstrap();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
 		managedArtifacts.clean();
-		updateClasspath();
+		updateBootstrap();
 	}
 
 	public void install( boolean overwrite ) throws SincerityException
 	{
 		container.getSincerity().getOut().println( "Making sure all dependencies are installed..." );
-
-		// Make sure class loader is set in thread
-		getClassLoader();
 
 		ivy.pushContext();
 		ResolveReport report;
@@ -473,7 +390,7 @@ public class Dependencies
 			throw new SincerityException( "Some dependencies could not be installed" );
 
 		if( report.hasChanged() )
-			updateClasspath();
+			updateBootstrap();
 		else
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
@@ -482,15 +399,39 @@ public class Dependencies
 		if( report.hasChanged() )
 		{
 			printDisclaimer( container.getSincerity().getOut() );
-			updateClasspath();
+			updateBootstrap();
 		}
 	}
 
-	public void updateClasspath()
+	public Bootstrap createBootstrap() throws SincerityException
 	{
-		classLoader = null;
-		plugins = null;
-		languageManager = null;
+		List<File> classpaths = getClasspaths();
+		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
+		try
+		{
+			for( File file : classpaths )
+				urls.add( file.toURI().toURL() );
+		}
+		catch( MalformedURLException x )
+		{
+			throw new SincerityException( "Parsing error while initializing bootstrap", x );
+		}
+
+		return new Bootstrap( urls );
+	}
+
+	public void updateBootstrap() throws SincerityException
+	{
+		Bootstrap bootstrap = container.getClassLoader();
+		try
+		{
+			for( File file : getClasspaths() )
+				bootstrap.addUrl( file.toURI().toURL() );
+		}
+		catch( MalformedURLException x )
+		{
+			throw new SincerityException( "Parsing error while updating classpath", x );
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -510,11 +451,7 @@ public class Dependencies
 
 	private ResolvedDependencies resolvedDependencies;
 
-	private ClassLoader classLoader;
-
 	private Plugins plugins;
-
-	private LanguageManager languageManager;
 
 	private void save() throws SincerityException
 	{

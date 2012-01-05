@@ -33,7 +33,7 @@ public class Command
 	// Construction
 	//
 
-	public Command( String name, Sincerity sincerity )
+	public Command( String name, boolean isGreedy, Sincerity sincerity )
 	{
 		String[] split = name.split( COMMANDS_SEPARATOR, 2 );
 		if( split.length == 2 )
@@ -44,6 +44,7 @@ public class Command
 		else
 			this.name = name;
 
+		this.isGreedy = isGreedy;
 		this.sincerity = sincerity;
 	}
 
@@ -98,6 +99,18 @@ public class Command
 		this.parse = parse;
 	}
 
+	public String[] toArguments()
+	{
+		String[] arguments = new String[rawArguments.size() + 1];
+		arguments[0] = toString();
+		if( isGreedy )
+			arguments[0] += GREEDY_POSTFIX;
+		int i = 1;
+		for( String argument : rawArguments )
+			arguments[i++] = argument;
+		return arguments;
+	}
+
 	//
 	// Object
 	//
@@ -121,6 +134,8 @@ public class Command
 	// Private
 
 	private final String name;
+
+	private final boolean isGreedy;
 
 	private final Sincerity sincerity;
 

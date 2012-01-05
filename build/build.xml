@@ -108,10 +108,16 @@
 
 	<target name="libraries" depends="classes" description="Create jar">
 		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" />
+		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="**/Bootstrap.class" />
+		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="**/Bootstrap.class">
+			<manifest>
+				<attribute name="Main-Class" value="com.threecrickets.sincerity.Bootstrap"/>
+		    </manifest>
+		</jar>
 	</target>
 
-	<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
+	<!--<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">-->
+	<target name="distribution" depends="libraries" description="Assemble distribution">
 		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
 		<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
 			<fileset dir="${component.source}" />

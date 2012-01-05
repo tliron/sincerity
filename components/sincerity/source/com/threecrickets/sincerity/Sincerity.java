@@ -7,13 +7,18 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
+import com.threecrickets.sincerity.exception.RebootException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.NativeUtil;
+import com.threecrickets.sincerity.internal.StringUtil;
 
 public class Sincerity implements Runnable
 {
@@ -79,7 +84,10 @@ public class Sincerity implements Runnable
 		{
 			container = sincerity.container;
 			containerRoot = sincerity.containerRoot;
-			sincerityHome = sincerity.sincerityHome;
+			plugins = sincerity.plugins;
+			out = sincerity.out;
+			err = sincerity.err;
+			verbosity = sincerity.verbosity;
 		}
 		commands = parseCommands( arguments );
 	}
@@ -90,23 +98,7 @@ public class Sincerity implements Runnable
 
 	public File getHome() throws SincerityException
 	{
-		if( sincerityHome == null )
-		{
-			String home = System.getProperty( "sincerity.home" );
-			if( home == null )
-				home = System.getenv( "SINCERITY_HOME" );
-			if( home == null )
-				home = ".";
-			try
-			{
-				sincerityHome = new File( home ).getCanonicalFile();
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not determine location of Sincerity home: " + home, x );
-			}
-		}
-		return sincerityHome;
+		return Bootstrap.getHome();
 	}
 
 	public File getHomeFile( String... parts ) throws SincerityException
@@ -115,26 +107,6 @@ public class Sincerity implements Runnable
 		for( String part : parts )
 			file = new File( file, part );
 		return file;
-	}
-
-	public PrintWriter getOut()
-	{
-		return out;
-	}
-
-	public void setOut( Writer out )
-	{
-		this.out = out instanceof PrintWriter ? (PrintWriter) out : new PrintWriter( out, true );
-	}
-
-	public PrintWriter getErr()
-	{
-		return err;
-	}
-
-	public void setErr( Writer err )
-	{
-		this.err = err instanceof PrintWriter ? (PrintWriter) err : new PrintWriter( err, true );
 	}
 
 	public int getVerbosity()
@@ -147,80 +119,73 @@ public class Sincerity implements Runnable
 		this.verbosity = verbosity;
 	}
 
+	public PrintWriter getOut()
+	{
+		if( out == null )
+		{
+			out = (PrintWriter) Bootstrap.getAttributes().get( "sincerity.out" );
+			if( out == null )
+			{
+				out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+				Bootstrap.getAttributes().put( "sincerity.out", out );
+			}
+		}
+
+		return out;
+	}
+
+	public void setOut( Writer out )
+	{
+		this.out = out instanceof PrintWriter ? (PrintWriter) out : new PrintWriter( out, true );
+		Bootstrap.getAttributes().put( "sincerity.out", this.out );
+	}
+
+	public PrintWriter getErr()
+	{
+		if( err == null )
+		{
+			err = (PrintWriter) Bootstrap.getAttributes().get( "sincerity.err" );
+			if( err == null )
+			{
+				err = new PrintWriter( new OutputStreamWriter( System.err ), true );
+				Bootstrap.getAttributes().put( "sincerity.err", err );
+			}
+		}
+
+		return err;
+	}
+
+	public void setErr( Writer err )
+	{
+		this.err = err instanceof PrintWriter ? (PrintWriter) err : new PrintWriter( err, true );
+		Bootstrap.getAttributes().put( "sincerity.err", this.err );
+	}
+
+	public File getContainerRoot() throws SincerityException
+	{
+		if( containerRoot == null )
+		{
+			containerRoot = (File) Bootstrap.getAttributes().get( "sincerity.containerRoot" );
+			if( containerRoot == null )
+			{
+				containerRoot = findContainerRoot();
+				Bootstrap.getAttributes().put( "sincerity.containerRoot", containerRoot );
+			}
+		}
+		return containerRoot;
+	}
+
+	public void setContainerRoot( File containerRoot ) throws SincerityException
+	{
+		Bootstrap.getAttributes().put( "sincerity.containerRoot", containerRoot );
+		reboot();
+	}
+
 	public Container getContainer() throws SincerityException
 	{
 		if( container == null )
 		{
-			//
-			// Look for container in this order:
-			//
-			// 1. the last 'container' command
-			// 2. 'sincerity.container' JVM property
-			// 3. 'SINCERITY_CONTAINER' environment variable
-			// 4. Search up filesystem tree from current path
-			//
-
-			if( containerRoot == null )
-			{
-				String prop = System.getProperty( CONTAINER_PROPERTY );
-				if( prop == null )
-					prop = System.getenv( CONTAINER_ENV );
-				if( prop != null )
-					containerRoot = new File( prop );
-			}
-
-			if( containerRoot != null )
-			{
-				try
-				{
-					containerRoot = containerRoot.getCanonicalFile();
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not determine location of container: " + containerRoot, x );
-				}
-
-				if( !containerRoot.exists() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
-				if( !containerRoot.isDirectory() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRoot );
-				File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
-				if( !sincerityDir.isDirectory() )
-					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRoot );
-			}
-			else
-			{
-				File currentDir;
-				try
-				{
-					currentDir = new File( "." ).getCanonicalFile();
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not determine location of current directory", x );
-				}
-				containerRoot = currentDir;
-				while( true )
-				{
-					File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
-					if( sincerityDir.isDirectory() )
-					{
-						// Found it!
-						break;
-					}
-					containerRoot = containerRoot.getParentFile();
-					if( containerRoot == null )
-						throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
-					try
-					{
-						containerRoot = containerRoot.getCanonicalFile();
-					}
-					catch( IOException x )
-					{
-						throw new SincerityException( "Could not determine location of container: " + containerRoot, x );
-					}
-				}
-			}
+			File containerRoot = getContainerRoot();
 
 			String debug = System.getProperty( DEBUG_PROPERTY );
 			if( debug == null )
@@ -241,26 +206,33 @@ public class Sincerity implements Runnable
 			container = new Container( this, containerRoot, debugLevel );
 
 			if( getVerbosity() >= 2 )
-				out.println( "Using Sincerity container at: " + containerRoot );
+				getOut().println( "Using Sincerity container at: " + containerRoot );
 		}
 
 		return container;
 	}
 
-	public void setContainerRoot( File containerRoot )
-	{
-		this.containerRoot = containerRoot;
-		container = null;
-	}
+	//
+	// Operations
+	//
 
 	public void createContainer( File containerRoot, File templateDir ) throws SincerityException
 	{
+		try
+		{
+			containerRoot = containerRoot.getCanonicalFile();
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not access container root: " + containerRoot );
+		}
+
 		if( containerRoot.exists() )
 		{
 			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
 			{
 				if( getVerbosity() >= 1 )
-					out.println( "The path is already a Sincerity container: " + containerRoot );
+					getOut().println( "The path is already a Sincerity container: " + containerRoot );
 				setContainerRoot( containerRoot );
 				return;
 			}
@@ -286,13 +258,9 @@ public class Sincerity implements Runnable
 		setContainerRoot( containerRoot );
 	}
 
-	//
-	// Operations
-	//
-
 	public List<Command> parseCommands( String... arguments )
 	{
-		ArrayList<Command> commands = new ArrayList<Command>();
+		LinkedList<Command> commands = new LinkedList<Command>();
 
 		Command command = null;
 		boolean isGreedy = false;
@@ -319,7 +287,7 @@ public class Sincerity implements Runnable
 						isGreedy = true;
 						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
 					}
-					command = new Command( argument, this );
+					command = new Command( argument, isGreedy, this );
 				}
 				else
 					command.rawArguments.add( argument );
@@ -379,14 +347,55 @@ public class Sincerity implements Runnable
 
 	public void run( String name, String... arguments ) throws SincerityException
 	{
-		// We ignore the greedy postfix in this case
+		boolean isGreedy;
 		if( name.endsWith( Command.GREEDY_POSTFIX ) )
+		{
 			name = name.substring( 0, name.length() - Command.GREEDY_POSTFIX_LENGTH );
+			isGreedy = true;
+		}
+		else
+			isGreedy = false;
 
-		Command command = new Command( name, this );
+		Command command = new Command( name, isGreedy, this );
 		for( String argument : arguments )
 			command.rawArguments.add( argument );
 		run( command );
+	}
+
+	public void reboot() throws SincerityException
+	{
+		// Convert remaining commands back into arguments
+		ArrayList<String> arguments = new ArrayList<String>();
+		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
+		{
+			Command command = i.next();
+			for( String argument : command.toArguments() )
+				arguments.add( argument );
+			if( i.hasNext() )
+				arguments.add( Command.COMMANDS_SEPARATOR );
+		}
+
+		if( arguments.isEmpty() )
+			return;
+
+		try
+		{
+			getOut().println( "rebooting: " + StringUtil.join( arguments, " " ) );
+			Bootstrap.setBootstrap( getContainer().getRoot(), getContainer().getDependencies().createBootstrap() );
+
+			// Go native!
+			File nativeDir = getContainer().getLibrariesFile( "native" );
+			if( nativeDir.isDirectory() )
+				NativeUtil.addNativePath( nativeDir );
+
+			Bootstrap.bootstrap( getContainer().getRoot(), arguments.toArray( new String[arguments.size()] ) );
+		}
+		catch( Exception x )
+		{
+			throw new SincerityException( "Could not bootstrap", x );
+		}
+
+		throw new RebootException();
 	}
 
 	//
@@ -396,22 +405,29 @@ public class Sincerity implements Runnable
 	public void run()
 	{
 		if( commands.isEmpty() )
-			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", this ) );
+			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", false, this ) );
 
 		try
 		{
-			for( Command command : commands )
+			while( !commands.isEmpty() )
+			{
+				Command command = commands.remove( 0 );
 				run( command );
+			}
+		}
+		catch( RebootException x )
+		{
+			// This means that the run has continued in a different bootstrap
 		}
 		catch( SincerityException x )
 		{
-			err.println( x.getMessage() );
-			x.printStackTrace( err );
+			getErr().println( x.getMessage() );
+			x.printStackTrace( getErr() );
 			System.exit( 1 );
 		}
 		catch( Throwable x )
 		{
-			x.printStackTrace( err );
+			x.printStackTrace( getErr() );
 			System.exit( 1 );
 		}
 	}
@@ -423,17 +439,15 @@ public class Sincerity implements Runnable
 
 	private final List<Command> commands;
 
-	private File sincerityHome;
-
 	private File containerRoot;
 
 	private Container container;
 
 	private Plugins plugins;
 
-	private PrintWriter out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+	private PrintWriter out;
 
-	private PrintWriter err = new PrintWriter( new OutputStreamWriter( System.err ), true );
+	private PrintWriter err;
 
 	private int verbosity = 1;
 
@@ -450,5 +464,79 @@ public class Sincerity implements Runnable
 
 			return plugins;
 		}
+	}
+
+	private static File findContainerRoot() throws SincerityException
+	{
+		//
+		// Look for container in this order:
+		//
+		// 1. 'sincerity.container' JVM property
+		// 2. 'SINCERITY_CONTAINER' environment variable
+		// 3. Search up filesystem tree from current path
+		//
+
+		File containerRoot = null;
+
+		String path = System.getProperty( CONTAINER_PROPERTY );
+		if( path == null )
+			path = System.getenv( CONTAINER_ENV );
+		if( path != null )
+			containerRoot = new File( path );
+
+		if( containerRoot != null )
+		{
+			try
+			{
+				containerRoot = containerRoot.getCanonicalFile();
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not access container root: " + containerRoot, x );
+			}
+
+			if( !containerRoot.exists() )
+				throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
+			if( !containerRoot.isDirectory() )
+				throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRoot );
+			File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
+			if( !sincerityDir.isDirectory() )
+				throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRoot );
+		}
+		else
+		{
+			File currentDir;
+			try
+			{
+				currentDir = new File( "." ).getCanonicalFile();
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not access current directory", x );
+			}
+			containerRoot = currentDir;
+			while( true )
+			{
+				File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
+				if( sincerityDir.isDirectory() )
+				{
+					// Found it!
+					break;
+				}
+				containerRoot = containerRoot.getParentFile();
+				if( containerRoot == null )
+					throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
+				try
+				{
+					containerRoot = containerRoot.getCanonicalFile();
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not access container root: " + containerRoot, x );
+				}
+			}
+		}
+
+		return containerRoot;
 	}
 }

@@ -26,7 +26,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 		try
 		{
 
-			classLoader = sincerity.getContainer().getDependencies().getClassLoader();
+			classLoader = sincerity.getContainer().getClassLoader();
 
 			// Scripturian plugins
 			File pluginsDir = sincerity.getContainer().getLibrariesFile( "plugins" );

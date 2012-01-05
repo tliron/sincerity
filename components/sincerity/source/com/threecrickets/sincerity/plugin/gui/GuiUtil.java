@@ -251,7 +251,7 @@ public class GuiUtil
 		}
 
 		s.append( "</html>" );
-		return new EnhancedNode( resolver, s.toString(), PACKAGE_ICON );
+		return new EnhancedNode( resolver, s.toString(), FILE_ICON );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

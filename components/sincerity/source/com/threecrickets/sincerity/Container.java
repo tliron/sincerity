@@ -20,6 +20,7 @@ import org.apache.ivy.plugins.trigger.Trigger;
 import org.apache.ivy.util.DefaultMessageLogger;
 import org.apache.ivy.util.Message;
 
+import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
 
@@ -182,6 +183,23 @@ public class Container implements IvyListener, TransferListener
 		return shortcuts;
 	}
 
+	public Bootstrap getClassLoader() throws SincerityException
+	{
+		return Bootstrap.getBootstrap( root );
+	}
+
+	public LanguageManager getLanguageManager() throws SincerityException
+	{
+		if( languageManager == null )
+		{
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, getCacheFile().getPath() );
+			languageManager = new LanguageManager( getClassLoader() );
+			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
+			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
+		}
+		return languageManager;
+	}
+
 	public File getRoot()
 	{
 		return root;
@@ -339,6 +357,8 @@ public class Container implements IvyListener, TransferListener
 	private final Dependencies dependencies;
 
 	private final Shortcuts shortcuts;
+
+	private LanguageManager languageManager;
 
 	private void configure()
 	{

@@ -59,7 +59,7 @@ public class JavaPlugin implements Plugin
 
 			try
 			{
-				Class<?> javac = dependencies.getClassLoader().loadClass( "com.sun.tools.javac.Main" );
+				Class<?> javac = container.getClassLoader().loadClass( "com.sun.tools.javac.Main" );
 				Method compileMethod = javac.getMethod( "compile", String[].class );
 
 				ArrayList<String> compileArguments = new ArrayList<String>();
@@ -73,7 +73,7 @@ public class JavaPlugin implements Plugin
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
 
-				dependencies.updateClasspath();
+				dependencies.updateBootstrap();
 			}
 			catch( ClassNotFoundException x )
 			{
