@@ -194,7 +194,17 @@ public class Container implements IvyListener, TransferListener
 		if( languageManager == null )
 		{
 			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, getCacheFile().getPath() );
+
+			// The Python standard library is here (Jython expects a "Lib"
+			// subdirectory underneath)
+			System.setProperty( "python.home", getLibrariesFile( "python" ).getPath() );
+
+			// The cachedir must be absolute or relative to PYTHON_HOME (Jython
+			// will add a "packages" subdirectory to it)
+			System.setProperty( "python.cachedir", getCacheFile( "python" ).getPath() );
+
 			languageManager = new LanguageManager( getBoostrap() );
+
 			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
 			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
 		}
