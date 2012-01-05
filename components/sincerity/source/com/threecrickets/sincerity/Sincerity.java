@@ -184,7 +184,15 @@ public class Sincerity implements Runnable
 
 	public void setContainerRoot( File containerRoot ) throws SincerityException
 	{
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot );
+		try
+		{
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot.getCanonicalFile() );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not access container root: " + containerRoot );
+		}
+
 		reboot();
 	}
 
@@ -225,15 +233,6 @@ public class Sincerity implements Runnable
 
 	public void createContainer( File containerRoot, File templateDir ) throws SincerityException
 	{
-		try
-		{
-			containerRoot = containerRoot.getCanonicalFile();
-		}
-		catch( IOException x )
-		{
-			throw new SincerityException( "Could not access container root: " + containerRoot );
-		}
-
 		if( containerRoot.exists() )
 		{
 			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
