@@ -456,6 +456,8 @@ public class Dependencies
 
 	private Plugins plugins;
 
+	private boolean printedDisclaimer;
+
 	private void save() throws SincerityException
 	{
 		try
@@ -496,8 +498,11 @@ public class Dependencies
 		return artifacts;
 	}
 
-	private static void printDisclaimer( PrintWriter out )
+	private void printDisclaimer( PrintWriter out )
 	{
+		if( printedDisclaimer )
+			return;
+
 		out.println();
 		out.println( "Sincerity has has downloaded software from a repository and installed in your container." );
 		out.println( "However, it is up to you to ensure that it is legal for you to use the installed software." );
@@ -517,5 +522,7 @@ public class Dependencies
 		out.println( "Use the \"sincerity dependencies:licenses\" command to see a list of all licenses, or" );
 		out.println( "\"sincerity gui:gui\" for a graphical interface." );
 		out.println();
+
+		printedDisclaimer = true;
 	}
 }
