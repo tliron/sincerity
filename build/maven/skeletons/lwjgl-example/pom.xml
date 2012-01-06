@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>lwjgl-example</artifactId>
-	<version>1.0.0</version>
+	<version>0.9</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton Add-on: LWJGL Example</name>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
 			<artifactId>lwjgl</artifactId>
-			<version>1.0.0</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.lwjgl</groupId>

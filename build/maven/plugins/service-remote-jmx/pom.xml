@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
 	<artifactId>service-remote-jmx</artifactId>
-	<version>1.0.0</version>
+	<version>0.9</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Plugin Add-on: Service Remote JMX</name>
@@ -51,12 +51,12 @@
 		<dependency>
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
 			<artifactId>service</artifactId>
-			<version>1.0.0</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.am.rmi</groupId>
 			<artifactId>firewall-friendly-agent</artifactId>
-			<version>1.0</version>
+			<version>0.9</version>
 		</dependency>
 	</dependencies>
 

@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>restlet-logging</artifactId>
-	<version>1.0.0</version>
+	<version>0.9</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton Add-on: Restlet Logging</name>
@@ -51,12 +51,12 @@
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
 			<artifactId>restlet</artifactId>
-			<version>1.0.0</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
 			<artifactId>logging</artifactId>
-			<version>1.0.0</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>

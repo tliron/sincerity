@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>jetty-servlet-jmx</artifactId>
-	<version>1.0.0</version>
+	<version>0.9</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton Add-on: Jetty Servlet JMX</name>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
 			<artifactId>jetty-servlet</artifactId>
-			<version>1.0.0</version>
+			<version>0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
