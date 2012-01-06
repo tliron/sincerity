@@ -184,9 +184,15 @@ public class Container implements IvyListener, TransferListener
 		return shortcuts;
 	}
 
-	public Bootstrap getBoostrap() throws SincerityException
+	public Bootstrap getBootstrap() throws SincerityException
 	{
-		return Bootstrap.getBootstrap( root );
+		Bootstrap bootstrap = Bootstrap.getBootstrap( root );
+		if( bootstrap == null )
+		{
+			bootstrap = dependencies.createBootstrap();
+			Bootstrap.setBootstrap( root, bootstrap );
+		}
+		return bootstrap;
 	}
 
 	public LanguageManager getLanguageManager() throws SincerityException
@@ -203,10 +209,18 @@ public class Container implements IvyListener, TransferListener
 			// will add a "packages" subdirectory to it)
 			System.setProperty( "python.cachedir", getCacheFile( "python" ).getPath() );
 
-			languageManager = new LanguageManager( getBoostrap() );
+			languageManager = new LanguageManager( getBootstrap() );
 
-			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
-			languageManager.getAttributes().put( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
+			try
+			{
+				// Prefer log4j chute for Velocity if log4j exists
+				Class.forName( "org.apache.log4j.Logger" );
+				languageManager.getAttributes().putIfAbsent( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
+				languageManager.getAttributes().putIfAbsent( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
+			}
+			catch( ClassNotFoundException x )
+			{
+			}
 		}
 		return languageManager;
 	}

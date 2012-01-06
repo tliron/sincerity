@@ -1366,6 +1366,21 @@ sincerity use mycontainer : service restlet stop
 Prudence
 \end_layout
 
+\begin_layout Standard
+Since version 2.0, Prudence is designed from the ground-up around Sincerity.
+ It's distributed exclusively as a Sincerity skeleton with a large collection
+ of tightly integrated add-ons.
+\end_layout
+
+\begin_layout Standard
+(Actually, it's the other way around! Sincerity was designed by Three Crickets
+ precisely in order to make Prudence 2.0 sanely modular, building on many
+ lessons learned while deploying Prudence 1.X.
+ It was clear during development that there was nothing in the proposed
+ solution that was specific to Prudence.
+ And so Sincerity was born as a generic tool useful for many JVM projects.)
+\end_layout
+
 \begin_layout Subsubsection
 The Savory Framework
 \end_layout

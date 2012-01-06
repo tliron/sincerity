@@ -175,8 +175,9 @@ public class Sincerity implements Runnable
 			containerRoot = (File) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.containerRoot" );
 			if( containerRoot == null )
 			{
-				containerRoot = findContainerRoot();
-				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot );
+				setContainerRoot( findContainerRoot() );
+				// Bootstrap.getAttributes().put(
+				// "com.threecrickets.sincerity.containerRoot", containerRoot );
 			}
 		}
 		return containerRoot;
@@ -381,9 +382,6 @@ public class Sincerity implements Runnable
 				arguments.add( Command.COMMANDS_SEPARATOR );
 		}
 
-		if( arguments.isEmpty() )
-			return;
-
 		try
 		{
 			// Go native!
@@ -391,8 +389,8 @@ public class Sincerity implements Runnable
 			if( nativeDir.isDirectory() )
 				NativeUtil.addNativePath( nativeDir );
 
-			// Boostrap into container
-			Bootstrap.bootstrap( getContainer().getRoot(), getContainer().getDependencies().createBootstrap(), arguments.toArray( new String[arguments.size()] ) );
+			// Bootstrap into container
+			getContainer().getBootstrap().bootstrap( arguments.toArray( new String[arguments.size()] ) );
 		}
 		catch( Exception x )
 		{
@@ -492,15 +490,6 @@ public class Sincerity implements Runnable
 
 		if( containerRoot != null )
 		{
-			try
-			{
-				containerRoot = containerRoot.getCanonicalFile();
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not access container root: " + containerRoot, x );
-			}
-
 			if( !containerRoot.exists() )
 				throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
 			if( !containerRoot.isDirectory() )
@@ -511,15 +500,7 @@ public class Sincerity implements Runnable
 		}
 		else
 		{
-			File currentDir;
-			try
-			{
-				currentDir = new File( "." ).getCanonicalFile();
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not access current directory", x );
-			}
+			File currentDir = new File( "." );
 			containerRoot = currentDir;
 			while( true )
 			{
@@ -532,14 +513,6 @@ public class Sincerity implements Runnable
 				containerRoot = containerRoot.getParentFile();
 				if( containerRoot == null )
 					throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
-				try
-				{
-					containerRoot = containerRoot.getCanonicalFile();
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not access container root: " + containerRoot, x );
-				}
 			}
 		}
 

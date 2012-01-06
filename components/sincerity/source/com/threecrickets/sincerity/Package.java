@@ -134,7 +134,7 @@ public class Package extends AbstractList<Artifact>
 					if( volatiles == null )
 						volatiles = new Volatiles( manifest );
 
-					ClassLoader classLoader = container.getBoostrap();
+					ClassLoader classLoader = container.getBootstrap();
 					for( String name : packageResourcesAttribute.toString().split( "," ) )
 					{
 						URL url = classLoader.getResource( name );

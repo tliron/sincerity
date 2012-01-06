@@ -31,7 +31,7 @@ public class ClassUtil
 
 		try
 		{
-			Class<?> theClass = Class.forName( className, true, sincerity.getContainer().getBoostrap() );
+			Class<?> theClass = Class.forName( className, true, sincerity.getContainer().getBootstrap() );
 			Method mainMethod = theClass.getMethod( "main", String[].class );
 			mainMethod.invoke( null, (Object) arguments );
 		}

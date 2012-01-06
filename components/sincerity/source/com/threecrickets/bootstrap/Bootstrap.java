@@ -26,7 +26,7 @@ public class Bootstrap extends URLClassLoader
 
 	public static Bootstrap getMasterBootstrap()
 	{
-		return getBootstrap( new File( "" ) );
+		return master;
 	}
 
 	public static Bootstrap getBootstrap( Object key )
@@ -61,20 +61,12 @@ public class Bootstrap extends URLClassLoader
 
 	public static void main( String[] arguments ) throws Exception
 	{
-		Bootstrap bootstrap = new Bootstrap();
-		setBootstrap( new File( "" ), bootstrap );
-		bootstrap( bootstrap, arguments );
+		getMasterBootstrap().bootstrap( arguments );
 	}
 
 	public static void bootstrap( Object key, String[] arguments ) throws Exception
 	{
-		bootstrap( getBootstrap( key ), arguments );
-	}
-
-	public static void bootstrap( Object key, Bootstrap bootstrap, String[] arguments ) throws Exception
-	{
-		setBootstrap( key, bootstrap );
-		bootstrap( bootstrap, arguments );
+		getBootstrap( key ).bootstrap( arguments );
 	}
 
 	//
@@ -104,6 +96,14 @@ public class Bootstrap extends URLClassLoader
 		addURL( url );
 	}
 
+	public void bootstrap( String[] arguments ) throws Exception
+	{
+		Thread.currentThread().setContextClassLoader( this );
+		Class<?> theClass = Class.forName( MAIN_CLASS, true, this );
+		Method mainMethod = theClass.getMethod( "main", String[].class );
+		mainMethod.invoke( null, (Object) arguments );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
@@ -113,9 +113,11 @@ public class Bootstrap extends URLClassLoader
 
 	private static final String HOME_VARIABLE;
 
-	private static final ConcurrentMap<Object, Object> attributes = new ConcurrentHashMap<Object, Object>();
+	private static final Bootstrap master;
 
-	private static final ConcurrentMap<Object, Bootstrap> bootstraps = new ConcurrentHashMap<Object, Bootstrap>();
+	private static final ConcurrentMap<Object, Object> attributes;
+
+	private static final ConcurrentMap<Object, Bootstrap> bootstraps;
 
 	/**
 	 * Constructor for the master bootstrap.
@@ -123,14 +125,6 @@ public class Bootstrap extends URLClassLoader
 	private Bootstrap()
 	{
 		super( getUrls(), Bootstrap.class.getClassLoader() );
-	}
-
-	private static void bootstrap( Bootstrap boostrap, String[] arguments ) throws Exception
-	{
-		Thread.currentThread().setContextClassLoader( boostrap );
-		Class<?> theClass = Class.forName( MAIN_CLASS, true, boostrap );
-		Method mainMethod = theClass.getMethod( "main", String[].class );
-		mainMethod.invoke( null, (Object) arguments );
 	}
 
 	private static URL[] inheritUrls( Collection<URL> urls )
@@ -239,5 +233,9 @@ public class Bootstrap extends URLClassLoader
 		MAIN_CLASS = (String) properties.get( "main.class" );
 		HOME_PROPERTY = (String) properties.get( "home.property" );
 		HOME_VARIABLE = (String) properties.get( "home.variable" );
+
+		attributes = new ConcurrentHashMap<Object, Object>();
+		bootstraps = new ConcurrentHashMap<Object, Bootstrap>();
+		master = new Bootstrap();
 	}
 }

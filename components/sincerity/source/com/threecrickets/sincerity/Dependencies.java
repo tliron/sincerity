@@ -423,7 +423,7 @@ public class Dependencies
 
 	public void updateBootstrap() throws SincerityException
 	{
-		Bootstrap bootstrap = container.getBoostrap();
+		Bootstrap bootstrap = container.getBootstrap();
 		try
 		{
 			for( File file : getClasspaths() )
