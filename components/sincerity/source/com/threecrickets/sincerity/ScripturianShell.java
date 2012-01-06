@@ -31,9 +31,11 @@ public class ScripturianShell implements Shell
 	{
 		this.container = container;
 		languageManager = container.getLanguageManager();
-		source = new DocumentFileSource<Executable>( sourceDir == null ? container.getRoot() : sourceDir, "default", "js", 1000 );
-		librarySources.add( new DocumentFileSource<Executable>( container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
-		librarySources.add( new DocumentFileSource<Executable>( container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );
+		if( sourceDir == null )
+			sourceDir = container.getRoot();
+		source = new DocumentFileSource<Executable>( "container/", sourceDir, "default", "js", 1000 );
+		librarySources.add( new DocumentFileSource<Executable>( "container/libraries/scripturian/", container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
+		librarySources.add( new DocumentFileSource<Executable>( "sincerity/", container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );
 		this.prepare = prepare;
 		this.arguments = arguments;
 	}
