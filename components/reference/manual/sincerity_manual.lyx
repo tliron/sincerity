@@ -226,6 +226,10 @@ DLL Hell
 OSGi is a decent solution, but boy is it intricate.
 \end_layout
 
+\begin_layout Subsubsection
+XML Hell
+\end_layout
+
 \begin_layout Subsection
 No DSL
 \end_layout
@@ -251,7 +255,201 @@ Comparison with OSGi
 \end_layout
 
 \begin_layout Standard
-There are more straightforward solutions to DLL hell.
+An 
+\begin_inset Quotes eld
+\end_inset
+
+interface
+\begin_inset Quotes erd
+\end_inset
+
+ in the JVM lets you create a standard protocol, letting you plug in various
+ implementations (
+\begin_inset Quotes eld
+\end_inset
+
+classes
+\begin_inset Quotes erd
+\end_inset
+
+) at runtime.
+ The protocol is enforced by the JVM, which will not let you plug in implementat
+ion that do not fit the interface.
+ OSGi takes this up a level: it also lets you defines protocols, while providing
+ much a much broader concept of 
+\begin_inset Quotes eld
+\end_inset
+
+implementation.
+\begin_inset Quotes erd
+\end_inset
+
+ The implementation is indeed a 
+\begin_inset Quotes eld
+\end_inset
+
+bundle
+\begin_inset Quotes erd
+\end_inset
+
+ that can contain any number of classes.
+\end_layout
+
+\begin_layout Standard
+So far so good, but it get complicated fast.
+ OSGi takes it up one level more: the protocols are published and endorsed
+ a community of providers, with the idea that different providers (software
+ vendors or departments in a large enterprise) can provide bundles to implement
+ them, which would all work together perfectly.
+ With this broader ambition, 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+ suddenly becomes far more malevolent: because bundles are often 
+\begin_inset Quotes eld
+\end_inset
+
+black boxes
+\begin_inset Quotes erd
+\end_inset
+
+ that you cannot fix to use a consistent version of a dependency, there
+ needs to be a built-in solution, which OSGi provides via a system of classloade
+rs.
+\end_layout
+
+\begin_layout Standard
+\SpecialChar \ldots{}
+Which, of course, introduces its own set of problems.
+ To get this to work, OSGi requires strict separation of classloading between
+ bundles, which in turn adds subtle and mischievous restrictions to your
+ usual JVM work.
+ This is not entirely bad: working within these limitations does encourage
+ clean, sharp boundaries between your module.
+ It's not, however, trivial by any means, and all your bundles must be designed
+ with this in mind.
+\end_layout
+
+\begin_layout Standard
+One very useful side effect of having the framework control classloading
+ is that entire bundles can be loaded and unloaded during runtime.
+ Indeed, OSGi defines protocols far 
+\begin_inset Quotes eld
+\end_inset
+
+starting,
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\begin_inset Quotes eld
+\end_inset
+
+stopping
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+hotswapping
+\begin_inset Quotes erd
+\end_inset
+
+ services.
+ This is indeed the entire reason for using OSGi in some cases.
+ (Though, honestly, there may simpler ways to enable hotswapping than embracing
+ the whole of OSGi.)
+\end_layout
+
+\begin_layout Standard
+You might be thinking at this point that there is an easier, straightforward
+ solution to the problem of 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+: Why not run each 
+\begin_inset Quotes eld
+\end_inset
+
+bundle
+\begin_inset Quotes erd
+\end_inset
+
+ as a separate process? Each JVM will load its own classes as necessary,
+ and never will they mix or conflict.
+ If you're running a distributed system, then you're already dividing your
+ software among many machines, and thus processes.
+ Indeed, many parts of your application may not be JVM-based at all, and
+ can't share memory space.
+ Likewise, 
+\begin_inset Quotes eld
+\end_inset
+
+starting
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+stopping
+\begin_inset Quotes erd
+\end_inset
+
+ processes is a problem already solved by the operating system.
+ Isn't OSGi, in effect, creating a virtual operating system inside the JVM?
+\end_layout
+
+\begin_layout Standard
+Well, one of the requirements of OSGi was precisely that all bundles run
+ in a single process, in shared memory space.
+ This requirement comes straight out of the world of embedded computing,
+ where environments are strict and confined: either you can't start another
+ process, or don't have the RAM to do so.
+ Indeed, in such environments, OSGi may be your only good solution for the
+ problem of modularity and pluggable services.
+ Still, OSGi has also proved popular in large enterprise environments that
+ are strictly working on the JVM, allowing for modules to be treated more
+ abstractly whether or not they are running in a single process.
+\end_layout
+
+\begin_layout Standard
+Sincerity in many ways takes an opposite approach: such high-level modularity
+ is provided through the notion of 
+\begin_inset Quotes eld
+\end_inset
+
+containers,
+\begin_inset Quotes erd
+\end_inset
+
+ which you can easily create, clone and change.
+ Containers can then talk to each other (and to other services) using whatever
+ technology is appropriate, be it REST, SOAP, Hazelcast, message queuing,
+ etc.
+ OSGi may indeed be appropriate for your project, and Sincerity provides
+ a nice Felix plugin to get you up and running.
+ The point being precisely that Sincerity was designed to be 
+\emph on
+neutral 
+\emph default
+to the technology
+\emph on
+ 
+\emph default
+of modularity, introducing no special restrictions for users that do not
+ need them.
 \end_layout
 
 \begin_layout Subsubsection
@@ -718,7 +916,7 @@ Scala
 \end_layout
 
 \begin_layout Subsubsection
-The Logging Plugin
+Logging Plugin
 \end_layout
 
 \begin_layout Standard
@@ -726,7 +924,60 @@ The Logging Plugin
 \end_layout
 
 \begin_layout Subsubsection
-The Wrapper Plugin
+Service Plugin
+\end_layout
+
+\begin_layout Subsubsection
+Felix Plugin
+\end_layout
+
+\begin_layout Standard
+As an example, let's install the web console.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+install http://archive.apache.org/dist/felix/org.apache.felix.http.jetty-2.2.0.jar
+\end_layout
+
+\begin_layout Plain Layout
+
+install http://archive.apache.org/dist/felix/org.apache.felix.webconsole-3.1.8.jar
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You'll then need to start both bundles.
+\end_layout
+
+\begin_layout Standard
+Point your browser to http://localhost:8080/system/console/.
+ The default user is 
+\begin_inset Quotes eld
+\end_inset
+
+admin
+\begin_inset Quotes erd
+\end_inset
+
+ with password 
+\begin_inset Quotes eld
+\end_inset
+
+admin
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection

@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.felix</groupId>
-			<artifactId>felix</artifactId>
+			<artifactId>felix-bootstrap</artifactId>
 			<version>4.0.2</version>
 		</dependency>
 	</dependencies>

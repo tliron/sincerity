@@ -17,7 +17,10 @@ function run(command) {
 }
 
 function gogo(command) {
-	System.setProperty('sincerity.cache', command.sincerity.container.cacheFile)
+	// These can be used in felix.conf
+	System.setProperty('sincerity.cache', command.sincerity.container.getCacheFile('felix'))
+	System.setProperty('sincerity.autodeploy', command.sincerity.container.getLibrariesFile('bootstrap'))
+	
 	System.setProperty('felix.config.properties', command.sincerity.container.getConfigurationFile('felix.conf').toURL())
 	
 	var mainArguments = [MAIN_CLASS]
