@@ -1,5 +1,7 @@
 
-print('\nTo start your Restlet component, run: "sincerity start component"\n\n')
+println()
+println('To start your Restlet component, run: "sincerity start component"')
+println()
 
 document.executeOnce('/sincerity/files/')
 

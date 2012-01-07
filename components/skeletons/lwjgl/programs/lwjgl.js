@@ -17,7 +17,7 @@ function validate() {
 		os = 'windows'
 	}
 	else {
-		print('Your operating system (' + os + ') is not supported by lwjgl.\n')
+		println('Your operating system (' + os + ') is not supported by lwjgl.')
 		System.exit(1)
 	}
 	

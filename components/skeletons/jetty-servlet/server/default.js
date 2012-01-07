@@ -51,5 +51,5 @@ if (warsDir.directory) {
 
 // Start server
 server.start()
-print('Started server\n')
+println('Started server')
 server.join()

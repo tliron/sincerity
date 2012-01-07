@@ -1,5 +1,7 @@
 
-print('\nTo start your web server, run: "sincerity start jetty"\n\n')
+println()
+print('To start your web server, run: "sincerity start jetty"')
+println()
 
 document.executeOnce('/sincerity/files/')
 

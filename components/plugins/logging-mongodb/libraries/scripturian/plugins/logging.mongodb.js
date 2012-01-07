@@ -46,8 +46,8 @@ function logtail(command) {
 	var db = Sincerity.Objects.ensure(properties.get('db'), 'logs')
 	var collection = Sincerity.Objects.ensure(properties.get('collection'), 'common')
 	
-	//print('db: ' + db + '\n')
-	//print('collection: ' + collection + '\n')
+	//println('db: ' + db)
+	//println('collection: ' + collection)
 	
 	// Connect
 	var connection = MongoDB.connect(connection, null, username, password)
@@ -69,6 +69,6 @@ function logtail(command) {
 			record.level += ' '
 		}
 		
-		print(TEMPLATE.cast(record) + '\n')
+		println(TEMPLATE.cast(record))
 	}
 }

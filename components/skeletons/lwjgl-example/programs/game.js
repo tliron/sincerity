@@ -30,11 +30,13 @@ var EXAMPLES = [
 	'test.opengl.shaders.ShadersTest',
 	'examples.spaceinvaders.Game']
 
-print('Available LWJGL examples:\n\n')
+println('Available LWJGL examples:')
+println()
 for (var i in EXAMPLES) {
-	print('  ' + i + ') ' + EXAMPLES[i] + '\n')
+	println('  ' + i + ') ' + EXAMPLES[i])
 }
-print('\nChoose an LWJGL example to run: ')
+println()
+print('Choose an LWJGL example to run: ')
 
 var reader = new BufferedReader(new InputStreamReader(System['in']))
 var example = reader.readLine()

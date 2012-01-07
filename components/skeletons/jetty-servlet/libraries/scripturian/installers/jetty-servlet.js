@@ -1,5 +1,7 @@
 
-print('\nTo start your servlet container, run: "sincerity start jetty"\n\n')
+println()
+println('To start your servlet container, run: "sincerity start jetty"')
+println()
 
 document.executeOnce('/sincerity/files/')
 

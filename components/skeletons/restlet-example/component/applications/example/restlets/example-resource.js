@@ -1,6 +1,5 @@
 
 var javaSourceDir = Sincerity.Container.getFileFromHere('..', 'java')
-print(javaSourceDir+'\n')
 
 try {
 	sincerity.run('java:compile', [javaSourceDir])

@@ -711,11 +711,43 @@ A strict structure, non-negotiable, non-configurable.
 \end_layout
 
 \begin_layout Subsubsection
+/configuration/sincerity/
+\end_layout
+
+\begin_layout Subsubsection
 /libraries/
 \end_layout
 
 \begin_layout Subsubsection
+/libraries/jars/
+\end_layout
+
+\begin_layout Subsubsection
+/libraries/scripturian/
+\end_layout
+
+\begin_layout Subsubsection
+/libraries/python/
+\end_layout
+
+\begin_layout Subsubsection
+/libraries/web/
+\end_layout
+
+\begin_layout Subsubsection
 /reference/
+\end_layout
+
+\begin_layout Subsubsection
+/reference/documentation/
+\end_layout
+
+\begin_layout Subsubsection
+/reference/licenses/
+\end_layout
+
+\begin_layout Subsubsection
+/reference/sources/
 \end_layout
 
 \begin_layout Section
@@ -775,23 +807,11 @@ git, Mercurial, Bazaar, Subversion
 \end_layout
 
 \begin_layout Section
-The Sincerity Ecosystem
+Language Plugins
 \end_layout
 
 \begin_layout Subsection
-Plugins
-\end_layout
-
-\begin_layout Subsubsection
-Built-In Plugins
-\end_layout
-
-\begin_layout Subsubsection
-Programming Language Plugins
-\end_layout
-
-\begin_layout Paragraph
-JavaScript
+JavaScript Plugin
 \end_layout
 
 \begin_layout Standard
@@ -846,12 +866,12 @@ The JavaScript shell provides a great way to test out code for developing
  plugins.
 \end_layout
 
-\begin_layout Paragraph
-Python
+\begin_layout Subsection
+Python Plugin
 \end_layout
 
-\begin_layout Paragraph
-Ruby
+\begin_layout Subsection
+Ruby Plugin
 \end_layout
 
 \begin_layout Standard
@@ -894,16 +914,16 @@ delegate:execute
  bootstraps the container's Ruby.
 \end_layout
 
-\begin_layout Paragraph
-PHP
+\begin_layout Subsection
+PHP Plugin
 \end_layout
 
-\begin_layout Paragraph
-Groovy
+\begin_layout Subsection
+Groovy Plugin
 \end_layout
 
-\begin_layout Paragraph
-Clojure
+\begin_layout Subsection
+Clojure Plugin
 \end_layout
 
 \begin_layout Standard
@@ -911,11 +931,15 @@ Clojure is a modern Lisp designed from the ground up to provide excellent
  concurrency and high performance.
 \end_layout
 
-\begin_layout Paragraph
-Scala
+\begin_layout Subsection
+Scala Plugin
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Section
+Feature Plugins
+\end_layout
+
+\begin_layout Subsection
 Logging Plugin
 \end_layout
 
@@ -923,12 +947,12 @@ Logging Plugin
 /configuration/logging.conf
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Service Plugin
 \end_layout
 
-\begin_layout Subsubsection
-Felix Plugin
+\begin_layout Subsection
+Felix OSGi Plugin
 \end_layout
 
 \begin_layout Standard
@@ -980,11 +1004,7 @@ admin
 .
 \end_layout
 
-\begin_layout Subsubsection
-Community Plugins
-\end_layout
-
-\begin_layout Subsection
+\begin_layout Section
 Skeletons
 \end_layout
 
@@ -995,8 +1015,8 @@ You've most likely come to Sincerity for the skeletons: they provide the
  languages as your project grows.
 \end_layout
 
-\begin_layout Subsubsection
-Web Server
+\begin_layout Subsection
+Jetty Web Server Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1085,7 +1105,7 @@ restlet.jetty
 .
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -1134,7 +1154,7 @@ You can configure the server by editing
  and configure new MIME types.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Extras
 \end_layout
 
@@ -1199,8 +1219,8 @@ sincerity use mycontainer : service jetty stop
 
 \end_layout
 
-\begin_layout Subsubsection
-Servlet
+\begin_layout Subsection
+Jetty Servlet Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1285,7 +1305,7 @@ prudence
  of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -1315,7 +1335,7 @@ Official Jetty,
  then you're in for a treat, as well as a sigh of relief.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Extras
 \end_layout
 
@@ -1419,8 +1439,8 @@ sincerity use mycontainer : service jetty stop
 
 \end_layout
 
-\begin_layout Subsubsection
-Restlet
+\begin_layout Subsection
+Restlet Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1485,7 +1505,7 @@ sincerity start restlet
 The default port is 8080, so point your browser to http://localhost:8080.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -1511,7 +1531,7 @@ JavaScript, Sincerity's natural language, provides a much more lightweight
  If you're ready to leave Java behind, take a look at the Prudence skeleton.)
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Extras
 \end_layout
 
@@ -1613,8 +1633,8 @@ sincerity use mycontainer : service restlet stop
 
 \end_layout
 
-\begin_layout Subsubsection
-Prudence
+\begin_layout Subsection
+Prudence Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1632,8 +1652,8 @@ Since version 2.0, Prudence is designed from the ground-up around Sincerity.
  And so Sincerity was born as a generic tool useful for many JVM projects.)
 \end_layout
 
-\begin_layout Subsubsection
-The Savory Framework
+\begin_layout Subsection
+Savory Framework Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1665,8 +1685,8 @@ large sites), authentication and authorization, and support for several
  The three products form a powerful stack!)
 \end_layout
 
-\begin_layout Subsubsection
-Rails
+\begin_layout Subsection
+Rails Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -1756,7 +1776,7 @@ sincerity start rails
 The default port is 3000, so point your browser to http://localhost:3000.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -1932,7 +1952,7 @@ If you need to access the Rails source code, you'll find it under
 , which is where all Ruby gems will be installed in your container.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Extras
 \end_layout
 
@@ -2013,8 +2033,8 @@ Note that Sincerity's logging plugin won't do you much good out of the box,
  to standard JVM logging if that seems exciting to you.
 \end_layout
 
-\begin_layout Subsubsection
-Django
+\begin_layout Subsection
+Django Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -2109,7 +2129,7 @@ sincerity start django
 The default port is 8000, so point your browser to http://localhost:8000.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -2274,7 +2294,7 @@ If you need to access the Django source code, you'll find it under
 , which is where all Python libraries will be installed in your container.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Extras
 \end_layout
 
@@ -2346,8 +2366,8 @@ Note that Sincerity's logging plugin won't do you much good out of the box,
  to standard JVM logging if that seems exciting to you.
 \end_layout
 
-\begin_layout Subsubsection
-Game
+\begin_layout Subsection
+LWJGL Skeleton
 \end_layout
 
 \begin_layout Standard
@@ -2433,7 +2453,7 @@ lwjgl.example
  It includes a simple Space Invaders clone.
 \end_layout
 
-\begin_layout Paragraph
+\begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
@@ -2490,11 +2510,11 @@ s to contribute, and also allow such plugins to be distributed as simple
  (Scripturian is the same library Sincerity uses for its plugins.)
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Shortcuts
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Repositories
 \end_layout
 

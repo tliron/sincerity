@@ -1,5 +1,7 @@
 
-print('\nTo start your LWJGL game, run: "sincerity start lwjgl"\n\n')
+println()
+println('To start your LWJGL game, run: "sincerity start lwjgl"')
+println()
 
 document.executeOnce('/sincerity/files/')
 

@@ -18,13 +18,13 @@ function run(command) {
 }
 
 function start() {
-	print('Starting!\n');
+	println('Starting!');
 }
 
 function stop() {
-	print('Stopping!\n');
+	println('Stopping!');
 }
 
 function console() {
-	print('Console!\n');
+	println('Console!');
 }
