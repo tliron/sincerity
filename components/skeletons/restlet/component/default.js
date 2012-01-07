@@ -5,7 +5,7 @@ importClass(
 	org.restlet.Component,
 	java.io.File)
 	
-var startupTasks = []
+var initializers = []
 
 // The component
 var component = new Component()
@@ -21,7 +21,7 @@ Sincerity.Container.executeAll('applications')
 // Start it!
 component.start()
 
-// Startup tasks
-for (var s in startupTasks) {
-	startupTasks[s]()
+// Call initializers
+for (var i in initializers) {
+	initializers[i]()
 }
