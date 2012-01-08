@@ -1,2 +1,2 @@
 
-//component.defaultHost.name = 'default'
+component.defaultHost.name = 'default'
