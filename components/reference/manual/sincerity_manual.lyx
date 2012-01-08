@@ -727,6 +727,14 @@ A strict structure, non-negotiable, non-configurable.
 \end_layout
 
 \begin_layout Subsubsection
+/libraries/scripturian/plugins/
+\end_layout
+
+\begin_layout Subsubsection
+/libraries/scripturian/installers/
+\end_layout
+
+\begin_layout Subsubsection
 /libraries/python/
 \end_layout
 

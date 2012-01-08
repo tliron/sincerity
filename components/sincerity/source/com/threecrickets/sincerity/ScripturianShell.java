@@ -132,6 +132,15 @@ public class ScripturianShell implements Shell
 	}
 
 	//
+	// Attributes
+	//
+
+	public Container getContainer()
+	{
+		return container;
+	}
+
+	//
 	// Shell
 	//
 
@@ -180,8 +189,6 @@ public class ScripturianShell implements Shell
 
 	private final Container container;
 
-	private Logger logger = Logger.getLogger( "sincerity" );
-
 	private final String[] arguments;
 
 	private final LanguageManager languageManager;
@@ -191,4 +198,6 @@ public class ScripturianShell implements Shell
 	private final DocumentSource<Executable> source;
 
 	private final CopyOnWriteArrayList<DocumentSource<Executable>> librarySources = new CopyOnWriteArrayList<DocumentSource<Executable>>();
+
+	private volatile Logger logger = Logger.getLogger( "sincerity" );
 }

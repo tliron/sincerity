@@ -1,11 +1,13 @@
 package com.threecrickets.sincerity;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.internal.FileUtil;
 
 public class DelegatedPlugin implements Plugin
 {
@@ -13,10 +15,10 @@ public class DelegatedPlugin implements Plugin
 	// Construction
 	//
 
-	public DelegatedPlugin( String pluginName, ScripturianShell shell ) throws SincerityException
+	public DelegatedPlugin( File pluginFile, ScripturianShell shell ) throws SincerityException
 	{
-		defaultName = pluginName;
-		executable = shell.makeEnterable( "/libraries/scripturian/plugins/" + pluginName + "/", ENTERING_KEY );
+		defaultName = FileUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
+		executable = shell.makeEnterable( "/" + shell.getContainer().getRelativePath( pluginFile ), ENTERING_KEY );
 	}
 
 	//

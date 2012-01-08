@@ -10,7 +10,6 @@ import java.util.Set;
 import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
 
 public class Plugins extends AbstractMap<String, Plugin>
 {
@@ -25,20 +24,22 @@ public class Plugins extends AbstractMap<String, Plugin>
 		ClassLoader classLoader;
 		try
 		{
-
-			classLoader = sincerity.getContainer().getBootstrap();
+			Container container = sincerity.getContainer();
+			classLoader = container.getBootstrap();
 
 			// Scripturian plugins
-			File pluginsDir = sincerity.getContainer().getLibrariesFile( "scripturian", "plugins" );
+			File pluginsDir = container.getLibrariesFile( "scripturian", "plugins" );
 			if( pluginsDir.isDirectory() )
 			{
-				ScripturianShell shell = new ScripturianShell( sincerity.getContainer(), null, true );
-				for( String pluginFilename : pluginsDir.list() )
+				ScripturianShell shell = new ScripturianShell( container, null, true );
+				for( File pluginFile : pluginsDir.listFiles() )
 				{
+					if( pluginFile.isHidden() )
+						continue;
+
 					try
 					{
-						String pluginName = FileUtil.separateExtensionFromFilename( pluginFilename )[0];
-						Plugin plugin = new DelegatedPlugin( pluginName, shell );
+						Plugin plugin = new DelegatedPlugin( pluginFile, shell );
 						plugins.put( plugin.getName(), plugin );
 					}
 					catch( Exception x )
@@ -53,20 +54,9 @@ public class Plugins extends AbstractMap<String, Plugin>
 			classLoader = Thread.currentThread().getContextClassLoader();
 		}
 
-		this.classLoader = classLoader;
-
 		// JVM plugins
 		for( Plugin plugin : ServiceLoader.load( Plugin.class, classLoader ) )
 			plugins.put( plugin.getName(), plugin );
-	}
-
-	//
-	// Attributes
-	//
-
-	public ClassLoader getClassLoader()
-	{
-		return classLoader;
 	}
 
 	//
@@ -81,8 +71,6 @@ public class Plugins extends AbstractMap<String, Plugin>
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
-
-	private final ClassLoader classLoader;
 
 	private HashMap<String, Plugin> plugins = new HashMap<String, Plugin>();
 }
