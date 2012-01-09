@@ -78,6 +78,7 @@ fi
 #
 
 JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
+"$SINCERITY_HOME/bootstrap.jar" \
 "$JAVA_HOME/lib/tools.jar")
 
 #
@@ -89,4 +90,4 @@ JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
 -Dfile.encoding=UTF-8 \
 -classpath "$(join ":" $JVM_LIBRARIES)")
 
-"$JAVA" $JVM_SWITCHES -jar "$SINCERITY_HOME/bootstrap.jar" "$@"
+"$JAVA" $JVM_SWITCHES com.threecrickets.bootstrap.Bootstrap "$@"

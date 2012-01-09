@@ -130,8 +130,7 @@ public class Bootstrap extends URLClassLoader
 	private static URL[] inheritUrls( Collection<URL> urls )
 	{
 		ArrayList<URL> combined = new ArrayList<URL>( urls );
-		Bootstrap bootstrap = getMasterBootstrap();
-		for( URL url : bootstrap.getURLs() )
+		for( URL url : master.getURLs() )
 			if( !combined.contains( url ) )
 				combined.add( url );
 		return combined.toArray( new URL[combined.size()] );
@@ -150,13 +149,24 @@ public class Bootstrap extends URLClassLoader
 		ArrayList<URL> urls = new ArrayList<URL>();
 		listJars( jarsDir, urls );
 
-		/*
-		 * // Add JVM classpath String system = System.getProperty(
-		 * "java.class.path" ); if( system != null ) { for( String path :
-		 * system.split( File.pathSeparator ) ) { try { URL url = new File( path
-		 * ).toURI().toURL(); if( !urls.contains( url ) ) urls.add( url ); }
-		 * catch( MalformedURLException x ) { } } }
-		 */
+		// Add JVM classpath
+		String system = System.getProperty( "java.class.path" );
+		if( system != null )
+		{
+			for( String path : system.split( File.pathSeparator ) )
+			{
+				try
+				{
+					URL url = new File( path ).toURI().toURL();
+					System.out.println(url);
+					if( !urls.contains( url ) )
+						urls.add( url );
+				}
+				catch( MalformedURLException x )
+				{
+				}
+			}
+		}
 
 		return urls.toArray( new URL[urls.size()] );
 	}
