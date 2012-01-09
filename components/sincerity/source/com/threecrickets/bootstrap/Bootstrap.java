@@ -149,24 +149,13 @@ public class Bootstrap extends URLClassLoader
 		ArrayList<URL> urls = new ArrayList<URL>();
 		listJars( jarsDir, urls );
 
-		// Add JVM classpath
-		String system = System.getProperty( "java.class.path" );
-		if( system != null )
-		{
-			for( String path : system.split( File.pathSeparator ) )
-			{
-				try
-				{
-					URL url = new File( path ).toURI().toURL();
-					System.out.println(url);
-					if( !urls.contains( url ) )
-						urls.add( url );
-				}
-				catch( MalformedURLException x )
-				{
-				}
-			}
-		}
+		/*
+		 * // Add JVM classpath String system = System.getProperty(
+		 * "java.class.path" ); if( system != null ) { for( String path :
+		 * system.split( File.pathSeparator ) ) { try { URL url = new File( path
+		 * ).toURI().toURL(); if( !urls.contains( url ) ) urls.add( url ); }
+		 * catch( MalformedURLException x ) { } } }
+		 */
 
 		return urls.toArray( new URL[urls.size()] );
 	}

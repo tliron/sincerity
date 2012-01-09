@@ -15,6 +15,7 @@
 
 	<property name="cache" value="./cache" />
 	<property name="cache.classes" value="${cache}/classes" />
+	<property name="cache.agent" value="${cache}/agent" />
 	<property name="cache.jars" value="${cache}/jars" />
 
 	<property name="distribution" value="./distribution" />
@@ -52,7 +53,7 @@
 			<fileset dir="${component.resources}" />
 		</copy>
 	</target>
-
+	
 	<target name="javadocs" description="Create API documentation if not present">
 		<available file="${distribution.api}" property="javadocs-present" />
 		<antcall target="javadocs-overwrite" />
@@ -106,7 +107,7 @@
 		</exec>
 	</target>
 
-	<target name="libraries" depends="classes" description="Create jar">
+	<target name="libraries" depends="classes" description="Create jars">
 		<mkdir dir="${distribution.jars}" />
 		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
 		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
