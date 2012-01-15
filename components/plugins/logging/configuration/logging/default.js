@@ -2,7 +2,8 @@
 document.execute('/sincerity/container/')
 
 importClass(
-	org.apache.log4j.PatternLayout)
+	org.apache.log4j.PatternLayout,
+	org.apache.log4j.Level)
 
 var appenders = {}
 var repository = org.apache.log4j.LogManager.loggerRepository

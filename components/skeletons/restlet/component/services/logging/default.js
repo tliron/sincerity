@@ -1,0 +1,2 @@
+
+component.logService.loggerName = 'web'

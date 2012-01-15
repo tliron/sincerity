@@ -24,7 +24,7 @@ public class Test
 {
 	public static void python() throws Exception
 	{
-		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "python", "default", ".py", 1000 );
+		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( new File( "python" ), "default", ".py", 1000 );
 		ParsingContext parsing = new ParsingContext();
 		parsing.setLanguageManager( new LanguageManager() );
 		parsing.setDefaultLanguageTag( "python" );
