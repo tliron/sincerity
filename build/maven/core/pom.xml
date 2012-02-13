@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity</groupId>
 	<artifactId>sincerity</artifactId>
-	<version>1.1.0</version>
+	<version>1.0-rc1</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity</name>
@@ -124,7 +124,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/libraries/jars/com.threecrickets.sincerity/sincerity/0.9/sincerity.jar</file>
+									<file>../../distribution/content/libraries/jars/com.threecrickets.sincerity/sincerity/${project.version}/sincerity.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>
