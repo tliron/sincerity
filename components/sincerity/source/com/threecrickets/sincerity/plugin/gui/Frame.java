@@ -9,7 +9,7 @@ import javax.swing.JTabbedPane;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class Frame extends JFrame
+public class Frame extends JFrame implements Runnable
 {
 	//
 	// Construction
@@ -21,15 +21,25 @@ public class Frame extends JFrame
 
 		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
-		JTabbedPane panes = new JTabbedPane();
-		getContentPane().add( panes );
+		pane = new JTabbedPane();
+		getContentPane().add( pane );
+	}
 
-		panes.add( "Dependencies", new DependenciesPane( sincerity.getContainer().getDependencies() ) );
-		panes.add( "Artifacts", new ArtifactsPane( sincerity.getContainer().getDependencies() ) );
-		panes.add( "Licenses", new LicensesPane( sincerity.getContainer().getDependencies() ) );
-		panes.add( "Repositories", new RepositoriesPane( sincerity ) );
-		panes.add( "Actions", new ActionsPane( sincerity ) );
+	//
+	// Attributes
+	//
 
+	public JTabbedPane getPane()
+	{
+		return pane;
+	}
+
+	//
+	// Operations
+	//
+
+	public void run()
+	{
 		Rectangle bounds = getGraphicsConfiguration().getBounds();
 		int width = bounds.width / 2;
 		int height = bounds.height / 2;
@@ -38,10 +48,13 @@ public class Frame extends JFrame
 		setLocation( centerX - width / 2, centerY - height / 2 );
 		setPreferredSize( new Dimension( width, height ) );
 		pack();
+		setVisible( true );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private final JTabbedPane pane;
 
 	private static final long serialVersionUID = 1L;
 }

@@ -9,19 +9,27 @@ import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.TreeUtil;
+import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
+import com.threecrickets.sincerity.plugin.gui.LicensesPane;
 
-public class DependenciesPlugin implements Plugin
+public class DependenciesPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -136,6 +144,13 @@ public class DependenciesPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getPane().add( "Dependencies", new DependenciesPane( sincerity.getContainer().getDependencies() ) );
+		sincerity.getFrame().getPane().add( "Licenses", new LicensesPane( sincerity.getContainer().getDependencies() ) );
 	}
 
 	//

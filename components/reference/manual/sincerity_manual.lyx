@@ -130,16 +130,19 @@ Why Sincerity?
 
 \begin_layout Standard
 The free software and open source movements have utterly changed how we
- develop new software.
- Though freely available libraries had existed before, these movements have
- created a culture of sharing and viable business models that have cultivated
- an unprecedented wealth of solutions.
+ develop software.
+\end_layout
+
+\begin_layout Standard
+Libraries had existed freely before, but these movements have created a
+ culture of sharing, fueled by viable business models, culminating in an
+ unprecedented wealth of solutions.
  For any problem you encounter in your everyday development work, there
  is likely a library out there that you can download for free.
  Your mileage may vary, as they say: quality may not always be up to snuff,
  and no warranty is provided, but the source code is included and you can
  make it better, for yourself and for others.
- Importantly, it's relatively worry-free to invest in free software: you
+ Importantly, it's relatively future-proof to depend on free software: you
  can be certain that your license to use the library will not be revoked
  and that bugs 
 \emph on
@@ -149,77 +152,56 @@ could
 \end_layout
 
 \begin_layout Standard
-(Of course, you do need to worry whether the software breaks any owned patents,
+(Though you do need to worry whether the software breaks any owned patents,
  but that problem exists for any software, whether it's free or proprietary,
  from a third party or developed by you.)
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Standard
+Unfortunately, this wealth also creates challenges.
+ There are several packaging, versioning and delivery standards for libraries.
+ And when it comes to platforms and frameworks, there is no standard way
+ to deploy software on top of them.
+ If your code is a composite of many of these, you will find yourself spending
+ a lot of time making sense of these various schemes and integrating them
+ into a system that is maintainable by you in the long run.
+ And if your software is itself modular and redistributable, you will find
+ yourself having to pick one of the many different methods, or inventing
+ one of your own.
+ So, when it comes down to it, while free software can save you a lot of
+ time and effort in terms of development, you end up spending extra effort
+ on integration and maintenance.
+ Annoyingly, you'll find that much of this work is repetitive, unnecessarily
+ so.
+ If you're a programmer used to making code reusable, you'll find this especiall
+y annoying.
+ 
+\end_layout
+
+\begin_layout Standard
+When it comes to the JVM, a few products have been widely adopted that make
+ some of this work easier.
+ However, experience has shown them to have too small a scope: they solve
+ very specific problems, but do not address the complete challenge.
+ And that's where Sincerity comes in.
+\end_layout
+
+\begin_layout Standard
+Let's start by looking at some of the tasks that Sincerity addresses.
+\end_layout
+
+\begin_layout Subsection
 Lather, Rinse, Repeat
 \end_layout
 
 \begin_layout Standard
-Bootstrapping
-\end_layout
-
-\begin_layout Standard
-Shell scripts
-\end_layout
-
-\begin_layout Standard
-Evironment variables
-\end_layout
-
-\begin_layout Standard
-Find java.
- Find JAVA_HOME.
-\end_layout
-
-\begin_layout Standard
-Bootstrapping the tools (
-\begin_inset Quotes eld
-\end_inset
-
-gem
-\begin_inset Quotes erd
-\end_inset
-
-, 
-\begin_inset Quotes eld
-\end_inset
-
-rake
-\begin_inset Quotes erd
-\end_inset
-
-, etc.)
-\end_layout
-
-\begin_layout Standard
-Install as service/daemon
-\end_layout
-
-\begin_layout Standard
-Logging
-\end_layout
-
-\begin_layout Standard
-Configuration by XML (worst offenders: Jetty, log4j)
+It seems that every new JVM-based software stack ends up reinventing the
+ same wheels, because the developers are faced with the same challenges.
+ Let's take a look at how Sincerity addresses these.
 \end_layout
 
 \begin_layout Subsubsection
-Reinventing Wheels
-\end_layout
-
-\begin_layout Standard
-It's fine and good that we can choose our wheels.
- But can't we at least lest the best practices roll? Design your car so
- that it will fit the standard wheels, and let the more particular users
- replace the standards with something more specific.
-\end_layout
-
-\begin_layout Subsubsection
-DLL Hell
+Dependency Handling and ``DLL hell''
 \end_layout
 
 \begin_layout Standard
@@ -227,7 +209,217 @@ OSGi is a decent solution, but boy is it intricate.
 \end_layout
 
 \begin_layout Subsubsection
-XML Hell
+Bootstrapping
+\end_layout
+
+\begin_layout Standard
+The JVM is packaged as a set of command line utilities, plus a few plugins
+ for specialized environments.
+ It does come with one simple way to distribute programs---executable JAR
+ files---but that would only suffice for the most trivial programs.
+\end_layout
+
+\begin_layout Standard
+For anything more complex, you will need to handle bootstrapping your applicatio
+n.
+ This means, at the very least, finding the right JVM on the machine (more
+ than one may be installed), and then loading the application via the ``java''
+ tool.
+ Usually, however, it ends up being far more complicated: rummaging through
+ environment variables, detecting the host operating system and environment
+ in order to set specialized JVM flags and load optimized native libraries,
+ and because this is so complex, you'll want to responding to specialized
+ bootstrapping flags set by the user.
+ Indeed, many JVM-based products won't ``just run,'' but will in fact require
+ you to set a host of environment variables first.
+\end_layout
+
+\begin_layout Standard
+All this work happens before the JVM even starts.
+ Thus, it's usually handled by writing a shell script, which is almost always
+ immediately runnable.
+ Depending on how many operating systems you want to support, this may mean,
+ at the very least, writing one for *nix systems and one for Windows systems.
+ This is highly specialized work, and a development project with its own
+ challenges, so some projects choose to avoid scripts, and develop native
+ binaries that handle bootstrapping.
+ And then there are installer products that purport to do this all for you.
+\end_layout
+
+\begin_layout Standard
+And what if you want the software to run as a daemon, system service, or
+ cron job?
+\end_layout
+
+\begin_layout Standard
+And what if your software is not just one program, but also contains a set
+ of tools that you also need to bootstrap?
+\end_layout
+
+\begin_layout Standard
+The bottom line is that bootstrapping is very hard to get right, and there
+ are many complicated approached to it.
+ It's a shame that so many JVM products keep trying to implement the same
+ bootstrapping solutions from scratch.
+ Sincerity streamlines this in two ways: first, by providing you with working
+ shell scripts, and second, by having these scripts delegate the process
+ as soon as possible to a JavaScript program running in the JVM.
+ Once on the JVM, Sincerity offers a range of installable plugins that handle
+ various configuration and deployment tasks, including running the software
+ as a daemon.
+\end_layout
+
+\begin_layout Standard
+What this means is that most products won't have to do anything beyond what
+ Sincerity offers out of the box, and those with specialized bootstrapping
+ will be able to write portable JavaScript programs, instead of having to
+ deal with complex shell scripting.
+\end_layout
+
+\begin_layout Subsubsection
+Configuration and ``XML hell''
+\end_layout
+
+\begin_layout Standard
+Between bootstrapping and reaching full usability, your product has to configure
+ itself.
+ Will you choose a properties file? XML? Something else? And where is the
+ file located?
+\end_layout
+
+\begin_layout Standard
+Well, consider that all the libraries you use had to make their own choices
+ for configuration.
+ A non-trivial JVM product could thus require several configuration files,
+ in different locations, with different configuration rules.
+\end_layout
+
+\begin_layout Standard
+But there's a more serious problem to most of these approaches: they are
+ unnecessarily rigid and static.
+ While there are many advantages to using text files for configuration,
+ the choice of technologies is baffling.
+ Possibly the worst choice is XML.
+ This language, ostensibly a ``markup'' language, is marking up nothing
+ when used for configuration: it's instead used as a cumbersome format for
+ structured textual data.
+ And it gets far, far worse: XML configuration files are often used 
+\emph on
+programatically
+\emph default
+ in the JVM world, to construct JVM classes and call JVM methods.
+ The best known, worst offenders are log4j and Jetty.
+ There, XML is used as if it were the clumsiest scripting language you have
+ ever seen.
+\end_layout
+
+\begin_layout Standard
+The use of XML for configuration is part of what we call ``XML hell,'' which
+ refers to programmers being swamped with countless overly-verbose XML files.
+ XML is also often abused as an interchange format on the Internet, and
+ a descriptor format in much of the JVM enterprise industry.
+ Enough already!
+\end_layout
+
+\begin_layout Standard
+The excuse for this insanity, one would guess, is that the ability to parse
+ XML is standard on many platforms, including the JVM.
+ But, 
+\emph on
+interpreting 
+\emph default
+this XML is far more complicated that just parsing it.
+ In essence, parsing a general-purpose XML for something like Jetty involves
+ writing a scripting language engine.
+ Another excuse for ``XML hell'' could be part of the general over-enthusiasm
+ with XML, and the untested faith that standardizing on a single format
+ would lead to greater interoperability.
+ Again, this is madness: unless you know how to interpret the XML tags,
+ the ability to parse them is of little use.
+\end_layout
+
+\begin_layout Standard
+Another approach, better than XML, is to create a Domain-Specific Language
+ (DSL).
+ But DSLs require a lot of work, both by developers and by users who must
+ learn them.
+\end_layout
+
+\begin_layout Standard
+Sincerity is here to stop the madness: wherever possible, it standardizes
+ on using JavaScript for configuration.
+ With JavaScript you can instantiate objects, call methods, insert conditionals
+ and loops using natural programming paradigms, instead of shoe-horning
+ them into XML.
+ At its simplest, a JavaScript configuration file can look identical to
+ a simple properties file: straightforward assignments of values to configuratio
+n parameters.
+ But, you also have the option of injecting interpreted code where appropriate.
+ And, of course, it's still just text files that don't need to be compiled,
+ and can even be picked up and re-interpreted at runtime, so you're still
+ absolutely within the ``configuration-by-text-file'' paradigm.
+\end_layout
+
+\begin_layout Standard
+If you've never tried the ``configuration-by-script'' approach before, you
+ might be skeptical about its benefits or worried about the extra weight
+ it adds.
+ But Sincerity's JavaScript engine is very lightweight, and we're convinced
+ that once you try this approach, you will never want another.
+ For an instructive example, install Sincerity's logging plugin, and take
+ a look at the logging configuration files.
+ Now compare them to the ``official'' log4j formats.
+\end_layout
+
+\begin_layout Standard
+One consequence of this approach is that the line between bootstrapping
+ and configuration gets blurred.
+ They end up as one integrated phase: a bunch of JavaScript programs strapped
+ together.
+ This leads to both simplification and greater flexibility for you.
+ This approach leads to exceptionally dynamic configuration systems that
+ can adopt to any operating environment.
+\end_layout
+
+\begin_layout Standard
+We really hope to see ``configuration-by-script'' used throughout the JVM
+ world, even for projects that do not want to or cannot use Sincerity.
+\end_layout
+
+\begin_layout Subsubsection
+Logging
+\end_layout
+
+\begin_layout Standard
+The JVM has a few good, widely-used logging APIs, as well as a great glue
+ library---SLF4J---that can bridge between them.
+ But there's quite a bit of work involved in getting all these libraries
+ working together.
+ It seems that every JVM product has its own way of doing this.
+ Logging is important, and can't be relegated to an afterthought: if it's
+ not properly configured and well integrated, it's close to useless.
+\end_layout
+
+\begin_layout Standard
+Sincerity takes logging very seriously: it provides a plugin that does much
+ of the work for you, and extensions that further enhance logging.
+ For example, one extension funnels all logs to a centralized MongoDB collection
+, perfect for distributed cloud deployments.
+ And this system will work with practically 
+\emph on
+any 
+\emph default
+JVM library.
+\end_layout
+
+\begin_layout Standard
+Note that logging configuration is handled via the ``configuration-by-script''
+ approach mentioned above, and is well integrated with the whole ecology
+ of Sincerity plugins.
+\end_layout
+
+\begin_layout Subsection
+Why JavaScript?
 \end_layout
 
 \begin_layout Subsection

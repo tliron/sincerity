@@ -5,17 +5,22 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
-public class LoggingPlugin implements Plugin
+public class LoggingPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -48,6 +53,10 @@ public class LoggingPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui(Command command)
+	{
 	}
 
 	//

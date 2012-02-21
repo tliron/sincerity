@@ -21,7 +21,7 @@ import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
@@ -210,7 +210,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createPluginNode( Plugin plugin, boolean includeCommands ) throws SincerityException
+	public static DefaultMutableTreeNode createPluginNode( Plugin1 plugin, boolean includeCommands ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( plugin, "<html><b>" + plugin.getName() + "</b></html>", PLUGIN_ICON );
 
@@ -221,7 +221,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createCommandNode( String command, Plugin plugin, boolean includePluginName ) throws SincerityException
+	public static DefaultMutableTreeNode createCommandNode( String command, Plugin1 plugin, boolean includePluginName ) throws SincerityException
 	{
 		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
 	}

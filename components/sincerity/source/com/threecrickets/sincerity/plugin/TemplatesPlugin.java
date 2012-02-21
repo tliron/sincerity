@@ -4,17 +4,22 @@ import java.io.File;
 import java.io.IOException;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
-public class TemplatesPlugin implements Plugin
+public class TemplatesPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -73,5 +78,9 @@ public class TemplatesPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
 	}
 }

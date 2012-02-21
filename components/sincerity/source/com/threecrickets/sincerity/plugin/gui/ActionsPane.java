@@ -13,7 +13,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
@@ -72,12 +72,12 @@ public class ActionsPane extends JPanel implements ItemListener
 			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
 			if( groupByPlugin )
 			{
-				for( Plugin plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
+				for( Plugin1 plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
 					root.add( GuiUtil.createPluginNode( plugin, true ) );
 			}
 			else
 			{
-				for( Plugin plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
+				for( Plugin1 plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
 					for( String command : plugin.getCommands() )
 						root.add( GuiUtil.createCommandNode( command, plugin, true ) );
 			}

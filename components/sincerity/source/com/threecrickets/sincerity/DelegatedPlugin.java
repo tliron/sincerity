@@ -9,7 +9,7 @@ import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
-public class DelegatedPlugin implements Plugin
+public class DelegatedPlugin implements Plugin1
 {
 	//
 	// Construction
@@ -24,6 +24,31 @@ public class DelegatedPlugin implements Plugin
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		try
+		{
+			Object version = executable.enter( ENTERING_KEY, "getVersion" );
+			if( version != null )
+			{
+				if( version instanceof Number )
+					return ( (Number) version ).intValue();
+				else
+					return Integer.parseInt( version.toString() );
+			}
+		}
+		catch( ParsingException x )
+		{
+		}
+		catch( ExecutionException x )
+		{
+		}
+		catch( NoSuchMethodException x )
+		{
+		}
+		return DEFAULT_VERSION;
+	}
 
 	public String getName()
 	{
@@ -94,10 +119,31 @@ public class DelegatedPlugin implements Plugin
 		}
 	}
 
+	public void gui( Command command ) throws SincerityException
+	{
+		try
+		{
+			executable.enter( ENTERING_KEY, "gui", command );
+		}
+		catch( ParsingException x )
+		{
+			throw new SincerityException( "Could not parse source code for delegated plugin: " + defaultName, x );
+		}
+		catch( ExecutionException x )
+		{
+			throw new SincerityException( x.getMessage(), x.getCause() );
+		}
+		catch( NoSuchMethodException x )
+		{
+		}
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final String ENTERING_KEY = "sincerity";
+
+	private static final int DEFAULT_VERSION = 1;
 
 	private final String defaultName;
 

@@ -2,15 +2,20 @@ package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Packages;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
-public class PackagesPlugin implements Plugin
+public class PackagesPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -45,5 +50,9 @@ public class PackagesPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
 	}
 }

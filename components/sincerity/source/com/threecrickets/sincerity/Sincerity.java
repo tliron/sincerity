@@ -19,6 +19,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
+import com.threecrickets.sincerity.plugin.gui.Frame;
 
 public class Sincerity implements Runnable
 {
@@ -228,6 +229,16 @@ public class Sincerity implements Runnable
 		return container;
 	}
 
+	public Frame getFrame()
+	{
+		return frame;
+	}
+
+	public void setFrame( Frame frame )
+	{
+		this.frame = frame;
+	}
+
 	//
 	// Operations
 	//
@@ -323,15 +334,15 @@ public class Sincerity implements Runnable
 
 		if( command.plugin != null )
 		{
-			Plugin thePlugin = getPlugins().get( command.plugin );
+			Plugin1 thePlugin = getPlugins().get( command.plugin );
 			if( thePlugin == null )
 				throw new UnknownCommandException( command );
 			thePlugin.run( command );
 		}
 		else
 		{
-			ArrayList<Plugin> plugins = new ArrayList<Plugin>();
-			for( Plugin plugin : getPlugins().values() )
+			ArrayList<Plugin1> plugins = new ArrayList<Plugin1>();
+			for( Plugin1 plugin : getPlugins().values() )
 			{
 				if( Arrays.asList( plugin.getCommands() ).contains( command.getName() ) )
 					plugins.add( plugin );
@@ -340,7 +351,7 @@ public class Sincerity implements Runnable
 			int size = plugins.size();
 			if( size == 1 )
 			{
-				Plugin plugin = plugins.get( 0 );
+				Plugin1 plugin = plugins.get( 0 );
 				command.plugin = plugin.getName();
 				plugin.run( command );
 				return;
@@ -454,6 +465,8 @@ public class Sincerity implements Runnable
 	private PrintWriter err;
 
 	private Integer verbosity;
+
+	private Frame frame;
 
 	private Plugins getPlugins() throws SincerityException
 	{

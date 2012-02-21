@@ -8,20 +8,27 @@ import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
+import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
 
-public class RepositoriesPlugin implements Plugin
+public class RepositoriesPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -107,6 +114,12 @@ public class RepositoriesPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getPane().add( "Repositories", new RepositoriesPane( sincerity ) );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

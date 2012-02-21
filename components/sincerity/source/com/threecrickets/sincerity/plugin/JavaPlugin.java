@@ -9,15 +9,20 @@ import java.util.Collection;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
-public class JavaPlugin implements Plugin
+public class JavaPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -77,7 +82,7 @@ public class JavaPlugin implements Plugin
 			}
 			catch( ClassNotFoundException x )
 			{
-				throw new SincerityException( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not set?", x );
+				throw new SincerityException( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not pointing to a JDK?", x );
 			}
 			catch( SecurityException x )
 			{
@@ -102,6 +107,10 @@ public class JavaPlugin implements Plugin
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

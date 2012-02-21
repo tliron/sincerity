@@ -1,16 +1,23 @@
 package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Plugin;
+import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Frame;
+import com.threecrickets.sincerity.plugin.gui.GuiUtil;
 
-public class GuiPlugin implements Plugin
+public class GuiPlugin implements Plugin1
 {
 	//
 	// Plugin
 	//
+
+	public int getVersion()
+	{
+		return 1;
+	}
 
 	public String getName()
 	{
@@ -30,11 +37,26 @@ public class GuiPlugin implements Plugin
 		String commandName = command.getName();
 		if( "gui".equals( commandName ) )
 		{
-			// GuiUtil.setNativeLookAndFeel();
-			Frame frame = new Frame( command.getSincerity() );
-			frame.setVisible( true );
+			command.setParse( true );
+
+			boolean isNative = command.getSwitches().contains( "native" );
+			if( isNative )
+				GuiUtil.setNativeLookAndFeel();
+
+			Sincerity sincerity = command.getSincerity();
+			Frame frame = new Frame( sincerity );
+			sincerity.setFrame( frame );
+
+			for( Plugin1 plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
+				plugin.gui( command );
+
+			frame.run();
 		}
 		else
 			throw new UnknownCommandException( command );
+	}
+
+	public void gui( Command command ) throws SincerityException
+	{
 	}
 }

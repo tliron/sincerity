@@ -11,7 +11,7 @@ import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class Plugins extends AbstractMap<String, Plugin>
+public class Plugins extends AbstractMap<String, Plugin1>
 {
 	//
 	// Construction
@@ -39,7 +39,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 
 					try
 					{
-						Plugin plugin = new DelegatedPlugin( pluginFile, shell );
+						Plugin1 plugin = new DelegatedPlugin( pluginFile, shell );
 						plugins.put( plugin.getName(), plugin );
 					}
 					catch( Exception x )
@@ -55,7 +55,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 		}
 
 		// JVM plugins
-		for( Plugin plugin : ServiceLoader.load( Plugin.class, classLoader ) )
+		for( Plugin1 plugin : ServiceLoader.load( Plugin1.class, classLoader ) )
 			plugins.put( plugin.getName(), plugin );
 	}
 
@@ -64,7 +64,7 @@ public class Plugins extends AbstractMap<String, Plugin>
 	//
 
 	@Override
-	public Set<Map.Entry<String, Plugin>> entrySet()
+	public Set<Map.Entry<String, Plugin1>> entrySet()
 	{
 		return Collections.unmodifiableSet( plugins.entrySet() );
 	}
@@ -72,5 +72,5 @@ public class Plugins extends AbstractMap<String, Plugin>
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private HashMap<String, Plugin> plugins = new HashMap<String, Plugin>();
+	private HashMap<String, Plugin1> plugins = new HashMap<String, Plugin1>();
 }
