@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>org.jruby</groupId>
 			<artifactId>jruby-standalone</artifactId>
-			<version>1.6.5</version>
+			<version>1.6.7</version>
 		</dependency>
 	</dependencies>
 

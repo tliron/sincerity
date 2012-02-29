@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.caucho</groupId>
 			<artifactId>quercus</artifactId>
-			<version>4.0.18</version>
+			<version>4.0.25</version>
 		</dependency>
 	</dependencies>
 

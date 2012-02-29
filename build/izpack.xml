@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<installation version="1.0">
+	<info>
+		<appname>@{title}</appname>
+		<appversion>@{version}</appversion>
+		<url>http://threecrickets.com/@{component}/</url>
+		<javaversion>1.5</javaversion>
+		<uninstaller path="$INSTALL_PATH/uninstaller" />
+	</info>
+
+	<locale>
+		<langpack iso3="eng" />
+	</locale>
+
+	<guiprefs width="600" height="480" resizable="yes" />
+
+	<panels>
+		<panel classname="HelloPanel" />
+		<panel classname="LicencePanel" />
+		<panel classname="TargetPanel" />
+		<panel classname="InstallPanel" />
+	</panels>
+
+	<resources>
+		<res id="LicencePanel.licence" src="@{distribution.content}/license.txt" />
+	</resources>
+	
+	<packs>
+		<pack name="Sincerity" required="yes">
+			<description>Sincerity</description>
+			<fileset dir="@{distribution.content}" targetdir="$INSTALL_PATH" />
+		</pack>
+	</packs>
+</installation>
