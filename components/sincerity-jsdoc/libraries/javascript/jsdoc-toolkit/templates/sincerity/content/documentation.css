@@ -1,0 +1,248 @@
+/*
+This file is part of the Savory Framework for Prudence
+
+Copyright 2011 Three Crickets LLC.
+
+The contents of this file are subject to the terms of the LGPL version 3.0:
+http:www.opensource.org/licenses/lgpl-3.0.html
+
+Alternatively, you can obtain a royalty free commercial license with less
+limitations, transferable or non-transferable, directly from Three Crickets
+at http://threecrickets.com/
+*/
+
+body {
+	font-family: Ubuntu, 'Lucida Sans Unicode', 'Lucida Grande', Verdana, Geneva, Tahoma, Arial, Helvetica, sans-serif !important;
+}
+
+a {
+	text-decoration: none;
+}
+
+/* Page Components */
+
+div.title {
+	font-size: 22px;
+	font-weight: bold;
+}
+
+div.subtitle {
+	font-weight: bold;
+}
+
+/* Tree View */
+
+img.namespace {
+	/* Icon from http://www.famfamfam.com/archive/silk-icons-thats-your-lot/ */
+	background-image: url(../media/cog.png) !important;
+}
+
+img.class {
+	/* Icon from http://www.famfamfam.com/archive/silk-icons-thats-your-lot/ */
+	background-image: url(../media/brick.png) !important;
+}
+
+img.hide-icon {
+	width: 0px;
+}
+
+.x-panel .x-grid-body {
+	/* Ext JS Override */
+	border-width: 0px;
+}
+
+tr.x-grid-row-over div {
+	/* Ext JS Override */
+	background-color: #DDDDFF;
+}
+
+/* Search View */
+
+div.search-item {
+	padding: 5px 5px 5px 5px;
+}
+
+div.search-item-over {
+	background-color: #DDDDFF;
+}
+
+div.x-item-selected {
+	background-color: #DFE8F6
+}
+
+/* Savory Class Panel */
+
+div.savory-class {
+	padding: 10px 10px 10px 10px;
+	font-size: 14px;
+}
+
+div.savory-class em {
+	font-style: italic;
+}
+
+div.savory-class p {
+	margin-top: 10px;
+}
+
+div.savory-class h1, div.savory-class h2, div.savory-class h3 {
+	margin-top: 15px;
+}
+
+div.savory-class ul, div.savory-class ol {
+	margin-left: 20px;
+}
+
+div.savory-class ul li {
+	list-style-type: disc;
+	text-indent: 10px;
+}
+
+div.savory-class ol li {
+	list-style-type: decimal;
+	text-indent: 10px;
+}
+
+div.savory-class pre {
+	border: 1px dashed black;
+	margin-top: 10px;
+	padding: 10px;
+	tab-size: 4;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	-webkit-tab-size: 4;
+}
+
+div.savory-class span.optional {
+	color: gray;
+}
+
+div.savory-class div.button {
+	display: inline;
+	color: black;
+	background-color: #DDDDFF;
+	border: 2px outset #DDDDFF;
+	padding: 1px 4px 1px 4px;
+	margin: 0px 2px 0px 2px;
+	font-size: 12px;
+	cursor: pointer;
+}
+
+div.savory-class div.deprecated {
+	font-weight: normal !important;
+	text-decoration: line-through;
+}
+
+div.savory-class div.meta {
+	padding: 5px 0px 0px 40px;
+	font-size: 12px;
+}
+
+div.savory-class span.open-namespace {
+	color: blue;
+	cursor: pointer;
+}
+
+div.savory-class div.last {
+	border-bottom: 0px;
+	padding-bottom: 0px;
+}
+
+div.savory-class > div.header {
+	padding-bottom: 10px;
+	border-bottom: solid 1px black;
+}
+
+div.savory-class > div.header > div.title {
+	font-size: 22px;
+	font-weight: bold;
+}
+
+div.savory-class > div.header > div.augments {
+	font-style: italic;
+}
+
+div.savory-class > div.header > div.menus {
+	margin-top: 10px;
+}
+
+div.savory-class > div.description {
+	padding: 10px 0px 10px 0px;
+	border-bottom: solid 1px black;
+	line-height: 180%;
+}
+
+div.savory-class > div.properties {
+	padding-top: 10px;
+	border-bottom: solid 1px black;
+}
+
+div.savory-class > div.properties > div.title {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+div.savory-class > div.properties > div.property {
+	padding: 10px 0px 10px 40px;
+	line-height: 180%;
+}
+
+div.savory-class > div.properties > div.property > div.signature {
+	font-weight: bold;
+}
+
+div.savory-class > div.properties > div.property > div.extra {
+	padding-left: 40px;
+	font-size: 12px;
+}
+
+div.savory-class > div.methods {
+	padding-top: 10px;
+	border-bottom: solid 1px black;
+}
+
+div.savory-class > div.methods > div.title {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+div.savory-class > div.methods > div.method {
+	padding: 10px 0px 10px 40px;
+	line-height: 180%;
+}
+
+div.savory-class > div.methods > div.method > div.signature {
+	font-weight: bold;
+}
+
+div.savory-class > div.methods > div.method > div.parameters {
+	margin-left: 80px;
+	text-indent: -40px;
+	padding: 10px 0px 10px 0px;
+}
+
+div.savory-class > div.methods > div.method > div.parameters > div.parameter > span.name {
+	font-weight: bold;
+}
+
+div.savory-class > div.methods > div.method > div.parameters > div.parameter > div.extra {
+	padding-left: 40px;
+	font-size: 12px;
+}
+
+div.savory-class > div.methods > div.method > div.returns {
+	padding: 10px 0px 10px 40px;
+}
+
+div.savory-class > div.methods > div.method > div.returns > div.return > span.name {
+	font-weight: bold;
+}
+
+div.savory-class > div.methods > div.method > div.returns > div.return > div.extra {
+	padding-left: 40px;
+	font-size: 12px;
+}
+
+div.savory-class > div.methods > div.method > div.exceptions {
+	padding: 10px 0px 10px 40px;
+}

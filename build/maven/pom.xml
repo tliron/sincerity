@@ -50,6 +50,7 @@
 	<modules>
 		<module>core</module>
 		<module>sincerity-foundation</module>
+		<module>sincerity-jsdoc</module>
 		<module>plugins/logging</module>
 		<module>plugins/logging-mongodb</module>
 		<module>plugins/clojure</module>
