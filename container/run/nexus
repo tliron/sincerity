@@ -1,7 +1,0 @@
-#!/bin/bash
-
-RUN=/Depot/Projects/Collaborative/Sincerity/container/run
-
-"$RUN/sincerity-default" \
-add org.sonatype.nexus nexus-oss-edition 1.9.2.3 : \
-bootstrap org.codehaus.plexus.classworlds.launcher.Launcher "$@"

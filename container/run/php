@@ -1,7 +1,0 @@
-#!/bin/bash
-
-RUN=/Depot/Projects/Collaborative/Sincerity/container/run
-
-"$RUN/sincerity-default" \
-add com.caucho quercus 4.0.18 : \
-bootstrap com.caucho.quercus.Quercus "$@"

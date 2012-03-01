@@ -871,7 +871,7 @@ Tutorial
 \end_layout
 
 \begin_layout Subsection
-Part 1: Install Sincerity
+Install Sincerity
 \end_layout
 
 \begin_layout Standard
@@ -916,7 +916,13 @@ You might want to add the Sincerity path to your system path, to allow for
 \end_layout
 
 \begin_layout Subsection
-Part 2: One-Line Wonders
+Working with the Command Line
+\end_layout
+
+\begin_layout Standard
+We'll start by pointing out that Sincerity can run in Graphical User Interface
+ (GUI) mode with the ``--gui'' command line switch.
+ But, it's strongly recommended that you learn how to use the command line.
 \end_layout
 
 \begin_layout Standard
@@ -928,15 +934,11 @@ Create a web server, just like that.
 \end_layout
 
 \begin_layout Subsection
-Part 2: Graphical User Interface
+Working with the Graphical User Interface (GUI)
 \end_layout
 
 \begin_layout Subsection
-Part 3: Containers
-\end_layout
-
-\begin_layout Subsection
-Part 4: Get with the Program
+Programs
 \end_layout
 
 \begin_layout Standard
@@ -952,7 +954,11 @@ Ruby, Groovy, etc.
 \end_layout
 
 \begin_layout Subsection
-Part 5: Skeletons in the Closet
+Plugins
+\end_layout
+
+\begin_layout Subsection
+Skeletons
 \end_layout
 
 \begin_layout Section

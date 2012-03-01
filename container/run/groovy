@@ -1,7 +1,0 @@
-#!/bin/bash
-
-RUN=/Depot/Projects/Collaborative/Sincerity/container/run
-
-"$RUN/sincerity-default" \
-add org.codehaus.groovy groovy 1.8.4 : \
-bootstrap groovy.ui.GroovyMain "$@"

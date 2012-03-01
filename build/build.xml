@@ -30,7 +30,7 @@
 	<property name="distribution.templates" value="${distribution.content}/templates" />
 
 	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
-	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies}/libraries/jars/com.izforge.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
+	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="izpack/izpack-standalone-compiler.jar" />
 	
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
@@ -144,10 +144,10 @@
 		</zip>
 	</target>
 	
-	<target name="installers" depends="package" description="Create installers">
+	<target name="installer" depends="package" description="Create installer">
 		<izpack
 			basedir="${basedir}"
-			input="${basedir}/izpack.xml"
+			input="${basedir}/izpack/${component}.xml"
 			output="${distribution}/${component}-${version}-install.jar"
 			inheritAll="true"
 			installerType="standard" />

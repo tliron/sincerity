@@ -1,9 +1,0 @@
-#!/bin/bash
-
-RUN=/Depot/Projects/Collaborative/Sincerity/container/run
-
-"$RUN/sincerity-default" \
-add org.scala-lang scala-compiler 2.9.1 : \
-bootstrap scala.tools.nsc.MainGenericRunner -usejavacp "$@"
- # See: scala-forum.org/read.php?5,411,411
-stty echo

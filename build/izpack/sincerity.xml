@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+<?xml version="1.0"?>
 
 <installation version="1.0">
 	<info>
@@ -7,6 +7,7 @@
 		<url>http://threecrickets.com/@{component}/</url>
 		<javaversion>1.5</javaversion>
 		<uninstaller path="$INSTALL_PATH/uninstaller" />
+		<run-privileged />
 	</info>
 
 	<locale>
@@ -16,19 +17,20 @@
 	<guiprefs width="600" height="480" resizable="yes" />
 
 	<panels>
-		<panel classname="HelloPanel" />
 		<panel classname="LicencePanel" />
 		<panel classname="TargetPanel" />
 		<panel classname="InstallPanel" />
 	</panels>
 
 	<resources>
-		<res id="LicencePanel.licence" src="@{distribution.content}/license.txt" />
+		<res id="LicencePanel.licence" src="@{component.notices}/license.txt" />
+		<!-- <res id="shortcutSpec.xml" src="izpack/shortcut_windows.xml" /> <res 
+			id="Unix_shortcutSpec.xml" src="izpack/shortcut_unix.xml" /> -->
 	</resources>
-	
+
 	<packs>
-		<pack name="Sincerity" required="yes">
-			<description>Sincerity</description>
+		<pack name="@{title}" required="yes">
+			<description>@{title}</description>
 			<fileset dir="@{distribution.content}" targetdir="$INSTALL_PATH" />
 		</pack>
 	</packs>

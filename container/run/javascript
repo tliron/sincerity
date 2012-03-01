@@ -1,7 +1,0 @@
-#!/bin/bash
-
-RUN=/Depot/Projects/Collaborative/Sincerity/container/run
-
-"$RUN/sincerity-default" \
-add org.mozilla rhino 1.7R3 : \
-bootstrap org.mozilla.javascript.tools.shell.Main "$@"
