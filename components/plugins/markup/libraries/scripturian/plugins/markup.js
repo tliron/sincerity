@@ -1,5 +1,6 @@
 
 document.execute('/sincerity/objects/')
+document.execute('/sincerity/files/')
 document.execute('/sincerity/jvm/')
 
 importClass(
@@ -31,11 +32,15 @@ function run(command) {
 }
 
 function render(command) {
-	if (command.arguments.length < 1) {
-		throw new BadArgumentsCommandException(command, 'language')
+	command.parse = true
+	if (command.arguments.length < 3) {
+		throw new BadArgumentsCommandException(command, 'language', 'marked up source path', 'rendered output path')
 	}
 
 	var name = command.arguments[0]
+	var sourceFile = command.arguments[1]
+	var renderedFile = command.arguments[2]
+	var complete = command.properties.get('complete') != 'false'
 	
 	var fullName = languageNames[name.toLowerCase()]
 	if (!Sincerity.Objects.exists(fullName)) {
@@ -54,14 +59,22 @@ function render(command) {
 	if (!Sincerity.Objects.exists(language)) {
 		throw new CommandException(command, 'Could not load markup language implementation: ' + fullName)
 	}
+	
+	var source = Sincerity.Files.loadText(sourceFile)
 
 	var parser = new org.eclipse.mylyn.wikitext.core.parser.MarkupParser(language) 
 	var writer = new java.io.StringWriter()
 	var builder = new org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder(writer)
 	parser.builder = builder
-	parser.parse('hi', true)
+	parser.parse(source, complete)
 	var rendered = String(writer.toString())
-	println(rendered)
+	writer = Sincerity.Files.openForTextWriting(renderedFile)
+	try {
+		writer.write(rendered)
+	}
+	finally {
+		writer.close()
+	}
 }
 
 function getLanguage(name) {
