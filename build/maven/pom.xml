@@ -64,6 +64,8 @@
 		<module>plugins/service-remote-jmx</module>
 		<module>plugins/felix</module>
 		<module>plugins/jsdoc</module>
+		<module>plugins/markup</module>
+		<module>plugins/batik</module>
 		<module>skeletons/rails</module>
 		<module>skeletons/restlet</module>
 		<module>skeletons/restlet-example</module>

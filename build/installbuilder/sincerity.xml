@@ -90,6 +90,19 @@
             </startMenuShortcutList>
         </component>
     </componentList>
+    <preInstallationActionList>
+        <autodetectJava>
+            <promptUser>0</promptUser>
+            <validVersionList>
+                <validVersion>
+                    <maxVersion></maxVersion>
+                    <minVersion>1.5</minVersion>
+                    <requireJDK>0</requireJDK>
+                    <vendor></vendor>
+                </validVersion>
+            </validVersionList>
+        </autodetectJava>
+    </preInstallationActionList>
     <postInstallationActionList>
         <addDirectoryToPath>
             <insertAt>end</insertAt>

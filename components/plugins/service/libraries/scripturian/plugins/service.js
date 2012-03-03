@@ -4,12 +4,14 @@ document.executeOnce('/sincerity/jvm/')
 document.executeOnce('/sincerity/objects/')
 
 importClass(
+	com.threecrickets.sincerity.exception.CommandException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException,
-	com.threecrickets.sincerity.exception.SincerityException,
 	java.io.File,
 	java.io.BufferedReader,
 	java.io.FileReader,
 	java.lang.System)
+
+var WRAPPER_VERSION = '3.5.13'
 
 var os = getOs()
 
@@ -92,8 +94,8 @@ function service(command) {
 		binary = command.sincerity.container.getLibrariesFile('native', binary)
 		if (!binary.exists()) {
 			if (isSupported(os)) {
-				sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, '3.5.13'])
-				sincerity.run('dependencies:install')
+				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, WRAPPER_VERSION])
+				command.sincerity.run('dependencies:install')
 				var nativeDir = command.sincerity.container.getLibrariesFile('native')
 				if (nativeDir.directory) {
 					var files = nativeDir.listFiles()
@@ -106,7 +108,7 @@ function service(command) {
 				}
 			}
 			if (!binary.exists()) {
-				throw new SincerityException('The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+				throw new CommandException(command, 'The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
 			}
 		}
 	
@@ -188,7 +190,7 @@ function service(command) {
 		for (var c in configuration) {
 			arguments.push(c + '=' + configuration[c])
 		}
-		sincerity.container.getLogsFile().mkdirs()
+		command.sincerity.container.getLogsFile().mkdirs()
 
 		/*for (c in arguments) {
 			command.sincerity.out.println(c + ' = ' + arguments[c])
@@ -198,7 +200,7 @@ function service(command) {
 		if (verb == 'console') {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
-		sincerity.run('delegate:execute', arguments)
+		command.sincerity.run('delegate:execute', arguments)
 		if ((verb == 'start') || (verb == 'restart')) {
 			command.sincerity.out.println('Started ' + displayName)
 		}
