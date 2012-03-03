@@ -888,17 +888,18 @@ Sincerity vs.
 Maven is a comprehensive solution for managing Java projects, handling building,
  dependency management and distribution.
  It contrastingly combines a lot flexibility on the one hand---an open plugin
- API built on the Plexus IoC container---with a rigid reactor-based, multi-phase
- cycle on the other.
+ API built on the Plexus IoC container---with deliberate rigidity on the
+ other hand: a strict reactor-based, multi-phase cycle.
  In particular, Maven's design goes to great lengths to keep you from affecting
  the order of operations: you are supposed to configure your project, and
  let Maven decide what to do when.
  For those used to scripting their build process, this approach may initially
  seem baffling and restricting.
- But you get to see the benefits in very large, complex projects: instead
- of coding and maintaining nightmarishly long build scripts based on dozens
- of changing environment variables, you can sit back and let Maven analyze
- the entire operation and then do the right thing.
+ However, there are significant benefits to this approach when working with
+ very large, complex projects: instead of coding and maintaining nightmarishly
+ long build scripts based on dozens of changing environment variables, you
+ can sit back and let Maven analyze the entire operation and then do the
+ right thing.
 \end_layout
 
 \begin_layout Standard
@@ -914,16 +915,15 @@ But, for this to work, you need to play by Maven's rules, and that's where
 \begin_layout Standard
 Both Sincerity and Maven handle downloading dependencies, but other than
  this apparent overlap these products have different goals and scope.
- Importantly, they can be quite complementary.
+ Importantly, they can be very complementary.
  One way to think of this is that Maven could come first and Sincerity come
  second: Maven could help you build your project and repositories, while
- Sincerity would be your deployment container.
- Maven can't help you run your application: its output is jars of compiled
- code, source code or documentation, but it doesn't handle bootstrapping
- or configuration.
+ Sincerity would handle your deployment container.
+ Maven wont't help you run your application: its output is jars of compiled
+ code, source code or documentation, but it doesn't handle their bootstrapping
+ or runtime configuration.
  On the other hand, Sincerity does not build your project, nor make any
- assumptions about how its built: you can use Maven or anything else.
- 
+ assumptions about how its built: you can use Maven, Ant or anything else.
 \end_layout
 
 \begin_layout Subsubsection
@@ -940,19 +940,27 @@ interface
 \begin_inset Quotes erd
 \end_inset
 
- in the JVM lets you create a standard protocol, letting you plug in various
- implementations (
+ in the JVM lets you create a standard protocol, such that you plug in various
+ implementations of it---
 \begin_inset Quotes eld
 \end_inset
 
-classes
+classes,
 \begin_inset Quotes erd
 \end_inset
 
-) at runtime.
+ with 
+\begin_inset Quotes eld
+\end_inset
+
+methods
+\begin_inset Quotes erd
+\end_inset
+
+ as the entry points---at runtime.
  The protocol is enforced by the JVM, which will not let you plug in implementat
-ion that do not fit the interface.
- OSGi takes this up a level: it provides a much broader concept of 
+ions that do not fit the interface.
+ OSGi takes this up a level, by providing a much broader concept of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -972,7 +980,7 @@ bundle
 \end_layout
 
 \begin_layout Standard
-So far so good, but it get complicated fast.
+So far so good, but it gets complicated fast.
  OSGi takes it up one level more: the protocols are published and endorsed
  by a community of providers, with the idea that different providers (software
  vendors or departments in a large enterprise) can provide bundles to implement
@@ -985,35 +993,38 @@ DLL hell
 \begin_inset Quotes erd
 \end_inset
 
- suddenly becomes far more malevolent: because bundles are often black boxes
+ suddenly becomes a far more malevolent enemy: bundles are often black boxes
  that you cannot easily patch to use a shared version of a dependency.
- There needs to be a built-in solution, which OSGi provides via a system
- of classloaders.
+ There's thus a real needs for a built-in solution, which OSGi provides
+ via a system of classloaders.
 \end_layout
 
 \begin_layout Standard
 \SpecialChar \ldots{}
 Which, of course, introduces its own set of problems.
- To get this to work, OSGi requires strict separation of classloading between
- bundles, which in turn adds subtle and mischievous restrictions to your
- usual JVM work.
+ To get its classloading scheme to work, OSGi requires strict separation
+ of classloading between bundles, which in turn adds subtle and mischievous
+ restrictions to your usual JVM work.
  This is not entirely bad: working within these limitations does encourage
- clean, sharp boundaries between your modules.
+ clean, sharp boundaries between your modules, and goes a long way towards
+ reducing classloading confusion.
  It's not, however, trivial by any means, and all your bundles must be designed
- with this in mind.
+ with this in mind for OSGi to work properly.
 \end_layout
 
 \begin_layout Standard
 One very useful side effect of having the framework control classloading
  is that entire bundles can be loaded and unloaded during runtime.
  Indeed, OSGi defines protocols far starting, stopping and hotswapping services.
- This is the entire motivation for using OSGi in some cases.
- (Though, if that's your reason, you might want to look at simpler ways
- to enable hotswapping, rather than embracing the whole of OSGi.)
+ This is a powerful feature in itself, and is indeed the entire motivation
+ for using OSGi in some cases.
+ (Though, if that's your reason, you might want to look at other, simpler
+ ways to enable hotswapping, rather than embracing the whole of OSGi.)
 \end_layout
 
 \begin_layout Standard
-There is a more straightforward solution to the problem of 
+It's worth noting, however, that there is a more straightforward solution
+ to the problem of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1029,37 +1040,54 @@ bundle
 \begin_inset Quotes erd
 \end_inset
 
- as a separate process? Each JVM will load its own classes as necessary,
+ as a separate process? Each JVM would load its own classes as necessary,
  and never will they mix or conflict.
  This makes a lot of sense if you're running a distributed system, since
- you're already dividing your software among many machines, and thus processes,
+ you're already dividing your software among many machines and processes,
  and indeed many parts of your application may not be JVM-based at all,
- and can't share memory space anyway.
- The problem of starting and stopping processes is already solved by the
- operating system, so you don't need OSGi's protocol for that.
- One way to look at it is that OSGi is, in effect, creating a virtual operating
- system 
+ and can't be run in a single process anyway.
+ As for starting and stopping your 
+\begin_inset Quotes eld
+\end_inset
+
+bundles,
+\begin_inset Quotes erd
+\end_inset
+
+ the operating system already does a good job of managing processes, so
+ you don't need OSGi's protocol for that.
+ From this perspective, you can see that OSGi is, in effect, creating a
+ virtual operating system 
 \emph on
 inside
 \emph default
- the JVM.
+ the JVM, where 
+\begin_inset Quotes eld
+\end_inset
+
+bundles
+\begin_inset Quotes erd
+\end_inset
+
+ are very much like operating system processes.
 \end_layout
 
 \begin_layout Standard
-Duh! The target environment for OSGi is precisely one in which all bundles
- run in a single process, in shared memory space.
- It is the world of embedded computing, where the runtime is variously confined:
- either you can't start another process, or don't have the RAM to do so.
- Indeed, in such environments, OSGi may be your only good solution for the
- problem of modularity and pluggable services.
+Indeed, the original target environment for OSGi was precisely one in which
+ all bundles run in a single process, in shared memory space: it is the
+ world of embedded computing, where the runtime is variously confined, such
+ that you are either limited to a single process for security concerns,
+ or due to limited resources.
+ In such environments OSGi may be your only good solution for the problem
+ of modularity and pluggable services.
  Still, OSGi has also proved popular in large enterprise environments, where
  it allows for modules to be treated more abstractly whether or not they
  are running in a single process.
 \end_layout
 
 \begin_layout Standard
-Sincerity, in itself, takes an opposite approach: such high-level modularity
- is provided through the notion of 
+Sincerity, in itself, takes the more straightforward approach: such high-level
+ modularity is provided through the notion of 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1067,7 +1095,8 @@ containers,
 \begin_inset Quotes erd
 \end_inset
 
- which you can easily create, clone and change.
+ which you can easily create, clone and change, and start and stop as processes
+ (the service plugin makes it especially easy to run them daemons and services).
  Containers can then talk to each other (and to other services) using whatever
  technology is appropriate, be it REST, SOAP, message queuing, Hazelcast,
  etc.
@@ -1633,6 +1662,14 @@ admin
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsubsection
+Markup Plugin
+\end_layout
+
+\begin_layout Subsubsection
+Batik SVG Plugin
 \end_layout
 
 \begin_layout Section

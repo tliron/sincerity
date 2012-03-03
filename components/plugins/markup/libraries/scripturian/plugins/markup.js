@@ -8,6 +8,7 @@ importClass(
 	com.threecrickets.sincerity.exception.CommandException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
+var PEGDOWN_VERSION = '1.1.0'
 var WIKITEXT_VERSION = '1.5.0'
 
 var languageNames = {
@@ -41,7 +42,29 @@ function render(command) {
 	var sourceFile = command.arguments[1]
 	var renderedFile = command.arguments[2]
 	var complete = command.properties.get('complete') != 'false'
+		
+	if (name.toLowerCase() == 'markdown') {
+		renderMarkdown(command, sourceFile, renderedFile)
+	}
+	else {
+		renderWikiText(command, sourceFile, renderedFile, name, complete)
+	}
+}
+
+function renderMarkdown(command, sourceFile, renderedFile) {
+	if (!Sincerity.Objects.exists(Sincerity.JVM.getClass('org.pegdown.PegDownProcessor'))) {
+		// Install the relevant dependency
+		command.sincerity.run('dependencies:add', ['org.pegdown', 'pegdown', PEGDOWN_VERSION])
+		command.sincerity.run('dependencies:install')
+	}
 	
+	var parser = new org.pegdown.PegDownProcessor()
+	var source = Sincerity.Files.loadText(sourceFile).array()
+	var rendered = parser.markdownToHtml(source)
+	write(rendered, renderedFile)
+}
+
+function renderWikiText(command, sourceFile, renderedFile, name, complete) {
 	var fullName = languageNames[name.toLowerCase()]
 	if (!Sincerity.Objects.exists(fullName)) {
 		throw new CommandException(command, 'Unsupported markup language: ' + name)
@@ -67,14 +90,8 @@ function render(command) {
 	var builder = new org.eclipse.mylyn.wikitext.core.parser.builder.HtmlDocumentBuilder(writer)
 	parser.builder = builder
 	parser.parse(source, complete)
-	var rendered = String(writer.toString())
-	writer = Sincerity.Files.openForTextWriting(renderedFile)
-	try {
-		writer.write(rendered)
-	}
-	finally {
-		writer.close()
-	}
+	var rendered = writer.toString()
+	write(rendered, renderedFile)
 }
 
 function getLanguage(name) {
@@ -83,4 +100,14 @@ function getLanguage(name) {
 		return serviceLocator.getMarkupLanguage(name)
 	}
 	return null
+}
+
+function write(rendered, renderedFile) {
+	var writer = Sincerity.Files.openForTextWriting(renderedFile)
+	try {
+		writer.write(rendered)
+	}
+	finally {
+		writer.close()
+	}
 }
