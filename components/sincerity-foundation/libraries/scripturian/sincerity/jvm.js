@@ -30,11 +30,12 @@ Sincerity.JVM = Sincerity.JVM || function() {
     var Public = {}
 
 	/**
-	 * Loads a JVM class by name.
+	 * Loads a JVM class by name, using the current thread context.
 	 * 
 	 * @returns {java.lang.Class}
 	 */
 	Public.getClass = function(name) {
+    	var classLoader = java.lang.Thread.currentThread().contextClassLoader
 		try {
 			return classLoader.loadClass(name)
 		}
@@ -416,8 +417,6 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	//
 	// Initialization
 	//
-	
-	var classLoader = java.lang.ClassLoader.systemClassLoader
 	
 	var primitiveTypes = {
 		'object': Public.getClass('java.lang.Object'),
