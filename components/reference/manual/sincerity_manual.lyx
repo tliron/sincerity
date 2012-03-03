@@ -183,11 +183,18 @@ When it comes to the JVM, a few products have been widely adopted that make
  some of this work easier.
  However, experience has shown them to have too small a scope: they solve
  very specific problems, but do not address the complete challenge.
- (See the ``Other Solutions'' section for an in-depth comparison of Sincerity
- to some of these existing solutions.) Additionally, since they are already
- a few years old, they predate the linguistic revolution that is happening
- in full force on the JVM: no longer is Java the only good choice for leveraging
- the platform.
+ (See the 
+\begin_inset Quotes eld
+\end_inset
+
+Other Solutions
+\begin_inset Quotes erd
+\end_inset
+
+ section for an in-depth comparison of Sincerity to some of these existing
+ solutions.) Additionally, since they are already a few years old, they predate
+ the linguistic revolution that is happening in full force on the JVM: no
+ longer is Java the only good choice for leveraging the platform.
  New and popular languages like Scala, Clojure and Groovy offer a new experience
  and culture, while Rhino, Jython, JRuby and Quercus bring popular languages
  and their paradigms to the JVM.
@@ -214,7 +221,15 @@ You might want to jump straight to the tutorial to see how it works, but
 \end_layout
 
 \begin_layout Subsubsection
-Dependency Management and ``DLL hell''
+Dependency Management and 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -226,7 +241,15 @@ Find the library's web site
 \end_layout
 
 \begin_layout Enumerate
-Look for the ``download'' button
+Look for the 
+\begin_inset Quotes eld
+\end_inset
+
+download
+\begin_inset Quotes erd
+\end_inset
+
+ button
 \end_layout
 
 \begin_layout Enumerate
@@ -322,7 +345,15 @@ This is not a new problem, and there are already a few solutions for it.
  now let's just say that the former is too limited in scope, and the latter
  too constraining.
  There are also various difficulties in configuring these tools: Sincerity
- ``just works,'' immediately and easily.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+just works,
+\begin_inset Quotes erd
+\end_inset
+
+ immediately and easily.
 \end_layout
 
 \begin_layout Standard
@@ -336,11 +367,19 @@ There's also the problem of working in a bubble: if you are using Jython,
 Then there's the issue of potential conflicts, a.
  k.
  a.
- ``DLL hell'': What if one application you're working on requires one version
- of a specific library, and another application requires another? What if
- this happens within different parts of the same application? Again, there
- are standards and tools for this---OSGi and Jigsaw---but they require to
- work entirely within the paradigms they enforce.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+: What if one application you're working on requires one version of a specific
+ library, and another application requires another? What if this happens
+ within different parts of the same application? Again, there are standards
+ and tools for this---OSGi and Jigsaw---but they require to work entirely
+ within the paradigms they enforce.
  Sincerity doesn't stop you from using them (in fact, it has great support
  for the Felix OSGi container), but definitely does not force you to play
  by any special rules.
@@ -364,15 +403,29 @@ The JVM is packaged as a set of command line utilities, plus a few plugins
 For anything more complex, you will need to handle bootstrapping your applicatio
 n.
  This means, at the very least, finding the right JVM on the machine (more
- than one may be installed), and then loading the application via the ``java''
+ than one may be installed), and then loading the application via the 
+\begin_inset Quotes eld
+\end_inset
+
+java
+\begin_inset Quotes erd
+\end_inset
+
  tool.
  Usually, however, it ends up being far more complicated: rummaging through
  environment variables, detecting the host operating system and environment
  in order to set specialized JVM flags and load optimized native libraries,
  and because this is so complex, you'll want to responding to specialized
  bootstrapping flags set by the user.
- Indeed, many JVM-based products won't ``just run,'' but will in fact require
- you to set a host of environment variables first.
+ Indeed, many JVM-based products won't 
+\begin_inset Quotes eld
+\end_inset
+
+just run,
+\begin_inset Quotes erd
+\end_inset
+
+ but will in fact require you to set a host of environment variables first.
 \end_layout
 
 \begin_layout Standard
@@ -423,7 +476,15 @@ What this means is that most products won't have to do anything beyond what
 \end_layout
 
 \begin_layout Subsubsection
-Configuration and ``XML hell''
+Configuration and 
+\begin_inset Quotes eld
+\end_inset
+
+XML hell
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -446,9 +507,16 @@ But there's a more serious problem to most of these approaches: they are
  While there are many advantages to using text files for configuration,
  the choice of technologies is baffling.
  Possibly the worst choice is XML.
- This language, ostensibly a ``markup'' language, is marking up nothing
- when used for configuration: it's instead used as a cumbersome format for
- structured textual data.
+ This language, ostensibly a 
+\begin_inset Quotes eld
+\end_inset
+
+markup
+\begin_inset Quotes erd
+\end_inset
+
+ language, is marking up nothing when used for configuration: it's instead
+ used as a cumbersome format for structured textual data.
  And it gets far, far worse: XML configuration files are often used 
 \emph on
 programatically
@@ -460,8 +528,16 @@ programatically
 \end_layout
 
 \begin_layout Standard
-The use of XML for configuration is part of what we call ``XML hell,'' which
- refers to programmers being swamped with countless overly-verbose XML files.
+The use of XML for configuration is part of what we call 
+\begin_inset Quotes eld
+\end_inset
+
+XML hell,
+\begin_inset Quotes erd
+\end_inset
+
+ which refers to programmers being swamped with countless overly-verbose
+ XML files.
  XML is also often abused as an interchange format on the Internet, and
  a descriptor format in much of the JVM enterprise industry.
  Enough already!
@@ -478,9 +554,17 @@ this XML is far more complicated that just parsing it.
  In essence, parsing a general-purpose XML for something like Jetty involves
  writing a complete (more likely, not complete enough) scripting language
  engine.
- Another excuse for ``XML hell'' could be part of the general over-enthusiasm
- with XML, and the untested faith that standardizing on a single format
- would lead to greater interoperability.
+ Another excuse for 
+\begin_inset Quotes eld
+\end_inset
+
+XML hell
+\begin_inset Quotes erd
+\end_inset
+
+ could be part of the general over-enthusiasm with XML, and the untested
+ faith that standardizing on a single format would lead to greater interoperabil
+ity.
  Again, this is madness: unless you couple the XML file with the code that
  can make sense of it, the ability to parse them is of little use.
 \end_layout
@@ -505,18 +589,41 @@ n parameters.
  But, you also have the option of injecting interpreted code where appropriate.
  And, of course, it's still just text files that don't need to be compiled,
  and can even be picked up and re-interpreted at runtime, so you're still
- absolutely within the ``configuration-by-text-file'' paradigm.
+ absolutely within the 
+\begin_inset Quotes eld
+\end_inset
+
+configuration-by-text-file
+\begin_inset Quotes erd
+\end_inset
+
+ paradigm.
 \end_layout
 
 \begin_layout Standard
-If you've never tried the ``configuration-by-script'' approach before, you
- might be skeptical about its benefits or worried about the extra weight
- it adds.
+If you've never tried the 
+\begin_inset Quotes eld
+\end_inset
+
+configuration-by-script
+\begin_inset Quotes erd
+\end_inset
+
+ approach before, you might be skeptical about its benefits or worried about
+ the extra weight it adds.
  But Sincerity's JavaScript engine is very lightweight, and we're convinced
  that once you try this approach, you will never want another.
  For an instructive example, install Sincerity's logging plugin, and take
  a look at the logging configuration files.
- Now compare them to the ``official'' log4j formats.
+ Now compare them to the 
+\begin_inset Quotes eld
+\end_inset
+
+official
+\begin_inset Quotes erd
+\end_inset
+
+ log4j formats.
 \end_layout
 
 \begin_layout Standard
@@ -530,8 +637,16 @@ One consequence of this approach is that the line between bootstrapping
 \end_layout
 
 \begin_layout Standard
-We really hope to see ``configuration-by-script'' used throughout the JVM
- world, even for projects that do not want to or cannot use Sincerity.
+We really hope to see 
+\begin_inset Quotes eld
+\end_inset
+
+configuration-by-script
+\begin_inset Quotes erd
+\end_inset
+
+ used throughout the JVM world, even for projects that do not want to or
+ cannot use Sincerity.
 \end_layout
 
 \begin_layout Subsubsection
@@ -561,7 +676,14 @@ JVM library.
 \end_layout
 
 \begin_layout Standard
-Note that logging configuration is handled via the ``configuration-by-script''
+Note that logging configuration is handled via the 
+\begin_inset Quotes eld
+\end_inset
+
+configuration-by-script
+\begin_inset Quotes erd
+\end_inset
+
  approach mentioned above, and is well integrated with the whole ecology
  of Sincerity plugins.
 \end_layout
@@ -572,8 +694,16 @@ Why JavaScript?
 
 \begin_layout Standard
 There are many great scripting languages for the JVM.
- Note that by ``scripting'' here we mean languages that are immediately
- runnable from the textual source code.
+ Note that by 
+\begin_inset Quotes eld
+\end_inset
+
+scripting
+\begin_inset Quotes erd
+\end_inset
+
+ here we mean languages that are immediately runnable from the textual source
+ code.
  This doesn't have to mean that are strictly interpreted: many of these
  languages compile some or all of such code on-the-fly.
  So, why hasn't Sincerity standardized on Groovy, Scala, Clojure, Lua, Python,
@@ -610,19 +740,49 @@ Since we are running JavaScript on the JVM, we have full access to the Java
 \end_layout
 
 \begin_layout Enumerate
-Sincerity comes with the ``Sincerity Framework,'' a very lightweight library,
- written in JavaScript, that makes working with JavaScript on the JVM a
- little bit easier.
+Sincerity comes with the 
+\begin_inset Quotes eld
+\end_inset
+
+Sincerity Framework,
+\begin_inset Quotes erd
+\end_inset
+
+ a very lightweight library, written in JavaScript, that makes working with
+ JavaScript on the JVM a little bit easier.
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
 JavaScript is very future-proof: not only is it an open standard (where
- it's called ``ECMAScript''), but it will be baked into Oracle's JVM distributio
-n from version 8, as the Nashorn engine.
- (Get it? ``Nashorn'' is German for ``rhinoceros.'') Nashorn will also make
- good use of the dynamicinvoke opcode introduced in version 7, promising
- especially good performance.
+ it's called 
+\begin_inset Quotes eld
+\end_inset
+
+ECMAScript
+\begin_inset Quotes erd
+\end_inset
+
+), but it will be baked into Oracle's JVM distribution from version 8, as
+ the Nashorn engine.
+ (Get it? 
+\begin_inset Quotes eld
+\end_inset
+
+Nashorn
+\begin_inset Quotes erd
+\end_inset
+
+ is German for 
+\begin_inset Quotes eld
+\end_inset
+
+rhinoceros.
+\begin_inset Quotes erd
+\end_inset
+
+) Nashorn will also make good use of the dynamicinvoke opcode introduced
+ in version 7, promising especially good performance.
  Sincerity may very well migrate to Nashorn when it becomes available, or
  at least offer it as an option.
 \end_layout
@@ -772,13 +932,43 @@ Sincerity vs.
 \end_layout
 
 \begin_layout Standard
-An ``interface'' in the JVM lets you create a standard protocol, letting
- you plug in various implementations (``classes'') at runtime.
+An 
+\begin_inset Quotes eld
+\end_inset
+
+interface
+\begin_inset Quotes erd
+\end_inset
+
+ in the JVM lets you create a standard protocol, letting you plug in various
+ implementations (
+\begin_inset Quotes eld
+\end_inset
+
+classes
+\begin_inset Quotes erd
+\end_inset
+
+) at runtime.
  The protocol is enforced by the JVM, which will not let you plug in implementat
 ion that do not fit the interface.
- OSGi takes this up a level: it provides a much broader concept of ``implementat
-ion.'' The implementation is a ``bundle'' that can contain any number of
- classes.
+ OSGi takes this up a level: it provides a much broader concept of 
+\begin_inset Quotes eld
+\end_inset
+
+implementation.
+\begin_inset Quotes erd
+\end_inset
+
+ The implementation is a 
+\begin_inset Quotes eld
+\end_inset
+
+bundle
+\begin_inset Quotes erd
+\end_inset
+
+ that can contain any number of classes.
 \end_layout
 
 \begin_layout Standard
@@ -787,9 +977,16 @@ So far so good, but it get complicated fast.
  by a community of providers, with the idea that different providers (software
  vendors or departments in a large enterprise) can provide bundles to implement
  them, which would all work together perfectly.
- With this broader ambition, ``DLL hell'' suddenly becomes far more malevolent:
- because bundles are often black boxes that you cannot easily patch to use
- a shared version of a dependency.
+ With this broader ambition, 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+ suddenly becomes far more malevolent: because bundles are often black boxes
+ that you cannot easily patch to use a shared version of a dependency.
  There needs to be a built-in solution, which OSGi provides via a system
  of classloaders.
 \end_layout
@@ -816,9 +1013,24 @@ One very useful side effect of having the framework control classloading
 \end_layout
 
 \begin_layout Standard
-There is a more straightforward solution to the problem of ``DLL hell'':
- Why not run each ``bundle'' as a separate process? Each JVM will load its
- own classes as necessary, and never will they mix or conflict.
+There is a more straightforward solution to the problem of 
+\begin_inset Quotes eld
+\end_inset
+
+DLL hell
+\begin_inset Quotes erd
+\end_inset
+
+: Why not run each 
+\begin_inset Quotes eld
+\end_inset
+
+bundle
+\begin_inset Quotes erd
+\end_inset
+
+ as a separate process? Each JVM will load its own classes as necessary,
+ and never will they mix or conflict.
  This makes a lot of sense if you're running a distributed system, since
  you're already dividing your software among many machines, and thus processes,
  and indeed many parts of your application may not be JVM-based at all,
@@ -847,8 +1059,15 @@ Duh! The target environment for OSGi is precisely one in which all bundles
 
 \begin_layout Standard
 Sincerity, in itself, takes an opposite approach: such high-level modularity
- is provided through the notion of ``containers,'' which you can easily
- create, clone and change.
+ is provided through the notion of 
+\begin_inset Quotes eld
+\end_inset
+
+containers,
+\begin_inset Quotes erd
+\end_inset
+
+ which you can easily create, clone and change.
  Containers can then talk to each other (and to other services) using whatever
  technology is appropriate, be it REST, SOAP, message queuing, Hazelcast,
  etc.
@@ -906,7 +1125,22 @@ Mac OS X: Applications
 \end_layout
 
 \begin_layout Standard
-You can then run the ``sincerity'' script (Unix and mac) or ``sincerity.bat''
+You can then run the 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity
+\begin_inset Quotes erd
+\end_inset
+
+ script (Unix and mac) or 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity.bat
+\begin_inset Quotes erd
+\end_inset
+
  (Windows).
 \end_layout
 
@@ -921,7 +1155,15 @@ Working with the Command Line
 
 \begin_layout Standard
 We'll start by pointing out that Sincerity can run in Graphical User Interface
- (GUI) mode with the ``--gui'' command line switch.
+ (GUI) mode with the 
+\begin_inset Quotes eld
+\end_inset
+
+--gui
+\begin_inset Quotes erd
+\end_inset
+
+ command line switch.
  But, it's strongly recommended that you learn how to use the command line.
 \end_layout
 
@@ -961,11 +1203,11 @@ Plugins
 Skeletons
 \end_layout
 
-\begin_layout Section
+\begin_layout Subsection
 Basic Concepts
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Container
 \end_layout
 
@@ -987,7 +1229,7 @@ Why such an emphasis on self-containment? One goal is for the container
  You can undo you work simply by deleting the container's directory.
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Dependency
 \end_layout
 
@@ -1042,7 +1284,7 @@ meta-dependencies.
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Artifact
 \end_layout
 
@@ -1063,7 +1305,7 @@ packages
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Package
 \end_layout
 
@@ -1089,7 +1331,7 @@ Sincerity contains tools to help you easily create your own packages, as
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Repository
 \end_layout
 
@@ -1106,28 +1348,24 @@ Sincerity supports several repository technologies, and can also help you
  
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Shortcut
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Plugin
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Skeleton
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 Template
 \end_layout
 
-\begin_layout Section
-Containers
-\end_layout
-
 \begin_layout Subsection
-Structure
+What Is a Container?
 \end_layout
 
 \begin_layout Standard
@@ -1197,62 +1435,6 @@ A strict structure, non-negotiable, non-configurable.
 
 \begin_layout Subsubsection
 /reference/sources/
-\end_layout
-
-\begin_layout Section
-Commands
-\end_layout
-
-\begin_layout Section
-The GUI
-\end_layout
-
-\begin_layout Section
-Templates
-\end_layout
-
-\begin_layout Section
-Repositories
-\end_layout
-
-\begin_layout Section
-Packages
-\end_layout
-
-\begin_layout Subsection
-Skeletons
-\end_layout
-
-\begin_layout Subsection
-Installers and Uninstallers
-\end_layout
-
-\begin_layout Section
-Shortcuts
-\end_layout
-
-\begin_layout Standard
-/configuration/sincerity/shortcuts.conf
-\end_layout
-
-\begin_layout Section
-Built-In Plugins
-\end_layout
-
-\begin_layout Section
-Custom Plugins
-\end_layout
-
-\begin_layout Standard
-Creating your own
-\end_layout
-
-\begin_layout Section
-Integration with Version Control Systems
-\end_layout
-
-\begin_layout Standard
-git, Mercurial, Bazaar, Subversion
 \end_layout
 
 \begin_layout Section
@@ -2960,7 +3142,19 @@ s to contribute, and also allow such plugins to be distributed as simple
 \end_layout
 
 \begin_layout Section
-Shortcuts
+The Sincerity Framework
+\end_layout
+
+\begin_layout Section
+The Sincerity JsDoc Template
+\end_layout
+
+\begin_layout Section
+Extending Sincerity
+\end_layout
+
+\begin_layout Standard
+Creating your own
 \end_layout
 
 \begin_layout Section

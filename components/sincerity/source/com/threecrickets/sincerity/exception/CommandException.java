@@ -14,6 +14,12 @@ public class CommandException extends SincerityException
 		this.command = command;
 	}
 
+	public CommandException( Command command, String message, Throwable cause )
+	{
+		super( message, cause );
+		this.command = command;
+	}
+
 	//
 	// Attributes
 	//
