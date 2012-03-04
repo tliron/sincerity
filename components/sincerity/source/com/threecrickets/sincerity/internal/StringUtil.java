@@ -1,5 +1,7 @@
 package com.threecrickets.sincerity.internal;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
 
 public class StringUtil
@@ -26,5 +28,32 @@ public class StringUtil
 				r.append( delimiter );
 		}
 		return r.toString();
+	}
+
+	public static String joinStackTrace( Throwable x )
+	{
+		StringWriter writer = null;
+		writer = new StringWriter();
+		joinStackTrace( x, writer );
+		return writer.toString();
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private static void joinStackTrace( Throwable x, StringWriter writer )
+	{
+		PrintWriter printer = new PrintWriter( writer );
+		while( x != null )
+		{
+			printer.println( x );
+			StackTraceElement[] trace = x.getStackTrace();
+			for( int i = 0; i < trace.length; i++ )
+				printer.println( "\tat " + trace[i] );
+
+			x = x.getCause();
+			if( x != null )
+				printer.println( "Caused by:\r\n" );
+		}
 	}
 }

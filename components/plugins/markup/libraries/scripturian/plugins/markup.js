@@ -4,7 +4,6 @@ document.execute('/sincerity/files/')
 document.execute('/sincerity/jvm/')
 
 importClass(
-	java.lang.ClassNotFoundException,
 	com.threecrickets.sincerity.exception.CommandException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 

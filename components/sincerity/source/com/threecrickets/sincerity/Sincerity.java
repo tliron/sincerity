@@ -19,6 +19,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
+import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 
 public class Sincerity implements Runnable
@@ -435,12 +436,12 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			getErr().println( x.getMessage() );
-			x.printStackTrace( getErr() );
+			printStackTrace( x );
 			System.exit( 1 );
 		}
 		catch( Throwable x )
 		{
-			x.printStackTrace( getErr() );
+			printStackTrace( x );
 			System.exit( 1 );
 		}
 	}
@@ -467,6 +468,11 @@ public class Sincerity implements Runnable
 	private Integer verbosity;
 
 	private Frame frame;
+
+	private void printStackTrace( Throwable x )
+	{
+		getErr().println( StringUtil.joinStackTrace( x ) );
+	}
 
 	private Plugins getPlugins() throws SincerityException
 	{
