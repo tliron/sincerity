@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>jetty-servlet-jsp</artifactId>
+	<artifactId>sincerity-jetty-servlet-jsp</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
-			<artifactId>jetty-servlet</artifactId>
+			<artifactId>sincerity-jetty-servlet</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<!--  Glassfish JSP implementation -->

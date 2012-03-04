@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>jetty-web</artifactId>
+	<artifactId>sincerity-jetty-web</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 

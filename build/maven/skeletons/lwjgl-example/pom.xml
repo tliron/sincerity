@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>lwjgl-example</artifactId>
+	<artifactId>sincerity-lwjgl-example</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
-			<artifactId>lwjgl</artifactId>
+			<artifactId>sincerity-lwjgl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>service-remote-jmx</artifactId>
+	<artifactId>sincerity-service-remote-jmx</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>service</artifactId>
+			<artifactId>sincerity-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

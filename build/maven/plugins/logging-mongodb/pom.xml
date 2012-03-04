@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>logging-mongodb</artifactId>
+	<artifactId>sincerity-logging-mongodb</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
@@ -50,7 +50,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>logging</artifactId>
+			<artifactId>sincerity-logging</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -60,7 +60,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.library</groupId>
-			<artifactId>mongodb</artifactId>
+			<artifactId>sincerity-mongodb</artifactId>
 			<version>1.69</version>
 		</dependency>
 	</dependencies>
