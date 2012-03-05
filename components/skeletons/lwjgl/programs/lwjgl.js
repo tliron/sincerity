@@ -22,8 +22,9 @@ function validate() {
 	}
 	
 	var module = 'lwjgl-' + os
-	if (!sincerity.container.dependencies.has('org.lwjgl', module, '2.8.2')) {
-		sincerity.run('dependencies:add', ['org.lwjgl', module, '2.8.2'])
+	if (!sincerity.container.dependencies.has('org.lwjgl', module)) {
+		var version = sincerity.container.dependencies.resolvedDependencies.getVersion('org.lwjgl', 'lwjgl')
+		sincerity.run('dependencies:add', ['org.lwjgl', module, version])
 		sincerity.run('dependencies:install')
 	}
 }

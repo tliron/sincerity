@@ -235,6 +235,17 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		return dependencies;
 	}
 
+	public String getVersion( String group, String name ) throws SincerityException
+	{
+		for( ResolvedDependency resolvedDependency : getAll() )
+		{
+			ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) )
+				return id.getRevision();
+		}
+		return null;
+	}
+
 	//
 	// AbstractList
 	//

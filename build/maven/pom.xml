@@ -71,7 +71,6 @@
 		<module>skeletons/restlet-example</module>
 		<module>skeletons/restlet-jetty</module>
 		<module>skeletons/restlet-logging</module>
-		<module>skeletons/savory</module>
 		<module>skeletons/jetty-servlet</module>
 		<module>skeletons/jetty-servlet-example</module>
 		<module>skeletons/jetty-servlet-jmx</module>

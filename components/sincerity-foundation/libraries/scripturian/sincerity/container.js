@@ -11,6 +11,9 @@
 // at http://threecrickets.com/
 //
 
+document.executeOnce('/sincerity/jvm/')
+document.executeOnce('/sincerity/objects/')
+
 var Sincerity = Sincerity || {}
 
 /**
@@ -24,10 +27,6 @@ var Sincerity = Sincerity || {}
 Sincerity.Container = Sincerity.Container || function() {
 	/** @exports Public as Sincerity.Container */
     var Public = {}
-
-    Public.getClass = function(name) {
-    	return sincerity.container.bootstrap.loadClass(name)
-    }
 
     Public.here = null
     
@@ -80,6 +79,21 @@ Sincerity.Container = Sincerity.Container || function() {
 		for (var c in children) {
 			Public.execute(children[c])
 		}
+	}
+	
+	Public.ensureClass = function(className/*, dependencies*/) {
+		var theClass = Sincerity.JVM.getClass(className)
+		if (!Sincerity.Objects.exists(theClass)) {
+			var length = arguments.length
+			if (length > 1) {
+				for (var d = 1; d < length; d++) {
+					sincerity.run('dependencies:add', arguments[d])
+				}
+				sincerity.run('dependencies:install')
+				theClass = Sincerity.JVM.getClass(className)
+			}
+		}
+		return theClass
 	}
 
 	//

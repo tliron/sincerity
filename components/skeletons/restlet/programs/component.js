@@ -8,22 +8,11 @@ importClass(java.lang.System)
 //
 
 try {
-// This would only work if the logging plugin is installed
 sincerity.run('logging:logging')
 
-try {
-	Sincerity.Container.getClass('org.restlet.ext.slf4j.Slf4jLoggerFacade')
-}
-catch (x) {
-	// Install Restlet's SLF4J extension
-	sincerity.run('dependencies:add', ['restlet.logging'])
-	sincerity.run('dependencies:install')
-}
-
-// This would only work if Restlet's SLF4J extension is installed
-Sincerity.Container.getClass('org.restlet.ext.slf4j.Slf4jLoggerFacade')
-
-// Have Restlet use SLF4J
+// Have Restlet use SLF4J (we'd get here only if the logging plugin is installed)
+var restletVersion = sincerity.container.dependencies.resolvedDependencies.getVersion('org.restlet.jse', 'restlet')
+Sincerity.Container.ensureClass('org.restlet.ext.slf4j.Slf4jLoggerFacade', ['org.restlet.jse', 'restlet-slf4j', restletVersion])
 System.setProperty('org.restlet.engine.loggerFacadeClass', 'org.restlet.ext.slf4j.Slf4jLoggerFacade')
 } catch(x) {}
 

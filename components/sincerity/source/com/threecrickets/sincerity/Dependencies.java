@@ -114,16 +114,17 @@ public class Dependencies
 		return new Packages( container );
 	}
 
-	public boolean has( String organisation, String name, String revision )
+	public boolean has( String group, String name )
 	{
-		return has( ModuleRevisionId.newInstance( organisation, name, revision ) );
+		return has( group, name, null );
 	}
 
-	public boolean has( ModuleRevisionId id )
+	public boolean has( String group, String name, String version )
 	{
 		for( DependencyDescriptor dependency : moduleDescriptor.getDependencies() )
 		{
-			if( id.equals( dependency.getDependencyRevisionId() ) )
+			ModuleRevisionId id = dependency.getDependencyRevisionId();
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) && ( ( version == null ) || ( version.equals( id.getRevision() ) ) ) )
 				return true;
 		}
 		return false;
@@ -265,10 +266,10 @@ public class Dependencies
 
 	public boolean add( String group, String name, String version ) throws SincerityException
 	{
-		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
-		if( has( id ) )
+		if( has( group, name, version ) )
 			return false;
 
+		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
 		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, false, true );
 		dependency.addDependencyConfiguration( "default", "*" );
 		moduleDescriptor.addDependency( dependency );

@@ -11,8 +11,6 @@ importClass(
 	java.io.FileReader,
 	java.lang.System)
 
-var WRAPPER_VERSION = '3.5.13'
-
 var os = getOs()
 
 function getCommands() {
@@ -94,7 +92,8 @@ function service(command) {
 		binary = command.sincerity.container.getLibrariesFile('native', binary)
 		if (!binary.exists()) {
 			if (isSupported(os)) {
-				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, WRAPPER_VERSION])
+				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('com.tanukisoftware', 'wrapper-base')
+				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, version])
 				command.sincerity.run('dependencies:install')
 				var nativeDir = command.sincerity.container.getLibrariesFile('native')
 				if (nativeDir.directory) {

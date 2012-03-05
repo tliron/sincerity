@@ -2,13 +2,14 @@
 document.execute('/sincerity/objects/')
 document.execute('/sincerity/files/')
 document.execute('/sincerity/jvm/')
+document.execute('/sincerity/container/')
 
 importClass(
 	com.threecrickets.sincerity.exception.CommandException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
-var PEGDOWN_VERSION = '1.1.0'
-var WIKITEXT_VERSION = '1.5.0'
+var pegdownVersion = '1.1.0'
+var wikiTextVersion = '1.5.0'
 
 var languageNames = {
 	confluence: 'Confluence',
@@ -51,11 +52,7 @@ function render(command) {
 }
 
 function renderMarkdown(command, sourceFile, renderedFile) {
-	if (!Sincerity.Objects.exists(Sincerity.JVM.getClass('org.pegdown.PegDownProcessor'))) {
-		// Install the relevant dependency
-		command.sincerity.run('dependencies:add', ['org.pegdown', 'pegdown', PEGDOWN_VERSION])
-		command.sincerity.run('dependencies:install')
-	}
+	Sincerity.Container.ensureClass('org.pegdown.PegDownProcessor', ['org.pegdown', 'pegdown', pegdownVersion])
 	
 	var parser = new org.pegdown.PegDownProcessor()
 	var source = Sincerity.Files.loadText(sourceFile).array()
@@ -73,7 +70,7 @@ function renderWikiText(command, sourceFile, renderedFile, name, complete) {
 
 	if (!Sincerity.Objects.exists(language)) {
 		// Install the relevant dependency and try again
-		command.sincerity.run('dependencies:add', ['org.eclipse.mylyn', 'wikitext-' + name, WIKITEXT_VERSION])
+		command.sincerity.run('dependencies:add', ['org.eclipse.mylyn', 'wikitext-' + name, wikiTextVersion])
 		command.sincerity.run('dependencies:install')
 		language = getLanguage(fullName)
 	}

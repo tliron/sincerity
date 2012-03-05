@@ -398,8 +398,7 @@ public class Sincerity implements Runnable
 		{
 			// Go native!
 			File nativeDir = getContainer().getLibrariesFile( "native" );
-			if( nativeDir.isDirectory() )
-				NativeUtil.addNativePath( nativeDir );
+			NativeUtil.addNativePath( nativeDir );
 
 			// Bootstrap into container
 			getContainer().getBootstrap().bootstrap( arguments.toArray( new String[arguments.size()] ) );

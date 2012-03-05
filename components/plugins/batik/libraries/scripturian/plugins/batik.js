@@ -1,9 +1,9 @@
 
-document.execute('/sincerity/objects/')
-document.execute('/sincerity/jvm/')
+document.execute('/sincerity/container/')
 
-importClass(
-	com.threecrickets.sincerity.exception.CommandException)
+importClass(com.threecrickets.sincerity.exception.CommandException)
+
+var fopVersion = '1.0'
 
 function getCommands() {
 	return ['render']
@@ -46,11 +46,7 @@ function render(command) {
 			break
 			
 		case 'pdf':
-			if (!Sincerity.Objects.exists(Sincerity.JVM.getClass('org.apache.fop.svg.PDFTranscoder'))) {
-				// Install the relevant dependency
-				command.sincerity.run('dependencies:add', ['org.apache.xmlgraphics', 'fop', '1.0'])
-				command.sincerity.run('dependencies:install')
-			}
+			Sincerity.Container.ensureClass('org.apache.fop.svg.PDFTranscoder', ['org.apache.xmlgraphics', 'fop', fopVersion])
 			transcoder = new org.apache.fop.svg.PDFTranscoder()
 			break
 			
