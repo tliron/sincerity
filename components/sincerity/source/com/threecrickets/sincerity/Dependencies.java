@@ -145,7 +145,7 @@ public class Dependencies
 	public Plugins getPlugins() throws SincerityException
 	{
 		if( plugins == null )
-			plugins = new Plugins( container.getSincerity() );
+			plugins = new Plugins( container );
 		return plugins;
 	}
 

@@ -115,7 +115,7 @@ public class DelegatePlugin implements Plugin1
 			}
 			catch( IOException x )
 			{
-				x.printStackTrace( command.getSincerity().getErr() );
+				command.getSincerity().printStackTrace( x );
 				throw new SincerityException( "Error executing system command: " + StringUtil.join( arguments, " " ), x );
 			}
 		}

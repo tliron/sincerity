@@ -3,6 +3,7 @@ package com.threecrickets.sincerity.plugin;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Frame;
@@ -47,8 +48,16 @@ public class GuiPlugin implements Plugin1
 			Frame frame = new Frame( sincerity );
 			sincerity.setFrame( frame );
 
-			for( Plugin1 plugin : sincerity.getContainer().getDependencies().getPlugins().values() )
-				plugin.gui( command );
+			for( Plugin1 plugin : sincerity.getPlugins().values() )
+			{
+				try
+				{
+					plugin.gui( command );
+				}
+				catch( NoContainerException x )
+				{
+				}
+			}
 
 			frame.run();
 		}

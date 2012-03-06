@@ -230,6 +230,21 @@ public class Sincerity implements Runnable
 		return container;
 	}
 
+	public Plugins getPlugins() throws SincerityException
+	{
+		try
+		{
+			return getContainer().getDependencies().getPlugins();
+		}
+		catch( NoContainerException x )
+		{
+			if( plugins == null )
+				plugins = new Plugins( this );
+
+			return plugins;
+		}
+	}
+
 	public Frame getFrame()
 	{
 		return frame;
@@ -411,6 +426,11 @@ public class Sincerity implements Runnable
 		throw new RebootException();
 	}
 
+	public void printStackTrace( Throwable x )
+	{
+		getErr().println( StringUtil.joinStackTrace( x ) );
+	}
+
 	//
 	// Runnable
 	//
@@ -418,7 +438,7 @@ public class Sincerity implements Runnable
 	public void run()
 	{
 		if( commands.isEmpty() )
-			commands.add( new Command( "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help", false, this ) );
+			commands.add( new Command( "gui", "gui", false, this ) );
 
 		try
 		{
@@ -467,26 +487,6 @@ public class Sincerity implements Runnable
 	private Integer verbosity;
 
 	private Frame frame;
-
-	private void printStackTrace( Throwable x )
-	{
-		getErr().println( StringUtil.joinStackTrace( x ) );
-	}
-
-	private Plugins getPlugins() throws SincerityException
-	{
-		try
-		{
-			return getContainer().getDependencies().getPlugins();
-		}
-		catch( NoContainerException x )
-		{
-			if( plugins == null )
-				plugins = new Plugins( this );
-
-			return plugins;
-		}
-	}
 
 	private static File findContainerRoot() throws SincerityException
 	{

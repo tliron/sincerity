@@ -33,6 +33,14 @@ public class Command
 	// Construction
 	//
 
+	public Command( String plugin, String name, boolean isGreedy, Sincerity sincerity )
+	{
+		this.plugin = plugin;
+		this.name = name;
+		this.isGreedy = isGreedy;
+		this.sincerity = sincerity;
+	}
+
 	public Command( String name, boolean isGreedy, Sincerity sincerity )
 	{
 		String[] split = name.split( COMMANDS_SEPARATOR, 2 );

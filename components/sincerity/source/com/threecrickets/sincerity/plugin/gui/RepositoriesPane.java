@@ -27,6 +27,8 @@ public class RepositoriesPane extends JPanel
 
 		this.sincerity = sincerity;
 
+		sincerity.getContainer();
+
 		tree = new JTree();
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
