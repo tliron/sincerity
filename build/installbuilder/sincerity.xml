@@ -2,8 +2,10 @@
     <shortName>sincerity</shortName>
     <fullName>Sincerity</fullName>
     <version>1.0-beta1</version>
-    <licenseFile>${build_project_directory}/../../components/notices/license.txt</licenseFile>
-    <logoImage>${build_project_directory}/../../components/media/savory-small.png</logoImage>
+    <licenseFile>${build_project_directory}/../../components/media/gpl-3.0.txt</licenseFile>
+    <htmlLicenseFile>${build_project_directory}/../../components/media/gpl-3.0.html</htmlLicenseFile>
+    <wrapLicenseFileText>0</wrapLicenseFileText>
+    <leftImage>${build_project_directory}/../../components/media/installer.png</leftImage>
     <componentList>
         <component>
             <name>default</name>
@@ -109,6 +111,7 @@
             <path>${installdir}</path>
         </addDirectoryToPath>
     </postInstallationActionList>
+    <disableSplashScreen>1</disableSplashScreen>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
     <vendor>Three Crickets</vendor>
@@ -116,7 +119,8 @@
         <licenseFile>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>${build_project_directory}/../../components/notices/license.txt</file>
+            <file>${build_project_directory}/../../components/media/gpl-3.0.txt</file>
+            <htmlFile>${build_project_directory}/../../components/media/gpl-3.0.html</htmlFile>
         </licenseFile>
     </licenseFileList>
     <parameterList>
