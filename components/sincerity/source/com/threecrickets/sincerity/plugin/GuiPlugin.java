@@ -1,5 +1,8 @@
 package com.threecrickets.sincerity.plugin;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
@@ -43,9 +46,19 @@ public class GuiPlugin implements Plugin1
 			boolean isNative = command.getSwitches().contains( "native" );
 			if( isNative )
 				GuiUtil.setNativeLookAndFeel();
+			else
+			{
+				JFrame.setDefaultLookAndFeelDecorated( true );
+				JDialog.setDefaultLookAndFeelDecorated( true );
+			}
 
 			Sincerity sincerity = command.getSincerity();
-			Frame frame = new Frame( sincerity );
+			Frame frame = sincerity.getFrame();
+			System.out.println(frame);
+			if( frame != null )
+				frame.dispose();
+
+			frame = new Frame( sincerity );
 			sincerity.setFrame( frame );
 
 			for( Plugin1 plugin : sincerity.getPlugins().values() )

@@ -1,8 +1,10 @@
 package com.threecrickets.sincerity.plugin.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
@@ -20,9 +22,12 @@ public class Frame extends JFrame implements Runnable
 		super( "Sincerity" );
 
 		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
 
 		pane = new JTabbedPane();
-		getContentPane().add( pane );
+		getContentPane().setLayout( new BorderLayout() );
+		getContentPane().add( new ContainerPane( sincerity ), BorderLayout.NORTH );
+		getContentPane().add( pane, BorderLayout.CENTER );
 	}
 
 	//

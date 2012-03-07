@@ -36,7 +36,7 @@ public class HelpPlugin implements Plugin1
 		String commandName = command.getName();
 		if( "help".equals( commandName ) )
 		{
-			for( Plugin1 plugin : command.getSincerity().getContainer().getDependencies().getPlugins().values() )
+			for( Plugin1 plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
 					System.out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
 		}
@@ -47,6 +47,6 @@ public class HelpPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Actions", new ActionsPane( sincerity ) );
+		sincerity.getFrame().getPane().add( "Help", new ActionsPane( sincerity ) );
 	}
 }

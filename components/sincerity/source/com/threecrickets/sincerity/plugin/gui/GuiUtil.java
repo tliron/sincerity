@@ -71,6 +71,7 @@ public class GuiUtil
 
 	public static void error( Throwable x )
 	{
+		x.printStackTrace();
 	}
 
 	public static void expandTree( JTree tree, boolean expand )

@@ -51,9 +51,17 @@ public class Sincerity implements Runnable
 
 	public static void main( String[] arguments )
 	{
+		boolean started = Bootstrap.getAttributes().get( "com.threecrickets.sincerity.started" ) != null;
 		try
 		{
 			Sincerity sincerity = new Sincerity( arguments, getCurrent() );
+
+			if( !started && sincerity.commands.isEmpty() )
+				sincerity.commands.add( new Command( "gui", "gui", false, sincerity ) );
+
+			if( !started )
+				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.started", true );
+
 			sincerity.run();
 		}
 		catch( SincerityException x )
@@ -84,7 +92,9 @@ public class Sincerity implements Runnable
 			err = sincerity.err;
 			verbosity = sincerity.verbosity;
 		}
+
 		commands = parseCommands( arguments );
+
 		threadLocal.set( this );
 	}
 
@@ -122,7 +132,7 @@ public class Sincerity implements Runnable
 		return verbosity;
 	}
 
-	public void setVerbsotiy( int verbosity )
+	public void setVerbosity( int verbosity )
 	{
 		this.verbosity = verbosity;
 		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", this.verbosity );
@@ -437,9 +447,6 @@ public class Sincerity implements Runnable
 
 	public void run()
 	{
-		if( commands.isEmpty() )
-			commands.add( new Command( "gui", "gui", false, this ) );
-
 		try
 		{
 			while( !commands.isEmpty() )

@@ -8,6 +8,7 @@ import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
@@ -66,6 +67,9 @@ public class ContainerPlugin implements Plugin1
 				throw new BadArgumentsCommandException( command, "container root path" );
 
 			File containerRoot = new File( arguments[0] );
+			if( !containerRoot.isDirectory() )
+				throw new NoContainerException( "Specified container root path is not a directory: " + containerRoot );
+
 			command.getSincerity().setContainerRoot( containerRoot );
 		}
 		else if( "clone".equals( commandName ) )
