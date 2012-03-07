@@ -54,7 +54,6 @@ public class GuiPlugin implements Plugin1
 
 			Sincerity sincerity = command.getSincerity();
 			Frame frame = sincerity.getFrame();
-			System.out.println(frame);
 			if( frame != null )
 				frame.dispose();
 
