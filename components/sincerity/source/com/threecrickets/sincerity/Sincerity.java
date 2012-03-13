@@ -269,16 +269,19 @@ public class Sincerity implements Runnable
 	// Operations
 	//
 
-	public void createContainer( File containerRoot, File templateDir ) throws SincerityException
+	public void createContainer( File containerRoot, File templateDir, boolean force ) throws SincerityException
 	{
-		if( containerRoot.exists() )
+		if( !force )
 		{
-			if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
+			if( containerRoot.exists() )
 			{
-				if( getVerbosity() >= 1 )
-					getOut().println( "The path is already a Sincerity container: " + containerRoot );
-				setContainerRoot( containerRoot );
-				return;
+				if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
+				{
+					if( getVerbosity() >= 1 )
+						getOut().println( "The path is already a Sincerity container: " + containerRoot );
+					setContainerRoot( containerRoot );
+					return;
+				}
 			}
 		}
 

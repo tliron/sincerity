@@ -42,6 +42,7 @@ public class ContainerPlugin implements Plugin1
 		String commandName = command.getName();
 		if( "create".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "container root path", "[template]" );
@@ -52,13 +53,14 @@ public class ContainerPlugin implements Plugin1
 				template = "default";
 			else
 				template = arguments[1];
+			boolean force = command.getSwitches().contains( "force" );
 			File templateDir = new File( new File( command.getSincerity().getHome(), "templates" ), template );
 
 			// TODO: look for templates according to ~/.sincerity/sincerity.conf
 			// first (likely ~/.sincerity/templates
 			// same for 'templatize'
 
-			command.getSincerity().createContainer( containerRoot, templateDir );
+			command.getSincerity().createContainer( containerRoot, templateDir, force );
 		}
 		else if( "use".equals( commandName ) )
 		{
@@ -74,12 +76,14 @@ public class ContainerPlugin implements Plugin1
 		}
 		else if( "clone".equals( commandName ) )
 		{
+			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "target container root path" );
+			boolean force = command.getSwitches().contains( "force" );
 
 			File containerRoot = new File( arguments[0] );
-			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot() );
+			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot(), force );
 		}
 		else if( "clean".equals( commandName ) )
 		{

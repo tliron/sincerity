@@ -3,8 +3,10 @@ package com.threecrickets.sincerity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
@@ -72,28 +74,37 @@ public class Command
 
 	public String[] getArguments() throws SincerityException
 	{
-		if( arguments == null && parse )
-			parse();
-		else
-			arguments = rawArguments.toArray( new String[rawArguments.size()] );
+		if( arguments == null )
+		{
+			if( parse )
+				parse();
+			else
+				arguments = rawArguments.toArray( new String[rawArguments.size()] );
+		}
 		return arguments;
 	}
 
-	public List<String> getSwitches() throws SincerityException
+	public Set<String> getSwitches() throws SincerityException
 	{
-		if( switches == null && parse )
-			parse();
-		else
-			switches = Collections.emptyList();
+		if( switches == null )
+		{
+			if( parse )
+				parse();
+			else
+				switches = Collections.emptySet();
+		}
 		return switches;
 	}
 
 	public Map<String, String> getProperties() throws SincerityException
 	{
-		if( properties == null && parse )
-			parse();
-		else
-			properties = Collections.emptyMap();
+		if( properties == null )
+		{
+			if( parse )
+				parse();
+			else
+				properties = Collections.emptyMap();
+		}
 		return properties;
 	}
 
@@ -151,14 +162,14 @@ public class Command
 
 	private String[] arguments;
 
-	private List<String> switches;
+	private Set<String> switches;
 
 	private Map<String, String> properties;
 
 	private void parse() throws SincerityException
 	{
 		ArrayList<String> arguments = new ArrayList<String>();
-		switches = new ArrayList<String>();
+		switches = new HashSet<String>();
 		properties = new HashMap<String, String>();
 
 		for( String argument : rawArguments )
