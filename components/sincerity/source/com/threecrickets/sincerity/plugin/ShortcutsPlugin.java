@@ -3,8 +3,10 @@ package com.threecrickets.sincerity.plugin;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.plugin.gui.ShortcutsPane;
 
 public class ShortcutsPlugin implements Plugin1
 {
@@ -54,5 +56,7 @@ public class ShortcutsPlugin implements Plugin1
 
 	public void gui( Command command ) throws SincerityException
 	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getPane().add( "Shortcuts", new ShortcutsPane( sincerity ) );
 	}
 }

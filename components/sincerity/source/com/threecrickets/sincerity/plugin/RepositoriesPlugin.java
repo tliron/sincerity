@@ -62,7 +62,7 @@ public class RepositoriesPlugin implements Plugin1
 			if( arguments.length == 1 )
 			{
 				String shortcut = arguments[0];
-				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "attach." + shortcut );
+				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "attach" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
 				return;
 			}
 

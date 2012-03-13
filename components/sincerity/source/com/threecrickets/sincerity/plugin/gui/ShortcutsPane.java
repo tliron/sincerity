@@ -1,27 +1,29 @@
 package com.threecrickets.sincerity.plugin.gui;
 
 import java.awt.BorderLayout;
+import java.awt.ItemSelectable;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-
-import com.threecrickets.sincerity.Repositories;
+import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class RepositoriesPane extends JPanel
+public class ShortcutsPane extends JPanel implements ItemListener
 {
 	//
 	// Construction
 	//
 
-	public RepositoriesPane( Sincerity sincerity ) throws SincerityException
+	public ShortcutsPane( Sincerity sincerity ) throws SincerityException
 	{
 		super( new BorderLayout() );
 
@@ -36,11 +38,28 @@ public class RepositoriesPane extends JPanel
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
 
+		groupByTypeCheckBox = new JCheckBox( "Group by type", groupByType );
+		groupByTypeCheckBox.addItemListener( this );
+
 		JPanel buttons = new JPanel();
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
+		buttons.add( groupByTypeCheckBox );
 
 		add( buttons, BorderLayout.EAST );
 
+		refresh();
+	}
+
+	//
+	// ItemListener
+	//
+
+	public void itemStateChanged( ItemEvent event )
+	{
+		ItemSelectable item = event.getItemSelectable();
+		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
+		if( item == groupByTypeCheckBox )
+			groupByType = selected;
 		refresh();
 	}
 
@@ -53,20 +72,18 @@ public class RepositoriesPane extends JPanel
 		try
 		{
 			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
-
-			DefaultMutableTreeNode publicRoot = new EnhancedNode( null, "Public", GuiUtil.FOLDER_ICON );
-			DefaultMutableTreeNode privateRoot = new EnhancedNode( null, "Private", GuiUtil.FOLDER_ICON );
-
-			Repositories repositories = sincerity.getContainer().getRepositories();
-			for( DependencyResolver resolver : repositories.getResolvers( "public" ) )
-				publicRoot.add( GuiUtil.createRepositoryNode( resolver ) );
-			for( DependencyResolver resolver : repositories.getResolvers( "private" ) )
-				privateRoot.add( GuiUtil.createRepositoryNode( resolver ) );
-
-			if( publicRoot.getChildCount() > 0 )
-				root.add( publicRoot );
-			if( privateRoot.getChildCount() > 0 )
-				root.add( privateRoot );
+			if( groupByType )
+			{
+				Shortcuts shortcuts = sincerity.getContainer().getShortcuts();
+				root.add( GuiUtil.createShortcutTypeNode( "add", shortcuts ) );
+				root.add( GuiUtil.createShortcutTypeNode( "attach", shortcuts ) );
+			}
+			else
+			{
+				Shortcuts shortcuts = sincerity.getContainer().getShortcuts();
+				for( String shortcut : shortcuts )
+					root.add( GuiUtil.createShortcutNode( shortcut, true ) );
+			}
 
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
@@ -85,4 +102,8 @@ public class RepositoriesPane extends JPanel
 	private final Sincerity sincerity;
 
 	private final JTree tree;
+
+	private final JCheckBox groupByTypeCheckBox;
+
+	private boolean groupByType = true;
 }

@@ -88,7 +88,7 @@ public class DependenciesPlugin implements Plugin1
 			if( arguments.length == 1 )
 			{
 				String shortcut = arguments[0];
-				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "add." + shortcut );
+				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "add" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
 				return;
 			}
 

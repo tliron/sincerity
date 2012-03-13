@@ -47,6 +47,6 @@ public class HelpPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Help", new ActionsPane( sincerity ) );
+		sincerity.getFrame().getPane().add( "Actions", new ActionsPane( sincerity ) );
 	}
 }

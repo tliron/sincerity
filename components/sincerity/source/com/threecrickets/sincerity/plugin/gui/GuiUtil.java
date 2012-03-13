@@ -24,6 +24,7 @@ import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.ResolvedDependency;
+import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
@@ -225,6 +226,25 @@ public class GuiUtil
 	public static DefaultMutableTreeNode createCommandNode( String command, Plugin1 plugin, boolean includePluginName ) throws SincerityException
 	{
 		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
+	}
+
+	public static DefaultMutableTreeNode createShortcutTypeNode( String type, Shortcuts shortcuts ) throws SincerityException
+	{
+		EnhancedNode node = new EnhancedNode( type, "<html><b>" + type + "</b></html>", PLUGIN_ICON );
+
+		if( shortcuts != null )
+			for( String shortcut : shortcuts.getByType( type ) )
+				node.add( createShortcutNode( shortcut, false ) );
+
+		return node;
+	}
+
+	public static DefaultMutableTreeNode createShortcutNode( String shortcut, boolean includeType ) throws SincerityException
+	{
+		if( !includeType && shortcut.contains( Shortcuts.SHORTCUT_TYPE_SEPARATOR ) )
+			return new EnhancedNode( shortcut, shortcut.substring( shortcut.indexOf( Shortcuts.SHORTCUT_TYPE_SEPARATOR ) + Shortcuts.SHORTCUT_TYPE_SEPARATOR.length() ), COMMAND_ICON );
+		else
+			return new EnhancedNode( shortcut, shortcut, COMMAND_ICON );
 	}
 
 	public static DefaultMutableTreeNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException

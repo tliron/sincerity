@@ -20,6 +20,8 @@ public class Shortcuts extends AbstractList<String>
 
 	public static final String SHORTCUT_PREFIX = "@";
 
+	public static final String SHORTCUT_TYPE_SEPARATOR = "@";
+
 	public static final int SHORTCUT_PREFIX_LENGTH = SHORTCUT_PREFIX.length();
 
 	//
@@ -47,6 +49,16 @@ public class Shortcuts extends AbstractList<String>
 		for( String argument : value.toString().split( " " ) )
 			addArgument( argument, items );
 		return items.toArray( new String[items.size()] );
+	}
+
+	public List<String> getByType( String type )
+	{
+		type += SHORTCUT_TYPE_SEPARATOR;
+		ArrayList<String> shortcuts = new ArrayList<String>();
+		for( String shortcut : this )
+			if( shortcut.startsWith( type ) )
+				shortcuts.add( shortcut );
+		return shortcuts;
 	}
 
 	public void addArgument( String argument, List<String> arguments ) throws SincerityException
