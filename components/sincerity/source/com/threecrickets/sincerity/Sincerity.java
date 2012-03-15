@@ -186,11 +186,7 @@ public class Sincerity implements Runnable
 		{
 			containerRoot = (File) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.containerRoot" );
 			if( containerRoot == null )
-			{
 				setContainerRoot( findContainerRoot() );
-				// Bootstrap.getAttributes().put(
-				// "com.threecrickets.sincerity.containerRoot", containerRoot );
-			}
 		}
 		return containerRoot;
 	}
@@ -199,7 +195,9 @@ public class Sincerity implements Runnable
 	{
 		try
 		{
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", containerRoot.getCanonicalFile() );
+			File canonicalContainerRoot = containerRoot.getCanonicalFile();
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", canonicalContainerRoot );
+			System.setProperty( CONTAINER_PROPERTY, canonicalContainerRoot.toString() );
 		}
 		catch( IOException x )
 		{
@@ -454,8 +452,9 @@ public class Sincerity implements Runnable
 		{
 			while( !commands.isEmpty() )
 			{
-				Command command = commands.remove( 0 );
+				Command command = commands.get( 0 );
 				run( command );
+				commands.remove( command );
 			}
 		}
 		catch( RebootException x )
@@ -476,11 +475,14 @@ public class Sincerity implements Runnable
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	protected final List<Command> commands;
+
+	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
-
-	private final List<Command> commands;
 
 	private File home;
 

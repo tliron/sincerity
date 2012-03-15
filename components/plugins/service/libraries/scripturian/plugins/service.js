@@ -26,12 +26,14 @@ function run(command) {
 }
 
 function service(command) {
+	command.parse = true
 	if (command.arguments.length < 2) {
 		throw new BadArgumentsCommandException(command, 'uri', 'verb ("start", "stop", "restart", "console", or "status")')
 	}
 
 	var uri = command.arguments[0]
 	var verb = command.arguments[1]
+	var verbose = command.switches.contains('verbose')
 
 	var name = uri.replace('/', '_')
 	var displayName = name
@@ -151,6 +153,7 @@ function service(command) {
 		var jvmDir = command.sincerity.container.getConfigurationFile('service', 'jvm')
 		var index = 1
 		configuration.wrapper.java['additional.' + index++] = '-Dsincerity.home=' + command.sincerity.home
+		configuration.wrapper.java['additional.' + index++] = '-Dsincerity.container=' + command.sincerity.container.root
 		if (jvmDir.directory) {
 			var files = jvmDir.listFiles()
 			for (var f in files) {
@@ -191,9 +194,12 @@ function service(command) {
 		}
 		command.sincerity.container.getLogsFile().mkdirs()
 
-		/*for (c in arguments) {
-			command.sincerity.out.println(c + ' = ' + arguments[c])
-		}*/
+		if (verbose) {
+			command.sincerity.out.println('Arguments:')
+			for (c in arguments) {
+				command.sincerity.out.println(' ' + c + ' = ' + arguments[c])
+			}
+		}
 
 		// Launch native wrapper binary
 		if (verb == 'console') {

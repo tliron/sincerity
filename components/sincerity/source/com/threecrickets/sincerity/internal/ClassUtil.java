@@ -60,5 +60,4 @@ public class ClassUtil
 			throw new SincerityException( x.getCause().getMessage(), x.getCause() );
 		}
 	}
-
 }

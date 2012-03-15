@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -198,23 +199,50 @@ public class Dependencies
 		return artifacts;
 	}
 
-	public String getClasspath() throws SincerityException
-	{
-		return getClasspath( false );
-	}
-
 	public String getClasspath( boolean includeSystem ) throws SincerityException
 	{
-		List<File> classpaths = getClasspaths();
+		List<File> classpaths = getClasspaths( includeSystem );
 		ArrayList<String> paths = new ArrayList<String>( classpaths.size() );
 		for( File file : classpaths )
 			paths.add( file.getPath() );
 		return StringUtil.join( paths, File.pathSeparator );
 	}
 
-	public List<File> getClasspaths() throws SincerityException
+	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
 	{
 		ArrayList<File> classpaths = new ArrayList<File>();
+
+		if( includeSystem )
+		{
+			// Add JVM classpath
+			String system = System.getProperty( "java.class.path" );
+			if( system != null )
+			{
+				for( String path : system.split( File.pathSeparator ) )
+				{
+					File file = new File( path );
+					if( !classpaths.contains( file ) )
+						classpaths.add( file );
+				}
+			}
+
+			// Add master bootstrap
+			for( URL url : Bootstrap.getMasterBootstrap().getURLs() )
+			{
+				if( "file".equals( url.getProtocol() ) )
+				{
+					try
+					{
+						File file = new File( url.toURI() );
+						if( !classpaths.contains( file ) )
+							classpaths.add( file );
+					}
+					catch( URISyntaxException x )
+					{
+					}
+				}
+			}
+		}
 
 		// Classes directory
 		File classesDir = container.getLibrariesFile( "classes" );
@@ -239,6 +267,9 @@ public class Dependencies
 				}
 			}
 		}
+
+		// for( File f : classpaths )
+		// System.out.println( f );
 
 		return classpaths;
 	}
@@ -407,7 +438,7 @@ public class Dependencies
 
 	public Bootstrap createBootstrap() throws SincerityException
 	{
-		List<File> classpaths = getClasspaths();
+		List<File> classpaths = getClasspaths( false );
 		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
 		try
 		{
@@ -427,7 +458,7 @@ public class Dependencies
 		Bootstrap bootstrap = container.getBootstrap();
 		try
 		{
-			for( File file : getClasspaths() )
+			for( File file : getClasspaths( false ) )
 				bootstrap.addUrl( file.toURI().toURL() );
 		}
 		catch( MalformedURLException x )

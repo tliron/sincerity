@@ -1684,6 +1684,133 @@ You've most likely come to Sincerity for the skeletons: they provide the
 \end_layout
 
 \begin_layout Subsection
+Nexus Repository Skeleton
+\end_layout
+
+\begin_layout Standard
+Sonatype's Nexus repository manager is a highly recommended companion for
+ Sincerity.
+ At its most basic, it provides you with a proxy for accessing remote repositori
+es, such as the Three Crickets repository in which many Sincerity packages
+ are stored.
+ Accessing repositories via a proxy provides you with much better performance
+ and reliability.
+\end_layout
+
+\begin_layout Standard
+Sincerity makes it very easy to install to Nexus:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add nexus : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start the server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start jetty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8080, so point your browser to http://localhost:8080
+ to see your new Nexus repository.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+Adding the service plugin is strongly recommended.
+ To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add service : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Nexus uses its own logging implementation, which is unfortunately
+ incompatible with Sincerity's logging plugin.
+\end_layout
+
+\begin_layout Standard
+The following command will install a Nexus repository with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create mycontainer : add nexus : add service : install : service
+ jetty start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : service jetty stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 Jetty Web Server Skeleton
 \end_layout
 

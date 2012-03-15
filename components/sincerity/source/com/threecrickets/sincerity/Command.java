@@ -130,6 +130,11 @@ public class Command
 		return arguments;
 	}
 
+	public void remove()
+	{
+		sincerity.commands.remove( this );
+	}
+
 	//
 	// Object
 	//

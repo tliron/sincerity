@@ -71,7 +71,7 @@ public class JavaPlugin implements Plugin1
 				compileArguments.add( "-d" );
 				compileArguments.add( classesDir.getAbsolutePath() );
 				compileArguments.add( "-classpath" );
-				compileArguments.add( dependencies.getClasspath() );
+				compileArguments.add( dependencies.getClasspath( true ) );
 				addSources( javaDir, compileArguments );
 
 				classesDir.mkdirs();
