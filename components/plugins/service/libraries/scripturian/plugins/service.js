@@ -274,11 +274,11 @@ function getOs() {
 }
 
 function getPid(pidFile) {
-	return pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)) : null
+	return pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)).trim() : null
 }
 
 function getStatus(statusFile) {
-	return statusFile.exists() ? String(Sincerity.Files.loadText(statusFile)) : null
+	return statusFile.exists() ? String(Sincerity.Files.loadText(statusFile)).trim() : null
 }
 
 function isRunning(status) {
