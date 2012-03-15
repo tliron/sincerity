@@ -1738,6 +1738,25 @@ sincerity start jetty
 \begin_layout Standard
 The default port is 8080, so point your browser to http://localhost:8080
  to see your new Nexus repository.
+ The default user is 
+\begin_inset Quotes eld
+\end_inset
+
+admin
+\begin_inset Quotes erd
+\end_inset
+
+ with password 
+\begin_inset Quotes eld
+\end_inset
+
+admin123
+\begin_inset Quotes erd
+\end_inset
+
+.
+ You probably want to change that\SpecialChar \ldots{}
+
 \end_layout
 
 \begin_layout Subsubsection
