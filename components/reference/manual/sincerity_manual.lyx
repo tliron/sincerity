@@ -1688,17 +1688,18 @@ Nexus Repository Skeleton
 \end_layout
 
 \begin_layout Standard
-Sonatype's Nexus repository manager is a highly recommended companion for
- Sincerity.
+Sonatype's Nexus repository manager is a recommended companion for Sincerity.
  At its most basic, it provides you with a proxy for accessing remote repositori
 es, such as the Three Crickets repository in which many Sincerity packages
  are stored.
  Accessing repositories via a proxy provides you with much better performance
  and reliability.
+ Nexus is a very powerful tool, and learning how to use it well will can
+ go a long way towards improving your Sincerity experience.
 \end_layout
 
 \begin_layout Standard
-Sincerity makes it very easy to install to Nexus:
+It's a piece of cake to install a working Nexus instance:
 \end_layout
 
 \begin_layout Standard
@@ -1737,8 +1738,16 @@ sincerity start jetty
 
 \begin_layout Standard
 The default port is 8080, so point your browser to http://localhost:8080
- to see your new Nexus repository.
- The default user is 
+ to see your new Nexus repository manager.
+ Nexus provides a rich web-based interface and includes excellent documentation.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The default user is 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1755,8 +1764,38 @@ admin123
 \end_inset
 
 .
- You probably want to change that\SpecialChar \ldots{}
+ You probably want to start with logging in and changing that password.
+\end_layout
 
+\begin_layout Standard
+You may also want to change the default port from 8080, which you can do
+ by editing 
+\begin_inset Quotes eld
+\end_inset
+
+/server/connectors/default.js
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Otherwise, the default configuration should be quite sensible.
+ It includes support for the standard repositories used by Sincerity, in
+ addition to the Nexus defaults.
+ Logging has also been configured to adhere to Sincerity's container structure,
+ so that logs will appear under 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Note that Nexus itself will not use Sincerity's logging plugin, but you
+ can configure Nexus logging right in the user interface.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1764,8 +1803,8 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Adding the service plugin is strongly recommended.
- To install:
+Two plugins are strongly recommended: logging and service.
+ To install them:
 \end_layout
 
 \begin_layout Standard
@@ -1775,7 +1814,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add service : install
+sincerity add logging : add service : install
 \end_layout
 
 \end_inset
@@ -1784,8 +1823,9 @@ sincerity add service : install
 \end_layout
 
 \begin_layout Standard
-Note that Nexus uses its own logging implementation, which is unfortunately
- incompatible with Sincerity's logging plugin.
+Note that the Nexus application uses its own logging implementation, which
+ must be configured internally.
+ However, the logging plugin will be used by the containing Jetty server.
 \end_layout
 
 \begin_layout Standard
@@ -1801,8 +1841,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add nexus : add service : install : service
- jetty start
+sincerity create mycontainer : add jetty.web : add logging : add service
+ : install : service jetty start
 \end_layout
 
 \end_inset

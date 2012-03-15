@@ -243,7 +243,7 @@
 			</externalConfiguration>
 		</repository>
 		<repository>
-			<id>threecrickets</id>
+			<id>three-crickets</id>
 			<name>Three Crickets</name>
 			<providerRole>org.sonatype.nexus.proxy.repository.Repository
 			</providerRole>
