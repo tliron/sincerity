@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- 
-See: http://izpack.org/documentation/installation-files.html
--->
+<!-- See: http://izpack.org/documentation/installation-files.html -->
 
 <installation version="1.0">
 	<info>
@@ -36,6 +34,7 @@ See: http://izpack.org/documentation/installation-files.html
 				<exclude name="logs/**" />
 				<exclude name="libraries/jars/com.izforge/**" />
 				<exclude name="configuration/izpack/**" />
+				<exclude name="installer.jar" />
 			</fileset>
 			<fileset dir="@{sincerity.home}" targetdir="$INSTALL_PATH">
 				<exclude name="templates/**" />
