@@ -1604,15 +1604,96 @@ Logging Plugin
 \end_layout
 
 \begin_layout Standard
+Using 
+\begin_inset CommandInset href
+LatexCommand href
+name "SLF4J"
+target "http://www.slf4j.org/"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache log4j"
+target "http://logging.apache.org/log4j/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 /configuration/logging.conf
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+logging.mongodb
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
 Service Plugin
 \end_layout
 
+\begin_layout Standard
+Using 
+\begin_inset CommandInset href
+LatexCommand href
+name "Tanuki's Java Service Wrapper"
+target "http://wrapper.tanukisoftware.com/"
+
+\end_inset
+
+, often abbreviated as 
+\begin_inset Quotes eld
+\end_inset
+
+JSW.
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+service.remote-jmx
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Felix OSGi Plugin
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache Felix"
+target "http://felix.apache.org/"
+
+\end_inset
+
+is flexible, straightforward 
+\begin_inset CommandInset href
+LatexCommand href
+name "OSGi (R4)"
+target "http://www.osgi.org/Specifications/HomePage"
+
+\end_inset
+
+ container.
 \end_layout
 
 \begin_layout Standard
@@ -1644,7 +1725,14 @@ You'll then need to start both bundles.
 \end_layout
 
 \begin_layout Standard
-Point your browser to http://localhost:8080/system/console/.
+Point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080/system/console/"
+
+\end_inset
+
+.
  The default user is 
 \begin_inset Quotes eld
 \end_inset
@@ -1668,8 +1756,194 @@ admin
 Markup Plugin
 \end_layout
 
+\begin_layout Standard
+Need to quickly render markup text into HTML? Markdown, Confluence, MediaWiki,
+ Twiki, Trac, Textile and Bugzilla Textile are all supported by this plugin.
+ Markdown is supported by the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Pegdown"
+target "https://github.com/sirthias/pegdown"
+
+\end_inset
+
+ engine, and the rest by 
+\begin_inset CommandInset href
+LatexCommand href
+name "Mylyn WikiText"
+target "http://wiki.eclipse.org/Mylyn/Incubator/WikiText"
+
+\end_inset
+
+.
+ (While useful in itself, this plugin is intended to serve as a code example
+ for using these libraries.)
+\end_layout
+
+\begin_layout Standard
+The rendering engines themselves are not at first installed: the plugin
+ will make sure that the engine you need is available, and install it if
+ it's not, on demand.
+\end_layout
+
+\begin_layout Standard
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add markup : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity render [language] [marked up source path] [rendered output path]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity render markdown README.md readme.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Batik SVG Plugin
+\end_layout
+
+\begin_layout Standard
+Need to quickly render SVG into PDF, PNG or JPEG? This plugin uses 
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache Batik"
+target "http://xmlgraphics.apache.org/batik/"
+
+\end_inset
+
+ to do so.
+ (While useful in itself, this plugin is intended to serve as a code example
+ for using Batik.)
+\end_layout
+
+\begin_layout Standard
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add batik : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity render [SVG source path] [rendered output path]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The output path extension will determine the output type.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity render test.svg test.pdf
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+JsDoc Plugin
+\end_layout
+
+\begin_layout Standard
+Uses 
+\begin_inset CommandInset href
+LatexCommand href
+name "JsDoc Toolkit"
+target "http://code.google.com/p/jsdoc-toolkit/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Quotes eld
+\end_inset
+
+jsdoc.sincerity
+\begin_inset Quotes erd
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -1688,7 +1962,14 @@ Nexus Repository Skeleton
 \end_layout
 
 \begin_layout Standard
-Sonatype's Nexus repository manager is a recommended companion for Sincerity.
+\begin_inset CommandInset href
+LatexCommand href
+name "Sonatype's Nexus repository manager"
+target "http://www.sonatype.org/nexus/"
+
+\end_inset
+
+is a recommended companion for Sincerity.
  At its most basic, it provides you with a proxy for accessing remote repositori
 es, such as the Three Crickets repository in which many Sincerity packages
  are stored.
@@ -1737,9 +2018,28 @@ sincerity start jetty
 \end_layout
 
 \begin_layout Standard
-The default port is 8080, so point your browser to http://localhost:8080
+The default port is 8080, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080"
+
+\end_inset
+
  to see your new Nexus repository manager.
  Nexus provides a rich web-based interface and includes excellent documentation.
+\end_layout
+
+\begin_layout Standard
+Note that the Nexus skeleton relies on the standard Jetty servlet skeleton,
+ to which you can indeed install other 
+\begin_inset Quotes eld
+\end_inset
+
+contexts
+\begin_inset Quotes erd
+\end_inset
+
+ (web applications).
 \end_layout
 
 \begin_layout Subsubsection
@@ -1764,7 +2064,7 @@ admin123
 \end_inset
 
 .
- You probably want to start with logging in and changing that password.
+ You probably want to log in and change that password.
 \end_layout
 
 \begin_layout Standard
@@ -1825,7 +2125,8 @@ sincerity add logging : add service : install
 \begin_layout Standard
 Note that the Nexus application uses its own logging implementation, which
  must be configured internally.
- However, the logging plugin will be used by the containing Jetty server.
+ However, the logging plugin will be put to good use by the containing Jetty
+ server.
 \end_layout
 
 \begin_layout Standard
@@ -1893,8 +2194,15 @@ sincerity add jetty.web : install
 \end_layout
 
 \begin_layout Standard
-Jetty is a very robust, modular web server with excellent asynchronous performan
-ce, and lots of features and extensions.
+\begin_inset CommandInset href
+LatexCommand href
+name "Jetty"
+target "http://jetty.codehaus.org/jetty/"
+
+\end_inset
+
+is a very robust, modular web server with excellent asynchronous performance,
+ and lots of features and extensions.
  With this skeleton we've provided you with the lightweight, bare minimum
  dependencies to serve just static files for a single web site.
 \end_layout
@@ -1919,7 +2227,13 @@ sincerity start jetty
 \end_layout
 
 \begin_layout Standard
-The default port is 8080, so point your browser to http://localhost:8080
+The default port is 8080, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080"
+
+\end_inset
+
  to see the default welcoming page.
 \end_layout
 
@@ -1948,7 +2262,7 @@ contexts
 
 \begin_layout Standard
 Additionally, Jetty is a recommended connector for Restlet.
- It's available as 
+ It's available as a skeleton add-on, 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2085,7 +2399,15 @@ Servlets let you generate dynamic content for a web site, usually using
 \end_layout
 
 \begin_layout Standard
-To install a barebones servlet skeleton, based on Jetty:
+To install a barebones servlet skeleton, based on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Jetty"
+target "http://jetty.codehaus.org/jetty/"
+
+\end_inset
+
+:
 \end_layout
 
 \begin_layout Standard
@@ -2119,10 +2441,17 @@ sincerity start jetty
 \end_layout
 
 \begin_layout Standard
-The default port is 8080, so point your browser to http://localhost:8080.
+The default port is 8080, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080"
+
+\end_inset
+
+.
  But, you won't see anything yet: this is a barebones skeleton waiting for
  you to add your application.
- You might want to start with 
+ You might want to start by installing 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2131,6 +2460,19 @@ jetty.servlet.example
 \end_inset
 
  first.
+\end_layout
+
+\begin_layout Standard
+Note that if you only intend to install Jetty as a simple web server for
+ static files, then you can use a simpler skeleton: 
+\begin_inset Quotes eld
+\end_inset
+
+jetty.web
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2155,8 +2497,8 @@ prudence
 \begin_inset Quotes erd
 \end_inset
 
- skeleton) builds on Restlet, letting you do all of that with your choice
- of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ skeleton) builds on Restlet, letting you do all of that and more with your
+ choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2171,22 +2513,22 @@ Jetty's official distribution (which doesn't rely on Sincerity\SpecialChar \ldot
 \begin_inset Quotes eld
 \end_inset
 
-Official Jetty
+Official
 \begin_inset Quotes erd
 \end_inset
 
- is a morass of XML files that effectively duplicate what a lightweight
+ Jetty is a morass of XML files that effectively duplicate what a lightweight
  scripting language, like JavaScript does far more comprehensibly and with
  far greater power.
  If you're switching from 
 \begin_inset Quotes eld
 \end_inset
 
-Official Jetty,
+official
 \begin_inset Quotes erd
 \end_inset
 
- then you're in for a treat, as well as a sigh of relief.
+ Jetty, then you're in for a treat, as well as a sigh of relief.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2194,9 +2536,46 @@ Extras
 \end_layout
 
 \begin_layout Standard
-A nice example of a Jetty server with multiple contexts is provided: a static
- web server, a servlet container, and a web application installed as a WAR
- file:
+Two add-ons are available: 
+\begin_inset Quotes eld
+\end_inset
+
+jetty.servlet.jsp
+\begin_inset Quotes erd
+\end_inset
+
+ adds support for JSP (JavaServer Pages), and 
+\begin_inset Quotes eld
+\end_inset
+
+jetty.servlet.jmx
+\begin_inset Quotes erd
+\end_inset
+
+ adds JMX support to your Jetty server, allowing you to manage it via VisualVM
+ or JConsole.
+ To install both:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add jetty.servlet.jsp : add jetty.servlet.jmx : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Also, a nice example of a Jetty server with multiple contexts is provided:
+ a static web server, a servlet container, and a web application installed
+ as a WAR file:
 \end_layout
 
 \begin_layout Standard
@@ -2220,7 +2599,7 @@ sincerity add jetty.servlet.example : install
 \end_layout
 
 \begin_layout Standard
-The 
+The example 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2228,8 +2607,8 @@ The
 \begin_inset Quotes erd
 \end_inset
 
- is most elaborate: it shows you how you can drop in Java source code for
- your servlets and have them compiled as the server starts.
+ is the most elaborate: it shows you how you can drop in Java source code
+ for your servlets and have them compiled as the server starts.
 \end_layout
 
 \begin_layout Standard
@@ -2298,23 +2677,35 @@ Restlet Skeleton
 \end_layout
 
 \begin_layout Standard
-Restlet lets you dynamically generate web content, but it goes beyond just
- responding to client requests: it lets you map RESTful resources to URIs,
- while abstracting away the tricky HTTP mechanics involved (content negotiation,
- conditional HTTP) and providing rich tools for routing, filtering and data.
-\end_layout
+The 
+\begin_inset CommandInset href
+LatexCommand href
+name "Restlet library"
+target "http://www.restlet.org/"
 
-\begin_layout Standard
-Restlet, on its own, requires Java, but Prudence (the 
+\end_inset
+
+ (
 \begin_inset Quotes eld
 \end_inset
 
-prudence
+Restlet
 \begin_inset Quotes erd
 \end_inset
 
- skeleton) builds on Restlet, letting you do all of the above with your
- choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ is a registered trademark of 
+\begin_inset CommandInset href
+LatexCommand href
+name "Restlet S.A.S."
+target "http://www.restlet.com/"
+
+\end_inset
+
+) lets you dynamically generate web content, but it goes beyond just responding
+ to client requests: it lets you map RESTful resources to URIs, while handling
+ all the tricky HTTP mechanics involved (content negotiation, conditional
+ HTTP) and providing full, rich abstractions for routing, filtering and
+ data presentation.
 \end_layout
 
 \begin_layout Standard
@@ -2356,7 +2747,35 @@ sincerity start restlet
 \end_layout
 
 \begin_layout Standard
-The default port is 8080, so point your browser to http://localhost:8080.
+The default port is 8080, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Restlet, on its own, requires you to code in Java, but 
+\begin_inset CommandInset href
+LatexCommand href
+name "Prudence"
+target "http://threecrickets.com/prudence/"
+
+\end_inset
+
+ (the 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton) builds on Restlet, letting you do all of the above with your
+ choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2368,9 +2787,10 @@ While Restlet requires you to write your resources in Java (see Prudence
  for an alternative that supports other languages), there is no reason for
  your bootstrapping code---the code that assembles your component, servers,
  clients, hosts and routes---to be so rigid.
- Restlet ships as a library, not as a deployable.
- The API for boostrapping your component is simple and elegant, but normally
- you would have to access it in Java.
+ Restlet ships as a library, not as a deployable container.
+ The API for boostrapping your component is simple and elegant enough, but
+ without Sincerity you would have to likely have to write it in Java, or
+ implement your own bootstrapping mechanism.
 \end_layout
 
 \begin_layout Standard
@@ -2415,6 +2835,7 @@ sincerity add restlet.example : install
 \end_layout
 
 \begin_layout Standard
+The example at 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2423,7 +2844,7 @@ sincerity add restlet.example : install
 \end_inset
 
  shows you how you can drop in Java source code for your resources and have
- them compiled as the component starts.
+ it compiled automatically.
 \end_layout
 
 \begin_layout Standard
@@ -2492,15 +2913,35 @@ Prudence Skeleton
 \end_layout
 
 \begin_layout Standard
-Since version 2.0, Prudence is designed from the ground-up around Sincerity.
+Since version 2.0, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Prudence"
+target "http://threecrickets.com/prudence/"
+
+\end_inset
+
+ is designed from the ground-up around Sincerity.
  It's distributed exclusively as a Sincerity skeleton with a large collection
  of tightly integrated add-ons.
 \end_layout
 
 \begin_layout Standard
-(Actually, it's the other way around! Sincerity was designed by Three Crickets
- precisely in order to make Prudence 2.0 sanely modular, building on many
- lessons learned while deploying Prudence 1.0 and 1.1.
+Prudence is underlying platform for the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Savory Framework"
+target "http://threecrickets.com/savory/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+(Historically, it's actually the other way around! Sincerity was designed
+ by Three Crickets precisely in order to make Prudence 2.0 sanely modular,
+ building on many lessons learned while deploying Prudence 1.0 and 1.1.
  It was clear during development that there was nothing in the proposed
  solution that was specific to Prudence.
  And so Sincerity was born as a generic tool useful for many JVM projects.)
@@ -2511,9 +2952,31 @@ Savory Framework Skeleton
 \end_layout
 
 \begin_layout Standard
-The Savory Framework lets you develop scalable data-driven web applications
- in server-side JavaScript, centering on MongoDB as its data provider and
- Prudence as its RESTful base.
+\begin_inset CommandInset href
+LatexCommand href
+name "The Savory Framework"
+target "http://threecrickets.com/savory/"
+
+\end_inset
+
+ lets you develop scalable data-driven web applications in server-side JavaScrip
+t, centering on 
+\begin_inset CommandInset href
+LatexCommand href
+name "MongoDB"
+target "http://www.mongodb.org/"
+
+\end_inset
+
+ as its data provider and 
+\begin_inset CommandInset href
+LatexCommand href
+name "Prudence"
+target "http://threecrickets.com/prudence/"
+
+\end_inset
+
+ as its RESTful base.
  It features strong integration with client-side 
 \begin_inset Quotes eld
 \end_inset
@@ -2522,8 +2985,23 @@ AJAX,
 \begin_inset Quotes erd
 \end_inset
 
- notably Ext JS and Sencha Touch, and clean-room integration with Facebook,
- Twitter, Google, etc..
+ notably 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ext JS"
+target "http://www.sencha.com/products/extjs"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sencha Touch"
+target "http://www.sencha.com/products/touch/"
+
+\end_inset
+
+, and clean-room integration with Facebook, Twitter, Google, etc.
  Services include a scalable email notification system, robust sitemap generatio
 n (with special support for 
 \emph on
@@ -2536,7 +3014,8 @@ large sites), authentication and authorization, and support for several
 \begin_layout Standard
 (Like Sincerity and Prudence, the Savory Framework is developed by Three
  Crickets.
- The three products form a powerful stack!)
+ The three products together form a powerful web application stack on top
+ of the JVM.)
 \end_layout
 
 \begin_layout Subsection
@@ -2544,17 +3023,24 @@ Rails Skeleton
 \end_layout
 
 \begin_layout Standard
-Rails, better known as 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ruby on Rails"
+target "http://rubyonrails.org/"
+
+\end_inset
+
+, or just 
 \begin_inset Quotes eld
 \end_inset
 
-Ruby on Rails,
+Rails,
 \begin_inset Quotes erd
 \end_inset
 
- is a popular web development framework for Ruby.
- It combines a traditional MVC approach with a RESTful orientation and relies
- on relational database stores (MySQL, Postgres).
+ is a popular web development framework for the Ruby programming language.
+ It combines a traditional MVC approach with a RESTful orientation backed
+ by relational database stores (MySQL, Postgres).
  Rails enjoys the elegant, often-imitated, ActiveRecord ORM, and a powerful
  
 \begin_inset Quotes eld
@@ -2567,19 +3053,6 @@ scaffolding
  feature that automatically generates models, views and controllers to which
  you can add your code.
  
-\end_layout
-
-\begin_layout Standard
-If you're looking for a more strictly RESTful, minimalist alternative to
- Rails, while sticking to Ruby, take a look at Prudence (the 
-\begin_inset Quotes eld
-\end_inset
-
-prudence
-\begin_inset Quotes erd
-\end_inset
-
- skeleton).
 \end_layout
 
 \begin_layout Standard
@@ -2604,7 +3077,7 @@ sincerity add rails : install
 \end_layout
 
 \begin_layout Standard
-This may take a minute or two: Rails is massive.
+This may take a minute or two: Rails is quite massive.
 \end_layout
 
 \begin_layout Standard
@@ -2627,7 +3100,35 @@ sincerity start rails
 \end_layout
 
 \begin_layout Standard
-The default port is 3000, so point your browser to http://localhost:3000.
+The default port is 3000, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:3000"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If you're looking for a more strictly RESTful, minimalist alternative to
+ Rails, while sticking to Ruby, take a look at 
+\begin_inset CommandInset href
+LatexCommand href
+name "Prudence"
+target "http://threecrickets.com/prudence/"
+
+\end_inset
+
+ (the 
+\begin_inset Quotes eld
+\end_inset
+
+prudence
+\begin_inset Quotes erd
+\end_inset
+
+ skeleton).
 \end_layout
 
 \begin_layout Subsubsection
@@ -2892,8 +3393,15 @@ Django Skeleton
 \end_layout
 
 \begin_layout Standard
-Django is a popular web development framework for Python.
- It relies on a traditional MVC approach and relational database stores
+\begin_inset CommandInset href
+LatexCommand href
+name "Django"
+target "https://www.djangoproject.com/"
+
+\end_inset
+
+ is a popular web development framework for the Python programming language.
+ It relies on a traditional MVC approach backed by relational database stores
  (MySQL, Postgres).
  Django enjoys a strong ecosystem of drop-in features and snippets, but
  also provides a lot of features right in the box.
@@ -2929,16 +3437,7 @@ prudence
 
 \begin_layout Standard
 Django can be difficult to install and get running on Jython, but of course
- it's trivial with Sincerity.
- In fact, you might find it easier than working with 
-\begin_inset Quotes eld
-\end_inset
-
-official Django.
-\begin_inset Quotes erd
-\end_inset
-
- To install it:
+ it's trivial with Sincerity:
 \end_layout
 
 \begin_layout Standard
@@ -2957,7 +3456,7 @@ sincerity add django : install
 \end_layout
 
 \begin_layout Standard
-This may take a minute or two: Django is massive.
+This may take a minute or two: Django is quite massive!
 \end_layout
 
 \begin_layout Standard
@@ -2980,7 +3479,14 @@ sincerity start django
 \end_layout
 
 \begin_layout Standard
-The default port is 8000, so point your browser to http://localhost:8000.
+The default port is 8000, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8000"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3098,8 +3604,15 @@ manage
 
 \begin_layout Standard
 And that's it: from here on, it's all standard Django goodness.
- You can go ahead with the tutorial at https://docs.djangoproject.com/en/dev/intro
-/tutorial01/, skipping the short 
+ You can go ahead with the 
+\begin_inset CommandInset href
+LatexCommand href
+name "tutorial"
+target " https://docs.djangoproject.com/en/dev/intro/tutorial01/"
+
+\end_inset
+
+, skipping the short 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3228,12 +3741,27 @@ LWJGL Skeleton
 The JVM is growing in popularity as a platform for game designers, due to
  its ability to easily have the game run on many operating systems, as well
  as in browsers.
- Much of this growth is due to the excellent LWJGL library, which makes
- easy to use hardware-accelerated features, such as 3D graphics and 3D sound,
- and to accept input from gaming controllers.
- While it does rely on native extensions to the JVM, they are supported
- on Linux, Windows, Mac OS X and Solaris.
- The author's favorite game, Minecraft, is based on it.
+ Much of this growth is due to the excellent 
+\begin_inset CommandInset href
+LatexCommand href
+name "LWJGL library"
+target "http://www.lwjgl.org/"
+
+\end_inset
+
+, which makes easy to use hardware-accelerated features, such as 3D graphics
+ and 3D sound, and to accept input from gaming controllers.
+ LWJGL relies on native extensions to the JVM, and supports Linux, Windows,
+ Mac OS X and Solaris.
+ The author's favorite game, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Minecraft"
+target "http://www.minecraft.net/"
+
+\end_inset
+
+, is based on it!
 \end_layout
 
 \begin_layout Standard
@@ -3321,8 +3849,8 @@ Create a
 \end_inset
 
  that starts up your game.
- If you want your game to be written only in Java, this likely means entering
- your main class, like this:
+ If you want your game to be written only in Java, this likely means delegating
+ to your main class, like this:
 \end_layout
 
 \begin_layout Standard

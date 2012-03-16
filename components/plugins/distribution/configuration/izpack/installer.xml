@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<installation version="1.0">
+	<info>
+		<appname>@{distribution.title}</appname>
+		<appversion>@{distribution.version}</appversion>
+		<url>@{distribution.url}</url>
+		<javaversion>1.5</javaversion>
+		<uninstaller path="$INSTALL_PATH/uninstaller" />
+	</info>
+
+	<locale>
+		<langpack iso3="eng" />
+	</locale>
+
+	<guiprefs width="600" height="480" resizable="yes" />
+
+	<panels>
+		<panel classname="LicencePanel" />
+		<panel classname="TargetPanel" />
+		<panel classname="InstallPanel" />
+	</panels>
+
+	<resources>
+		<res id="LicencePanel.licence" src="configuration/izpack/license.txt" />
+	</resources>
+
+	<packs>
+		<pack name="@{distribution.title}" required="yes">
+			<description>@{distribution.title}</description>
+			<fileset dir="." targetdir="$INSTALL_PATH" />
+		</pack>
+	</packs>
+</installation>

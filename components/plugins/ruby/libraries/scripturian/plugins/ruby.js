@@ -56,8 +56,7 @@ function gem(command) {
 	for (var i in arguments) {
 		executeArguments.push(arguments[i])
 		if ((i == 0) && (arguments[i] == 'install')) {
-			executeArguments.push('--bindir')
-			executeArguments.push(sincerity.container.getExecutablesFile())
+			executeArguments.push('--bindir', sincerity.container.getExecutablesFile())
 		}
 	}
 	sincerity.run('delegate:execute', executeArguments)
