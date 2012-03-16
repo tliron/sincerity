@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.tanukisoftware</groupId>
 			<artifactId>wrapper-base</artifactId>
-			<version>3.5.13</version>
+			<version>3.5.14</version>
 		</dependency>
 	</dependencies>
 
