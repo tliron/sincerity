@@ -37,8 +37,10 @@ get-parent-path()
 }
 
 #
-# Find Java
+# Find JVM
 #
+
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 
 if [ -n "$JAVA_HOME" ]; then
 	JAVA="$JAVA_HOME/bin/java"
@@ -47,7 +49,6 @@ if [ -n "$JAVA_HOME" ]; then
 		exit 1
 	fi
 else
-	OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 	case "$OS" in
 		linux)
 			JAVA=/usr/bin/java
@@ -66,6 +67,19 @@ else
 fi
 
 #
+# Find JVM tools
+#
+
+if [ "$OS" == darwin ]; then
+	if [ -z "$JAVA_VERSION" ] ; then
+		JAVA_VERSION=CurrentJDK
+	fi
+	TOOLS="/System/Library/Frameworks/JavaVM.framework/Versions/${JAVA_VERSION}/Classes/classes.jar"
+else
+	TOOLS="$JAVA_HOME/lib/tools.jar"
+fi
+
+#
 # Find Sincerity home
 #
 
@@ -79,10 +93,10 @@ fi
 
 JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
 "$SINCERITY_HOME/bootstrap.jar" \
-"$JAVA_HOME/lib/tools.jar")
+"$TOOLS")
 
 #
-# Run Sincerity
+# Sincerity
 #
 
 JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
