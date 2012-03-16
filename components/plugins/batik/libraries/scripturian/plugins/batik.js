@@ -1,7 +1,7 @@
 
 document.execute('/sincerity/container/')
 
-importClass(com.threecrickets.sincerity.exception.CommandException)
+importClass(com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
 var fopVersion = '1.0'
 

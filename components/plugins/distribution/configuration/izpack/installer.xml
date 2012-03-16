@@ -4,7 +4,6 @@
 	<info>
 		<appname>@{distribution.title}</appname>
 		<appversion>@{distribution.version}</appversion>
-		<url>@{distribution.url}</url>
 		<javaversion>1.5</javaversion>
 		<uninstaller path="$INSTALL_PATH/uninstaller" />
 	</info>
