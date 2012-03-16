@@ -1674,6 +1674,22 @@ service.remote-jmx
 \end_layout
 
 \begin_layout Subsection
+Distribution Plugin
+\end_layout
+
+\begin_layout Standard
+Using 
+\begin_inset CommandInset href
+LatexCommand href
+name "IzPack"
+target "http://izpack.org/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
 Felix OSGi Plugin
 \end_layout
 

@@ -91,17 +91,10 @@ fi
 # Libraries
 #
 
-JVM_LIBRARIES=$(echo "$JVM_LIBRARIES" \
-"$SINCERITY_HOME/bootstrap.jar" \
-"$TOOLS")
+JVM_LIBRARIES="$JVM_LIBRARIES${JVM_LIBRARIES:+:}$SINCERITY_HOME/bootstrap.jar:$TOOLS"
 
 #
 # Sincerity
 #
 
-JVM_SWITCHES=$(echo "$JVM_SWITCHES" \
--Dsincerity.home="$SINCERITY_HOME" \
--Dfile.encoding=UTF-8 \
--classpath "$(join ":" $JVM_LIBRARIES)")
-
-"$JAVA" $JVM_SWITCHES com.threecrickets.bootstrap.Bootstrap "$@"
+"$JAVA" $JVM_SWITCHES -Dsincerity.home="$SINCERITY_HOME" -Dfile.encoding=UTF-8 -classpath "$JVM_LIBRARIES" com.threecrickets.bootstrap.Bootstrap "$@"

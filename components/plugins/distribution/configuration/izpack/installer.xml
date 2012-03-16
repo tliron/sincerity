@@ -31,7 +31,17 @@ See: http://izpack.org/documentation/installation-files.html
 	<packs>
 		<pack name="@{distribution.title}" required="yes">
 			<description>@{distribution.title}</description>
-			<fileset dir="." targetdir="$INSTALL_PATH" />
+			<fileset dir="." targetdir="$INSTALL_PATH">
+				<exclude name="cache/**" />
+				<exclude name="logs/**" />
+				<exclude name="libraries/jars/com.izforge/**" />
+				<exclude name="configuration/izpack/**" />
+			</fileset>
+			<fileset dir="@{sincerity.home}" targetdir="$INSTALL_PATH">
+				<exclude name="templates/**" />
+				<exclude name="*.txt" />
+			</fileset>
+			<executable targetfile="$INSTALL_PATH/sincerity" />
 		</pack>
 	</packs>
 </installation>
