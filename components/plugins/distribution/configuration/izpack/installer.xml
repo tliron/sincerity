@@ -1,11 +1,15 @@
 <?xml version="1.0"?>
 
+<!-- 
+See: http://izpack.org/documentation/installation-files.html
+-->
+
 <installation version="1.0">
 	<info>
 		<appname>@{distribution.title}</appname>
 		<appversion>@{distribution.version}</appversion>
 		<javaversion>1.5</javaversion>
-		<uninstaller path="$INSTALL_PATH/uninstaller" />
+		<uninstaller path="$INSTALL_PATH" />
 	</info>
 
 	<locale>
