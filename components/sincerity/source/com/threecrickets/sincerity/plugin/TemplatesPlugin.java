@@ -5,10 +5,13 @@ import java.io.IOException;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.plugin.gui.TemplatesPane;
 
 public class TemplatesPlugin implements Plugin1
 {
@@ -39,15 +42,8 @@ public class TemplatesPlugin implements Plugin1
 		String commandName = command.getName();
 		if( "templates".equals( commandName ) )
 		{
-			File templatesDir = new File( command.getSincerity().getHome(), "templates" );
-			if( templatesDir.isDirectory() )
-			{
-				for( File templateDir : templatesDir.listFiles() )
-				{
-					if( templateDir.isDirectory() )
-						System.out.println( templateDir.getName() );
-				}
-			}
+			for( Template template : command.getSincerity().getTemplates() )
+				command.getSincerity().getOut().println( template );
 		}
 		else if( "templatize".equals( commandName ) )
 		{
@@ -82,5 +78,7 @@ public class TemplatesPlugin implements Plugin1
 
 	public void gui( Command command ) throws SincerityException
 	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getPane().add( "Templates", new TemplatesPane( sincerity ) );
 	}
 }

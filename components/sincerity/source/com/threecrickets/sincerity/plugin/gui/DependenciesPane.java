@@ -12,7 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Dependencies;
@@ -98,7 +97,8 @@ public class DependenciesPane extends JPanel implements ItemListener
 	{
 		try
 		{
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			SortedNode root = new SortedNode();
+
 			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
 				root.add( GuiUtil.createDependencyNode( resolvedDependency, dependencies, true, asTree && includeSub, showLicenses, showArtifacts, showPackageContents ) );
 

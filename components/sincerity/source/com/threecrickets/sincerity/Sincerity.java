@@ -263,6 +263,21 @@ public class Sincerity implements Runnable
 		this.frame = frame;
 	}
 
+	public List<Template> getTemplates() throws SincerityException
+	{
+		ArrayList<Template> templates = new ArrayList<Template>();
+		File templatesDir = new File( getHome(), "templates" );
+		if( templatesDir.isDirectory() )
+		{
+			for( File templateDir : templatesDir.listFiles() )
+			{
+				if( templateDir.isDirectory() )
+					templates.add( new Template( templateDir ) );
+			}
+		}
+		return templates;
+	}
+
 	//
 	// Operations
 	//
@@ -271,15 +286,17 @@ public class Sincerity implements Runnable
 	{
 		if( !force )
 		{
-			if( containerRoot.exists() )
+			if( containerRoot.isDirectory() )
 			{
-				if( new File( containerRoot, Container.SINCERITY_DIR ).exists() )
+				if( new File( containerRoot, Container.SINCERITY_DIR ).isDirectory() )
 				{
 					if( getVerbosity() >= 1 )
-						getOut().println( "The path is already a Sincerity container: " + containerRoot );
+						getOut().println( "The folder is already a Sincerity container: " + containerRoot );
 					setContainerRoot( containerRoot );
 					return;
 				}
+				else
+					throw new SincerityException( "The folder already exists: " + containerRoot );
 			}
 		}
 

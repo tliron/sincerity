@@ -4,10 +4,11 @@ import java.io.File;
 import java.util.Enumeration;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
@@ -25,6 +26,7 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
@@ -44,29 +46,37 @@ public class GuiUtil
 
 	public static final ImageIcon COMMAND_ICON = new ImageIcon( GuiUtil.class.getResource( "control_play.png" ) );
 
-	public static void setNativeLookAndFeel()
+	public static void setNativeLookAndFeel( boolean enabled )
 	{
 		// System.setProperty( "awt.useSystemAAFontSettings", "on" );
-		String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
-		try
+		if( enabled )
 		{
-			UIManager.setLookAndFeel( lookAndFeel );
+			String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+			try
+			{
+				UIManager.setLookAndFeel( lookAndFeel );
+			}
+			catch( InstantiationException x )
+			{
+				x.printStackTrace();
+			}
+			catch( ClassNotFoundException x )
+			{
+				x.printStackTrace();
+			}
+			catch( UnsupportedLookAndFeelException x )
+			{
+				x.printStackTrace();
+			}
+			catch( IllegalAccessException x )
+			{
+				x.printStackTrace();
+			}
 		}
-		catch( InstantiationException x )
+		else
 		{
-			x.printStackTrace();
-		}
-		catch( ClassNotFoundException x )
-		{
-			x.printStackTrace();
-		}
-		catch( UnsupportedLookAndFeelException x )
-		{
-			x.printStackTrace();
-		}
-		catch( IllegalAccessException x )
-		{
-			x.printStackTrace();
+			JFrame.setDefaultLookAndFeelDecorated( true );
+			JDialog.setDefaultLookAndFeelDecorated( true );
 		}
 	}
 
@@ -112,8 +122,8 @@ public class GuiUtil
 		return s.toString();
 	}
 
-	public static DefaultMutableTreeNode createDependencyNode( ResolvedDependency resolvedDependency, Dependencies dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses,
-		boolean includeArtifacts, boolean includePackageContents ) throws SincerityException
+	public static EnhancedNode createDependencyNode( ResolvedDependency resolvedDependency, Dependencies dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses, boolean includeArtifacts,
+		boolean includePackageContents ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( resolvedDependency, toHtml( resolvedDependency, isMain, false ), DEPENDENCY_ICON );
 
@@ -132,7 +142,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createLicenseNode( License license, Dependencies dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
+	public static EnhancedNode createLicenseNode( License license, Dependencies dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
 		throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
@@ -161,7 +171,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createArtifactNode( Artifact artifact, Dependencies dependencies, boolean includePackageContents ) throws SincerityException
+	public static EnhancedNode createArtifactNode( Artifact artifact, Dependencies dependencies, boolean includePackageContents ) throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
 
@@ -212,7 +222,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createPluginNode( Plugin1 plugin, boolean includeCommands ) throws SincerityException
+	public static EnhancedNode createPluginNode( Plugin1 plugin, boolean includeCommands ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( plugin, "<html><b>" + plugin.getName() + "</b></html>", PLUGIN_ICON );
 
@@ -223,12 +233,12 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createCommandNode( String command, Plugin1 plugin, boolean includePluginName ) throws SincerityException
+	public static EnhancedNode createCommandNode( String command, Plugin1 plugin, boolean includePluginName ) throws SincerityException
 	{
 		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
 	}
 
-	public static DefaultMutableTreeNode createShortcutTypeNode( String type, Shortcuts shortcuts ) throws SincerityException
+	public static EnhancedNode createShortcutTypeNode( String type, Shortcuts shortcuts ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( type, "<html><b>" + type + "</b></html>", PLUGIN_ICON );
 
@@ -239,7 +249,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static DefaultMutableTreeNode createShortcutNode( String shortcut, boolean includeType ) throws SincerityException
+	public static EnhancedNode createShortcutNode( String shortcut, boolean includeType ) throws SincerityException
 	{
 		if( !includeType && shortcut.contains( Shortcuts.SHORTCUT_TYPE_SEPARATOR ) )
 			return new EnhancedNode( shortcut, shortcut.substring( shortcut.indexOf( Shortcuts.SHORTCUT_TYPE_SEPARATOR ) + Shortcuts.SHORTCUT_TYPE_SEPARATOR.length() ), COMMAND_ICON );
@@ -247,7 +257,12 @@ public class GuiUtil
 			return new EnhancedNode( shortcut, shortcut, COMMAND_ICON );
 	}
 
-	public static DefaultMutableTreeNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException
+	public static EnhancedNode createTemplateNode( Template template ) throws SincerityException
+	{
+		return new EnhancedNode( template, template.getName(), FILE_ICON );
+	}
+
+	public static EnhancedNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
 		s.append( "<html><b>" );

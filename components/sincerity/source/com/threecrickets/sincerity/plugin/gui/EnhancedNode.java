@@ -1,9 +1,8 @@
 package com.threecrickets.sincerity.plugin.gui;
 
 import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultMutableTreeNode;
 
-public class EnhancedNode extends DefaultMutableTreeNode
+public class EnhancedNode extends SortedNode
 {
 	//
 	// Construction

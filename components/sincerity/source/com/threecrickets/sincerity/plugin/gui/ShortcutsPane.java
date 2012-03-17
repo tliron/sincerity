@@ -10,7 +10,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Shortcuts;
@@ -71,7 +70,7 @@ public class ShortcutsPane extends JPanel implements ItemListener
 	{
 		try
 		{
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			SortedNode root = new SortedNode();
 			if( groupByType )
 			{
 				Shortcuts shortcuts = sincerity.getContainer().getShortcuts();

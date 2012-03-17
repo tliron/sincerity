@@ -15,7 +15,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -81,7 +80,7 @@ public class ArtifactsPane extends JPanel implements ItemListener
 	{
 		try
 		{
-			DefaultMutableTreeNode root = new DefaultMutableTreeNode();
+			SortedNode root = new SortedNode();
 			if( groupByType )
 			{
 				HashMap<String, ArrayList<Artifact>> groups = new HashMap<String, ArrayList<Artifact>>();
@@ -99,7 +98,7 @@ public class ArtifactsPane extends JPanel implements ItemListener
 
 				for( Map.Entry<String, ArrayList<Artifact>> entry : groups.entrySet() )
 				{
-					DefaultMutableTreeNode groupNode = new DefaultMutableTreeNode( "<html><b>" + entry.getKey() + "</b></html>" );
+					SortedNode groupNode = new SortedNode( "<html><b>" + entry.getKey() + "</b></html>" );
 					root.add( groupNode );
 					for( Artifact artifact : entry.getValue() )
 						groupNode.add( GuiUtil.createArtifactNode( artifact, dependencies, showPackageContents ) );

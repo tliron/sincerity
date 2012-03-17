@@ -328,7 +328,7 @@ The library might have requirements, so you need to make sure to do all
 \end_layout
 
 \begin_layout Standard
-The above is a lot of work.
+The above steps involve a lot of work.
  And what if you have 20 dependencies?
 \end_layout
 
@@ -353,20 +353,19 @@ just works,
 \begin_inset Quotes erd
 \end_inset
 
- immediately and easily.
+ immediately and easily, and also handles bootstrapping and assists in configura
+tion.
 \end_layout
 
 \begin_layout Standard
-There's also the problem of working in a bubble: if you are using Jython,
- JRuby or Quercus, then you have to also work with the repository standards
- of Python (PyPI), Ruby (gems) and PHP (PEAR).
+There's also the problem of being forced in the JVM bubble: if you're using
+ Jython, JRuby or Quercus, then you have to also work with the repository
+ standards of Python (PyPI), Ruby (gems) and PHP (PEAR).
  Sincerity is designed to support all of these standards.
 \end_layout
 
 \begin_layout Standard
-Then there's the issue of potential conflicts, a.
- k.
- a.
+Then there's the issue of potential conflicts, a.k.a.
  
 \begin_inset Quotes eld
 \end_inset
@@ -385,7 +384,7 @@ DLL hell
  by any special rules.
  From the bottom up, Sincerity is designed to be as straightforward and
  universal as possible.
- See the detailed comparison to OSGi, below, for more information.
+ See the detailed comparison to OSGi below for more information.
 \end_layout
 
 \begin_layout Subsubsection
@@ -702,12 +701,19 @@ scripting
 \begin_inset Quotes erd
 \end_inset
 
- here we mean languages that are immediately runnable from the textual source
- code.
- This doesn't have to mean that are strictly interpreted: many of these
- languages compile some or all of such code on-the-fly.
- So, why hasn't Sincerity standardized on Groovy, Scala, Clojure, Lua, Python,
- Ruby or others?
+ here we mean that these languages are immediately runnable from the textual
+ source code.
+ This doesn't have to mean that they are 
+\begin_inset Quotes eld
+\end_inset
+
+interpreted
+\begin_inset Quotes erd
+\end_inset
+
+: many of these languages compile some or all of such code on-the-fly.
+ So, why has Sincerity standardized on JavaScript, rather than Groovy, Scala,
+ Clojure, Lua, Python, Ruby or others?
 \end_layout
 
 \begin_layout Standard
@@ -717,9 +723,9 @@ There's no single answer, but rather a combination of factors that make
 
 \begin_layout Enumerate
 JavaScript is very well known.
- Since it has been introduced into web browsers, it has gained an enormous
- skill share in the industry.
- There's a wealth of education material for it available.
+ Since its original introduction into web browsers, and universal adoption
+ as a web standard, it has gained an enormous skill share in the industry.
+ There's a wealth of education material available for it.
 \end_layout
 
 \begin_layout Enumerate
@@ -788,14 +794,20 @@ rhinoceros.
 \end_layout
 
 \begin_layout Enumerate
-It's actually a nice language! JavaScript has been the target of a lot of
- negativity from programmers who had to work with it in browser environments.
- But, we believe the fault is more of the environment (the browser DOM's
- poor API and many annoying differences between various browser implementations
- of it) than the language itself.
+JavaScript is actually a 
+\emph on
+nice 
+\emph default
+language.
+ It has been the target of a lot of negativity from programmers who had
+ to work with it in browser environments, but we believe the fault is more
+ of the environment (the browser DOM's poor API and many annoying differences
+ between various browser implementations of it) than the language itself.
+ It encourages prototype-oriented programming, which can easily emulate
+ object-oriented programming, as well as other paradigms.
  In fact, JavaScript shares much of its scoping and function handling with
  Scheme, a language that is generally admired.
- Think of it this way: JavaScript is Scheme with a C-like syntax.
+ You can think of it this way: JavaScript is Scheme with a C-like syntax.
 \end_layout
 
 \begin_layout Standard
@@ -830,7 +842,7 @@ JavaScript vs.
 
 \begin_layout Standard
 This section is meant for those of you who are comfortable with shell scripting,
- and are not very excited about Sincerity's use of JavaScript for bootstrapping.
+ and are wary about Sincerity's use of JavaScript for bootstrapping.
 \end_layout
 
 \begin_layout Enumerate
@@ -847,15 +859,16 @@ into
 \emph on
 does
 \emph default
- have shell scripts, but they're designed is to delegate to the JVM as soon
+ have shell scripts, but they're designed to delegate to the JVM as soon
  as they can.
 \end_layout
 
 \begin_layout Enumerate
-Starting up the JVM with all the JavaScript engine classes is much slower
- than starting up a shell script.
+You might be concerned about startup delay: starting up the JVM with all
+ the JavaScript engine classes is much slower than starting up a shell script.
  This is true, no doubt, but since version 7 the JVM is doing better.
- Also consider that you have to get into the JVM anyway.
+ Also consider that you have to get into the JVM anyway for your application
+ to do anything useful.
  Still, if your application has a lot of tools that do not always require
  the JVM, and would be adversely affected by the JavaScript bootstrap times,
  then by all means write them as shell scripts! You can use all of Sincerity's
@@ -872,7 +885,7 @@ Shell scripts treat most of your program as an opaque, black box.
 \begin_layout Enumerate
 JavaScript is likely richer than your shell language.
  Sure, bash 4.0 and PowerShell are a leap forward compared to what we had
- 20 years ago, but c'mon.
+ 20 years ago, but they're still quite constricting.
 \end_layout
 
 \begin_layout Subsection
@@ -910,6 +923,7 @@ But, for this to work, you need to play by Maven's rules, and that's where
  procedure into a product that abhors procedure.
  Specifically, Maven's ideal environment is one in which your versioned
  modules are written in Java mapped to single jar files.
+ Anything even slightly different becomes painful and hacky.
 \end_layout
 
 \begin_layout Standard
@@ -920,10 +934,11 @@ Both Sincerity and Maven handle downloading dependencies, but other than
  second: Maven could help you build your project and repositories, while
  Sincerity would handle your deployment container.
  Maven wont't help you run your application: its output is jars of compiled
- code, source code or documentation, but it doesn't handle their bootstrapping
+ code, source code or documentation, and it doesn't handle their bootstrapping
  or runtime configuration.
- On the other hand, Sincerity does not build your project, nor make any
- assumptions about how its built: you can use Maven, Ant or anything else.
+ On the other hand, Sincerity does not build your project, nor does it make
+ any assumptions about how its built: you can use Maven, Ant or anything
+ else.
 \end_layout
 
 \begin_layout Subsubsection
@@ -940,8 +955,8 @@ interface
 \begin_inset Quotes erd
 \end_inset
 
- in the JVM lets you create a standard protocol, such that you plug in various
- implementations of it---
+ in the JVM lets you create a standard protocol, such that you can plug
+ in various implementations of it---
 \begin_inset Quotes eld
 \end_inset
 
@@ -995,8 +1010,8 @@ DLL hell
 
  suddenly becomes a far more malevolent enemy: bundles are often black boxes
  that you cannot easily patch to use a shared version of a dependency.
- There's thus a real needs for a built-in solution, which OSGi provides
- via a system of classloaders.
+ There's thus a real need for a standard solution of runtime code compartmentali
+zation, which OSGi provides via a clever system of classloaders.
 \end_layout
 
 \begin_layout Standard
@@ -1074,10 +1089,10 @@ bundles
 
 \begin_layout Standard
 Indeed, the original target environment for OSGi was precisely one in which
- all bundles run in a single process, in shared memory space: it is the
+ all bundles ran in a single process, in shared memory space: it is the
  world of embedded computing, where the runtime is variously confined, such
- that you are either limited to a single process for security concerns,
- or due to limited resources.
+ that you are either limited to a single process due to limited resources
+ or security concerns.
  In such environments OSGi may be your only good solution for the problem
  of modularity and pluggable services.
  Still, OSGi has also proved popular in large enterprise environments, where
@@ -1096,7 +1111,8 @@ containers,
 \end_inset
 
  which you can easily create, clone and change, and start and stop as processes
- (the service plugin makes it especially easy to run them daemons and services).
+ (the service plugin makes it especially easy to run them as daemons and
+ services).
  Containers can then talk to each other (and to other services) using whatever
  technology is appropriate, be it REST, SOAP, message queuing, Hazelcast,
  etc.
@@ -1604,15 +1620,33 @@ Logging Plugin
 \end_layout
 
 \begin_layout Standard
-Using 
-\begin_inset CommandInset href
-LatexCommand href
-name "SLF4J"
-target "http://www.slf4j.org/"
+This plugin makes it exceptionally easy to unify and configure your logging
+ across a diverse set of technologies and dependencies.
+ In most cases, simply installing this plugin into your container should
+ handle all logging with sensible defaults.
+ Should you need to customize and configure logging, you'll find Sincerity's
+ scheme especially flexible and powerful.
+\end_layout
 
+\begin_layout Standard
+Though the JVM includes a standard logging API, in the 
+\begin_inset Quotes eld
 \end_inset
 
- and 
+java.util.logging
+\begin_inset Quotes erd
+\end_inset
+
+ (
+\begin_inset Quotes eld
+\end_inset
+
+JULI
+\begin_inset Quotes erd
+\end_inset
+
+) package, the greater JVM ecology has adopted a few incompatible standards.
+ In particular, 
 \begin_inset CommandInset href
 LatexCommand href
 name "Apache log4j"
@@ -1620,19 +1654,454 @@ target "http://logging.apache.org/log4j/"
 
 \end_inset
 
-.
+, which was the inspiration for JULI, enjoys broad support and a more robust
+ implementation.
+ We've thus preferred to use log4j for our actual implementation, and rely
+ on the excellent 
+\begin_inset CommandInset href
+LatexCommand href
+name "SLF4J"
+target "http://www.slf4j.org/"
+
+\end_inset
+
+ library for bridging JULI to it.
+ SLF4J has become popular enough that several libraries support it directly,
+ so that we can even avoid the minimal overhead introduced by bridging.
 \end_layout
 
 \begin_layout Standard
-/configuration/logging.conf
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To initialize logging, you can execute the 
+\begin_inset Quotes eld
+\end_inset
+
+logging
+\begin_inset Quotes erd
+\end_inset
+
+ command from within your programs.
+ An example in JavaScript:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+// Will do nothing if the logging plugin is not installed:
+\end_layout
+
+\begin_layout Plain Layout
+
+try { sincerity.run('logging:logging') } catch(x) {}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You can also test logging simply using the 
+\begin_inset Quotes eld
+\end_inset
+
+log
+\begin_inset Quotes erd
+\end_inset
+
+ command, which sends an 
+\begin_inset Quotes eld
+\end_inset
+
+info
+\begin_inset Quotes erd
+\end_inset
+
+ level message to the 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity
+\begin_inset Quotes erd
+\end_inset
+
+ logger:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging : install : log "This is a test!"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Logs will appear under the 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+ By default, all loggers are appended to 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/common.log
+\begin_inset Quotes erd
+\end_inset
+
+, which is a rolling log file with a size of 5MB per file, and a maximum
+ of 10 files.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
 \end_layout
 
 \begin_layout Standard
 \begin_inset Quotes eld
 \end_inset
 
-logging.mongodb
+Officially,
 \begin_inset Quotes erd
+\end_inset
+
+ log4j configuration is based either on JVM properties files or XML.
+ Both are hardcoded, inflexible and difficult to scale.
+ Sincerity's logging plugin instead uses a powerful JavaScript-based scheme,
+ which allows you to dynamically configure your loggers according to your
+ operating environment.
+\end_layout
+
+\begin_layout Standard
+Configure your loggers under 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging/loggers/
+\begin_inset Quotes erd
+\end_inset
+
+ and your appenders under 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging/appenders/
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Any JavaScript file you add to these directories will be executed upon
+ logging initialization.
+ Take a look at the defaults to get a sense of how this works.
+\end_layout
+
+\begin_layout Standard
+For example, if you want to add console logging to root, add the following
+ line to 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging/loggers/root.js
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+logger.addAppender(appenders.console)
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that you can also use 
+\begin_inset Quotes eld
+\end_inset
+
+official
+\begin_inset Quotes erd
+\end_inset
+
+ log4j configuration if you are more comfortable with it.
+ If the file 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging.conf
+\begin_inset Quotes erd
+\end_inset
+
+ is present, it will be used.
+ This file can either be a properties file, or an XML file (in which case
+ it must begin with the 
+\begin_inset Quotes eld
+\end_inset
+
+<?xml
+\begin_inset Quotes erd
+\end_inset
+
+ header).
+ The plugin comes with an example 
+\begin_inset Quotes eld
+\end_inset
+
+logging.conf
+\begin_inset Quotes erd
+\end_inset
+
+ named 
+\begin_inset Quotes eld
+\end_inset
+
+logging.alt.conf
+\begin_inset Quotes erd
+\end_inset
+
+, which you can rename to 
+\begin_inset Quotes eld
+\end_inset
+
+logging.conf
+\begin_inset Quotes erd
+\end_inset
+
+ if you wish to use it.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+In distributed environments, such as grids and clouds, you may prefer to
+ centralize your logging.
+ To aid this common use case, Sincerity comes with a 
+\begin_inset CommandInset href
+LatexCommand href
+name "MongoDB"
+target "http://www.mongodb.org/"
+
+\end_inset
+
+-backed appender, based on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Log4mongo"
+target "http://log4mongo.org/"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging.mongodb : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To configure the MongoDB connection, edit 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging/appenders/common-mongo-db.js
+\begin_inset Quotes erd
+\end_inset
+
+.
+ By default, it connects to localhost at the default port (27017) without
+ security, and logs to database 
+\begin_inset Quotes eld
+\end_inset
+
+logs
+\begin_inset Quotes erd
+\end_inset
+
+, collection 
+\begin_inset Quotes eld
+\end_inset
+
+common
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is strongly recommended that you use a 
+\begin_inset CommandInset href
+LatexCommand href
+name "capped collection"
+target "http://www.mongodb.org/display/DOCS/Capped+Collections"
+
+\end_inset
+
+ for your log.
+ This guarantees both excellent write performance as well as automatic rolling.
+ You can create it from the mongo shell like so:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+db.createCollection('log', {capped: true, size: 100000})
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or, convert an existing collection to capped:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+db.runCommand({'convertToCapped': 'log', size: 100000})
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This plugin also provides you with a very useful tool to 
+\begin_inset Quotes eld
+\end_inset
+
+tail
+\begin_inset Quotes erd
+\end_inset
+
+ your central log (works only with capped collections):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity logtail
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Press CTRL+C to quit.
+ To test that this works, open another terminal and send a log message:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity log "This is a test!"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You can provide 
+\begin_inset Quotes eld
+\end_inset
+
+logtail
+\begin_inset Quotes erd
+\end_inset
+
+ with the following optional parameters:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity logtail --connection=localhost:27017 --username=admin --password=admin
+123 --db=logs --collection=common
+\end_layout
+
 \end_inset
 
 
@@ -1643,34 +2112,323 @@ Service Plugin
 \end_layout
 
 \begin_layout Standard
-Using 
+This plugin lets you easily start and control any program as a daemon or
+ service running in the background.
+ This is achieved using Tanuki Software's excellent 
 \begin_inset CommandInset href
 LatexCommand href
-name "Tanuki's Java Service Wrapper"
+name "Java Service Wrapper"
 target "http://wrapper.tanukisoftware.com/"
 
 \end_inset
 
-, often abbreviated as 
+ (or 
 \begin_inset Quotes eld
 \end_inset
 
-JSW.
+JSW
 \begin_inset Quotes erd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+While you can, of course, naïvely start any program using the 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity start
+\begin_inset Quotes erd
+\end_inset
+
+ command, it is strongly recommended that you use this plugin for production
+ environments.
+ JSW deploys a native process to monitor your daemon's health, able to detect
+ failures and hangs, and can restart it if in such cases.
+ It supports many configuration options to control the JVM process, as well
+ as support for JMX-based management.
+\end_layout
+
+\begin_layout Standard
+JSW runs on an impressive array of operating systems: Linux, Mac OS X, Windows,
+ Solaris, AIX, FreeBSD, HPUX, z/OS and z/Linux, supporting several 32bit
+ and 64bit machine architectures for each.
+ Of course, you do not want to install support for 
+\emph on
+all 
+\emph default
+of these platforms in your container, and so this plugin cleverly detects
+ the underlying operating system and downloads the necessary native libraries
+ on-demand.
+ An error message will be displayed for unsupported platforms.
+\end_layout
+
+\begin_layout Standard
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add service : install
+\end_layout
+
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
+To start a program as a daemon:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity service myprogram start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above assumes that you have a 
 \begin_inset Quotes eld
 \end_inset
 
-service.remote-jmx
+/programs/myprogram.js
 \begin_inset Quotes erd
 \end_inset
 
+ file.
+ (Programs can be written in languages other than JavaScript if they are
+ installed in your container.) See the service wrapper's log at 
+\begin_inset Quotes eld
+\end_inset
 
+/logs/service.log
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To stop the daemon:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity service myprogram stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To restart it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity service myprogram restart
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To check its status:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity service myprogram status
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Additionally, you can run the wrapper in 
+\begin_inset Quotes eld
+\end_inset
+
+console mode,
+\begin_inset Quotes erd
+\end_inset
+
+ which outputs the wrapper's log to the console, and lets you easily stop
+ it using CTRL+C.
+ This is very useful for testing and debugging:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity service myprogram console
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Sincerity uses the Community Edition of JSW, which is licensed
+ under the GPL (v2).
+ Make sure that you understand the special implications of this license
+ if you intend to redistribute your product.
+ Furthermore, some Windows platforms (64bit x86 and Itanium) are not supported
+ by the Community Edition.
+ A commercial license is also available without these limitations.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "license guide"
+target "http://wrapper.tanukisoftware.com/doc/english/licenseOverview.html"
+
+\end_inset
+
+ for more information.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+This plugin generates some parts of the JSW configuration on the fly, but
+ it can furthermore merge your custom settings into this configuration.
+ To do so, edit 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/service/service.conf
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In particular, you might want to control the memory profile of your JVM,
+ or configure the wrapper's logging.
+ See the JSW 
+\begin_inset CommandInset href
+LatexCommand href
+name "documentation"
+target "http://wrapper.tanukisoftware.com/doc/english/properties.html"
+
+\end_inset
+
+ for more details.
+\end_layout
+
+\begin_layout Standard
+Additionally, this plugin provides a flexible way for you to send arguments
+ to the wrapped JVM.
+ Any files under 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/service/jvm/
+\begin_inset Quotes erd
+\end_inset
+
+ with a 
+\begin_inset Quotes eld
+\end_inset
+
+.conf
+\begin_inset Quotes erd
+\end_inset
+
+ extension will be merged and added.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+To add 
+\emph on
+remote
+\emph default
+ JMX support:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add service.remote-jmx : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that this add-on is only required for 
+\emph on
+remote
+\emph default
+ JMX (local JMX is automatically supported by JSW).
+ Remote JMX introduces several challenges, especially when working behind
+ firewalls.
+ We've specially engineered this add-on using a dedicated JVM agent, which
+ allows the RMI Registry to run on port 1651, with the JMX port at 1650.
+\end_layout
+
+\begin_layout Standard
+To configure, edit: 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/service/jvm/remote-jmx.conf
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
@@ -1678,7 +2436,13 @@ Distribution Plugin
 \end_layout
 
 \begin_layout Standard
-Using 
+This plugin lets you package your Sincerity container for convenient distributio
+n.
+\end_layout
+
+\begin_layout Standard
+Currently, it supports creating a powerful cross-platform JVM-based graphical
+ installer, using the excellent 
 \begin_inset CommandInset href
 LatexCommand href
 name "IzPack"
@@ -1686,7 +2450,181 @@ target "http://izpack.org/"
 
 \end_inset
 
+ library.
+ In the future, we hope to support additional distribution media.
+\end_layout
+
+\begin_layout Standard
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add distribution : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity izpack [application name] [version (optional, defaults to "1.0")]
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For example, in a single command let's create an installable Nexus repository
+ manager with a few plugins:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create nexus : add nexus : add logging : add service : add distributio
+n : install : izpack "Nexus Repository Manager"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The result will be an 
+\begin_inset Quotes eld
+\end_inset
+
+installer.jar
+\begin_inset Quotes erd
+\end_inset
+
+ file in your container's root directory, which you can distribute.
+ To install your application:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+java -jar installer.jar
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Note that on some platforms double-clicking this file would also run it
+ appropriately.)
+\end_layout
+
+\begin_layout Standard
+The installed directory will contain a convenient 
+\begin_inset Quotes eld
+\end_inset
+
+uninstaller.jar
+\begin_inset Quotes erd
+\end_inset
+
 .
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+To change the license, edit 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/izpack/license.txt
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/izpack/installer.xml
+\begin_inset Quotes erd
+\end_inset
+
+ included with this plugin has sensible defaults that should work fine for
+ many use cases, but you'll likely want to customize it.
+ By default, it merges your Sincerity install in, and excludes IzPack itself,
+ as well as the 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/
+\begin_inset Quotes erd
+\end_inset
+
+ directory.
+ This guarantees that it would 
+\begin_inset Quotes eld
+\end_inset
+
+just work
+\begin_inset Quotes erd
+\end_inset
+
+ cleanly on any JVM with no pre-requisites.
+\end_layout
+
+\begin_layout Standard
+Please see the 
+\begin_inset CommandInset href
+LatexCommand href
+name "IzPack documentation"
+target "http://izpack.org/documentation/installation-files.html"
+
+\end_inset
+
+ for full details.
+ IzPack is very powerful, and can let you create modular, flexible distributions.
 \end_layout
 
 \begin_layout Subsection

@@ -71,7 +71,10 @@ public class ContainerPlugin implements Plugin1
 
 			File containerRoot = new File( arguments[0] );
 			if( !containerRoot.isDirectory() )
-				throw new NoContainerException( "Specified container root path is not a directory: " + containerRoot );
+				throw new NoContainerException( "The container root path is not a folder: " + containerRoot );
+
+			if( !new File( containerRoot, Container.SINCERITY_DIR ).isDirectory() )
+				throw new NoContainerException( "The folder is not a valid container: " + containerRoot );
 
 			command.remove();
 			command.getSincerity().setContainerRoot( containerRoot );

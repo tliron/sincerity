@@ -2,10 +2,21 @@
 set -e
 
 #
-# Constants
+# This script will take into consideration the following environment variables, if defined:
 #
-
-SINCERITY_DIRNAME=${SINCERITY_DIRNAME:-.sincerity}
+#  SINCERITY_HOME
+#    The root of the Sincerity installation to use. If not provided, will automatically
+#    discover it according to actual (not symlinked) location of this script file
+#  JAVA_HOME
+#    The root of the JVM installation. If not provided, will use a platform-specific
+#    heuristic to discover it.
+#  JAVA_VERSION
+#    Used only in Darwin (Mac OS X). Defaults to "CurrentJDK".
+#  JVM_LIBRARIES
+#    Extra libraries to add to the classpath.
+#  JVM_SWITCHES
+#    Extra switches to add to the JVM invocation.
+#
 
 function join()
 {
@@ -97,4 +108,11 @@ JVM_LIBRARIES="$JVM_LIBRARIES${JVM_LIBRARIES:+:}$SINCERITY_HOME/bootstrap.jar:$T
 # Sincerity
 #
 
-"$JAVA" $JVM_SWITCHES -Dsincerity.home="$SINCERITY_HOME" -Dfile.encoding=UTF-8 -classpath "$JVM_LIBRARIES" com.threecrickets.bootstrap.Bootstrap "$@"
+"$JAVA" \
+$JVM_SWITCHES \
+-Dsincerity.home="$SINCERITY_HOME" \
+-Dfile.encoding=UTF-8 \
+-classpath \
+"$JVM_LIBRARIES" \
+com.threecrickets.bootstrap.Bootstrap \
+"$@"

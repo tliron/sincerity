@@ -8,23 +8,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-
-import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class RepositoriesPane extends JPanel
+public class TemplatesPane extends JPanel
 {
 	//
 	// Construction
 	//
 
-	public RepositoriesPane( Sincerity sincerity ) throws SincerityException
+	public TemplatesPane( Sincerity sincerity ) throws SincerityException
 	{
 		super( new BorderLayout() );
-
-		sincerity.getContainer();
 
 		this.sincerity = sincerity;
 
@@ -53,19 +49,8 @@ public class RepositoriesPane extends JPanel
 		{
 			SortedNode root = new SortedNode();
 
-			EnhancedNode publicRoot = new EnhancedNode( null, "Public", GuiUtil.FOLDER_ICON );
-			EnhancedNode privateRoot = new EnhancedNode( null, "Private", GuiUtil.FOLDER_ICON );
-
-			Repositories repositories = sincerity.getContainer().getRepositories();
-			for( DependencyResolver resolver : repositories.getResolvers( "public" ) )
-				publicRoot.add( GuiUtil.createRepositoryNode( resolver ) );
-			for( DependencyResolver resolver : repositories.getResolvers( "private" ) )
-				privateRoot.add( GuiUtil.createRepositoryNode( resolver ) );
-
-			if( publicRoot.getChildCount() > 0 )
-				root.add( publicRoot );
-			if( privateRoot.getChildCount() > 0 )
-				root.add( privateRoot );
+			for( Template template : sincerity.getTemplates() )
+				root.add( GuiUtil.createTemplateNode( template ) );
 
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
