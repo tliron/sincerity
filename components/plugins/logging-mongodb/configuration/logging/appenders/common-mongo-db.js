@@ -7,3 +7,6 @@ appender.name = 'commonMongoDb'
 appender.hostname = 'localhost'
 appender.databaseName = 'logs'
 appender.collectionName = 'common'
+
+// This is a high-priority root appender
+rootAppenders.unshift(appender)

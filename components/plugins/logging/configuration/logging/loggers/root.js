@@ -1,11 +1,7 @@
 
-document.execute('/sincerity/objects/')
-
 var logger = repository.rootLogger
 
-if (Sincerity.Objects.exists(appenders.commonMongoDb)) {
-	logger.addAppender(appenders.commonMongoDb)
-}
-else {
-	logger.addAppender(appenders.commonFile)
+// Use the highest-priority root appender
+if (rootAppenders.length > 0) {
+	logger.addAppender(rootAppenders[0])
 }

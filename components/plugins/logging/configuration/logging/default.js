@@ -6,6 +6,7 @@ importClass(
 	org.apache.log4j.Level)
 
 var appenders = {}
+var rootAppenders = []
 var repository = org.apache.log4j.LogManager.loggerRepository
 
 repository.resetConfiguration()
