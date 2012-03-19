@@ -413,7 +413,18 @@ Sincerity.JVM = Sincerity.JVM || function() {
 			Public.exec('kill', [pid])
 		}
 	}
-	
+
+	Public.getProcessState = function(pid) {
+		var os = java.lang.System.getProperty('os.name')
+		if (os == 'Windows') {
+			return null
+		}
+		else {
+			var lines = Public.exec('ps', ['h', '-o', 'state', pid])
+			return lines.length > 0 ? lines[0] == 'S' : false
+		}
+	}
+
 	//
 	// Initialization
 	//

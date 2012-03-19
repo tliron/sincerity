@@ -2934,7 +2934,7 @@ es, such as the Three Crickets repository in which many Sincerity packages
 \end_layout
 
 \begin_layout Standard
-It's a piece of cake to install a working Nexus instance:
+With Sincerity, it's a piece of cake to install a working Nexus instance:
 \end_layout
 
 \begin_layout Standard
@@ -3096,8 +3096,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add jetty.web : add logging : add service
- : install : service jetty start
+sincerity create mycontainer : add nexus : add logging : add service : install
+ : service jetty start
 \end_layout
 
 \end_inset
@@ -3122,6 +3122,458 @@ sincerity use mycontainer : service jetty stop
 \end_inset
 
 
+\end_layout
+
+\begin_layout Subsection
+Solr Skeleton
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache Solr"
+target "http://lucene.apache.org/solr/"
+
+\end_inset
+
+ is a popular distributed textual search platform.
+ It runs on the JVM and relies on the excellent 
+\begin_inset CommandInset href
+LatexCommand href
+name "Lucene"
+target "http://lucene.apache.org/"
+
+\end_inset
+
+ library for indexing and searching, but is accessed via simple network
+ APIs, making it perfect for distributed deployments and heavy loads.
+ Client libraries are available for many platforms, and are even integrated
+ into the backends of many web development frameworks, such as Django and
+ Ruby on Rails.
+\end_layout
+
+\begin_layout Standard
+With Sincerity, it's a piece of cake to install a working Solr instance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add solr : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start the server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start jetty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default port is 8080, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080/solr/admin/"
+
+\end_inset
+
+ to see the main Solr administration page.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The skeleton comes with the example configuration supplied with the official
+ Solr distribution, and should serve as a good starting point for the majority
+ of project.
+ The configuration is available under 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/solr/conf/
+\begin_inset Quotes erd
+\end_inset
+
+, and indexing and other data is stored in 
+\begin_inset Quotes eld
+\end_inset
+
+/data/solr/
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Solr is very configurable, both in terms of performance fine-tuning and
+ language analysis and indexing.
+ It also enjoys a range of useful plugins.
+ See the official site for more information on fleshing out your skeleton.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+Two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging : add service : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install a Solr server with the recommended plugins
+ into a Sincerity container created in the current directory, and then start
+ it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create mycontainer : add solr : add logging : add service : install
+ : service jetty start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : service jetty stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Hadoop Skeleton
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache Hadoop"
+target "http://hadoop.apache.org/"
+
+\end_inset
+
+ is a powerful platform for distributed computing, well known for its scalable
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "distributed filesystem"
+target "http://hadoop.apache.org/hdfs/"
+
+\end_inset
+
+ and popular 
+\begin_inset CommandInset href
+LatexCommand href
+name "map-reduce module"
+target "http://hadoop.apache.org/mapreduce/"
+
+\end_inset
+
+.
+ It provides the underlying infrastructure for several data storage and
+ analysis platforms, such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "Cassandra"
+target "http://cassandra.apache.org/"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "HBase"
+target "http://hbase.apache.org/"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Hive"
+target "http://hive.apache.org/"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "Pig"
+target "http://pig.apache.org/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Hadoop runs best on Linux, where it relies on native libraries.
+ This skeleton detects the underlying architecture and downloads the necessary
+ native libraries on-demand.
+\end_layout
+
+\begin_layout Standard
+With Sincerity, it's a piece of cake to install a working Hadoop instance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add hadoop : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Before starting Hadoop, you need to format the name node:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity hadoop namenode -format
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Note that the 
+\begin_inset Quotes eld
+\end_inset
+
+namenode -format
+\begin_inset Quotes erd
+\end_inset
+
+ command exits the JVM when done, so you cannot chain more commands after
+ it.)
+\end_layout
+
+\begin_layout Standard
+Then, to start the node:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity hadoop start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If this is the only node in your Hadoop cluster, you might need to wait
+ 30 seconds for the services to fully initialize.
+ To test copying files to and from the Hadoop filesystem:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity hadoop fs -put myfile.txt test.txt
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity hadoop fs -get test.txt test.txt
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop the node:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity hadoop stop
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To see the status of the node services:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity hadoop status
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that Hadoop uses the service plugin to manage the node services.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The skeleton comes with a plugin that supports the 
+\begin_inset CommandInset href
+LatexCommand href
+name "full list of Hadoop commands"
+target "http://hadoop.apache.org/common/docs/current/commands_manual.html"
+
+\end_inset
+
+, and additionally supports 
+\begin_inset Quotes eld
+\end_inset
+
+start
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+stop
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+status
+\begin_inset Quotes erd
+\end_inset
+
+ to manage the services.
+\end_layout
+
+\begin_layout Standard
+To configure your instance, see 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/hadoop/
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The default configuration is based on that of the official Hadoop distribution,
+ configured for 
+\begin_inset CommandInset href
+LatexCommand href
+name "pseudo-distributed operation"
+target "http://hadoop.apache.org/common/docs/current/single_node_setup.html#PseudoDistributed"
+
+\end_inset
+
+ on ports 8000 (name node) and 8001 (job tracker).
+\end_layout
+
+\begin_layout Standard
+See the logging plugin for more information on the logging configuration.
 \end_layout
 
 \begin_layout Subsection
@@ -3313,8 +3765,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add jetty.web : add logging : add service
- : install : service jetty start
+sincerity create mycontainer : add solr : add logging : add service : install
+ : service jetty start
 \end_layout
 
 \end_inset
@@ -3527,8 +3979,8 @@ sincerity add jetty.servlet.jsp : add jetty.servlet.jmx : install
 \end_layout
 
 \begin_layout Standard
-Also, a nice example of a Jetty server with multiple contexts is provided:
- a static web server, a servlet container, and a web application installed
+Also, a nice example of a Jetty server with multiple contexts is provided,
+ with a static web server, a servlet container, and a web application installed
  as a WAR file:
 \end_layout
 

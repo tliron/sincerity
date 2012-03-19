@@ -45,23 +45,20 @@ function service(command) {
 	var statusFile = new File(cacheDir, name + '.status')
 	
 	if (verb == 'status') {
+		var pid = getPid(pidFile, statusFile)
 		var status = getStatus(statusFile)
 		if (null === status) {
 			command.sincerity.out.println(displayName + ' is not running')
 		}
 		else {
-			var pid = null
-			if (isRunning(status)) {
-				pid = getPid(pidFile)
-			}
 			command.sincerity.out.println(displayName + ': ' + status + (null === pid ? '' : ' (pid: ' + pid + ')'))
 		}
 		return
 	}
 	
 	if ((verb == 'stop' ) || (verb == 'restart')) {
+		var pid = getPid(pidFile, statusFile)
 		var status = getStatus(statusFile)
-		var pid = getPid(pidFile)
 		if (isStopped(status) || (null === pid)) {
 			command.sincerity.out.println(displayName + ' is not running' + (null === status ? '' : ' (' + status + ')'))
 			return
@@ -69,12 +66,12 @@ function service(command) {
 		
 		command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
 		Sincerity.JVM.kill(pid)
-		pid = getPid(pidFile)
+		pid = getPid(pidFile, statusFile)
 		if (null !== pid) {
 			command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
 			while (null !== pid) {
 				java.lang.Thread.sleep(1000)
-				pid = getPid(pidFile)
+				pid = getPid(pidFile, statusFile)
 			}
 		}
 		command.sincerity.out.println(displayName + ' has stopped')
@@ -84,6 +81,7 @@ function service(command) {
 	}
 	
 	if ((verb == 'start') || (verb == 'restart') || (verb == 'console')) {
+		var pid = getPid(pidFile, statusFile)
 		var status = getStatus(statusFile)
 		if (isRunning(status)) {
 			command.sincerity.out.println(displayName + ' is already running (' + status + ')')
@@ -274,8 +272,17 @@ function getOs() {
 	}
 }
 
-function getPid(pidFile) {
-	return pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)).trim() : null
+function getPid(pidFile, statusFile) {
+	var pid = pidFile.exists() ? String(Sincerity.Files.loadText(pidFile)).trim() : null
+	if ((null !== pid) && Sincerity.Objects.exists(statusFile)) {
+		var state = Sincerity.JVM.getProcessState(pid)
+		if (state === false) {
+			pidFile['delete']()
+			statusFile['delete']()
+			pid = null
+		}
+	}
+	return pid
 }
 
 function getStatus(statusFile) {

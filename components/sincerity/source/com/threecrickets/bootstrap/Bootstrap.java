@@ -96,6 +96,11 @@ public class Bootstrap extends URLClassLoader
 		addURL( url );
 	}
 
+	public void addFile( File file ) throws MalformedURLException
+	{
+		addUrl( file.toURI().toURL() );
+	}
+
 	public void bootstrap( String[] arguments ) throws Exception
 	{
 		Thread.currentThread().setContextClassLoader( this );

@@ -459,7 +459,7 @@ public class Dependencies
 		try
 		{
 			for( File file : getClasspaths( false ) )
-				bootstrap.addUrl( file.toURI().toURL() );
+				bootstrap.addFile( file );
 		}
 		catch( MalformedURLException x )
 		{
