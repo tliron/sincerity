@@ -119,7 +119,7 @@ function service(command) {
 				displayname: displayName,
 				pidfile: pidFile,
 				'pidfile.strict': true,
-				logfile: command.sincerity.container.getLogsFile('service.log'),
+				logfile: command.sincerity.container.getLogsFile('service-' + name + '.log'),
 				working: {
 					dir: command.sincerity.container.root
 				},
