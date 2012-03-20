@@ -12,13 +12,16 @@ context.resourceBase = Sincerity.Container.getFileFromHere('web')
 context.tempDirectory = Sincerity.Container.getFileFromHere('work')
 
 // Plexus needs all classes to be in the same classloader
-context.classLoader = new WebAppClassLoader(context)
+context.classLoader = new WebAppClassLoader(null, context)
 for (var i = sincerity.container.dependencies.getClasspaths(false).iterator(); i.hasNext(); ) {
 	var jar = i.next()
 	// Nexus annoyingly *requires* that SLF4J run over Logback, so we will make sure not
 	// to load the log4j implementation
 	if (jar.name != 'slf4j-log4j12.jar') {
 		context.classLoader.addClassPath(jar)
+	}
+	else {
+		context.addServerClass('org.slf4j.impl.')
 	}
 }
 
