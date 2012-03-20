@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>sincerity-nexus</artifactId>
+	<artifactId>sincerity-nexus-optional</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Nexus</name>
-	<description>A Sincerity skeleton that turns your container into a Nexus repository server.</description>
+	<name>Sincerity Skeleton Add-on: Nexus Optional</name>
+	<description>Adds the optional plugins to the Nexus skeleton.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,53 +49,15 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.threecrickets.sincerity.skeleton</groupId>
+			<artifactId>sincerity-nexus</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-webapp</artifactId>
+			<artifactId>nexus-webapp-optional-plugins</artifactId>
 			<version>2.0.2</version>
 		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.sincerity.skeleton</groupId>
-			<artifactId>sincerity-jetty-servlet</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>sincerity-logging</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
-
-	<build>
-		<directory>../../../cache/maven</directory>
-
-		<plugins>
-			<!-- jar artifact -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestEntries>
-									<Package-Folders>package</Package-Folders>
-								</manifestEntries>
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>

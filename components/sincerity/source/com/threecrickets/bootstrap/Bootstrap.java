@@ -96,9 +96,24 @@ public class Bootstrap extends URLClassLoader
 		addURL( url );
 	}
 
-	public void addFile( File file ) throws MalformedURLException
+	public void addFile( File file )
 	{
-		addUrl( file.toURI().toURL() );
+		try
+		{
+			addUrl( file.toURI().toURL() );
+		}
+		catch( MalformedURLException x )
+		{
+		}
+	}
+
+	public void addJars( File file )
+	{
+		if( file.isDirectory() )
+			for( File child : file.listFiles() )
+				addJars( child );
+		else if( file.getName().endsWith( ".jar" ) )
+			addFile( file );
 	}
 
 	public void bootstrap( String[] arguments ) throws Exception

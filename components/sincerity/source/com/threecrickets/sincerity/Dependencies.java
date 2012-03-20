@@ -456,15 +456,8 @@ public class Dependencies
 	public void updateBootstrap() throws SincerityException
 	{
 		Bootstrap bootstrap = container.getBootstrap();
-		try
-		{
-			for( File file : getClasspaths( false ) )
-				bootstrap.addFile( file );
-		}
-		catch( MalformedURLException x )
-		{
-			throw new SincerityException( "Parsing error while updating bootstrap", x );
-		}
+		for( File file : getClasspaths( false ) )
+			bootstrap.addFile( file );
 
 		plugins = null;
 	}

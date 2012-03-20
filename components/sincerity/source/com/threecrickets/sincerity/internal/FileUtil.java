@@ -143,7 +143,8 @@ public class FileUtil
 			for( File child : file.listFiles() )
 				listRecursiveEndsWith( child, postfix, files );
 		else if( file.getName().endsWith( postfix ) )
-			files.add( file );
+			if( !files.contains( file ) )
+				files.add( file );
 	}
 
 	public static boolean isSameContent( URL url, File file ) throws IOException
