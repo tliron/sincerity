@@ -49,6 +49,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>solr-webapp</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.threecrickets.sincerity.skeleton</groupId>
 			<artifactId>sincerity-jetty-servlet-jsp</artifactId>
 			<version>${project.version}</version>
@@ -57,11 +62,6 @@
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
 			<artifactId>sincerity-logging</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>solr-webapp</artifactId>
-			<version>3.5.0</version>
 		</dependency>
 	</dependencies>
 

@@ -58,6 +58,11 @@
 			<artifactId>sincerity-jetty-servlet</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.threecrickets.sincerity.plugin</groupId>
+			<artifactId>sincerity-logging</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>

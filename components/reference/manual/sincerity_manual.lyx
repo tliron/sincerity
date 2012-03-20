@@ -3240,8 +3240,8 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Two plugins are strongly recommended: logging and service.
- To install them:
+The service plugin is strongly recommended.
+ To install it:
 \end_layout
 
 \begin_layout Standard
@@ -3251,12 +3251,17 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add logging : add service : install
+sincerity add service : install
 \end_layout
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Note that the logging plugin is already included in the skeleton, because
+ Solr relies on SLF4J.
 \end_layout
 
 \begin_layout Standard
@@ -3272,8 +3277,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add solr : add logging : add service : install
- : service jetty start
+sincerity create mycontainer : add solr : add service : install : service
+ jetty start
 \end_layout
 
 \end_inset
