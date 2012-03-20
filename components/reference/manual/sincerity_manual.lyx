@@ -3373,7 +3373,8 @@ Hadoop runs best on Linux, where it relies on native libraries.
 \end_layout
 
 \begin_layout Standard
-With Sincerity, it's a piece of cake to install a working Hadoop instance:
+With Sincerity, it's a piece of cake to install a working Hadoop instance.
+ Note that we need to format the node first:
 \end_layout
 
 \begin_layout Standard
@@ -3383,26 +3384,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add hadoop : install
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Before starting Hadoop, you need to format the name node:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-sincerity hadoop namenode -format
+sincerity add hadoop : install : hadoop namenode -format
 \end_layout
 
 \end_inset
@@ -3443,7 +3425,7 @@ sincerity hadoop start
 \end_layout
 
 \begin_layout Standard
-If this is the only node in your Hadoop cluster, you might need to wait
+If this is the only node in your Hadoop cluster, you will need to wait about
  30 seconds for the services to fully initialize.
  To test copying files to and from the Hadoop filesystem:
 \end_layout
@@ -3551,6 +3533,26 @@ status
 \end_layout
 
 \begin_layout Standard
+All logs are under 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/
+\begin_inset Quotes erd
+\end_inset
+
+, and the data is stored in 
+\begin_inset Quotes eld
+\end_inset
+
+/data/
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 To configure your instance, see 
 \begin_inset Quotes eld
 \end_inset
@@ -3561,7 +3563,7 @@ To configure your instance, see
 
 .
  The default configuration is based on that of the official Hadoop distribution,
- configured for 
+ for 
 \begin_inset CommandInset href
 LatexCommand href
 name "pseudo-distributed operation"
@@ -3570,10 +3572,8 @@ target "http://hadoop.apache.org/common/docs/current/single_node_setup.html#Pseu
 \end_inset
 
  on ports 8000 (name node) and 8001 (job tracker).
-\end_layout
-
-\begin_layout Standard
-See the logging plugin for more information on the logging configuration.
+ The logging configuration is based on the logging plugin, but its essential
+ setup has likewise been copied over from the official distribution.
 \end_layout
 
 \begin_layout Subsection

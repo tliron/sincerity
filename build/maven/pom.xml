@@ -69,6 +69,7 @@
 		<module>plugins/batik</module>
 		<module>skeletons/nexus</module>
 		<module>skeletons/solr</module>
+		<module>skeletons/hadoop</module>
 		<module>skeletons/rails</module>
 		<module>skeletons/restlet</module>
 		<module>skeletons/restlet-example</module>
