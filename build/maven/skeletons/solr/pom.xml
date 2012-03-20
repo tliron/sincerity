@@ -54,6 +54,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.threecrickets.sincerity.plugin</groupId>
+			<artifactId>sincerity-logging</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.lucene</groupId>
 			<artifactId>solr-webapp</artifactId>
 			<version>3.5.0</version>
