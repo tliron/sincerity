@@ -20,9 +20,8 @@ for (var i = sincerity.container.dependencies.getClasspaths(false).iterator(); i
 	if (jar.name != 'slf4j-log4j12.jar') {
 		context.classLoader.addClassPath(jar)
 	}
-	else {
-		context.addServerClass('org.slf4j.impl.')
-	}
 }
+
+context.addServerClass('org.slf4j.impl.')
 
 server.handler.addHandler(context)
