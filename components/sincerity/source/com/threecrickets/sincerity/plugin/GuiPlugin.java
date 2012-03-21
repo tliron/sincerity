@@ -1,3 +1,14 @@
+/**
+ * Copyright 2011-2012 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Command;
@@ -7,7 +18,7 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Frame;
-import com.threecrickets.sincerity.plugin.gui.GuiUtil;
+import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
 public class GuiPlugin implements Plugin1
 {

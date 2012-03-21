@@ -2,10 +2,10 @@
 // This file is part of the Sincerity Foundation Library
 //
 
-// Copyright 2011 Three Crickets LLC.
+// Copyright 2011-2012 Three Crickets LLC.
 //
 // The contents of this file are subject to the terms of the LGPL version 3.0:
-// http://www.opensource.org/licenses/lgpl-3.0.html
+// http://www.gnu.org/copyleft/lesser.html
 //
 // Alternatively, you can obtain a royalty free commercial license with less
 // limitations, transferable or non-transferable, directly from Three Crickets
@@ -17,17 +17,17 @@ document.executeOnce('/sincerity/objects/')
 var Sincerity = Sincerity || {}
 
 /**
- * Object Oriented Programming for JavaScript, Savory style.
+ * Object Oriented Programming for JavaScript, Sincerity-style.
  * <p>
  * Though JavaScript does not in itself have most OOP constructs, it provides all the essentials for
- * building an OOP framework. And this is Savory's take on it: we've opted for an especially lightweight
+ * building an OOP framework. And this is Sincerity's take on it: we've opted for an especially lightweight
  * approach to provide the bare minimum required for an OOP development experience that promotes
  * clarity, consistency and functionality. If you've come from heavily OOP languages, such as Java or
  * Python, we'd like to encourage you to avoid automatically turning everything into a "class," and 
  * instead and choose more horizontal ways of code organization and reuse, via closures, raw prototypes
  * and duck typing. Use OOP only when it adds coherence to your code.
  * <p>
- * That said, Savory supports all OOP principles:
+ * That said, Sinceriy supports all OOP principles:
  * <ol>
  * <li>Encapsulation: This is already available, because functions are first-class citizens in JavaScript.
  * A dict can contain both data properties and functions. Additionally, the "this" keyword is automatically

@@ -1,10 +1,10 @@
 //
 // This file is part of the Sincerity Foundation Library
 //
-// Copyright 2011 Three Crickets LLC.
+// Copyright 2011-2012 Three Crickets LLC.
 //
 // The contents of this file are subject to the terms of the LGPL version 3.0:
-// http://www.opensource.org/licenses/lgpl-3.0.html
+// http://www.gnu.org/copyleft/lesser.html
 //
 // Alternatively, you can obtain a royalty free commercial license with less
 // limitations, transferable or non-transferable, directly from Three Crickets
@@ -18,7 +18,7 @@ var Sincerity = Sincerity || {}
 /**
  * A whole bunch of useful iterators with a consistent API.
  * <p>
- * Inspired by sequences in functional languages, Savory iterators are used to traverse potentially very large series
+ * Inspired by sequences in functional languages, Sincerity iterators are used to traverse potentially very large series
  * of entries without advance knowledge of how many entries are in the series. These are somewhat similar
  * to JavaScript generator functions, but more generic. A wrapper ({@link Sincerity.Iterators.Generator})
  * exists to let you use JavaScript generator functions here. 

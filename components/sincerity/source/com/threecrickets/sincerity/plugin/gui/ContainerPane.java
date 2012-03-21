@@ -1,3 +1,14 @@
+/**
+ * Copyright 2011-2012 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.sincerity.plugin.gui;
 
 import java.awt.FlowLayout;
@@ -19,6 +30,7 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
 public class ContainerPane extends JPanel implements ActionListener
 {
@@ -40,6 +52,10 @@ public class ContainerPane extends JPanel implements ActionListener
 		{
 			Container container = sincerity.getContainer();
 			label.setText( "Using container at: " + container.getRoot() );
+			JButton add = new JButton( "Add/Install" );
+			add.setActionCommand( "add" );
+			add.addActionListener( this );
+			add( add );
 		}
 		catch( NoContainerException x )
 		{
@@ -57,41 +73,42 @@ public class ContainerPane extends JPanel implements ActionListener
 
 	public void actionPerformed( ActionEvent event )
 	{
-		if( "create".equals( event.getActionCommand() ) )
+		try
 		{
-			JFileChooser chooser = new JFileChooser();
-			chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
-			chooser.setDialogTitle( "Container root" );
-			if( chooser.showDialog( this, "Create this folder" ) == JFileChooser.APPROVE_OPTION )
+			String command = event.getActionCommand();
+			if( "create".equals( command ) )
 			{
-				File containerRoot = chooser.getSelectedFile();
-
-				boolean force = false;
-				if( containerRoot.isDirectory() )
+				JFileChooser chooser = new JFileChooser();
+				chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
+				chooser.setDialogTitle( "Container root" );
+				if( chooser.showDialog( this, "Create this folder" ) == JFileChooser.APPROVE_OPTION )
 				{
-					if( new File( containerRoot, Container.SINCERITY_DIR ).isDirectory() )
+					File containerRoot = chooser.getSelectedFile();
+
+					boolean force = false;
+					if( containerRoot.isDirectory() )
 					{
-						if( JOptionPane.showConfirmDialog( this, "The folder is already a container. Do you want to use it?", "Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
+						if( new File( containerRoot, Container.SINCERITY_DIR ).isDirectory() )
 						{
-							sincerity.getFrame().dispose();
-							Sincerity.main( new String[]
+							if( JOptionPane.showConfirmDialog( this, "The folder is already a container. Do you want to use it?", "Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
 							{
-								"container" + Command.PLUGIN_COMMAND_SEPARATOR + "use", containerRoot.toString(), Command.COMMANDS_SEPARATOR, "gui" + Command.PLUGIN_COMMAND_SEPARATOR + "gui"
-							} );
-						}
-						return;
-					}
-					else
-					{
-						if( JOptionPane.showConfirmDialog( this, "The folder already exists. Do you want to to turn it into a container?", "Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
-							force = true;
-						else
+								sincerity.getFrame().dispose();
+								Sincerity.main( new String[]
+								{
+									"container" + Command.PLUGIN_COMMAND_SEPARATOR + "use", containerRoot.toString(), Command.COMMANDS_SEPARATOR, "gui" + Command.PLUGIN_COMMAND_SEPARATOR + "gui"
+								} );
+							}
 							return;
+						}
+						else
+						{
+							if( JOptionPane.showConfirmDialog( this, "The folder already exists. Do you want to to turn it into a container?", "Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
+								force = true;
+							else
+								return;
+						}
 					}
-				}
 
-				try
-				{
 					List<Template> templates = sincerity.getTemplates();
 					Template defaultTemplate = null;
 					for( Template template : templates )
@@ -120,11 +137,15 @@ public class ContainerPane extends JPanel implements ActionListener
 							"container" + Command.PLUGIN_COMMAND_SEPARATOR + "create", containerRoot.toString(), template.getName(), Command.COMMANDS_SEPARATOR, "gui" + Command.PLUGIN_COMMAND_SEPARATOR + "gui"
 						} );
 				}
-				catch( SincerityException x )
-				{
-					GuiUtil.error( x );
-				}
 			}
+			else if( "add".equals( command ) )
+			{
+				new AddDialog( sincerity );
+			}
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
 		}
 	}
 
