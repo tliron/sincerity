@@ -14,6 +14,11 @@ package com.threecrickets.sincerity.plugin.gui.internal;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
+/**
+ * A Swing tree node that sorts its child nodes.
+ * 
+ * @author Tal Liron
+ */
 public class SortedNode extends DefaultMutableTreeNode
 {
 	//

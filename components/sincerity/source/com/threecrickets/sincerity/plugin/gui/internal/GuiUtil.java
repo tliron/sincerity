@@ -41,6 +41,11 @@ import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
+/**
+ * Generaly Swing utilities for Sincerity.
+ * 
+ * @author Tal Liron
+ */
 public class GuiUtil
 {
 	public static final ImageIcon DEPENDENCY_ICON = new ImageIcon( GuiUtil.class.getResource( "cog.png" ) );

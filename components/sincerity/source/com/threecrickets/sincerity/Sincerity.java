@@ -33,6 +33,28 @@ import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 
+/**
+ * This is the highest level instance for the Sincerity runtime.
+ * <p>
+ * While strictly speaking it is a singleton, several Sincerity instances may
+ * coexist via the {@link Bootstrap} mechanism. This is in order to allow
+ * Sincerity to "reboot" itself using a new classpath in case the
+ * {@link Container} is changed. See {@link #reboot()}.
+ * <p>
+ * The main role of this class is to manage the {@link Container} singleton.
+ * Indeed, Sincerity can run without a container, and this class can be used to
+ * create it.
+ * <p>
+ * This is also where you can access the "system" plugins, those that are part
+ * of the Sincerity base installation and are not associated with any container.
+ * See {@link #getPlugins()}.
+ * <p>
+ * Additionally, this class manages the general runtime environment and
+ * interface for all of Sincerity. This includes both the command line interface
+ * (CLI) and the graphical user interface (GUI).
+ * 
+ * @author Tal Liron
+ */
 public class Sincerity implements Runnable
 {
 	//
@@ -51,6 +73,11 @@ public class Sincerity implements Runnable
 	// Static attributes
 	//
 
+	/**
+	 * The Sincerity instance running in the current thread.
+	 * 
+	 * @return The Sincerity instance
+	 */
 	public static Sincerity getCurrent()
 	{
 		return threadLocal.get();

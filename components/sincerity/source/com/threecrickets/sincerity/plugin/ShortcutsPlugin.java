@@ -19,6 +19,16 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.ShortcutsPane;
 
+/**
+ * The shorcuts plugin supports the following commands:
+ * <ul>
+ * <li><b>shortcuts</b>: prints a list of all available shortcuts in this
+ * container.</li>
+ * </ul>
+ * Additionally, this plugin adds a "Shortcuts" tab to the GUI.
+ * 
+ * @author Tal Liron
+ */
 public class ShortcutsPlugin implements Plugin1
 {
 	//
@@ -32,7 +42,7 @@ public class ShortcutsPlugin implements Plugin1
 
 	public String getName()
 	{
-		return "aliases";
+		return "shortcuts";
 	}
 
 	public String[] getCommands()

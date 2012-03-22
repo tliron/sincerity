@@ -19,9 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.threecrickets.sincerity.exception.CommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * "Commands" are the core operation in Sincerity, and is implemented by a
+ * plugin (see {@link Plugin1}). Each command can have any number of arguments.
+ * <p>
+ * Commands can be parsed similarly to command line interfaces: arguments can
+ * include properties (such as "--prop=value") and switches (such as
+ * "--switch").
+ * 
+ * @author Tal Liron
+ * @see CommandException
+ */
 public class Command
 {
 	//

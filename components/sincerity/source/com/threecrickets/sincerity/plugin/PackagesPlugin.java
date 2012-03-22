@@ -17,6 +17,17 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
+/**
+ * The packages plugin supports the following commands:
+ * <ul>
+ * <li><b>unpack</b>: unpacks all packages and runs their installation hooks.
+ * This allows you to run only this particular phase in the install process, in
+ * case you do not want a full install.</li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ * @see Package
+ */
 public class PackagesPlugin implements Plugin1
 {
 	//

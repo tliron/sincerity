@@ -16,8 +16,19 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.ActionsPane;
+import com.threecrickets.sincerity.plugin.gui.CommandsPane;
 
+/**
+ * The help plugin supports the following commands:
+ * <ul>
+ * <li><b>help</b>: prints a list of all available commands, organized by
+ * plugin. Note that this command can either run with a container or without
+ * one.</li>
+ * </ul>
+ * Additionally, this plugin adds a "Commands" tab to the GUI.
+ * 
+ * @author Tal Liron
+ */
 public class HelpPlugin implements Plugin1
 {
 	//
@@ -49,7 +60,7 @@ public class HelpPlugin implements Plugin1
 		{
 			for( Plugin1 plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
-					System.out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
+					command.getSincerity().getOut().println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
 		}
 		else
 			throw new UnknownCommandException( command );
@@ -58,6 +69,6 @@ public class HelpPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Actions", new ActionsPane( sincerity ) );
+		sincerity.getFrame().getPane().add( "Commands", new CommandsPane( sincerity ) );
 	}
 }

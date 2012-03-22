@@ -24,6 +24,30 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
+/**
+ * The container plugin supports the following commands:
+ * <ul>
+ * <li><b>create</b>: creates a new container. The first argument is required,
+ * and is the container root path. The second optional argument is the template
+ * to use. It defaults to "default". If the directory already exists, the
+ * command will fail, unless the --force switch is used, in which case the
+ * template will be force-copied into the directory (which may result in files
+ * being overriden). Note that this command will cause Sincerity to reboot if
+ * successful.</li>
+ * <li><b>use</b>: switches to an existing container. The required argument is
+ * the container root path. Note that this command will cause Sincerity to
+ * reboot if successful.</li>
+ * <li><b>clone</b>: similar to "create", except that the current container will
+ * be used as the template for the new container. The --force switch is also
+ * supported. Note that this command will cause Sincerity to reboot if
+ * successful.</li>
+ * <li><b>clean</b>: uninstalls all dependencies and deletes this container's
+ * "/cache/" directory. Also see "dependencies:uninstall".</li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ * @see Container
+ */
 public class ContainerPlugin implements Plugin1
 {
 	//
@@ -99,6 +123,7 @@ public class ContainerPlugin implements Plugin1
 			boolean force = command.getSwitches().contains( "force" );
 
 			File containerRoot = new File( arguments[0] );
+			command.remove();
 			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot(), force );
 		}
 		else if( "clean".equals( commandName ) )

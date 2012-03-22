@@ -39,6 +39,20 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.XmlUtil;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 
+/**
+ * Manages the source repositories for a {@link Container}.
+ * <p>
+ * Repositories can be organized in "sections", allowing to prioritize the list
+ * according to these groups. For example, a common scheme is to have two
+ * sections, "public" and "private".
+ * <p>
+ * The Ivy configuration is stored in
+ * "/configuration/sincerity/repositories.conf". For low-level access to the Ivy
+ * resolvers, see {@link #getResolvers(String)}.
+ * 
+ * @author Tal Liron
+ * @see Container#getRepositories()
+ */
 public class Repositories
 {
 	//

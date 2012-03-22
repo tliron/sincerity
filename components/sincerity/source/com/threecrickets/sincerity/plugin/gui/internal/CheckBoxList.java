@@ -24,7 +24,9 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 /**
- * See: http://www.devx.com/tips/Tip/5342
+ * A Swing list that supports a model of {@link JCheckBox} instances.
+ * <p>
+ * <a href="http://www.devx.com/tips/Tip/5342">Source</a>.
  */
 public class CheckBoxList extends JList
 {

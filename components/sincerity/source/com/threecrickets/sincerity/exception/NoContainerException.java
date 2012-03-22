@@ -11,6 +11,19 @@
 
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.sincerity.Container;
+import com.threecrickets.sincerity.Sincerity;
+
+/**
+ * Signifies that Sincerity is not running with a {@link Container}.
+ * <p>
+ * While Sincerity can run without a container, in some cases a container is
+ * required, and this except can signify that there this condition has not been
+ * met.
+ * 
+ * @author Tal Liron
+ * @see Sincerity#setContainerRoot(java.io.File)
+ */
 public class NoContainerException extends SincerityException
 {
 	//

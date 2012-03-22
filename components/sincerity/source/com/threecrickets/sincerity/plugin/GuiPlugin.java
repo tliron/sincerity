@@ -20,6 +20,18 @@ import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
+/**
+ * The GUI plugin supports the following commands:
+ * <ul>
+ * <li><b>gui</b>: starts the Sincerity GUI, using all available plugins. Note
+ * that this command can either run with a container or without one, in which
+ * case it would prompt the user to create a new container. Use the --native
+ * switch to set the native Look-and-Feel for Swing.</li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ * @see Plugin1#gui(Command)
+ */
 public class GuiPlugin implements Plugin1
 {
 	//

@@ -28,6 +28,27 @@ import com.threecrickets.sincerity.internal.Pipe;
 import com.threecrickets.sincerity.internal.ProcessDestroyer;
 import com.threecrickets.sincerity.internal.StringUtil;
 
+/**
+ * The delegate plugin supports the following commands:
+ * <ul>
+ * <li><b>main</b>: invokes the main() entry point of a class. The first
+ * argument is the full name of the class, and subsequent optional arguments are
+ * sent to main().</li>
+ * <li><b>start</b>: executes any Scripturian document. The argument is the
+ * document URI: unless it starts with a "/", it is considered to be a URI
+ * relative to "/programs/". All arguments (including the first one, which is
+ * the URI) will be sent as is to the executable.</li>
+ * <li><b>executes</b>: executes any system command as a separate process. This
+ * command will block, waiting for the process to terminate, unless the the
+ * <i>first</i> argument is "--background". The arguments otherwise will be sent
+ * directly to the underlying operating system as a complete command. Note that
+ * the process' stdout and stdin will be piped to Sincerity's stdout/stdin.</li>
+ * <li><b>languages</b>: prints out a list of all languages supported by
+ * Scripturian in this container.</li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ */
 public class DelegatePlugin implements Plugin1
 {
 	//

@@ -24,6 +24,19 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
+/**
+ * The Java plugin supports the following commands:
+ * <ul>
+ * <li><b>compile</b>: compiles .java files using the container's classpath. The
+ * optional argument is the root directory of the .java files, otherwise the
+ * default would be "/libraries/java/". The second argument, also optional, is
+ * the output directory, which defaults to "/libraries/classes/". Note that this
+ * command require you to be running in a JVM environment that supports
+ * compilation (a JDK).</li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ */
 public class JavaPlugin implements Plugin1
 {
 	//

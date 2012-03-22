@@ -21,6 +21,19 @@ import java.util.Set;
 import com.threecrickets.scripturian.internal.ServiceLoader;
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * Can manage the collection of Sincerity plugins for a {@link Container}, and
+ * also the "system" plugins that are part of the Sincerity base installation.
+ * <p>
+ * Because the set of plugins in a container depends on its classpath, instance
+ * of this class are associated with the {@link Dependencies} class.
+ * <p>
+ * Note that this class implements an <i>unmodifiable</i> map.
+ * 
+ * @author Tal Liron
+ * @see Dependencies#getPlugins()
+ * @see Sincerity#getPlugins()
+ */
 public class Plugins extends AbstractMap<String, Plugin1>
 {
 	//

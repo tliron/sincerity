@@ -48,6 +48,28 @@ import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
+/**
+ * Manages the dependencies of a {@link Container}, including its classpath of
+ * Jars as well as other managed artifacts. With this class you can add or
+ * remove dependencies to a Sincerity container.
+ * <p>
+ * Changes to dependencies are only actually resolved when
+ * {@link #install(boolean)} is called. To access the actually resolved
+ * dependencies, see {@link #getResolvedDependencies()}.
+ * <p>
+ * To access the Jars, use {@link #getClasspaths(boolean)}. To access the
+ * artifacts, use {@link #getArtifacts()} or {@link #getPackages()}. See also
+ * the {@link ManagedArtifacts} class.
+ * <p>
+ * Because the set of plugins in a container depends on its classpath, this is
+ * also where you can access them, via {@link #getPlugins()}.
+ * <p>
+ * The Ivy configuration is stored in
+ * "/configuration/sincerity/dependencies.conf". For low-level access to the Ivy
+ * descriptors, see {@link #getDescriptors()}.
+ * 
+ * @author Tal Liron
+ */
 public class Dependencies
 {
 	//

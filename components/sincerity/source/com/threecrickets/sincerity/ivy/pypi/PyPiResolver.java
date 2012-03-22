@@ -62,6 +62,27 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.ivy.SincerityRepositoryCacheManager;
 
+/**
+ * An Ivy resolver for <a href="http://pypi.python.org/">PyPI</a>-compatible
+ * software repositories. The default root is http://pypi.python.org/simple
+ * (a.k.a. "The Cheese Factory").
+ * <p>
+ * Note that, unfortunately, there are several distribution formats for Python
+ * modules. This resolver attempts to support all of them. The Sincerity Python
+ * plugin must be present in order to run setup.py on eggs and tarballs.
+ * <p>
+ * The PyPI format does not support grouping: the organization identifier must
+ * always be "python".
+ * <p>
+ * When dealing with Python eggs, in some cases it is not necessary to actually
+ * run setup.py on the egg, but instead just have it downloaded. If you know
+ * this to be the case, you can mark the module name with the "egg mode" prefix
+ * to in order to avoid unnecessary setup. For example, "python:MyModule" would
+ * be referenced as "python:~MyModule" in egg mode.
+ * 
+ * @author Tal Liron
+ * @see PyPi
+ */
 public class PyPiResolver extends BasicResolver
 {
 	//

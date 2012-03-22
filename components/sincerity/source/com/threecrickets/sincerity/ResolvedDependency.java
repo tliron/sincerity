@@ -18,6 +18,12 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 
 import com.threecrickets.sincerity.ResolvedDependencies.Caller;
 
+/**
+ * A descriptor for a single node in the resolved dependency tree. See
+ * {@link ResolvedDependencies}.
+ * 
+ * @author Tal Liron
+ */
 public class ResolvedDependency
 {
 	//

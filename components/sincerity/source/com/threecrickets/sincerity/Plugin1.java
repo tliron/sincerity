@@ -13,6 +13,24 @@ package com.threecrickets.sincerity;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * Sincerity plugins handle the running of Sincerity commands (see
+ * {@link Command}).
+ * <p>
+ * In order to allow for future upgrades to the plugin interface, while still
+ * allowing support for older plugin implementation, this interface has a
+ * version suffix.
+ * <p>
+ * This is version 1 of the plugin interface.
+ * <p>
+ * Note that although this is a Java language interface, a robust mechanism is
+ * in place to allow you to delegate the interface to non-Java languages running
+ * in the JVM, using the Scripturian library. See {@link DelegatedPlugin} for
+ * more information.
+ * 
+ * @author Tal Liron
+ * @see Plugins
+ */
 public interface Plugin1
 {
 	public int getVersion();

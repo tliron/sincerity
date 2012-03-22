@@ -18,6 +18,9 @@ import java.net.URL;
 import com.threecrickets.sincerity.exception.UnpackingException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
+/**
+ * @author Tal Liron
+ */
 public class Artifact implements Comparable<Artifact>
 {
 	//
@@ -37,16 +40,34 @@ public class Artifact implements Comparable<Artifact>
 	// Attributes
 	//
 
+	/**
+	 * The artifact's intended absolute location in the filesystem.
+	 * 
+	 * @return The file
+	 */
 	public File getFile()
 	{
 		return file;
 	}
 
+	/**
+	 * The artifact's intended location in the filesystem relative to the
+	 * container root.
+	 * 
+	 * @return The path
+	 */
 	public String getPath()
 	{
 		return path;
 	}
 
+	/**
+	 * This URL points to the read-only original source for this artifact. This
+	 * is often a "jar:" URL, meaning that the artifact was or will be extracted
+	 * from a Jar file.
+	 * 
+	 * @return The origin URL
+	 */
 	public URL getUrl()
 	{
 		return url;
@@ -57,6 +78,13 @@ public class Artifact implements Comparable<Artifact>
 		return isVolatile;
 	}
 
+	/**
+	 * Checks if the artifact exists in the filesystem and if its contents are
+	 * identical to that of the origin URL.
+	 * 
+	 * @return True if file is different from its origin
+	 * @throws UnpackingException
+	 */
 	public boolean isDifferent() throws UnpackingException
 	{
 		try
@@ -73,6 +101,15 @@ public class Artifact implements Comparable<Artifact>
 	// Operations
 	//
 
+	/**
+	 * Copies the artifact from its origin URL to its intended location in the
+	 * filesystem.
+	 * 
+	 * @param filter
+	 * @param overwrite
+	 *        Whether to overwrite the file if it already exists
+	 * @throws UnpackingException
+	 */
 	public void install( String filter, boolean overwrite ) throws UnpackingException
 	{
 		if( file.exists() )

@@ -25,7 +25,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * A hypervisor for the JVM.
+ * Bootstrap makes it easy to start a JVM application without having to set the
+ * classpath first via a shell script.
+ * <p>
+ * Usually, you need to provide the classpath before invoking the JVM with your
+ * application's main() entry point. With Bootstrap, you use Bootstrap's
+ * {@link #main(String[])} instead. All you need to do is provide a base
+ * directory for your jars, and the name of the class with your actual main()
+ * entry point.
+ * <p>
+ * But Bootstrap offers another important benefit: it acts as a straightforward
+ * hypervisor, letting you bootstrap several applications in the same JVM
+ * instance, each with their own "class world." This lets you, in effect, run
+ * several applications, either at the same time or in sequence, even if they
+ * have overlapping and conflicting classes. The "master" bootstrap singleton
+ * provides you with a space of shared classes, allowing the running
+ * applications to share data structures.
+ * <p>
+ * One important use case for this is to let you "reboot" your application with
+ * a new classpath, via a fresh bootstrap, without ever exiting the JVM.
  * 
  * @author Tal Liron
  */
@@ -35,33 +53,66 @@ public class Bootstrap extends URLClassLoader
 	// Static attributes
 	//
 
+	/**
+	 * The master bootstrap.
+	 * 
+	 * @return The master bootstrap
+	 */
 	public static Bootstrap getMasterBootstrap()
 	{
 		return master;
 	}
 
+	/**
+	 * A bootstrap according to a unique identifying key.
+	 * 
+	 * @param key
+	 *        The key object (must qualify for use as a key in a hashmap)
+	 * @return The bootstrap or null if not found
+	 * @see #setBootstrap(Object, Bootstrap)
+	 */
 	public static Bootstrap getBootstrap( Object key )
 	{
 		return bootstraps.get( key );
 	}
 
+	/**
+	 * @param key
+	 *        The key object (must qualify for use as a key in a hashmap)
+	 * @param bootstrap
+	 *        The bootstrap
+	 * @see #getBootstrap(Object)
+	 */
 	public static void setBootstrap( Object key, Bootstrap bootstrap )
 	{
 		bootstraps.put( key, bootstrap );
 	}
 
+	/**
+	 * A general-purpose thread-safe location for global static attributes.
+	 * 
+	 * @return The attributes map
+	 */
 	public static ConcurrentMap<Object, Object> getAttributes()
 	{
 		return attributes;
 	}
 
+	/**
+	 * The base directory for the master bootstrap. All shared Jars will be
+	 * underneath this directory.
+	 * 
+	 * @return The base directory or null if not set
+	 */
 	public static File getHome()
 	{
 		File home = (File) getAttributes().get( "com.threecrickets.bootstrap.home" );
 		if( home == null )
 		{
 			home = findHome();
-			getAttributes().put( "com.threecrickets.bootstrap.home", home );
+			File existing = (File) getAttributes().putIfAbsent( "com.threecrickets.bootstrap.home", home );
+			if( existing != null )
+				home = existing;
 		}
 		return home;
 	}
@@ -70,11 +121,29 @@ public class Bootstrap extends URLClassLoader
 	// Main
 	//
 
+	/**
+	 * Delegates to your configured main() entry point through the master
+	 * bootstrap.
+	 * 
+	 * @param arguments
+	 *        Arguments to delegate to main
+	 * @throws Exception
+	 */
 	public static void main( String[] arguments ) throws Exception
 	{
 		getMasterBootstrap().bootstrap( arguments );
 	}
 
+	/**
+	 * Delegates to your configured main() entry point through any bootstrap.
+	 * 
+	 * @param key
+	 *        The key object (must qualify for use as a key in a hashmap)
+	 * @param arguments
+	 *        Arguments to delegate to main
+	 * @throws Exception
+	 * @see #getBootstrap(Object)
+	 */
 	public static void bootstrap( Object key, String[] arguments ) throws Exception
 	{
 		getBootstrap( key ).bootstrap( arguments );
@@ -98,6 +167,12 @@ public class Bootstrap extends URLClassLoader
 	// Operations
 	//
 
+	/**
+	 * Adds a URL to the classpath. Checks to make sure there are no duplicates.
+	 * 
+	 * @param url
+	 *        The URL
+	 */
 	public void addUrl( URL url )
 	{
 		for( URL existing : getURLs() )
@@ -107,6 +182,13 @@ public class Bootstrap extends URLClassLoader
 		addURL( url );
 	}
 
+	/**
+	 * Shortcut to add a file URL to the classpath.
+	 * 
+	 * @param file
+	 *        The file
+	 * @see #addUrl(URL)
+	 */
 	public void addFile( File file )
 	{
 		try
@@ -118,6 +200,16 @@ public class Bootstrap extends URLClassLoader
 		}
 	}
 
+	/**
+	 * Recursively adds a directory and all Jar files underneath it to the
+	 * classpath.
+	 * <p>
+	 * Note that recursion only happens if you add a directory, otherwise it
+	 * behaves like {@link #addFile(File)}).
+	 * 
+	 * @param file
+	 *        The file (special behavior if the file is a directory)
+	 */
 	public void addJars( File file )
 	{
 		if( file.isDirectory() )
@@ -127,6 +219,13 @@ public class Bootstrap extends URLClassLoader
 			addFile( file );
 	}
 
+	/**
+	 * Delegates to your configured main() entry point through the bootstrap.
+	 * 
+	 * @param arguments
+	 *        Arguments to delegate to main
+	 * @throws Exception
+	 */
 	public void bootstrap( String[] arguments ) throws Exception
 	{
 		Thread.currentThread().setContextClassLoader( this );

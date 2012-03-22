@@ -11,6 +11,14 @@
 
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.sincerity.Artifact;
+
+/**
+ * Signifies that an {@link Artifact} could not extracted from its archive.
+ * 
+ * @author Tal Liron
+ * @see Artifact#install(String, boolean)
+ */
 public class UnpackingException extends InstallationException
 {
 	//

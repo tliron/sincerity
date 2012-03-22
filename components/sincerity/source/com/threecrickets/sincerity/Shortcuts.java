@@ -23,6 +23,21 @@ import java.util.Properties;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownShortcutException;
 
+/**
+ * Shortcuts can be used by Sincerity commands to allow for simpler, more
+ * user-friendly access.
+ * <p>
+ * Shortcuts can be general-purpose, or can be of one or more "types" that
+ * define special usage for specific commands. For example, the "add" type is
+ * used by the "dependencies:add" command and the "attach" type is used by the
+ * "repositories:attach" command.
+ * <p>
+ * Shortcuts are defined per container, and are stored in a standard JVM
+ * properties file under "/configuration/sincerity/shortcuts.conf".
+ * 
+ * @author Tal Liron
+ * @see Container#getShortcuts()
+ */
 public class Shortcuts extends AbstractList<String>
 {
 	//

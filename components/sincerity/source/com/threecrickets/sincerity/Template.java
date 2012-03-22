@@ -13,6 +13,12 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 
+/**
+ * Templates are simple file structures that are copied verbatim when a
+ * {@link Container} is created.
+ * 
+ * @author Tal Liron
+ */
 public class Template
 {
 	//

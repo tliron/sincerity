@@ -13,6 +13,11 @@ package com.threecrickets.sincerity.exception;
 
 import com.threecrickets.sincerity.Command;
 
+/**
+ * Signifies that a Sincerity command did not get the arguments it expected.
+ * 
+ * @author Tal Liron
+ */
 public class BadArgumentsCommandException extends CommandException
 {
 	//

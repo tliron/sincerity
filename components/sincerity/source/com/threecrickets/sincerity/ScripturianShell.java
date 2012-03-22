@@ -32,6 +32,16 @@ import com.threecrickets.scripturian.service.DocumentService;
 import com.threecrickets.scripturian.service.Shell;
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * An implementation of Scripturian's {@link Shell} interface for Sincerity
+ * {@link Container} instances.
+ * <p>
+ * Additionally, includes utility methods to make it easy to invoke Scripturian
+ * from Sincerity.
+ * 
+ * @author Tal Liron
+ * @see DelegatedPlugin
+ */
 public class ScripturianShell implements Shell
 {
 	//

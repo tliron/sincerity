@@ -21,6 +21,7 @@ import org.apache.ivy.core.module.descriptor.License;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
@@ -31,6 +32,43 @@ import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
 import com.threecrickets.sincerity.plugin.gui.LicensesPane;
 
+/**
+ * The dependencies plugin supports the following commands:
+ * <ul>
+ * <li><b>dependencies</b>: prints out the <i>resolved</i> dependency tree for
+ * this container.</li>
+ * <li><b>licenses</b>: prints out the licenses of all <i>resolved</i>
+ * dependencies in this container. Use the --verbose switch for a more detailed
+ * report.</li>
+ * <li><b>install</b>: downloads and installs all dependencies in this
+ * container. This would also involve unpacking all packages and running their
+ * installation hooks.</li>
+ * <li><b>uninstall</b>: uninstalls all dependencies in this container. This
+ * would also involve calling all package uninstall hooks. Note that the
+ * dependencies are still added to the container, and can be re-installed. Also
+ * see "container:clean".</li>
+ * <li><b>reset</b>: removes all dependencies from this container. Note that
+ * this does not actually uninstall them.</li>
+ * <li><b>adds</b>: adds a dependency to this container. Supports one, two or
+ * three arguments. If it's one argument, it is considered a reference to an
+ * "add"-type shortcut. If it's two arguments, they are the group and module
+ * name of the dependency, leaving Sincerity to pick the highest available
+ * version. If it's three arguments, they are the group, module name and version
+ * of the dependency. Note that this does not actually install the dependency.</li>
+ * <li><b>revise</b>: allows you to change the version of a previously added
+ * dependency. The first two arguments are the group and module name, and the
+ * third is the new version. Note that this does not actually install the
+ * dependency.</li>
+ * <li><b>removes</b>: removes a single dependency. The two arguments are group
+ * and module name. Note that this does not actually uninstall the dependency.</li>
+ * </ul>
+ * Additionally, this plugin adds a "Dependencies" and a "Licenses" tabs to the
+ * GUI.
+ * 
+ * @author Tal Liron
+ * @see Dependencies
+ * @see ResolvedDependencies
+ */
 public class DependenciesPlugin implements Plugin1
 {
 	//
@@ -66,10 +104,10 @@ public class DependenciesPlugin implements Plugin1
 		else if( "licenses".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean shortSwitch = command.getSwitches().contains( "short" );
+			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printLicenses( dependencies, command.getSincerity().getOut(), !shortSwitch );
+			printLicenses( dependencies, command.getSincerity().getOut(), verbose );
 		}
 		else if( "install".equals( commandName ) )
 		{

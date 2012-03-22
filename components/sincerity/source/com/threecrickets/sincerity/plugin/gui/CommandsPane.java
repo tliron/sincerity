@@ -30,13 +30,13 @@ import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
-public class ActionsPane extends JPanel implements ItemListener
+public class CommandsPane extends JPanel implements ItemListener
 {
 	//
 	// Construction
 	//
 
-	public ActionsPane( Sincerity sincerity ) throws SincerityException
+	public CommandsPane( Sincerity sincerity ) throws SincerityException
 	{
 		super( new BorderLayout() );
 

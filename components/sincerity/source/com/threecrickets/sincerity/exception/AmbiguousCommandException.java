@@ -16,6 +16,15 @@ import java.util.Iterator;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 
+/**
+ * Signifies that a Sincerity command is implemented by more than one plugin,
+ * and thus it's unclear which version of the command is being referred to.
+ * <p>
+ * This problem can usually be solved by prefixing the plugin name to the
+ * command.
+ * 
+ * @author Tal Liron
+ */
 public class AmbiguousCommandException extends CommandException
 {
 	//

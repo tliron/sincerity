@@ -35,6 +35,18 @@ import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * A tree of all dependencies actually resolved by a {@link Dependencies}
+ * instance, with added utility methods for querying different aspects of this
+ * data. See {@link Dependencies#getResolvedDependencies()}.
+ * <p>
+ * The instance itself lists the root nodes of the tree. For flat access to the
+ * entire tree, use {@link ResolvedDependencies#getAll()}.
+ * <p>
+ * This class is essentially a parser for an Ivy resolution report.
+ * 
+ * @author Tal Liron
+ */
 public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 {
 	//

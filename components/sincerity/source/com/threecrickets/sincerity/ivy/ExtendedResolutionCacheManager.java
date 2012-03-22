@@ -16,6 +16,13 @@ import java.io.FilenameFilter;
 
 import org.apache.ivy.core.cache.DefaultResolutionCacheManager;
 
+/**
+ * Extends Ivy's default resolution cache manager to allow for separate
+ * configuration of the root directory for resolution reports. In the default
+ * implementation, the resolution cache root is used.
+ * 
+ * @author Tal Liron
+ */
 public class ExtendedResolutionCacheManager extends DefaultResolutionCacheManager
 {
 	//

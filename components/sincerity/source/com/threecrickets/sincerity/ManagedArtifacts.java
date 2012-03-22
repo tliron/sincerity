@@ -25,6 +25,15 @@ import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * This class helps a {@link Dependencies} instance keep track of installed
+ * artifacts.
+ * <p>
+ * Information about installed artifacts is stored in
+ * "/configuration/sincerity/artifacts.conf".
+ * 
+ * @author Tal Liron
+ */
 public class ManagedArtifacts
 {
 	//

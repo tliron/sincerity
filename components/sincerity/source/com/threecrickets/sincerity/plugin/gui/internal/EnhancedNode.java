@@ -13,6 +13,12 @@ package com.threecrickets.sincerity.plugin.gui.internal;
 
 import javax.swing.ImageIcon;
 
+/**
+ * A Swing node which can be configured with separate value, label and icon.
+ * 
+ * @author Tal Liron
+ * @see EnhancedTreeCellRenderer
+ */
 public class EnhancedNode extends SortedNode
 {
 	//

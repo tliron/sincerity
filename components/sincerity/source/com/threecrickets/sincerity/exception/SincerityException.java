@@ -11,6 +11,11 @@
 
 package com.threecrickets.sincerity.exception;
 
+/**
+ * The base of the Sincerity exception hierarchy.
+ * 
+ * @author Tal Liron
+ */
 public class SincerityException extends Exception
 {
 	//

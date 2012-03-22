@@ -30,6 +30,26 @@ import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
 
+/**
+ * The repositories plugin supports the following commands:
+ * <ul>
+ * <li><b>repositories</b>: prints out a list of all repositories attached to
+ * this container, organized by section ("public" and "private").</li>
+ * <li><b>attach</b>: attaches a repository to this container. Supports one or
+ * three or more arguments. If it's one argument, it is considered a reference
+ * to an "attach"-type shortcut. If it's three ore more arguments, the first one
+ * is the section ("public" or "private"), the second is a unique identifier in
+ * this container for the repository, the third is the repository type
+ * ("maven"/"ibiblio", "pypi/"python", etc.) and additional arguments are per
+ * repository type.</li>
+ * <li><b>detach</b>: detaches a repository from this container. Two arguments
+ * are required: the section name and the unique identifier.</li>
+ * </ul>
+ * Additionally, this plugin adds a "Repositories" tab to the GUI.
+ * 
+ * @author Tal Liron
+ * @see Repositories
+ */
 public class RepositoriesPlugin implements Plugin1
 {
 	//

@@ -18,6 +18,7 @@ import java.io.Writer;
 
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
+import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
@@ -28,6 +29,21 @@ import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
 
+/**
+ * The artifact plugin supports the following commands:
+ * <ul>
+ * <li><b>artifacts</b>: prints out a list of artifacts installed in the current
+ * container, organized by jars. Use the --verbose switch for a more detailed
+ * report.</li>
+ * <li><b>prune</b> : deletes any artifacts that have been previously installed
+ * but are no longer necessary due to changed in the dependencies. Note that
+ * changed artifacts will be ignored.</li>
+ * </ul>
+ * Additionally, this plugin adds an "Artifacts" tab to the GUI.
+ * 
+ * @author Tal Liron
+ * @see Artifact
+ */
 public class ArtifactsPlugin implements Plugin1
 {
 	//

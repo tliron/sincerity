@@ -28,6 +28,20 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/**
+ * Handles access to <a href="http://pypi.python.org/">PyPI</a>-compatible
+ * software repositories for the Python platform.
+ * <p>
+ * This code was developed by reverse engineering the Python code in
+ * easy_install and pip.
+ * <p>
+ * Note that pypi.python.org itself does not return modification dates for any
+ * of its resources, an unfortunate implementation that makes it difficult to
+ * efficiently cache downloads.
+ * 
+ * @author Tal Liron
+ * @see PyPiResolver
+ */
 public class PyPi
 {
 	//

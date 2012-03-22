@@ -24,6 +24,19 @@ import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
 import com.threecrickets.sincerity.plugin.gui.TemplatesPane;
 
+/**
+ * The templates plugin supports the following commands:
+ * <ul>
+ * <li><b>templates</b>: prints a list of all available templates in this
+ * Sincerity installation.</li>
+ * <li><b>templatize</b>: turns this container into a template. The first
+ * argument is the name of the template to use. The entire container is copied
+ * as is, so you may want to clean it out first.</li>
+ * </ul>
+ * Additionally, this plugin adds a "Templates" tab to the GUI.
+ * 
+ * @author Tal Liron
+ */
 public class TemplatesPlugin implements Plugin1
 {
 	//

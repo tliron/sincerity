@@ -12,7 +12,14 @@
 package com.threecrickets.sincerity.exception;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Sincerity;
 
+/**
+ * Signifies that there was a problem executing a Sincerity command.
+ * 
+ * @author Tal Liron
+ * @see Sincerity#run(Command)
+ */
 public class CommandException extends SincerityException
 {
 	//

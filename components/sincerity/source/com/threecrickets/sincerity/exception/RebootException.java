@@ -11,6 +11,18 @@
 
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.bootstrap.Bootstrap;
+import com.threecrickets.sincerity.Sincerity;
+
+/**
+ * Signifies that Sincerity is in the process of rebooting, and that no further
+ * operations should take place in the current instance.
+ * <p>
+ * Rebooting is handled via the {@link Bootstrap} mechanism.
+ * 
+ * @author Tal Liron
+ * @see Sincerity#reboot()
+ */
 public class RebootException extends SincerityException
 {
 	//

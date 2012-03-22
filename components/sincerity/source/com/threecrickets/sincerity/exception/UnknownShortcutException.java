@@ -11,6 +11,15 @@
 
 package com.threecrickets.sincerity.exception;
 
+import com.threecrickets.sincerity.Shortcuts;
+
+/**
+ * Signifies that a Sincerity shortcut has been referred to, but is not defined
+ * by this container.
+ * 
+ * @author Tal Liron
+ * @see Shortcuts
+ */
 public class UnknownShortcutException extends SincerityException
 {
 	//

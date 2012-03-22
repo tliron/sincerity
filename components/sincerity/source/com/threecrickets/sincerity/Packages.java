@@ -16,10 +16,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.jar.Manifest;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
 
+/**
+ * Manages the packages defined in the classpath of a {@link Dependencies}
+ * instance.
+ * <p>
+ * This class works by scanning the entire classpath for packages defined in the
+ * JVM resources manifests, and parsing them. See {@link Package} for more
+ * information.
+ * 
+ * @author Tal Liron
+ * @see Manifest
+ */
 public class Packages extends ArrayList<Package>
 {
 	//

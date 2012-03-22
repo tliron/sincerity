@@ -16,6 +16,12 @@ import java.awt.Component;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+/**
+ * A Swing tree cell renderer that supports special rendering for
+ * {@link EnhancedNode}.
+ * 
+ * @author Tal Liron
+ */
 public class EnhancedTreeCellRenderer extends DefaultTreeCellRenderer
 {
 	//

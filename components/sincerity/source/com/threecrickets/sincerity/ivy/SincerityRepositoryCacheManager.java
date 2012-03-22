@@ -19,6 +19,13 @@ import org.apache.ivy.core.cache.ArtifactOrigin;
 import org.apache.ivy.core.cache.DefaultRepositoryCacheManager;
 import org.apache.ivy.core.module.descriptor.Artifact;
 
+/**
+ * Extends Ivy's default repository cache manager to allow for configuration of
+ * several additional patterns, as well as patterns per artifact type. If a
+ * pattern is not defined for a type, the basic artifact pattern will be used.
+ * 
+ * @author Tal Liron
+ */
 public class SincerityRepositoryCacheManager extends DefaultRepositoryCacheManager
 {
 	//

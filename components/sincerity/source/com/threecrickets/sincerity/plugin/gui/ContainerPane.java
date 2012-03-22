@@ -102,7 +102,9 @@ public class ContainerPane extends JPanel implements ActionListener
 						}
 						else
 						{
-							if( JOptionPane.showConfirmDialog( this, "The folder already exists. Do you want to to turn it into a container?", "Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
+							if( JOptionPane.showConfirmDialog( this,
+								"The folder already exists. Do you want to to turn it into a container? Note that this will copy the template's files into this folder, potentially overriding existing files!",
+								"Container root", JOptionPane.YES_NO_OPTION ) == JOptionPane.YES_OPTION )
 								force = true;
 							else
 								return;

@@ -33,6 +33,58 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
 import com.threecrickets.sincerity.internal.ClassUtil;
 
+/**
+ * Packages are collections of artifacts (see {@link Artifact}). They are
+ * defined using special tags in standard JVM resource manifests. Additionally,
+ * packages support special install/uninstall hooks for calling arbitrary entry
+ * points, allowing for custom behavior. Indeed, a package can include no
+ * artifacts, and only implement these hooks.
+ * <p>
+ * Packages allow you to work around various limitations in repositories such as
+ * iBiblio/Maven, in which the smallest deployable unit is a Jar. The package
+ * specification allows you to include as many files as you need in a single
+ * Jar, greatly simplifying your deployment scheme.
+ * <p>
+ * Note that two different ways are supported for specifying artifacts: they can
+ * specified as files, thus referring to actual zipped entries with the Jar file
+ * in which the manifest resides, or that can be specified as general resources,
+ * in which case they will be general resource URLs to be loaded by the
+ * classloader, and thus they can reside anywhere in the classpath.
+ * <p>
+ * Also note what "volatile" means in this context: a "volatile" artifact is one
+ * that should be installed once and only once. This means that subsequent
+ * attempts to install the package, beyond the first, should ignore these
+ * artifacts. This is useful for marking configuration files, example files, and
+ * other files that the user should be allow to delete without worrying that
+ * they would reappear on every change to the dependency structure.
+ * <p>
+ * Supported manifest tags:
+ * <ul>
+ * <li><b>Package-Files</b>: a comma separated list of file paths within this
+ * Jar.</li>
+ * <li><b>Package-Folders</b>: a comma separated list of folder paths within
+ * this Jar. Specifies all artifacts under these folders, recursively.</li>
+ * <li><b>Package-Resources</b>: a comma separated list of resource paths to be
+ * retrieved via the classloader.</li>
+ * <li><b>Package-Volatile-Files</b>: all these artifacts will be marked as
+ * volatile.</li>
+ * <li><b>Package-Volatile-Folders</b>: all artifacts under these paths will be
+ * marked as volatile.</li>
+ * <li><b>Package-Installer</b>: specifies a class name which has a main() entry
+ * point. Simple string arguments can be optionally appended, separated by
+ * spaces. The installer will be called when the package is to be installed,
+ * <i>after</i> all artifacts have been unpacked. Any thrown exception would
+ * cause installation to fail.</li>
+ * <li><b>Package-Uninstaller</b>: specifies a class name which has a main()
+ * entry point. Simple string arguments can be optionally appended, separated by
+ * spaces. The uninstaller will be called when the package is to be uninstalled.
+ * </li>
+ * </ul>
+ * 
+ * @author Tal Liron
+ * @see Packages
+ * @see Manifest
+ */
 public class Package extends AbstractList<Artifact>
 {
 	//

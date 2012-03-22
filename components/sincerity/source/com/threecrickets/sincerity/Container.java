@@ -37,56 +37,13 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
 
 /**
- * Sincerity is a full-featured, straightforward package manager for the JVM. It
- * supports many JVM languages and repository technologies.
+ * The second highest level instance for the Sincerity runtime, after the
+ * {@link Sincerity} class.
  * <p>
- * Sincerity differs from other package managers in that it manages and installs
- * packages into a self-contained container, allowing for isolated, deployable
- * environments. It can be used to very simply distribute a single application
- * with or without its dependencies. Whatever is missing will be automatically
- * downloaded from your managed repository, or from public repositories should
- * you allow it. Application or dependency upgrades can be easily handled
- * programatically, manually or automatically.
- * <p>
- * But Sincerity can handle more complex containers, which in turn run other
- * services internally. For example, RESTful web containers based on <a
- * href="http://threecrickets.com/prudence/">Prudence</a>, or OSGi containers
- * based on <a href="https://felix.apache.org/">Felix</a>.
- * <p>
- * Essential packages take care of centralizing your logging, installing your
- * application as an operating system daemon or service, and allowing for remote
- * management via JMX.
- * <p>
- * Working with Sincerity is easy, and even fun: its usage paradigm is
- * "by command" rather than "by configuration," meaning that you will never have
- * to edit monstrous XML files. Instead, you tell Sincerity what you want to do,
- * for example: "add this package (and its dependencies)," "remove this package"
- * or "package this code and deploy it to a repository." It comes with a command
- * line interface and a Swing-based GUI. Additional packages let you install
- * Prudence-based web frontend. The API, written in Java with non-Java languages
- * in mind, is well-documented and easy to embed.
- * <p>
- * The usual package management features are supported:
- * <p>
- * <ul>
- * <li>Intelligent dependency resolution based on versions</li>
- * <li>Packaging and deployment to repositories</li>
- * </ul>
- * <p>
- * The following repository technologies are supported:
- * <ul>
- * <li>Java, Clojure, Scala and other JVM libraries from Maven and Ivy ibiblio
- * repositories</li>
- * <li>Python eggs from PyPI or compatible repositories (similarly to
- * easy_install and PIP tools)</li>
- * <li>Ruby gems</li>
- * <li>PHP packages from PEAR or compatible repositories (similarly to the pecl
- * tool)</li>
- * </ul>
- * Under the hood, Sincerity relies on <a
- * href="https://ant.apache.org/ivy/">Ivy</a> and <a
- * href="http://threecrickets.com/scripturian/">Scripturian</a>, which are both
- * lightweight and minimal. Plugins for each are implicitly supported.
+ * While strictly speaking it is a singleton, several Container instances may
+ * coexist via the {@link Bootstrap} mechanism. This is in order to allow
+ * Sincerity to "reboot" itself using a new classpath in case the
+ * {@link Container} is changed. See {@link Sincerity#reboot()}.
  * 
  * @author Tal Liron
  */

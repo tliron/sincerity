@@ -20,6 +20,13 @@ import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
 
+/**
+ * Allows you to delegate the {@link Plugin1} interface to non-Java languages
+ * running in the JVM, using the Scripturian library.
+ * 
+ * @author Tal Liron
+ * @see ScripturianShell
+ */
 public class DelegatedPlugin implements Plugin1
 {
 	//

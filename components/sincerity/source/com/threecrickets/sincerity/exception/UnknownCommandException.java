@@ -13,6 +13,11 @@ package com.threecrickets.sincerity.exception;
 
 import com.threecrickets.sincerity.Command;
 
+/**
+ * Signifies that a Sincerity command is not supported by any plugin.
+ * 
+ * @author Tal Liron
+ */
 public class UnknownCommandException extends CommandException
 {
 	//
