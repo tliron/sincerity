@@ -18,11 +18,13 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.plugin.gui.CreateContainerButton;
 
 /**
  * The container plugin supports the following commands:
@@ -44,9 +46,11 @@ import com.threecrickets.sincerity.internal.FileUtil;
  * <li><b>clean</b>: uninstalls all dependencies and deletes this container's
  * "/cache/" directory. Also see "dependencies:uninstall".</li>
  * </ul>
+ * Additionally, this plugin adds a "Create" button to the GUI.
  * 
  * @author Tal Liron
  * @see Container
+ * @see CreateContainerButton
  */
 public class ContainerPlugin implements Plugin1
 {
@@ -151,5 +155,7 @@ public class ContainerPlugin implements Plugin1
 
 	public void gui( Command command ) throws SincerityException
 	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getToolbar().add( new CreateContainerButton( sincerity ) );
 	}
 }

@@ -43,7 +43,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
  * container, allowing the user to add a selection of them and install them.
  * 
  * @author Tal Liron
- * @see ContainerPane
+ * @see AddDependenciesButton
  */
 public class AddDependenciesDialog extends JDialog implements ActionListener
 {

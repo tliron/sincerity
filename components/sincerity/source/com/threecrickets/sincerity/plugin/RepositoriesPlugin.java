@@ -151,7 +151,7 @@ public class RepositoriesPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Repositories", new RepositoriesPane( sincerity ) );
+		sincerity.getFrame().getTabs().add( "Repositories", new RepositoriesPane( sincerity ) );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -79,6 +79,6 @@ public class ShortcutsPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Shortcuts", new ShortcutsPane( sincerity ) );
+		sincerity.getFrame().getTabs().add( "Shortcuts", new ShortcutsPane( sincerity ) );
 	}
 }

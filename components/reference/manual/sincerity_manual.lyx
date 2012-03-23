@@ -1486,8 +1486,85 @@ A strict structure, non-negotiable, non-configurable.
 Core Plugins
 \end_layout
 
+\begin_layout Standard
+These are the plugins that come with the Sincerity installation and implement
+ its most essential commands.
+\end_layout
+
+\begin_layout Standard
+Since these commands are used so often, it's a good idea to avoid implementing
+ these command names in your own custom plugins, so that there would never
+ be ambiguity for the essentials.
+ In other words, treat 
+\begin_inset Quotes eld
+\end_inset
+
+add
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+install
+\begin_inset Quotes erd
+\end_inset
+
+, etc.
+ as reserved command names.
+\end_layout
+
 \begin_layout Section
 Language Plugins
+\end_layout
+
+\begin_layout Standard
+These plugins add a language engine to your container.
+ In some cases, this also means support for standard tools that come with
+ the language distribution, such as a CLI, a REPL, and tools for compilation
+ and packaging.
+\end_layout
+
+\begin_layout Standard
+Most of these language engines support the Scripturian standard, meaning
+ that with a language plugin installed you can:
+\end_layout
+
+\begin_layout Itemize
+Write programs in this language.
+ For example, with Python installed, you can write a 
+\begin_inset Quotes eld
+\end_inset
+
+/programs/fish.py
+\begin_inset Quotes erd
+\end_inset
+
+ program and start it via 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity start fish
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Note that the service plugin can also be used to run programs as daemons
+ or services.
+\end_layout
+
+\begin_layout Itemize
+Write Sincerity plugins in this language.
+ For example, with Ruby installed, you can write a 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/scripturian/plugins/fish.rb
+\begin_inset Quotes erd
+\end_inset
+
+ plugin.
 \end_layout
 
 \begin_layout Subsection
@@ -1495,7 +1572,7 @@ JavaScript Plugin
 \end_layout
 
 \begin_layout Standard
-JavaScript is the Sincerity's 
+JavaScript is Sincerity's 
 \begin_inset Quotes eld
 \end_inset
 

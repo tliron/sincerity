@@ -29,7 +29,9 @@ import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.TreeUtil;
+import com.threecrickets.sincerity.plugin.gui.AddDependenciesButton;
 import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
+import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.LicensesPane;
 
 /**
@@ -62,14 +64,15 @@ import com.threecrickets.sincerity.plugin.gui.LicensesPane;
  * <li><b>removes</b>: removes a single dependency. The two arguments are group
  * and module name. Note that this does not actually uninstall the dependency.</li>
  * </ul>
- * Additionally, this plugin adds a "Dependencies" and a "Licenses" tabs to the
- * GUI.
+ * Additionally, this plugin adds "Dependencies" and "Licenses" tabs and an
+ * "Add and Install" button to the GUI.
  * 
  * @author Tal Liron
  * @see Dependencies
  * @see ResolvedDependencies
  * @see DependenciesPane
  * @see LicensesPane
+ * @see AddDependenciesButton
  */
 public class DependenciesPlugin implements Plugin1
 {
@@ -200,8 +203,11 @@ public class DependenciesPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Dependencies", new DependenciesPane( sincerity.getContainer().getDependencies() ) );
-		sincerity.getFrame().getPane().add( "Licenses", new LicensesPane( sincerity.getContainer().getDependencies() ) );
+		Frame frame = sincerity.getFrame();
+		Dependencies dependencies = sincerity.getContainer().getDependencies();
+		frame.getTabs().add( "Dependencies", new DependenciesPane( dependencies ) );
+		frame.getTabs().add( "Licenses", new LicensesPane( dependencies ) );
+		frame.getToolbar().add( new AddDependenciesButton( sincerity ) );
 	}
 
 	//

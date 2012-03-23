@@ -92,7 +92,7 @@ public class ArtifactsPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Artifacts", new ArtifactsPane( sincerity.getContainer().getDependencies() ) );
+		sincerity.getFrame().getTabs().add( "Artifacts", new ArtifactsPane( sincerity.getContainer().getDependencies() ) );
 	}
 
 	//

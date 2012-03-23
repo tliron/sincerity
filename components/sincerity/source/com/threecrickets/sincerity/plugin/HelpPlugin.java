@@ -70,6 +70,6 @@ public class HelpPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Commands", new CommandsPane( sincerity ) );
+		sincerity.getFrame().getTabs().add( "Commands", new CommandsPane( sincerity ) );
 	}
 }

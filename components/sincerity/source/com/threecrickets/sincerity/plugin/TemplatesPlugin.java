@@ -105,6 +105,6 @@ public class TemplatesPlugin implements Plugin1
 	public void gui( Command command ) throws SincerityException
 	{
 		Sincerity sincerity = command.getSincerity();
-		sincerity.getFrame().getPane().add( "Templates", new TemplatesPane( sincerity ) );
+		sincerity.getFrame().getTabs().add( "Templates", new TemplatesPane( sincerity ) );
 	}
 }
