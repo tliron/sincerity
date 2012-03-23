@@ -22,10 +22,17 @@ import javax.swing.tree.DefaultTreeModel;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.TemplatesPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all templates available in the Sincerity installation.
+ * 
+ * @author Tal Liron
+ * @see TemplatesPlugin
+ */
 public class TemplatesPane extends JPanel
 {
 	//

@@ -3,6 +3,10 @@ importClass(java.lang.System)
 
 var MAIN_CLASS = 'org.jruby.Main'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['ruby', 'gem', 'ast', 'irb', 'rake', 'rdoc', 'ri', 'testrb']
 }

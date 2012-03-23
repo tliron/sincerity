@@ -26,12 +26,21 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.ContainerPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all <i>resolved</i> dependencies in the current container.
+ * 
+ * @author Tal Liron
+ * @see ContainerPlugin
+ * @see ResolvedDependencies
+ */
 public class DependenciesPane extends JPanel implements ItemListener
 {
 	//

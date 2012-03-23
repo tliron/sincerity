@@ -3,6 +3,10 @@ var MAIN_CLASS = 'org.apache.felix.main.Main'
 
 importClass(java.lang.System)
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['felix', 'gogo']
 }

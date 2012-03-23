@@ -3,6 +3,10 @@ importClass(Packages.scala.tools.jline.TerminalFactory)
 
 var MAIN_CLASS = 'scala.tools.nsc.MainGenericRunner'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['scala']
 }

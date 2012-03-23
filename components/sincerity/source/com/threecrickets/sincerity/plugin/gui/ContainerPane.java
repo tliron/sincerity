@@ -32,6 +32,14 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
+/**
+ * A pane that appears at the top of the Sincerity GUI and shows information
+ * about the current container if such is in use, or otherwise provides the user
+ * with the option of creating a new container.
+ * 
+ * @author Tal Liron
+ * @see AddDependenciesDialog
+ */
 public class ContainerPane extends JPanel implements ActionListener
 {
 	//
@@ -142,7 +150,7 @@ public class ContainerPane extends JPanel implements ActionListener
 			}
 			else if( "add".equals( command ) )
 			{
-				new AddDialog( sincerity );
+				new AddDependenciesDialog( sincerity );
 			}
 		}
 		catch( SincerityException x )

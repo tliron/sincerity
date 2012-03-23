@@ -26,10 +26,17 @@ import javax.swing.tree.DefaultTreeModel;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.ShortcutsPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all shortcuts available in the current container.
+ * 
+ * @author Tal Liron
+ * @see ShortcutsPlugin
+ */
 public class ShortcutsPane extends JPanel implements ItemListener
 {
 	//

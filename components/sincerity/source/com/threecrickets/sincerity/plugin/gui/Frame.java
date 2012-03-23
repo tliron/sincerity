@@ -19,9 +19,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
+import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * The main frame for the Sincerity GUI.
+ * <p>
+ * Plugins can extend this GUI by implementing {@link Plugin1#gui(Command)}. A
+ * common extensions is to add an extra tab to {@link #getPane()}.
+ * 
+ * @author Tal Liron
+ * @see Sincerity#getFrame()
+ * @see Plugin1#gui(Command)
+ */
 public class Frame extends JFrame implements Runnable
 {
 	//

@@ -39,25 +39,28 @@ import com.threecrickets.sincerity.plugin.gui.internal.CheckBoxList;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
 /**
- * See:
- * http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.
- * oracle
- * .com/javase/tutorial/uiswing/examples/components/ListDialogRunnerProject
- * /src/components/ListDialog.java *
+ * Shows a list of available "add"-type shortcuts available in the current
+ * container, allowing the user to add a selection of them and install them.
+ * 
+ * @author Tal Liron
+ * @see ContainerPane
  */
-public class AddDialog extends JDialog implements ActionListener
+public class AddDependenciesDialog extends JDialog implements ActionListener
 {
 	//
 	// Construction
 	//
 
-	public AddDialog( Sincerity sincerity ) throws SincerityException
+	public AddDependenciesDialog( Sincerity sincerity ) throws SincerityException
 	{
 		super( sincerity.getFrame() );
 
 		this.sincerity = sincerity;
 
 		setTitle( "Add and Install" );
+
+		// See:
+		// http://docs.oracle.com/javase/tutorial/displayCode.html?code=http://docs.oracle.com/javase/tutorial/uiswing/examples/components/ListDialogRunnerProject/src/components/ListDialog.java
 
 		// Buttons
 		JButton cancelButton = new JButton( "Cancel" );

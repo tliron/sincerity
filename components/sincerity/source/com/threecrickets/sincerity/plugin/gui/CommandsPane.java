@@ -26,10 +26,18 @@ import javax.swing.tree.DefaultTreeModel;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.HelpPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all commands available in all plugins installed in the current
+ * container or the Sincerity installation if no container is in use.
+ * 
+ * @author Tal Liron
+ * @see HelpPlugin
+ */
 public class CommandsPane extends JPanel implements ItemListener
 {
 	//

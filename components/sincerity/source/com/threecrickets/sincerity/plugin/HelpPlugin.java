@@ -28,6 +28,7 @@ import com.threecrickets.sincerity.plugin.gui.CommandsPane;
  * Additionally, this plugin adds a "Commands" tab to the GUI.
  * 
  * @author Tal Liron
+ * @see CommandsPane
  */
 public class HelpPlugin implements Plugin1
 {
@@ -35,7 +36,7 @@ public class HelpPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

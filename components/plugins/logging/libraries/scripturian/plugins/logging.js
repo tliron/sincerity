@@ -8,6 +8,10 @@ importClass(
 	com.threecrickets.sincerity.exception.CommandException,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['logging', 'log']
 }

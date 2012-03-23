@@ -29,6 +29,10 @@ var commands = {
 	sampler: 'org.apache.hadoop.mapred.lib.InputSampler'
 } 
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['hadoop']
 }

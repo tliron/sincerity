@@ -18,6 +18,7 @@ import java.io.File;
  * {@link Container} is created.
  * 
  * @author Tal Liron
+ * @see Sincerity#getTemplates()
  */
 public class Template
 {

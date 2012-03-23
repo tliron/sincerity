@@ -68,6 +68,8 @@ import com.threecrickets.sincerity.plugin.gui.LicensesPane;
  * @author Tal Liron
  * @see Dependencies
  * @see ResolvedDependencies
+ * @see DependenciesPane
+ * @see LicensesPane
  */
 public class DependenciesPlugin implements Plugin1
 {
@@ -75,7 +77,7 @@ public class DependenciesPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

@@ -49,6 +49,7 @@ import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
  * 
  * @author Tal Liron
  * @see Repositories
+ * @see RepositoriesPane
  */
 public class RepositoriesPlugin implements Plugin1
 {
@@ -56,7 +57,7 @@ public class RepositoriesPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

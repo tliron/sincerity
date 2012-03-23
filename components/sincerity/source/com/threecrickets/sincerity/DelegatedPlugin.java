@@ -43,11 +43,11 @@ public class DelegatedPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		try
 		{
-			Object version = executable.enter( ENTERING_KEY, "getVersion" );
+			Object version = executable.enter( ENTERING_KEY, "getInterfaceVersion" );
 			if( version != null )
 			{
 				if( version instanceof Number )
@@ -161,7 +161,7 @@ public class DelegatedPlugin implements Plugin1
 
 	private static final String ENTERING_KEY = "sincerity";
 
-	private static final int DEFAULT_VERSION = 1;
+	private static final int DEFAULT_VERSION = 0;
 
 	private final String defaultName;
 

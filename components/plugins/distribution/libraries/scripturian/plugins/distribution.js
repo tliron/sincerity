@@ -5,6 +5,10 @@ importClass(
 	java.lang.System,
 	com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['izpack']
 }

@@ -24,11 +24,18 @@ import org.apache.ivy.plugins.resolver.DependencyResolver;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.RepositoriesPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedNode;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all repositories attached to the current container.
+ * 
+ * @author Tal Liron
+ * @see RepositoriesPlugin
+ */
 public class RepositoriesPane extends JPanel
 {
 	//

@@ -7,6 +7,10 @@ importClass(
 
 var MAIN_CLASS = 'org.python.util.jython'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['python', 'easy_install']
 }

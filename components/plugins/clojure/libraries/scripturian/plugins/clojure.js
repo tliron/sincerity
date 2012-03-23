@@ -1,6 +1,10 @@
 
 var MAIN_CLASS = 'clojure.main'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['clojure']
 }

@@ -32,10 +32,17 @@ import org.apache.ivy.core.module.descriptor.Artifact;
 
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.ArtifactsPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
+/**
+ * Shows all artifacts installed in the current container.
+ * 
+ * @author Tal Liron
+ * @see ArtifactsPlugin
+ */
 public class ArtifactsPane extends JPanel implements ItemListener
 {
 	//

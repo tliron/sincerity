@@ -1,4 +1,8 @@
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['rails']
 }

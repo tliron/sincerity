@@ -11,7 +11,11 @@
 
 package com.threecrickets.sincerity;
 
+import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.CommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.plugin.GuiPlugin;
 
 /**
  * Sincerity plugins handle the running of Sincerity commands (see
@@ -33,13 +37,55 @@ import com.threecrickets.sincerity.exception.SincerityException;
  */
 public interface Plugin1
 {
-	public int getVersion();
+	/**
+	 * The version of the Sincerity plugin interface supported by this plugin.
+	 * 
+	 * @return The interface version number
+	 */
+	public int getInterfaceVersion();
 
+	/**
+	 * The name of this plugin. Plugin names are expected to be unique per
+	 * container.
+	 * 
+	 * @return The plugin name
+	 */
 	public String getName();
 
+	/**
+	 * The command names supported by this plugin. Command names do not have to
+	 * be unique per container, but unique names do make work easier for users.
+	 * 
+	 * @return An array of command names
+	 * @throws SincerityException
+	 */
 	public String[] getCommands() throws SincerityException;
 
+	/**
+	 * Runs a command.
+	 * <p>
+	 * If the command is not supported by this plugin, should throw a
+	 * {@link UnknownCommandException}. If the command does not have the
+	 * arguments it needs in order to run, should throw a
+	 * {@link BadArgumentsCommandException}. Other command-specific failures
+	 * should throw a {@link CommandException}.
+	 * 
+	 * @param command
+	 *        The command to run
+	 * @throws SincerityException
+	 */
 	public void run( Command command ) throws SincerityException;
 
+	/**
+	 * Called by the {@link GuiPlugin} to allow this plugin to activate its own
+	 * extension to the GUI. This is an optional operation.
+	 * <p>
+	 * The {@link Frame} can be accessed at {@link Sincerity#getFrame()}. Note
+	 * that when this hook is called, the frame is not yet made visible.
+	 * 
+	 * @param command
+	 *        The command used to invoke the GUI (likely "gui:gui")
+	 * @throws SincerityException
+	 */
 	public void gui( Command command ) throws SincerityException;
 }

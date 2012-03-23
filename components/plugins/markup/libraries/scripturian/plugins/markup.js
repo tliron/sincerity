@@ -20,6 +20,10 @@ var languageNames = {
 	bugzilla: 'Textile Bugzilla Dialect'
 }
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['render']
 }

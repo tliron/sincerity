@@ -43,7 +43,7 @@ public class JavaPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

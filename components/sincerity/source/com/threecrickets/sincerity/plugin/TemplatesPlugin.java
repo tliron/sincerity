@@ -36,6 +36,8 @@ import com.threecrickets.sincerity.plugin.gui.TemplatesPane;
  * Additionally, this plugin adds a "Templates" tab to the GUI.
  * 
  * @author Tal Liron
+ * @see Template
+ * @see TemplatesPane
  */
 public class TemplatesPlugin implements Plugin1
 {
@@ -43,7 +45,7 @@ public class TemplatesPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

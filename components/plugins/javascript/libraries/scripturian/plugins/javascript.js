@@ -1,6 +1,10 @@
 
 var MAIN_CLASS = 'org.mozilla.javascript.tools.shell.Main'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['javascript']
 }

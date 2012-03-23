@@ -1,6 +1,10 @@
 
 var MAIN_CLASS = 'com.caucho.quercus.Quercus'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['php']
 }

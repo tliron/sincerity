@@ -43,6 +43,7 @@ import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
  * 
  * @author Tal Liron
  * @see Artifact
+ * @see ArtifactsPane
  */
 public class ArtifactsPlugin implements Plugin1
 {
@@ -50,7 +51,7 @@ public class ArtifactsPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

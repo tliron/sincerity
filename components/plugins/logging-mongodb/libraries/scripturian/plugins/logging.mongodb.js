@@ -24,6 +24,10 @@ document.executeOnce('/sincerity/templates/')
 document.executeOnce('/sincerity/objects/')
 document.executeOnce('/sincerity/localization/')
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['logtail']
 }

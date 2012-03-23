@@ -28,6 +28,7 @@ import com.threecrickets.sincerity.plugin.gui.ShortcutsPane;
  * Additionally, this plugin adds a "Shortcuts" tab to the GUI.
  * 
  * @author Tal Liron
+ * @see ShortcutsPane
  */
 public class ShortcutsPlugin implements Plugin1
 {
@@ -35,7 +36,7 @@ public class ShortcutsPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getVersion()
+	public int getInterfaceVersion()
 	{
 		return 1;
 	}

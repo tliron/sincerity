@@ -5,6 +5,10 @@ importClass(com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 
 var fopVersion = '1.0'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['render']
 }

@@ -1,6 +1,10 @@
 
 var MAIN_CLASS = 'groovy.ui.GroovyMain'
 
+function getInterfaceVersion() {
+	return 1
+}
+
 function getCommands() {
 	return ['groovy']
 }
