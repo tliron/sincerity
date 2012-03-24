@@ -17,6 +17,7 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.plugin.gui.Console;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
@@ -61,6 +62,10 @@ public class GuiPlugin implements Plugin1
 		String commandName = command.getName();
 		if( "gui".equals( commandName ) )
 		{
+			// Don't show GUI while console is up
+			if( Console.getCurrent() != null )
+				return;
+
 			command.setParse( true );
 
 			boolean isNative = command.getSwitches().contains( "native" );

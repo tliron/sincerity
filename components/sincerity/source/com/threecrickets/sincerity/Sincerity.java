@@ -126,8 +126,6 @@ public class Sincerity implements Runnable
 			container = sincerity.container;
 			containerRoot = sincerity.containerRoot;
 			plugins = sincerity.plugins;
-			out = sincerity.out;
-			err = sincerity.err;
 			verbosity = sincerity.verbosity;
 		}
 
@@ -178,14 +176,11 @@ public class Sincerity implements Runnable
 
 	public PrintWriter getOut()
 	{
+		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.out" );
 		if( out == null )
 		{
-			out = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.out" );
-			if( out == null )
-			{
-				out = new PrintWriter( new OutputStreamWriter( System.out ), true );
-				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
-			}
+			out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
 		}
 
 		return out;
@@ -193,20 +188,18 @@ public class Sincerity implements Runnable
 
 	public void setOut( Writer out )
 	{
-		this.out = out instanceof PrintWriter ? (PrintWriter) out : new PrintWriter( out, true );
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", this.out );
+		if( !( out instanceof PrintWriter ) )
+			out = new PrintWriter( out, true );
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
 	}
 
 	public PrintWriter getErr()
 	{
+		PrintWriter err = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.err" );
 		if( err == null )
 		{
-			err = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.err" );
-			if( err == null )
-			{
-				err = new PrintWriter( new OutputStreamWriter( System.err ), true );
-				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
-			}
+			err = new PrintWriter( new OutputStreamWriter( System.err ), true );
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
 		}
 
 		return err;
@@ -214,8 +207,9 @@ public class Sincerity implements Runnable
 
 	public void setErr( Writer err )
 	{
-		this.err = err instanceof PrintWriter ? (PrintWriter) err : new PrintWriter( err, true );
-		Bootstrap.getAttributes().put( "sincerity.err", this.err );
+		if( !( err instanceof PrintWriter ) )
+			err = new PrintWriter( err, true );
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
 	}
 
 	public File getContainerRoot() throws SincerityException
@@ -546,10 +540,6 @@ public class Sincerity implements Runnable
 	private Container container;
 
 	private Plugins plugins;
-
-	private PrintWriter out;
-
-	private PrintWriter err;
 
 	private Integer verbosity;
 

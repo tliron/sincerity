@@ -140,7 +140,7 @@ public class AddDependenciesDialog extends JDialog implements ActionListener
 					for( String shortcut : shortcuts )
 						sincerity.run( "dependencies" + Command.PLUGIN_COMMAND_SEPARATOR + "add", shortcut );
 
-					sincerity.getFrame().dispose();
+					sincerity.getFrame().toConsole();
 					Sincerity.main( new String[]
 					{
 						"dependencies" + Command.PLUGIN_COMMAND_SEPARATOR + "install", Command.COMMANDS_SEPARATOR, "gui" + Command.PLUGIN_COMMAND_SEPARATOR + "gui"
@@ -153,6 +153,7 @@ public class AddDependenciesDialog extends JDialog implements ActionListener
 				}
 			}
 		}
+
 		dispose();
 	}
 

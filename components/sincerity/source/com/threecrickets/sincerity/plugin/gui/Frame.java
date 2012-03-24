@@ -28,6 +28,7 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
 /**
  * The main frame for the Sincerity GUI.
@@ -49,6 +50,8 @@ public class Frame extends JFrame implements Runnable
 	public Frame( Sincerity sincerity ) throws SincerityException
 	{
 		super( "Sincerity" );
+
+		this.sincerity = sincerity;
 
 		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
@@ -86,6 +89,24 @@ public class Frame extends JFrame implements Runnable
 	// Operations
 	//
 
+	public void toConsole()
+	{
+		dispose();
+
+		try
+		{
+			new Console( sincerity ).run();
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
+	}
+
+	//
+	// Runnable
+	//
+
 	public void run()
 	{
 		Rectangle bounds = getGraphicsConfiguration().getBounds();
@@ -102,9 +123,11 @@ public class Frame extends JFrame implements Runnable
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private static final long serialVersionUID = 1L;
+
+	private final Sincerity sincerity;
+
 	private final JTabbedPane tabs;
 
 	private final JPanel toolbar;
-
-	private static final long serialVersionUID = 1L;
 }
