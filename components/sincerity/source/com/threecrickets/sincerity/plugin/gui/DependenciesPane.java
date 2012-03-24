@@ -33,6 +33,7 @@ import com.threecrickets.sincerity.plugin.ContainerPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
+import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
 
 /**
  * Shows all <i>resolved</i> dependencies in the current container.
@@ -82,6 +83,8 @@ public class DependenciesPane extends JPanel implements ItemListener
 		buttons.add( showArtifactsCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( showPackageContentsCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( new WrappedText( "Note that this list only reflects dependencies that have already been installed." ) );
 
 		add( buttons, BorderLayout.EAST );
 

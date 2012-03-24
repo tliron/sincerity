@@ -19,6 +19,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.Console;
 import com.threecrickets.sincerity.plugin.gui.Frame;
+import com.threecrickets.sincerity.plugin.gui.Splash;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
 /**
@@ -57,7 +58,7 @@ public class GuiPlugin implements Plugin1
 		};
 	}
 
-	public void run( Command command ) throws SincerityException
+	public void run( final Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
 		if( "gui".equals( commandName ) )
@@ -71,26 +72,38 @@ public class GuiPlugin implements Plugin1
 			boolean isNative = command.getSwitches().contains( "native" );
 			GuiUtil.setNativeLookAndFeel( isNative );
 
-			Sincerity sincerity = command.getSincerity();
-			Frame frame = sincerity.getFrame();
-			if( frame != null )
-				frame.dispose();
-
-			frame = new Frame( sincerity );
-			sincerity.setFrame( frame );
-
-			for( Plugin1 plugin : sincerity.getPlugins().values() )
+			new Splash( new Runnable()
 			{
-				try
+				public void run()
 				{
-					plugin.gui( command );
-				}
-				catch( NoContainerException x )
-				{
-				}
-			}
+					try
+					{
+						Sincerity sincerity = command.getSincerity();
+						Frame frame = sincerity.getFrame();
+						if( frame != null )
+							frame.dispose();
+						frame = new Frame( sincerity );
+						sincerity.setFrame( frame );
 
-			frame.run();
+						for( Plugin1 plugin : sincerity.getPlugins().values() )
+						{
+							try
+							{
+								plugin.gui( command );
+							}
+							catch( NoContainerException x )
+							{
+							}
+						}
+
+						frame.run();
+					}
+					catch( SincerityException x )
+					{
+						GuiUtil.error( x );
+					}
+				}
+			} );
 		}
 		else
 			throw new UnknownCommandException( command );

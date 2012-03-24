@@ -36,6 +36,7 @@ import com.threecrickets.sincerity.plugin.ArtifactsPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
+import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
 
 /**
  * Shows all artifacts installed in the current container.
@@ -72,6 +73,8 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		buttons.add( groupByTypeCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( showPackageContentsCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( new WrappedText( "Note that this list only reflects artifacts that have been installed by Sincerity." ) );
 
 		add( buttons, BorderLayout.EAST );
 
