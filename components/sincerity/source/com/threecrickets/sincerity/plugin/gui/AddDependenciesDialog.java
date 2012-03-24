@@ -111,8 +111,7 @@ public class AddDependenciesDialog extends JDialog implements ActionListener
 		contentPane.add( listPane, BorderLayout.CENTER );
 		contentPane.add( buttonPane, BorderLayout.PAGE_END );
 
-		setLocationRelativeTo( getOwner() );
-		pack();
+		GuiUtil.center( this );
 		setVisible( true );
 	}
 

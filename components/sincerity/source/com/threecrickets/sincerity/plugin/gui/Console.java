@@ -12,7 +12,7 @@
 package com.threecrickets.sincerity.plugin.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Rectangle;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -74,15 +74,19 @@ public class Console extends JFrame implements Runnable, ActionListener
 		setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
 
-		getContentPane().add( new JLabel( "Output:" ), BorderLayout.PAGE_START );
+		// Label
+		JLabel label = new JLabel( "Command output:" );
+		label.setBorder( BorderFactory.createEmptyBorder( 5, 5, 0, 5 ) );
+		getContentPane().add( label, BorderLayout.PAGE_START );
 
 		// Text area
 		textArea = new JTextArea();
+		textArea.setFont( new Font( "monospaced", Font.PLAIN, textArea.getFont().getSize() ) );
 		textArea.setEditable( false );
 		textArea.setRows( 30 );
 		textArea.setColumns( 80 );
 		JScrollPane textPane = new JScrollPane( textArea );
-		textPane.setBorder( BorderFactory.createEmptyBorder( 5, 0, 5, 0 ) );
+		textPane.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		getContentPane().add( textPane, BorderLayout.CENTER );
 
 		// Buttons
@@ -128,13 +132,7 @@ public class Console extends JFrame implements Runnable, ActionListener
 	public void run()
 	{
 		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.console", this );
-		pack();
-		Rectangle bounds = getGraphicsConfiguration().getBounds();
-		int width = getWidth();
-		int height = getHeight();
-		int centerX = bounds.x + bounds.width / 2;
-		int centerY = bounds.y + bounds.height / 2;
-		setLocation( centerX - width / 2, centerY - height / 2 );
+		GuiUtil.center( this );
 		setVisible( true );
 	}
 

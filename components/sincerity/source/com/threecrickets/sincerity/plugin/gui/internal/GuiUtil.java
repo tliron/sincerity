@@ -11,6 +11,9 @@
 
 package com.threecrickets.sincerity.plugin.gui.internal;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.io.File;
 import java.util.Enumeration;
 
@@ -99,6 +102,30 @@ public class GuiUtil
 	public static void error( Throwable x )
 	{
 		x.printStackTrace();
+	}
+
+	public static void center( Window window, double ratio )
+	{
+		Rectangle bounds = window.getGraphicsConfiguration().getBounds();
+		int width = bounds.width / 2;
+		int height = bounds.height / 2;
+		int centerX = (int) ( bounds.x + bounds.width * ratio );
+		int centerY = (int) ( bounds.y + bounds.height * ratio );
+		window.setLocation( centerX - width / 2, centerY - height / 2 );
+		window.setPreferredSize( new Dimension( width, height ) );
+		window.pack();
+	}
+
+	public static void center( Window window )
+	{
+		window.pack();
+		Rectangle bounds = window.getGraphicsConfiguration().getBounds();
+		int width = window.getWidth();
+		int height = window.getHeight();
+		int centerX = bounds.x + bounds.width / 2;
+		int centerY = bounds.y + bounds.height / 2;
+		window.setLocation( centerX - width / 2, centerY - height / 2 );
+		window.setPreferredSize( new Dimension( width, height ) );
 	}
 
 	public static void expandTree( JTree tree, boolean expand )
