@@ -30,9 +30,10 @@ Sincerity.JVM = Sincerity.JVM || function() {
     var Public = {}
 
 	/**
-	 * Loads a JVM class by name, using the current thread context.
+	 * Loads a JVM class, using the current thread context.
 	 * 
-	 * @returns {java.lang.Class}
+	 * @param {String} name The class name
+	 * @returns {java.lang.Class} The class or null if not found
 	 */
 	Public.getClass = function(name) {
     	var classLoader = java.lang.Thread.currentThread().contextClassLoader
@@ -43,6 +44,22 @@ Sincerity.JVM = Sincerity.JVM || function() {
 			return null
 		}
 	}
+    
+	/**
+	 * Opens a JVM resource for input, using the current thread context.
+	 * 
+	 * @param {String} name The resource name
+	 * @returns {java.io.InputStream} The stream or null if not found
+	 */
+    Public.getResourceAsStream = function(name) {
+    	var classLoader = java.lang.Thread.currentThread().contextClassLoader
+		try {
+			return classLoader.getResourceAsStream(name)
+		}
+		catch (x) {
+			return null
+		}
+    }
 	
 	/**
 	 * True if the value is an instance of the JVM class (or its sub-classes). 
@@ -270,12 +287,48 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JavaScript dict into a JVM Properties sheet.
 	 * 
-	 * @return {java.util.Properties}
+	 * @param {Object} dict The dictionary
+	 * @returns {java.util.Properties}
 	 */
 	Public.toProperties = function(dict) {
-		var properties = java.lang.System.properties
+		var properties = new java.util.Properties()
 		for (var d in dict) {
 			properties.put(d, dict[d])
+		}
+		return properties
+	}
+	
+	/**
+	 * Converts a JVM Properties sheet into a new JavaScript dict.
+	 * 
+	 * @param {java.util.Properties} properties The properties sheet
+	 * @returns {Object}
+	 */
+	Public.fromProperties = function(properties) {
+		var dict = {}
+		for (var e = properties.propertyNames(); e.hasMoreElements(); ) {
+			var name = e.nextElement()
+			dict[name] = String(properties.get(name))
+		}
+		return dict
+	}
+	
+	/**
+	 * Loads a resource as a JVM Properties sheet.
+	 * 
+	 * @param {String} name The resource name
+	 * @returns {java.util.Properties}
+	 */
+	Public.getResourceAsProperties = function(name) {
+		var properties = new java.util.Properties()
+		var stream = Public.getResourceAsStream(name)
+		if (null !== stream) {
+			try {
+				properties.load(stream)
+			}
+			finally {
+				stream.close()
+			}
 		}
 		return properties
 	}

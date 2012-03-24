@@ -48,7 +48,7 @@ public class Frame extends JFrame implements Runnable
 
 	public Frame( Sincerity sincerity ) throws SincerityException
 	{
-		super( "Sincerity" );
+		super( "Sincerity " + Sincerity.getVersion().get( "version" ) );
 
 		this.sincerity = sincerity;
 

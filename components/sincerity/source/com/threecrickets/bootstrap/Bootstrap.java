@@ -338,14 +338,14 @@ public class Bootstrap extends URLClassLoader
 	static
 	{
 		Properties properties = new Properties();
-		InputStream stream = Bootstrap.class.getResourceAsStream( "bootstrap.properties" );
+		InputStream stream = Bootstrap.class.getResourceAsStream( "bootstrap.conf" );
 		try
 		{
 			properties.load( stream );
 		}
 		catch( IOException x )
 		{
-			System.err.println( "Could not read bootstrap.properties" );
+			System.err.println( "Could not read bootstrap.conf" );
 			System.exit( 1 );
 		}
 		finally

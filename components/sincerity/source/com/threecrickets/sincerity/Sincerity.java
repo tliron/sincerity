@@ -13,14 +13,19 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
@@ -81,6 +86,44 @@ public class Sincerity implements Runnable
 	public static Sincerity getCurrent()
 	{
 		return threadLocal.get();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> getVersion()
+	{
+		Map<String, String> version = (Map<String, String>) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.version" );
+		if( version == null )
+		{
+			Properties properties = new Properties();
+			InputStream stream = Sincerity.class.getResourceAsStream( "version.conf" );
+			try
+			{
+				properties.load( stream );
+			}
+			catch( IOException x )
+			{
+			}
+			finally
+			{
+				try
+				{
+					stream.close();
+				}
+				catch( IOException x )
+				{
+				}
+			}
+			version = new HashMap<String, String>();
+			for( Enumeration<?> e = properties.propertyNames(); e.hasMoreElements(); )
+			{
+				Object name = e.nextElement();
+				version.put( name.toString(), properties.getProperty( name.toString() ) );
+			}
+			Map<String, String> existing = (Map<String, String>) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.version", version );
+			if( existing != null )
+				version = existing;
+		}
+		return version;
 	}
 
 	//

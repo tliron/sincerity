@@ -2,7 +2,7 @@
 <project name="Sincerity" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
 	<property file="component.properties" />
-	
+
 	<property name="component.source" value="../components/${component}/source" />
 	<property name="component.resources" value="../components/${component}/resources" />
 	<property name="component.notices" value="../components/notices" />
@@ -31,7 +31,7 @@
 
 	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
 	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="izpack/izpack-standalone-compiler.jar" />
-	
+
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
 	</target>
@@ -54,18 +54,22 @@
 			<fileset dir="${component.resources}" />
 		</copy>
 	</target>
-	
+
+	<target name="version">
+		<mkdir dir="${cache.classes}" />
+		<propertyfile file="${cache.classes}/com/threecrickets/sincerity/version.conf">
+			<entry key="version" value="${version}" />
+			<entry key="built" type="date" value="now" pattern="MMM dd yyyy, HH:mm:ss, 'TZ'Z" />
+		</propertyfile>
+	</target>
+
 	<target name="javadocs" description="Create API documentation if not present">
 		<available file="${distribution.api}" property="javadocs-present" />
 		<antcall target="javadocs-overwrite" />
 	</target>
 
 	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
-		<javadoc
-			destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*"
-			access="protected" source="${jvm.version}"
-			windowtitle="${documentation.title} ${version}" doctitle="${documentation.title} ${version}"
-			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
+		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${jvm.version}" windowtitle="${documentation.title} ${version}" doctitle="${documentation.title} ${version}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
 			<link href="${jvm.docs}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
@@ -76,89 +80,84 @@
 			<bottom>
 				<![CDATA[<i>${documentation.copyright}</i>]]>
 			</bottom>
-		</javadoc>
-	</target>
+	</javadoc>
+</target>
 
-	<target name="manual" description="Create manual if not present">
-		<available file="${distribution.manual}" property="manual-present" />
-		<antcall target="manual-overwrite" />
-	</target>
-	
-	<target name="clean-manual" description="Clean manual">
-		<delete dir="${distribution.manual}" />
-	</target>
+<target name="manual" description="Create manual if not present">
+	<available file="${distribution.manual}" property="manual-present" />
+	<antcall target="manual-overwrite" />
+</target>
 
-	<target name="manual-overwrite" description="Create manual" unless="manual-present">
-		<mkdir dir="${distribution.manual}" />
-		<copy todir="${distribution.manual}">
-			<fileset dir="${reference}/manual" excludes="*~" />
-		</copy>
-		<replace dir="${distribution.manual}" includes="${component}_manual.lyx" token="%VERSION%" value="${version}" />
-		<exec executable="lyx" failifexecutionfails="false">
-			<arg value="--export" />
-			<arg value="pdf" />
-			<arg value="${distribution.manual}/${component}_manual.lyx" />
-		</exec>
-		<exec executable="elyxer" failifexecutionfails="false">
-			<arg value="--unicode" />
-			<arg value="--title" />
-			<arg value="${documentation.title} Manual" />
-			<arg value="${distribution.manual}/${component}_manual.lyx" />
-			<arg value="${distribution.manual}/${component}_manual.html" />
-		</exec>
-	</target>
+<target name="clean-manual" description="Clean manual">
+	<delete dir="${distribution.manual}" />
+</target>
 
-	<target name="libraries" depends="classes" description="Create jars">
-		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
-		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
-			<manifest>
-				<attribute name="Main-Class" value="com.threecrickets.bootstrap.Bootstrap"/>
-		    </manifest>
-		</jar>
-	</target>
+<target name="manual-overwrite" description="Create manual" unless="manual-present">
+	<mkdir dir="${distribution.manual}" />
+	<copy todir="${distribution.manual}">
+		<fileset dir="${reference}/manual" excludes="*~" />
+	</copy>
+	<replace dir="${distribution.manual}" includes="${component}_manual.lyx" token="%VERSION%" value="${version}" />
+	<exec executable="lyx" failifexecutionfails="false">
+		<arg value="--export" />
+		<arg value="pdf" />
+		<arg value="${distribution.manual}/${component}_manual.lyx" />
+	</exec>
+	<exec executable="elyxer" failifexecutionfails="false">
+		<arg value="--unicode" />
+		<arg value="--title" />
+		<arg value="${documentation.title} Manual" />
+		<arg value="${distribution.manual}/${component}_manual.lyx" />
+		<arg value="${distribution.manual}/${component}_manual.html" />
+	</exec>
+</target>
 
-	<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
-		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
-		<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
-			<fileset dir="${component.source}" />
-		</copy>
-		<copy todir="${distribution.content}">
-			<fileset dir="${component.notices}" />
-			<fileset dir="${scripts}" excludes="*.old" />
-			<fileset dir="${dependencies}" />
-			<fileset dir="${sincerity-javascript-library}" />
-		</copy>
-		<copy todir="${distribution.templates}">
-			<fileset dir="${templates}" />
-		</copy>
-		<chmod perm="ugo+rx">
-			<fileset dir="${distribution.content}" includes="sincerity" />
-		</chmod>
-	</target>
-	
-	<target name="package" depends="distribution" description="Create distribution package">
-		<zip destfile="${distribution}/${component}-${version}.zip">
-			<fileset dir="${distribution.content}" />
-		</zip>
-	</target>
-	
-	<target name="izpack-installer" depends="package" description="Create IzPack installer">
-		<izpack
-			basedir="${basedir}"
-			input="${basedir}/izpack/${component}.xml"
-			output="${distribution}/${component}-${version}-install.jar"
-			inheritAll="true"
-			installerType="standard" />
-	</target>
-	
-	<target name="build" depends="package" description="Build distribution" />
-	
-	<target name="clean" description="Clean">
-		<delete dir="${cache}" />
-		<delete dir="${distribution}" />
-	</target>
-	
-	<target name="rebuild" depends="clean, build" description="First clean and then build distribution" />
-	
+<target name="libraries" depends="classes, version" description="Create jars">
+	<mkdir dir="${distribution.jars}" />
+	<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
+	<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
+		<manifest>
+			<attribute name="Main-Class" value="com.threecrickets.bootstrap.Bootstrap" />
+		</manifest>
+	</jar>
+</target>
+
+<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
+	<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
+	<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
+		<fileset dir="${component.source}" />
+	</copy>
+	<copy todir="${distribution.content}">
+		<fileset dir="${component.notices}" />
+		<fileset dir="${scripts}" excludes="*.old" />
+		<fileset dir="${dependencies}" />
+		<fileset dir="${sincerity-javascript-library}" />
+	</copy>
+	<copy todir="${distribution.templates}">
+		<fileset dir="${templates}" />
+	</copy>
+	<chmod perm="ugo+rx">
+		<fileset dir="${distribution.content}" includes="sincerity" />
+	</chmod>
+</target>
+
+<target name="package" depends="distribution" description="Create distribution package">
+	<zip destfile="${distribution}/${component}-${version}.zip">
+		<fileset dir="${distribution.content}" />
+	</zip>
+</target>
+
+<target name="izpack-installer" depends="package" description="Create IzPack installer">
+	<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-install.jar" inheritAll="true" installerType="standard" />
+</target>
+
+<target name="build" depends="package" description="Build distribution" />
+
+<target name="clean" description="Clean">
+	<delete dir="${cache}" />
+	<delete dir="${distribution}" />
+</target>
+
+<target name="rebuild" depends="clean, build" description="First clean and then build distribution" />
+
 </project>

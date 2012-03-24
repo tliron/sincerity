@@ -11,6 +11,8 @@
 
 package com.threecrickets.sincerity.plugin;
 
+import java.util.Map;
+
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
@@ -21,6 +23,7 @@ import com.threecrickets.sincerity.plugin.gui.CommandsPane;
 /**
  * The help plugin supports the following commands:
  * <ul>
+ * <li><b>version</b>: prints the Sincerity version.</li>
  * <li><b>help</b>: prints a list of all available commands, organized by
  * plugin. Note that this command can either run with a container or without
  * one.</li>
@@ -50,14 +53,20 @@ public class HelpPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"help"
+			"version", "help"
 		};
 	}
 
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
-		if( "help".equals( commandName ) )
+		if( "version".equals( commandName ) )
+		{
+			Map<String, String> version = Sincerity.getVersion();
+			for( Map.Entry<String, String> entry : version.entrySet() )
+				command.getSincerity().getOut().println( entry.getKey() + "=" + entry.getValue() );
+		}
+		else if( "help".equals( commandName ) )
 		{
 			for( Plugin1 plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
