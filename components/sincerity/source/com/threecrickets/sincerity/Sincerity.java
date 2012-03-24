@@ -105,7 +105,6 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			System.err.println( x.getMessage() );
-			System.exit( 1 );
 		}
 	}
 
@@ -513,13 +512,11 @@ public class Sincerity implements Runnable
 		catch( SincerityException x )
 		{
 			getErr().println( x.getMessage() );
-			printStackTrace( x );
-			System.exit( 1 );
+			// printStackTrace( x );
 		}
 		catch( Throwable x )
 		{
 			printStackTrace( x );
-			System.exit( 1 );
 		}
 	}
 

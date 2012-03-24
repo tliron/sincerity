@@ -40,6 +40,7 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
@@ -101,7 +102,7 @@ public class GuiUtil
 
 	public static void error( Throwable x )
 	{
-		x.printStackTrace();
+		Sincerity.getCurrent().printStackTrace( x );
 	}
 
 	public static void center( Window window, double ratio )
@@ -278,7 +279,8 @@ public class GuiUtil
 
 	public static EnhancedNode createCommandNode( String command, Plugin1 plugin, boolean includePluginName ) throws SincerityException
 	{
-		return new EnhancedNode( plugin, includePluginName ? plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command : command, COMMAND_ICON );
+		String full = plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + command;
+		return new EnhancedNode( full, includePluginName ? full : command, COMMAND_ICON );
 	}
 
 	public static EnhancedNode createShortcutTypeNode( String type, Shortcuts shortcuts ) throws SincerityException

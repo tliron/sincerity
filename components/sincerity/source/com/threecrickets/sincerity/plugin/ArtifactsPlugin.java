@@ -12,7 +12,6 @@
 package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 
@@ -78,7 +77,7 @@ public class ArtifactsPlugin implements Plugin1
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printArtifacts( dependencies, new OutputStreamWriter( System.out ), verbose );
+			printArtifacts( dependencies, command.getSincerity().getOut(), verbose );
 		}
 		else if( "prune".equals( commandName ) )
 		{

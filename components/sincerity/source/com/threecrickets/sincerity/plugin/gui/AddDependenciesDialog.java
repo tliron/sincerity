@@ -145,7 +145,7 @@ public class AddDependenciesDialog extends JDialog implements ActionListener
 						"dependencies" + Command.PLUGIN_COMMAND_SEPARATOR + "install", Command.COMMANDS_SEPARATOR, "gui" + Command.PLUGIN_COMMAND_SEPARATOR + "gui"
 					} );
 				}
-				catch( SincerityException x )
+				catch( Exception x )
 				{
 					GuiUtil.error( x );
 					return;

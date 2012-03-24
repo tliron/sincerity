@@ -11,7 +11,13 @@
 
 package com.threecrickets.sincerity.plugin.gui.internal;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.ImageIcon;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+
 
 /**
  * A Swing node which can be configured with separate value, label and icon.
@@ -21,6 +27,24 @@ import javax.swing.ImageIcon;
  */
 public class EnhancedNode extends SortedNode
 {
+	//
+	// Static operations
+	//
+
+	public static void addListener( final JTree tree, final EnhancedNodeListener listener )
+	{
+		tree.addMouseListener( new MouseAdapter()
+		{
+			@Override
+			public void mousePressed( MouseEvent event )
+			{
+				TreePath selPath = tree.getPathForLocation( event.getX(), event.getY() );
+				if( ( selPath != null ) && ( event.getClickCount() == 2 ) )
+					listener.nodeActivated( ( (EnhancedNode) selPath.getLastPathComponent() ).getUserObject() );
+			}
+		} );
+	}
+
 	//
 	// Construction
 	//
