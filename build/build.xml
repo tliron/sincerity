@@ -8,7 +8,7 @@
 	<property name="component.notices" value="../components/notices" />
 	<property name="reference" value="../components/reference" />
 	<property name="scripts" value="../components/scripts" />
-	<property name="sincerity-foundation" value="../components/sincerity-foundation" />
+	<property name="sincerity-javascript-library" value="../components/sincerity-javascript-library" />
 	<property name="templates" value="../components/templates" />
 
 	<property name="dependencies" value="../dependencies" />
@@ -118,8 +118,7 @@
 		</jar>
 	</target>
 
-	<!--<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">-->
-	<target name="distribution" depends="libraries" description="Assemble distribution">
+	<target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
 		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
 		<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
 			<fileset dir="${component.source}" />
@@ -128,7 +127,7 @@
 			<fileset dir="${component.notices}" />
 			<fileset dir="${scripts}" excludes="*.old" />
 			<fileset dir="${dependencies}" />
-			<fileset dir="${sincerity-foundation}" />
+			<fileset dir="${sincerity-javascript-library}" />
 		</copy>
 		<copy todir="${distribution.templates}">
 			<fileset dir="${templates}" />
@@ -144,7 +143,7 @@
 		</zip>
 	</target>
 	
-	<target name="installer" depends="package" description="Create installer">
+	<target name="izpack-installer" depends="package" description="Create IzPack installer">
 		<izpack
 			basedir="${basedir}"
 			input="${basedir}/izpack/${component}.xml"

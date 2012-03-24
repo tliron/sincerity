@@ -5393,7 +5393,7 @@ s to contribute, and also allow such plugins to be distributed as simple
 \end_layout
 
 \begin_layout Section
-The Sincerity Foundation Library
+The Sincerity JavaScript Library
 \end_layout
 
 \begin_layout Standard
@@ -5408,7 +5408,7 @@ Still, this isn't quite good enough: using JVM libraries works, but they
 
 \begin_layout Standard
 For Sincerity, we decided that we can do better, and so we present you with
- a collection of useful code called the Sincerity Foundation Library.
+ a collection of useful code called the Sincerity JavaScript Library (SJL).
  We should point out from the start that this is not a general-purpose JavaScrip
 t library: it relies on the JVM libraries, and only works in the JVM.
  There are also a few optimizations specific to the Rhino engine, which
@@ -5427,7 +5427,7 @@ What follows is a general introduction to the library.
 
 \begin_layout Standard
 Note that the Sincerity Foundation Library is used by at least two other
- JavaScript frameworks: the Prudence JavaScript Library, and the Sincerity
+ JavaScript frameworks: the Prudence JavaScript Library (PJL), and the Sincerity
  Framework, which builds on the Prudence JavaScript Library.
 \end_layout
 
@@ -5459,9 +5459,9 @@ Iterators
 \end_layout
 
 \begin_layout Standard
-Iterators let you write coherent code that can efficiently operate on sequences
- of any size.
- It uses techniques borrowed from functional programming languages.
+Iterators let you write coherent code that can efficiently comprehend and
+ operate on sequences of any size.
+ Its design borrows stylistically from functional programming languages.
 \end_layout
 
 \begin_layout Paragraph
@@ -5469,8 +5469,8 @@ Files
 \end_layout
 
 \begin_layout Standard
-Low-level access to the filesystem, including very high-performance reading
- and writing of files using memory-mapped files.
+Low-level access to the filesystem, including high-performance reading and
+ writing of files using memory-mapped files.
 \end_layout
 
 \begin_layout Paragraph
@@ -5526,7 +5526,7 @@ Calendar
 \end_layout
 
 \begin_layout Standard
-Enhancement to JavaScript's standard Date type.
+Enhancements to JavaScript's standard Date type.
 \end_layout
 
 \begin_layout Paragraph
@@ -5544,7 +5544,7 @@ Cryptography
 
 \begin_layout Standard
 Easy access to the JVM's cryptography libraries, including shortcuts for
- many common hashing, encryption and decryption tasks.
+ common hashing, encryption and decryption tasks.
 \end_layout
 
 \begin_layout Paragraph
@@ -5553,7 +5553,7 @@ JVM
 
 \begin_layout Standard
 Easy conversions between JVM and JavaScript types, and also access to a
- few low-level operating system services.
+ few operating system services.
 \end_layout
 
 \begin_layout Paragraph
@@ -5561,7 +5561,7 @@ Validation
 \end_layout
 
 \begin_layout Standard
-A general-purpose text validation library for commonly used input types,
+A general-purpose user input validation library for commonly used types,
  such as numbers and email addresses.
 \end_layout
 
@@ -5590,8 +5590,8 @@ Rhino
 \end_layout
 
 \begin_layout Standard
-A collection of shortcuts for features specific to the Rhino JavaScript
- engine, such as accessing the call stack.
+Access to features of the Rhino JavaScript engine, such as the call stack
+ and exception details.
 \end_layout
 
 \begin_layout Section

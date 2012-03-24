@@ -16,6 +16,7 @@ import com.threecrickets.sincerity.exception.CommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.GuiPlugin;
+import com.threecrickets.sincerity.plugin.gui.Frame;
 
 /**
  * Sincerity plugins handle the running of Sincerity commands (see

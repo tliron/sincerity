@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.library</groupId>
-	<artifactId>sincerity-foundation</artifactId>
+	<artifactId>sincerity-javascript-library</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Foundation Library</name>
+	<name>Sincerity JavaScript Library</name>
 	<description>A collection of utility code that greatly enhances the use of JavaScript on the JVM.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
