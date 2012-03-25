@@ -33,6 +33,7 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 
+import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
@@ -66,35 +67,44 @@ public class GuiUtil
 
 	public static final ImageIcon COMMAND_ICON = new ImageIcon( GuiUtil.class.getResource( "control_play.png" ) );
 
-	public static void setNativeLookAndFeel( boolean enabled )
+	public static void initLookAndFeel( boolean java )
 	{
-		// System.setProperty( "awt.useSystemAAFontSettings", "on" );
-		String lookAndFeel = enabled ? UIManager.getSystemLookAndFeelClassName() : "javax.swing.plaf.metal.MetalLookAndFeel";
-		try
+		Boolean current = (Boolean) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.lookAndFeel" );
+		if( ( current == null ) || ( current.booleanValue() != java ) )
 		{
-			UIManager.setLookAndFeel( lookAndFeel );
-		}
-		catch( InstantiationException x )
-		{
-			x.printStackTrace();
-		}
-		catch( ClassNotFoundException x )
-		{
-			x.printStackTrace();
-		}
-		catch( UnsupportedLookAndFeelException x )
-		{
-			x.printStackTrace();
-		}
-		catch( IllegalAccessException x )
-		{
-			x.printStackTrace();
-		}
+			// See: http://bugs.sun.com/view_bug.do?bug_id=6742850
+			System.setProperty( "awt.useSystemAAFontSettings", "on" );
+			System.setProperty( "swing.aatext", "on" );
 
-		if( !enabled )
-		{
-			JFrame.setDefaultLookAndFeelDecorated( true );
-			JDialog.setDefaultLookAndFeelDecorated( true );
+			String lookAndFeel = java ? "javax.swing.plaf.metal.MetalLookAndFeel" : UIManager.getSystemLookAndFeelClassName();
+			try
+			{
+				UIManager.setLookAndFeel( lookAndFeel );
+			}
+			catch( InstantiationException x )
+			{
+				x.printStackTrace();
+			}
+			catch( ClassNotFoundException x )
+			{
+				x.printStackTrace();
+			}
+			catch( UnsupportedLookAndFeelException x )
+			{
+				x.printStackTrace();
+			}
+			catch( IllegalAccessException x )
+			{
+				x.printStackTrace();
+			}
+
+			if( java )
+			{
+				JFrame.setDefaultLookAndFeelDecorated( true );
+				JDialog.setDefaultLookAndFeelDecorated( true );
+			}
+
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.lookAndFeel", java );
 		}
 	}
 

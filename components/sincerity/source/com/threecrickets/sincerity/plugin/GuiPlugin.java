@@ -27,8 +27,8 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
  * <ul>
  * <li><b>gui</b>: starts the Sincerity GUI, using all available plugins. Note
  * that this command can either run with a container or without one, in which
- * case it would prompt the user to create a new container. Use the --native
- * switch to set the native Look-and-Feel for Swing.</li>
+ * case it would prompt the user to create a new container. Use the --java
+ * switch for the cross-platform Java Look-and-Feel.</li>
  * </ul>
  * 
  * @author Tal Liron
@@ -69,8 +69,8 @@ public class GuiPlugin implements Plugin1
 
 			command.setParse( true );
 
-			boolean isNative = command.getSwitches().contains( "native" );
-			GuiUtil.setNativeLookAndFeel( isNative );
+			boolean java = command.getSwitches().contains( "java" );
+			GuiUtil.initLookAndFeel( java );
 
 			new Splash( new Runnable()
 			{
