@@ -67,16 +67,33 @@ public class GuiUtil
 
 	public static final ImageIcon COMMAND_ICON = new ImageIcon( GuiUtil.class.getResource( "control_play.png" ) );
 
-	public static void initLookAndFeel( boolean java )
+	public static void initLookAndFeel( String ui )
 	{
-		Boolean current = (Boolean) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.lookAndFeel" );
-		if( ( current == null ) || ( current.booleanValue() != java ) )
+		String current = (String) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.lookAndFeel" );
+		if( ( current == null ) || !current.equals( ui ) )
 		{
-			// See: http://bugs.sun.com/view_bug.do?bug_id=6742850
-			System.setProperty( "awt.useSystemAAFontSettings", "on" );
-			System.setProperty( "swing.aatext", "on" );
+			String lookAndFeel = null;
+			for( UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels() )
+			{
+				if( ui.equals( info.getName().toLowerCase() ) )
+				{
+					lookAndFeel = info.getClassName();
+					break;
+				}
+			}
 
-			String lookAndFeel = java ? "javax.swing.plaf.metal.MetalLookAndFeel" : UIManager.getSystemLookAndFeelClassName();
+			if( lookAndFeel == null )
+			{
+				// See: http://bugs.sun.com/view_bug.do?bug_id=6742850
+				System.setProperty( "awt.useSystemAAFontSettings", "lcd" );
+				System.setProperty( "swing.aatext", "on" );
+
+				lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+			}
+
+			JFrame.setDefaultLookAndFeelDecorated( true );
+			JDialog.setDefaultLookAndFeelDecorated( true );
+
 			try
 			{
 				UIManager.setLookAndFeel( lookAndFeel );
@@ -98,13 +115,7 @@ public class GuiUtil
 				x.printStackTrace();
 			}
 
-			if( java )
-			{
-				JFrame.setDefaultLookAndFeelDecorated( true );
-				JDialog.setDefaultLookAndFeelDecorated( true );
-			}
-
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.lookAndFeel", java );
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.lookAndFeel", ui );
 		}
 	}
 

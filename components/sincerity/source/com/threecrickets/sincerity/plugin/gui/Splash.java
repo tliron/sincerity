@@ -12,6 +12,7 @@
 package com.threecrickets.sincerity.plugin.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
@@ -41,9 +42,11 @@ public class Splash extends JWindow
 
 		this.runnable = runnable;
 
-		getContentPane().setLayout( new BorderLayout() );
 		JLabel title = new JLabel( "Starting Sincerity...", SwingConstants.CENTER );
 		title.setBorder( BorderFactory.createEmptyBorder( 20, 20, 0, 20 ) );
+
+		getContentPane().setLayout( new BorderLayout() );
+		getContentPane().setBackground( Color.WHITE );
 		getContentPane().add( title, BorderLayout.NORTH );
 		getContentPane().add( new JLabel( new ImageIcon( Splash.class.getResource( "sincerity.png" ) ) ), BorderLayout.CENTER );
 
