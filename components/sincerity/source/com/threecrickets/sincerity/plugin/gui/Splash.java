@@ -20,6 +20,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 
@@ -60,14 +61,21 @@ public class Splash extends JWindow
 	public void paint( Graphics g )
 	{
 		super.paint( g );
-		try
+		SwingUtilities.invokeLater( new Runnable()
 		{
-			runnable.run();
-		}
-		finally
-		{
-			dispose();
-		}
+			public void run()
+			{
+
+				try
+				{
+					runnable.run();
+				}
+				finally
+				{
+					dispose();
+				}
+			}
+		} );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

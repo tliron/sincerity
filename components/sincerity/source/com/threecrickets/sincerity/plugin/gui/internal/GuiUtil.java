@@ -69,31 +69,29 @@ public class GuiUtil
 	public static void setNativeLookAndFeel( boolean enabled )
 	{
 		// System.setProperty( "awt.useSystemAAFontSettings", "on" );
-		if( enabled )
+		String lookAndFeel = enabled ? UIManager.getSystemLookAndFeelClassName() : "javax.swing.plaf.metal.MetalLookAndFeel";
+		try
 		{
-			String lookAndFeel = UIManager.getSystemLookAndFeelClassName();
-			try
-			{
-				UIManager.setLookAndFeel( lookAndFeel );
-			}
-			catch( InstantiationException x )
-			{
-				x.printStackTrace();
-			}
-			catch( ClassNotFoundException x )
-			{
-				x.printStackTrace();
-			}
-			catch( UnsupportedLookAndFeelException x )
-			{
-				x.printStackTrace();
-			}
-			catch( IllegalAccessException x )
-			{
-				x.printStackTrace();
-			}
+			UIManager.setLookAndFeel( lookAndFeel );
 		}
-		else
+		catch( InstantiationException x )
+		{
+			x.printStackTrace();
+		}
+		catch( ClassNotFoundException x )
+		{
+			x.printStackTrace();
+		}
+		catch( UnsupportedLookAndFeelException x )
+		{
+			x.printStackTrace();
+		}
+		catch( IllegalAccessException x )
+		{
+			x.printStackTrace();
+		}
+
+		if( !enabled )
 		{
 			JFrame.setDefaultLookAndFeelDecorated( true );
 			JDialog.setDefaultLookAndFeelDecorated( true );
