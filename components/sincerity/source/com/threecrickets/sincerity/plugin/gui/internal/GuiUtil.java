@@ -67,28 +67,43 @@ public class GuiUtil
 
 	public static final ImageIcon COMMAND_ICON = new ImageIcon( GuiUtil.class.getResource( "control_play.png" ) );
 
+	public static final String GTK_LOOK_AND_FEEL = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+
+	public static String getLookAndFeel( String name )
+	{
+		if( !"native".equals( name ) )
+			for( UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels() )
+				if( name.equals( info.getName().toLowerCase() ) )
+					return info.getClassName();
+		return null;
+	}
+
 	public static void initLookAndFeel( String ui )
 	{
 		String current = (String) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.lookAndFeel" );
 		if( ( current == null ) || !current.equals( ui ) )
 		{
-			String lookAndFeel = null;
-			for( UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels() )
+			String lookAndFeel = getLookAndFeel( ui );
+
+			if( lookAndFeel == null )
 			{
-				if( ui.equals( info.getName().toLowerCase() ) )
+				// Default to native
+				lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+
+				// The GTK L&F is so broken that we will prefer anything else!
+				if( GTK_LOOK_AND_FEEL.equals( lookAndFeel ) )
 				{
-					lookAndFeel = info.getClassName();
-					break;
+					lookAndFeel = getLookAndFeel( "nimbus" );
+					if( lookAndFeel == null )
+						lookAndFeel = getLookAndFeel( "metal" );
 				}
 			}
 
-			if( lookAndFeel == null )
+			if( GTK_LOOK_AND_FEEL.equals( lookAndFeel ) )
 			{
 				// See: http://bugs.sun.com/view_bug.do?bug_id=6742850
 				System.setProperty( "awt.useSystemAAFontSettings", "lcd" );
 				System.setProperty( "swing.aatext", "on" );
-
-				lookAndFeel = UIManager.getSystemLookAndFeelClassName();
 			}
 
 			JFrame.setDefaultLookAndFeelDecorated( true );

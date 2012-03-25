@@ -28,8 +28,8 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
  * <li><b>gui</b>: starts the Sincerity GUI, using all available plugins. Note
  * that this command can either run with a container or without one, in which
  * case it would prompt the user to create a new container. Use the --ui=
- * property to change the Look-and-Feel. Nice options are "nimbus", "metal" and
- * "native".</li>
+ * property to change the Look-and-Feel. Some options are "native", "nimbus",
+ * "metal", "gtk+" and "cde/motif".</li>
  * </ul>
  * 
  * @author Tal Liron
