@@ -17,12 +17,15 @@ import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Dependencies;
@@ -73,6 +76,7 @@ public class DependenciesPane extends JPanel implements ItemListener
 		showLicensesCheckBox.addItemListener( this );
 
 		JPanel buttons = new JPanel();
+		buttons.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		buttons.add( includeSubCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
@@ -83,6 +87,8 @@ public class DependenciesPane extends JPanel implements ItemListener
 		buttons.add( showArtifactsCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( showPackageContentsCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( new JSeparator( SwingConstants.HORIZONTAL ) );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( new WrappedText( "Note that this list only reflects dependencies that have already been installed." ) );
 

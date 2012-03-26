@@ -11,8 +11,11 @@
 
 package com.threecrickets.sincerity.plugin.gui.internal;
 
+import java.awt.Color;
+
 import javax.swing.BorderFactory;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
 
 /**
  * Displays auto-wrapped text.
@@ -32,12 +35,18 @@ public class WrappedText extends JTextArea
 		setWrapStyleWord( true );
 		setAlignmentX( 0 );
 		setEditable( false );
-		setBackground( null );
-		setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
+		setBorder( border );
+		setBackground( background );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final long serialVersionUID = 1L;
+
+	private static final Border border = BorderFactory.createEmptyBorder();
+
+	// See:
+	// http://stackoverflow.com/questions/613603/java-nimbus-laf-with-transparent-text-fields
+	private static final Color background = new Color( 0, 0, 0, 0 );
 }

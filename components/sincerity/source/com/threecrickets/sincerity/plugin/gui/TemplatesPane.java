@@ -13,7 +13,6 @@ package com.threecrickets.sincerity.plugin.gui;
 
 import java.awt.BorderLayout;
 
-import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -51,11 +50,6 @@ public class TemplatesPane extends JPanel
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
-
-		JPanel buttons = new JPanel();
-		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
-
-		add( buttons, BorderLayout.EAST );
 
 		refresh();
 	}

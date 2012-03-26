@@ -19,13 +19,16 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Plugin1;
@@ -70,8 +73,11 @@ public class CommandsPane extends JPanel implements ItemListener, EnhancedNodeLi
 		groupByPluginCheckBox.addItemListener( this );
 
 		JPanel buttons = new JPanel();
+		buttons.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		buttons.add( groupByPluginCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( new JSeparator( SwingConstants.HORIZONTAL ) );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( new WrappedText( "Double click a command to run it." ) );
 

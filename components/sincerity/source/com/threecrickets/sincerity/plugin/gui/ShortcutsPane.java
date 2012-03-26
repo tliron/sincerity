@@ -16,6 +16,7 @@ import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -62,6 +63,7 @@ public class ShortcutsPane extends JPanel implements ItemListener
 		groupByTypeCheckBox.addItemListener( this );
 
 		JPanel buttons = new JPanel();
+		buttons.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		buttons.add( groupByTypeCheckBox );
 

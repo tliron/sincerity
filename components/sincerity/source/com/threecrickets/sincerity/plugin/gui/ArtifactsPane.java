@@ -20,12 +20,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -69,10 +72,13 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		showPackageContentsCheckBox.addItemListener( this );
 
 		JPanel buttons = new JPanel();
+		buttons.setBorder( BorderFactory.createEmptyBorder( 5, 5, 5, 5 ) );
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 		buttons.add( groupByTypeCheckBox );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( showPackageContentsCheckBox );
+		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
+		buttons.add( new JSeparator( SwingConstants.HORIZONTAL ) );
 		buttons.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
 		buttons.add( new WrappedText( "Note that this list only reflects artifacts that have been installed by Sincerity." ) );
 
