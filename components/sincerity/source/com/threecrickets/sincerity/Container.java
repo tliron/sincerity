@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ivy.Ivy;
@@ -278,6 +280,24 @@ public class Container implements IvyListener, TransferListener
 		if( path.startsWith( root ) )
 			path = path.substring( root.length() + 1 );
 		return path;
+	}
+
+	public List<String> getPrograms() throws SincerityException
+	{
+		ArrayList<String> programs = new ArrayList<String>();
+		File programsDir = getProgramsFile();
+		if( programsDir.isDirectory() )
+		{
+			for( File program : programsDir.listFiles() )
+			{
+				String name = program.getName();
+				int lastDot = name.lastIndexOf( '.' );
+				if( lastDot != -1 )
+					name = name.substring( 0, lastDot );
+				programs.add( name );
+			}
+		}
+		return programs;
 	}
 
 	//

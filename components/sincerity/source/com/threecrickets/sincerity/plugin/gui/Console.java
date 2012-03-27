@@ -71,7 +71,7 @@ public class Console extends JFrame implements Runnable, ActionListener
 
 		this.sincerity = sincerity;
 
-		setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+		setDefaultCloseOperation( DISPOSE_ON_CLOSE );
 		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
 
 		// Label

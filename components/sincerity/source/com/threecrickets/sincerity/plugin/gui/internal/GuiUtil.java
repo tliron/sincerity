@@ -341,6 +341,11 @@ public class GuiUtil
 		return new EnhancedNode( template, template.getName(), FILE_ICON );
 	}
 
+	public static EnhancedNode createProgramNode( String program ) throws SincerityException
+	{
+		return new EnhancedNode( program, program, COMMAND_ICON );
+	}
+
 	public static EnhancedNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();

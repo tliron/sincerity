@@ -112,9 +112,6 @@ public class CommandsPane extends JPanel implements ItemListener, EnhancedNodeLi
 			{
 				ArrayList<String> argumentList = new ArrayList<String>( Arrays.asList( arguments ) );
 				argumentList.add( 0, (String) value );
-				// argumentList.add( Command.COMMANDS_SEPARATOR );
-				// argumentList.add( "gui" + Command.PLUGIN_COMMAND_SEPARATOR +
-				// "gui" );
 				String[] argumentArray = argumentList.toArray( new String[argumentList.size()] );
 
 				sincerity.getFrame().toConsole();

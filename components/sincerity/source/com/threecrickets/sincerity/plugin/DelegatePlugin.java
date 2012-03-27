@@ -20,6 +20,7 @@ import com.threecrickets.scripturian.LanguageAdapter;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ScripturianShell;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -27,6 +28,7 @@ import com.threecrickets.sincerity.internal.ClassUtil;
 import com.threecrickets.sincerity.internal.Pipe;
 import com.threecrickets.sincerity.internal.ProcessDestroyer;
 import com.threecrickets.sincerity.internal.StringUtil;
+import com.threecrickets.sincerity.plugin.gui.ProgramsPane;
 
 /**
  * The delegate plugin supports the following commands:
@@ -43,9 +45,12 @@ import com.threecrickets.sincerity.internal.StringUtil;
  * <i>first</i> argument is "--background". The arguments otherwise will be sent
  * directly to the underlying operating system as a complete command. Note that
  * the process' stdout and stdin will be piped to Sincerity's stdout/stdin.</li>
+ * <li><b>programs</b>: prints out a list of all programs available in this
+ * container.</li>
  * <li><b>languages</b>: prints out a list of all languages supported by
  * Scripturian in this container.</li>
  * </ul>
+ * Additionally, this plugin adds a "Programs" tab to the GUI.
  * 
  * @author Tal Liron
  */
@@ -69,7 +74,7 @@ public class DelegatePlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"main", "start", "execute", "languages"
+			"main", "start", "execute", "programs", "languages"
 		};
 	}
 
@@ -151,11 +156,16 @@ public class DelegatePlugin implements Plugin1
 				throw new SincerityException( "Error executing system command: " + StringUtil.join( arguments, " " ), x );
 			}
 		}
+		else if( "programs".equals( commandName ) )
+		{
+			for( String program : command.getSincerity().getContainer().getPrograms() )
+				command.getSincerity().getOut().println( program );
+		}
 		else if( "languages".equals( commandName ) )
 		{
 			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
-				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( "name" ) );
+				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( "language.name" ) );
 		}
 		else
 			throw new UnknownCommandException( command );
@@ -163,5 +173,7 @@ public class DelegatePlugin implements Plugin1
 
 	public void gui( Command command ) throws SincerityException
 	{
+		Sincerity sincerity = command.getSincerity();
+		sincerity.getFrame().getTabs().add( "Programs", new ProgramsPane( sincerity ) );
 	}
 }
