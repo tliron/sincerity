@@ -21,12 +21,12 @@
 	<property name="distribution" value="./distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
 	<property name="distribution.libraries" value="${distribution.content}/libraries" />
-	<property name="distribution.jars" value="${distribution.libraries}/jars" />
+	<property name="distribution.jars" value="${distribution.libraries}/jars/${maven.group}/${maven.artifact}/${version}" />
 	<property name="distribution.jars.pattern" value="${distribution.jars}/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
-	<property name="distribution.api" value="${distribution.reference}/documentation/api" />
-	<property name="distribution.manual" value="${distribution.reference}/documentation/manual" />
-	<property name="distribution.source" value="${distribution.content}/reference/source" />
+	<property name="distribution.api" value="${distribution.reference}/api/${maven.group}/${maven.artifact}/${version}" />
+	<property name="distribution.manual" value="${distribution.reference}/manuals/${maven.group}/${maven.artifact}/${version}" />
+	<property name="distribution.source" value="${distribution.reference}/source/${maven.group}/${maven.artifact}/${version}" />
 	<property name="distribution.templates" value="${distribution.content}/templates" />
 
 	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
@@ -114,7 +114,7 @@
 
 <target name="libraries" depends="classes, version" description="Create jars">
 	<mkdir dir="${distribution.jars}" />
-	<jar destfile="${distribution.jars}/${maven.group}/${maven.artifact}/${version}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
+	<jar destfile="${distribution.jars}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
 	<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
 		<manifest>
 			<attribute name="Main-Class" value="com.threecrickets.bootstrap.Bootstrap" />
@@ -124,7 +124,7 @@
 
 <target name="distribution" depends="libraries, javadocs, manual" description="Assemble distribution">
 	<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
-	<copy todir="${distribution.source}/${maven.group}/${maven.artifact}/${version}">
+	<copy todir="${distribution.source}">
 		<fileset dir="${component.source}" />
 	</copy>
 	<copy todir="${distribution.content}">
