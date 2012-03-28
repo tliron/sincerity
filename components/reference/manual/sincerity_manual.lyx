@@ -125,29 +125,9 @@ Introduction
 \end_layout
 
 \begin_layout Standard
-Sincerity is a tool for deploying, installing and bootstrapping complex
- software stacks on top of the JVM.
- It aims at making these tedious tasks easy, simple and fun.
-\end_layout
-
-\begin_layout Standard
-And there's no 
-\begin_inset Quotes eld
-\end_inset
-
-Java-centric
-\begin_inset Quotes erd
-\end_inset
-
- discrimination here: Sincerity explicitly supports software written in
- languages such as Groovy, Clojure, Scala, JavaScript, Python, Ruby and
- PHP.
- It goes a step further in embracing the 
-\emph on
-culture
-\emph default
- surrounding these dynamic languages, an important part of what makes them
- so exciting and productive.
+Sincerity is a tool for deploying, installing and bootstrapping software
+ stacks on top of the JVM.
+ It makes these tedious tasks easy, simple and fun.
 \end_layout
 
 \begin_layout Standard
@@ -181,6 +161,26 @@ repository
  simple JavaScript code, and Sincerity's growing ecology of plugins makes
  it especially easy to add features such as centralized logging and robust
  daemons with surprisingly minimal fuss.
+\end_layout
+
+\begin_layout Standard
+And there's no 
+\begin_inset Quotes eld
+\end_inset
+
+Java-centric
+\begin_inset Quotes erd
+\end_inset
+
+ discrimination here: Sincerity explicitly supports software written in
+ languages such as Groovy, Clojure, Scala, JavaScript, Python, Ruby and
+ PHP.
+ It goes a step further in embracing the 
+\emph on
+culture
+\emph default
+ surrounding these dynamic languages, an important part of what makes them
+ so exciting and productive.
 \end_layout
 
 \begin_layout Section
@@ -4483,6 +4483,10 @@ sincerity use mycontainer : service restlet stop
 \end_layout
 
 \begin_layout Subsection
+Felix Skeleton
+\end_layout
+
+\begin_layout Subsection
 Prudence Skeleton
 \end_layout
 
@@ -5182,7 +5186,7 @@ And that's it: from here on, it's all standard Django goodness.
 \begin_inset CommandInset href
 LatexCommand href
 name "tutorial"
-target " https://docs.djangoproject.com/en/dev/intro/tutorial01/"
+target "https://docs.djangoproject.com/en/1.4/intro/tutorial01/"
 
 \end_inset
 

@@ -40,11 +40,12 @@ import com.threecrickets.sincerity.plugin.gui.ProgramsPane;
  * document URI: unless it starts with a "/", it is considered to be a URI
  * relative to "/programs/". All arguments (including the first one, which is
  * the URI) will be sent as is to the executable.</li>
- * <li><b>executes</b>: executes any system command as a separate process. This
- * command will block, waiting for the process to terminate, unless the the
- * <i>first</i> argument is "--background". The arguments otherwise will be sent
- * directly to the underlying operating system as a complete command. Note that
- * the process' stdout and stdin will be piped to Sincerity's stdout/stdin.</li>
+ * <li><b>execute</b>: executes a system executable as a separate process.
+ * Executables should be installed under "/executables/". This command will
+ * block, waiting for the process to terminate, unless the the <i>first</i>
+ * argument is "--background". The arguments otherwise will be sent directly to
+ * the underlying operating system as a complete command. Note that the process'
+ * stdout and stdin will be piped to Sincerity's stdout/stdin.</li>
  * <li><b>programs</b>: prints out a list of all programs available in this
  * container.</li>
  * <li><b>languages</b>: prints out a list of all languages supported by
