@@ -121,7 +121,81 @@ LatexCommand tableofcontents
 \end_layout
 
 \begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+Sincerity is a tool for deploying, installing and bootstrapping complex
+ software stacks on top of the JVM.
+ It aims at making these tedious tasks easy, simple and fun.
+\end_layout
+
+\begin_layout Standard
+And there's no 
+\begin_inset Quotes eld
+\end_inset
+
+Java-centric
+\begin_inset Quotes erd
+\end_inset
+
+ discrimination here: Sincerity explicitly supports software written in
+ languages such as Groovy, Clojure, Scala, JavaScript, Python, Ruby and
+ PHP.
+ It goes a step further in embracing the 
+\emph on
+culture
+\emph default
+ surrounding these dynamic languages, an important part of what makes them
+ so exciting and productive.
+\end_layout
+
+\begin_layout Standard
+From the user's perspective, Sincerity makes it easy to install complete
+ products and stacks, or individual modules and libraries, into portable
+ 
+\begin_inset Quotes eld
+\end_inset
+
+containers,
+\begin_inset Quotes erd
+\end_inset
+
+ which are nothing more than straightforward file directories.
+ According to your preferences and constraints, you can use either Sincerity's
+ pretty GUI or the powerful CLI.
+\end_layout
+
+\begin_layout Standard
+From the provider's perspective, Sincerity is distribution system: simply
+ host your packages in a 
+\begin_inset Quotes eld
+\end_inset
+
+repository
+\begin_inset Quotes erd
+\end_inset
+
+ (a simple web site) and let Sincerity do the rest.
+ Configuration and bootstrapping of applications is easily controlled via
+ simple JavaScript code, and Sincerity's growing ecology of plugins makes
+ it especially easy to add features such as centralized logging and robust
+ daemons with surprisingly minimal fuss.
+\end_layout
+
+\begin_layout Section
 Background
+\end_layout
+
+\begin_layout Standard
+Sincerity was born of many years of experience writing complex software
+ for the JVM.
+\end_layout
+
+\begin_layout Standard
+You can go ahead and just use it; it will feel quite natural and trivial.
+ However, what follows is some of the more complicated impetus behind it,
+ that can help you understand why a tool such as Sincerity became necessary.
 \end_layout
 
 \begin_layout Subsection
@@ -334,8 +408,8 @@ The above steps involve a lot of work.
 
 \begin_layout Standard
 This is not a new problem, and there are already a few solutions for it.
- For one, there is a straightforward standard for JVM repositories, iBiblio,
- which is widely used by many projects.
+ For one, there is a straightforward standard for JVM repositories, iBiblio/Mave
+n, which is widely used by many projects.
  But it requires you to use one of two tools: Ivy, which does a good job
  of downloading dependencies (and is used internally by Sincerity), but
  does nothing else, or Maven, which is a sophisticated, heavyweight project
@@ -933,7 +1007,7 @@ Both Sincerity and Maven handle downloading dependencies, but other than
  One way to think of this is that Maven could come first and Sincerity come
  second: Maven could help you build your project and repositories, while
  Sincerity would handle your deployment container.
- Maven wont't help you run your application: its output is jars of compiled
+ Maven won't help you run your application: its output is jars of compiled
  code, source code or documentation, and it doesn't handle their bootstrapping
  or runtime configuration.
  On the other hand, Sincerity does not build your project, nor does it make
@@ -5622,7 +5696,7 @@ The Three Crickets Repository
 \end_layout
 
 \begin_layout Subsubsection
-Maven Repositories
+iBiblio/Maven Repositories
 \end_layout
 
 \begin_layout Subsubsection
