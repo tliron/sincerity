@@ -1,0 +1,13 @@
+Standards-Version: 3.8.0
+Source: sincerity
+Section: devel
+Priority: optional
+Maintainer: Tal Liron <tal.liron@gmail.com>
+Build-Depends: cdbs (>=0.4.49), debhelper (>=5)
+
+Package: sincerity
+Architecture: any
+Homepage: http://threecrickets.com/sincerity/
+Depends: java6-runtime | java6-runtime-headless | java5-runtime | java5-runtime-headless
+Suggests: openjdk-6-jdk
+Description: Sincerity is a container and dependency manager for the JVM.

@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+DEB_DH_INSTALL_SOURCEDIR=content
+DEB_DH_SHLIBDEPS_ARGS_ALL='--exclude=jsvc'
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+
+# %:
+#	dh $@
