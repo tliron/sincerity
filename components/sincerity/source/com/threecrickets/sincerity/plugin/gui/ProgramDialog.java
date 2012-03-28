@@ -78,32 +78,33 @@ public class ProgramDialog extends JDialog implements ActionListener
 
 		if( sincerity.getPlugins().get( "service" ) != null )
 		{
-			JPanel service = new JPanel();
-			service.setAlignmentX( 0 );
-			service.setLayout( new BoxLayout( service, BoxLayout.LINE_AXIS ) );
+			// Service buttons
+			JPanel buttons = new JPanel();
+			buttons.setAlignmentX( 0 );
+			buttons.setLayout( new BoxLayout( buttons, BoxLayout.LINE_AXIS ) );
 			button = new JButton( "Start" );
 			button.setActionCommand( "start" );
 			button.addActionListener( this );
-			service.add( button );
+			buttons.add( button );
 			button = new JButton( "Stop" );
 			button.setActionCommand( "stop" );
 			button.addActionListener( this );
-			service.add( button );
+			buttons.add( button );
 			button = new JButton( "Restart" );
 			button.setActionCommand( "restart" );
 			button.addActionListener( this );
-			service.add( button );
+			buttons.add( button );
 			button = new JButton( "Status" );
 			button.setActionCommand( "status" );
 			button.addActionListener( this );
-			service.add( button );
+			buttons.add( button );
 
 			content.add( Box.createRigidArea( new Dimension( 0, 10 ) ) );
 			content.add( new JSeparator( SwingConstants.HORIZONTAL ) );
 			content.add( Box.createRigidArea( new Dimension( 0, 10 ) ) );
-			content.add( new JLabel( "Or, to run this program as a service/daemon:" ) );
+			content.add( new JLabel( "Or, to run this program as a background service:" ) );
 			content.add( Box.createRigidArea( new Dimension( 0, 5 ) ) );
-			content.add( service );
+			content.add( buttons );
 		}
 
 		pack();
