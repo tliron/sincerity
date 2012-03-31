@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>sincerity-distribution</artifactId>
+	<artifactId>sincerity-redistribution</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Plugin: Distribution</name>
-	<description>A Sincerity plugin that can package a container for distribution.</description>
+	<name>Sincerity Plugin: Redistribution</name>
+	<description>A Sincerity plugin that can package a container for redistribution.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 

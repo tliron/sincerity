@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/distribution</directory>
+			<directory>../../../../components/plugins/redistribution</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

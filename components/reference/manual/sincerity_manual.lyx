@@ -173,14 +173,100 @@ Java-centric
 \end_inset
 
  discrimination here: Sincerity explicitly supports software written in
- languages such as Groovy, Clojure, Scala, JavaScript, Python, Ruby and
- PHP.
+ Groovy, Clojure, Scala, JavaScript, Python, Ruby or PHP.
  It goes a step further in embracing the 
 \emph on
 culture
 \emph default
  surrounding these dynamic languages, an important part of what makes them
  so exciting and productive.
+\end_layout
+
+\begin_layout Subsection
+Painless Deployment
+\end_layout
+
+\begin_layout Standard
+Containers also make deployment of your application a piece of cake: just
+ copy your container directory to any JVM-enabled operating system and it
+ will run, pulling any missing dependencies if it needs them.
+\end_layout
+
+\begin_layout Standard
+Linux, BSD (OS X), OpenSolaris and Windows are explicitly supported with
+ carefully tailored scripts.
+\end_layout
+
+\begin_layout Standard
+Additionally, Sincerity has plugins to ease the pain of common deployment
+ headaches: use a simple command to configure your container for <i>all</i>
+ JVM logging frameworks, for remote management via JMX, and for running
+ your application as a daemon/service using Tanuki Java Service Wrapper,
+ Apache Daemon, or YASJW.
+ You can even add support for running in clusters ("grids" or "the cloud")
+ using Hazelcast: pre-configured and ready to scale out.
+\end_layout
+
+\begin_layout Standard
+When you're done, Sincerity plugins can also package and publish your libraries
+ and applications to your own private repository, or to public repositories
+ on the Internet.
+\end_layout
+
+\begin_layout Subsection
+Painless Deployment
+\end_layout
+
+\begin_layout Standard
+Three Crickets, the company behind Sincerity, maintains a collection of
+ quality plugins that do all the above, and the list keeps growing.
+\end_layout
+
+\begin_layout Standard
+Developing plugins is a piece of cake and you're strongly encouraged to
+ develop your own using the straightforward API.
+ The Sincerity Manual contains everything you need to know to get started.
+\end_layout
+
+\begin_layout Standard
+(For the central repository, we prefer to accept plugins written in JavaScript
+ or Java, in order to make them as lightweight, accessible and hackable
+ as possible.)
+\end_layout
+
+\begin_layout Subsection
+What Sincerity Stands For
+\end_layout
+
+\begin_layout Standard
+<p> After using used Sincerity for a while, you'll wonder how you could
+ ever have lived without it.
+ </p><p> Indeed, Sincerity arrives after years of us having to repeat the
+ same development and deployment tasks over and over again for every new
+ project: download, unzip, copy, rename and configure, hopefully while staying
+ organized as to dependencies and versions.
+ Solutions like Maven create their own problems: "enterprise"-style complexity,
+ enormous XML configuration files, and a Java-centrism that is becoming
+ a burden as more of us are developing for the JVM without Java.
+ </p><p> We decided that enough was enough! Sincerity intends: </p><ul>
+ <li>To simplify and unify the <b>installation</b> of JVM applications,
+ services and libraries.
+ You should never have to download idiosyncratic distributions and read
+ through pages of installation instructions.
+ A simpler recipe should be enough.</li> <li>To simplify and unify <b>deployment<
+/b> via the JVM.
+ It seems that every application and service has its own set of bootsrapping
+ scripts, service wrappers, logging configuration, directory structures,
+ etc.
+ We can't entirely smooth out the quirks, but we can make your deployment
+ experience consistent.</li> <li>To be <b>language agnostic</b>.
+ The JVM is no longer the domain of Java.
+ A rich ecosystem of languages has grown around it, and Sincerity lets you
+ manage installation and deployment without ever having to write or think
+ in Java if you don't want to.</li> <li>To be <b>culturally agnostic</b>.
+ The JVM is no longer the domain of enterprise applications.
+ If you think and work like an agile Internet startup, Sincerity is here
+ for you.</li> </ul>
 \end_layout
 
 \begin_layout Section
