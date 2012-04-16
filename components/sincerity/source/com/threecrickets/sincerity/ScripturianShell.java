@@ -50,15 +50,21 @@ public class ScripturianShell implements Shell
 
 	public ScripturianShell( Container container, File sourceDir, boolean prepare, String... arguments ) throws SincerityException
 	{
-		this.container = container;
-		languageManager = container.getLanguageManager();
 		if( sourceDir == null )
 			sourceDir = container.getRoot();
-		source = new DocumentFileSource<Executable>( "container/", sourceDir, "default", "js", 1000 );
+
+		this.container = container;
+		this.arguments = arguments;
+
+		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "container/", sourceDir, "default", "js", 1000 );
 		librarySources.add( new DocumentFileSource<Executable>( "container/libraries/scripturian/", container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
 		librarySources.add( new DocumentFileSource<Executable>( "sincerity/", container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );
-		this.prepare = prepare;
-		this.arguments = arguments;
+
+		parsingContext = new ParsingContext();
+		parsingContext.setLanguageManager( container.getLanguageManager() );
+		parsingContext.setDocumentSource( source );
+		parsingContext.setDefaultLanguageTag( "javascript" );
+		parsingContext.setPrepare( prepare );
 	}
 
 	//
@@ -69,7 +75,7 @@ public class ScripturianShell implements Shell
 	{
 		ExecutionContext executionContext = new ExecutionContext( container.getSincerity().getOut(), container.getSincerity().getErr() );
 		DocumentService documentService = new DocumentService( this, executionContext );
-		documentService.setDefaultLanguageTag( "javascript" );
+		documentService.setDefaultLanguageTag( parsingContext.getDefaultLanguageTag() );
 		executionContext.getServices().put( "document", documentService );
 		executionContext.getServices().put( "application", new ApplicationService( this ) );
 		executionContext.getServices().put( "sincerity", container.getSincerity() );
@@ -111,12 +117,6 @@ public class ScripturianShell implements Shell
 
 	public Executable makeEnterable( String documentName, String enteringKey ) throws SincerityException
 	{
-		ParsingContext parsingContext = new ParsingContext();
-		parsingContext.setLanguageManager( languageManager );
-		parsingContext.setDocumentSource( source );
-		parsingContext.setDefaultLanguageTag( "javascript" );
-		parsingContext.setPrepare( prepare );
-
 		boolean enterable = false;
 		ExecutionContext executionContext = createExecutionContext();
 		try
@@ -182,17 +182,17 @@ public class ScripturianShell implements Shell
 
 	public LanguageManager getLanguageManager()
 	{
-		return languageManager;
+		return parsingContext.getLanguageManager();
 	}
 
 	public boolean isPrepare()
 	{
-		return prepare;
+		return parsingContext.isPrepare();
 	}
 
 	public DocumentSource<Executable> getSource()
 	{
-		return source;
+		return parsingContext.getDocumentSource();
 	}
 
 	public CopyOnWriteArrayList<DocumentSource<Executable>> getLibrarySources()
@@ -212,11 +212,7 @@ public class ScripturianShell implements Shell
 
 	private final String[] arguments;
 
-	private final LanguageManager languageManager;
-
-	private final boolean prepare;
-
-	private final DocumentSource<Executable> source;
+	private final ParsingContext parsingContext;
 
 	private final CopyOnWriteArrayList<DocumentSource<Executable>> librarySources = new CopyOnWriteArrayList<DocumentSource<Executable>>();
 

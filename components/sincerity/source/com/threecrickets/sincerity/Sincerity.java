@@ -222,7 +222,9 @@ public class Sincerity implements Runnable
 		if( out == null )
 		{
 			out = new PrintWriter( new OutputStreamWriter( System.out ), true );
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
+			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.out", out );
+			if( existing != null )
+				out = existing;
 		}
 
 		return out;
@@ -241,7 +243,9 @@ public class Sincerity implements Runnable
 		if( err == null )
 		{
 			err = new PrintWriter( new OutputStreamWriter( System.err ), true );
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
+			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.err", err );
+			if( existing != null )
+				err = existing;
 		}
 
 		return err;
