@@ -16,25 +16,30 @@ public class SincerityNature implements IProjectNature
 	// IProjectNature
 	//
 
-	@Override
 	public void configure() throws CoreException
 	{
+		try
+		{
+			SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( SincerityNature.class.getClassLoader() );
+			sincerityBoostrap.main( "container:create", "--force", project.getLocation().toOSString() );
+		}
+		catch( Exception x )
+		{
+			x.printStackTrace();
+		}
 		EclipseUtil.addBuilder( project, SincerityBuilder.ID );
 	}
 
-	@Override
 	public void deconfigure() throws CoreException
 	{
 		EclipseUtil.removeBuilder( project, SincerityBuilder.ID );
 	}
 
-	@Override
 	public IProject getProject()
 	{
 		return project;
 	}
 
-	@Override
 	public void setProject( IProject project )
 	{
 		this.project = project;

@@ -16,7 +16,6 @@ public class ConvertActionDelegate implements IObjectActionDelegate
 	// IObjectActionDelegate
 	//
 
-	@Override
 	public void run( IAction action )
 	{
 		System.out.println( "Converting..." );
@@ -36,7 +35,6 @@ public class ConvertActionDelegate implements IObjectActionDelegate
 		// "Hello, Eclipse world" );
 	}
 
-	@Override
 	public void selectionChanged( IAction action, ISelection selection )
 	{
 		projects.clear();
@@ -57,7 +55,6 @@ public class ConvertActionDelegate implements IObjectActionDelegate
 		}
 	}
 
-	@Override
 	public void setActivePart( IAction action, IWorkbenchPart workbenchPart )
 	{
 	}
