@@ -25,11 +25,4 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>src</name>
-			<type>2</type>
-			<location>/Depot/Projects/Collaborative/Sincerity/components/eclipse-plugin/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>

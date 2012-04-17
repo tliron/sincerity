@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
-public class ConvertActionDelegate implements IObjectActionDelegate
+public class SincerityConvertCommand implements IObjectActionDelegate
 {
 	//
 	// IObjectActionDelegate

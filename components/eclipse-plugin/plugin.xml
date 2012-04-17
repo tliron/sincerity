@@ -17,7 +17,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="com.threecrickets.sincerity.eclipse.SincerityCommandHandler"
+            class="com.threecrickets.sincerity.eclipse.SincerityGuiCommand"
             commandId="com.threecrickets.sincerity.commands.gui">
       </handler>
    </extension>
@@ -48,11 +48,11 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="com.threecrickets.sincerity.toolbars.sampleToolbar">
+               id="com.threecrickets.sincerity.toolbar">
             <command
                   commandId="com.threecrickets.sincerity.commands.gui"
-                  icon="icons/sample.gif"
-                  id="com.threecrickets.sincerity.toolbars.sampleCommand"
+                  icon="icons/sincerity.png"
+                  id="com.threecrickets.sincerity.toolbar.gui"
                   tooltip="Say hello world">
             </command>
          </toolbar>
@@ -68,7 +68,7 @@
                id="com.threecrickets.sincerity.commands.gui"
                label="Convert to Sincerity container"
                menubarPath="org.eclipse.ui.projectConfigure/additions"
-               class="com.threecrickets.sincerity.eclipse.ConvertActionDelegate">
+               class="com.threecrickets.sincerity.eclipse.SincerityConvertCommand">
          </action>
          <visibility>
          	<not>
@@ -97,4 +97,10 @@
       	</run>
       </builder>
 </extension>
+   <extension
+       point="org.eclipse.jdt.core.classpathContainerInitializer">
+      <classpathContainerInitializer
+          id="com.threecrickets.sincerity.classpathContainer"
+          class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerInitializer"/>
+   </extension>
 </plugin>

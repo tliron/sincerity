@@ -3,6 +3,8 @@ package com.threecrickets.sincerity.eclipse;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 public class SincerityNature implements IProjectNature
 {
@@ -21,12 +23,20 @@ public class SincerityNature implements IProjectNature
 		try
 		{
 			SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( SincerityNature.class.getClassLoader() );
-			sincerityBoostrap.main( "container:create", "--force", project.getLocation().toOSString() );
+			sincerityBoostrap.main( "container:create", "--force", project.getLocation().toOSString(), "dev" );
 		}
 		catch( Exception x )
 		{
 			x.printStackTrace();
 		}
+
+		if( !project.hasNature( JavaCore.NATURE_ID ) )
+			throw new CoreException( null );
+
+		IJavaProject javaProject = JavaCore.create( project );
+		SincerityClasspathContainer container = new SincerityClasspathContainer( project );
+		EclipseUtil.addClasspathContainer( javaProject, container );
+
 		EclipseUtil.addBuilder( project, SincerityBuilder.ID );
 	}
 

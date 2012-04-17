@@ -9,6 +9,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.IClasspathContainer;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
@@ -99,5 +105,28 @@ public class EclipseUtil
 				return;
 			}
 		}
+	}
+
+	public static void addClasspathContainer( IJavaProject project, IClasspathContainer container ) throws JavaModelException
+	{
+		IClasspathEntry[] entries = project.getRawClasspath();
+
+		for( IClasspathEntry entry : entries )
+			if( ( entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER ) && ( entry.getPath().equals( container.getPath() ) ) )
+				return;
+
+		JavaCore.setClasspathContainer( SincerityClasspathContainer.ID, new IJavaProject[]
+		{
+			project
+		}, new IClasspathContainer[]
+		{
+			container
+		}, null );
+
+		IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
+		System.arraycopy( entries, 0, newEntries, 0, entries.length );
+		newEntries[entries.length] = JavaCore.newContainerEntry( container.getPath() );
+
+		project.setRawClasspath( newEntries, new NullProgressMonitor() );
 	}
 }
