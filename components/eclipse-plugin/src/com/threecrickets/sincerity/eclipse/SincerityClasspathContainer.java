@@ -26,7 +26,18 @@ public class SincerityClasspathContainer implements IClasspathContainer
 
 	public SincerityClasspathContainer( IProject project )
 	{
-		this.project = project;
+		jarsDir = new File( new File( project.getLocation().toFile(), "libraries" ), "jars" );
+	}
+
+	//
+	// Attributes
+	//
+
+	public boolean has( File file )
+	{
+		String path = file.getPath();
+		String jarsPath = jarsDir.getPath() + File.separatorChar;
+		return path.startsWith( jarsPath );
 	}
 
 	//
@@ -53,22 +64,27 @@ public class SincerityClasspathContainer implements IClasspathContainer
 		ArrayList<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
 
 		ArrayList<File> jars = new ArrayList<File>();
-		File libraries = new File( project.getLocation().toFile(), "libraries" );
-		addJars( libraries, jars );
+		addJars( jarsDir, jars );
+		// TODO: sources and javadocs?
 		for( File jar : jars )
 		{
-			IClasspathEntry entry = JavaCore.newLibraryEntry( new Path( jar.getAbsolutePath() ), null, new Path( "/" ), new IAccessRule[0], null, false );
+			IClasspathEntry entry = JavaCore.newLibraryEntry( new Path( jar.getAbsolutePath() ), null, ROOT_PATH, new IAccessRule[0], null, false );
 			entries.add( entry );
 		}
 
 		return entries.toArray( new IClasspathEntry[entries.size()] );
 	}
 
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
 	private final static int KIND = IClasspathContainer.K_APPLICATION;
 
 	private final static String DESCRIPTION = "Sincerity Libraries";
 
-	private final IProject project;
+	private final static Path ROOT_PATH = new Path( "/" );
+
+	private final File jarsDir;
 
 	private static void addJars( File file, Collection<File> jars )
 	{

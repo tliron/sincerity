@@ -9,7 +9,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -128,5 +131,15 @@ public class EclipseUtil
 		newEntries[entries.length] = JavaCore.newContainerEntry( container.getPath() );
 
 		project.setRawClasspath( newEntries, new NullProgressMonitor() );
+	}
+
+	public static void log( ILog log, String id, int severity, Throwable x )
+	{
+		log.log( new Status( severity, id, IStatus.OK, x.getMessage(), x ) );
+	}
+
+	public static void log( ILog log, String id, int severity, String message )
+	{
+		log.log( new Status( severity, id, IStatus.OK, message, null ) );
 	}
 }

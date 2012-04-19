@@ -3,6 +3,7 @@ package com.threecrickets.sincerity.eclipse;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -27,7 +28,7 @@ public class SincerityNature implements IProjectNature
 		}
 		catch( Exception x )
 		{
-			x.printStackTrace();
+			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 		}
 
 		if( !project.hasNature( JavaCore.NATURE_ID ) )

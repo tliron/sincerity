@@ -8,6 +8,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.IStatus;
+
 public class SincerityBootstrap extends URLClassLoader
 {
 	//
@@ -33,7 +35,7 @@ public class SincerityBootstrap extends URLClassLoader
 		}
 		catch( Exception x )
 		{
-			x.printStackTrace();
+			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 		}
 	}
 

@@ -6,6 +6,7 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -42,7 +43,7 @@ public class SincerityGuiCommand extends AbstractHandler
 			}
 			catch( Exception x )
 			{
-				x.printStackTrace();
+				SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 			}
 		}
 

@@ -1,9 +1,10 @@
 package com.threecrickets.sincerity.eclipse;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class Activator extends AbstractUIPlugin
+public class SincerityPlugin extends AbstractUIPlugin
 {
 	//
 	// Constants
@@ -12,10 +13,26 @@ public class Activator extends AbstractUIPlugin
 	public static final String ID = "com.threecrickets.sincerity";
 
 	//
+	// Static attributes
+	//
+
+	public static SimpleLog getSimpleLog()
+	{
+		if( log == null )
+			log = new SimpleLog( ID );
+		return log;
+	}
+
+	public static SincerityPlugin getDefault()
+	{
+		return plugin;
+	}
+
+	//
 	// Construction
 	//
 
-	public Activator()
+	public SincerityPlugin()
 	{
 	}
 
@@ -28,7 +45,7 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start( context );
 		plugin = this;
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SINCERITY ACTIVATOR");
+		getSimpleLog().log( IStatus.INFO, "Sincerity plugin started" );
 	}
 
 	@Override
@@ -36,15 +53,13 @@ public class Activator extends AbstractUIPlugin
 	{
 		plugin = null;
 		super.stop( context );
-	}
-
-	public static Activator getDefault()
-	{
-		return plugin;
+		getSimpleLog().log( IStatus.INFO, "Sincerity plugin stopped" );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static Activator plugin;
+	private static SincerityPlugin plugin;
+
+	private static SimpleLog log;
 }

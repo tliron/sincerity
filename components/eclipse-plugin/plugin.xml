@@ -102,5 +102,14 @@
       <classpathContainerInitializer
           id="com.threecrickets.sincerity.classpathContainer"
           class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerInitializer"/>
-   </extension>
+</extension>
+<extension
+     point="org.eclipse.jdt.ui.javaElementFilters">
+     <filter
+           id="com.threecrickets.sincerity.classpathContainerFilter"
+           targetId="org.eclipse.jdt.ui.PackageExplorer"
+           enabled="true"
+           name="Sincerity Container Classpath Filter"
+           class="com.threecrickets.sincerity.eclipse.SincerityClasspathFilter"/>
+</extension>
 </plugin>
