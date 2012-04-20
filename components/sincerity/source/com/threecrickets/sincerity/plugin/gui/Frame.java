@@ -52,7 +52,7 @@ public class Frame extends JFrame implements Runnable
 
 		this.sincerity = sincerity;
 
-		setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
 
 		tabs = new JTabbedPane();

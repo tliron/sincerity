@@ -1,66 +1,37 @@
 package com.threecrickets.sincerity.eclipse;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IAction;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class SincerityConvertCommand implements IObjectActionDelegate
+public class SincerityConvertCommand extends AbstractHandler
 {
 	//
-	// IObjectActionDelegate
+	// AbstractHandler
 	//
 
-	public void run( IAction action )
+	public Object execute( ExecutionEvent event ) throws ExecutionException
 	{
-		System.out.println( "Converting..." );
-		for( IProject project : projects )
+		ISelection selection = HandlerUtil.getCurrentSelection( event );
+
+		try
 		{
-			try
+			for( IProject project : EclipseUtil.getSelectedProjects( selection, false, SincerityNature.ID ) )
 			{
 				EclipseUtil.addNature( project, SincerityNature.ID );
+				SincerityPlugin.getSimpleLog().log( IStatus.INFO, "Convert to Sincerity container: " + project );
 			}
-			catch( CoreException x )
-			{
-				x.printStackTrace();
-			}
-			System.out.println( "Convert to Sincerity container: " + project );
 		}
-		// MessageDialog.openInformation( null, "Sincerity",
-		// "Hello, Eclipse world" );
-	}
-
-	public void selectionChanged( IAction action, ISelection selection )
-	{
-		projects.clear();
-		for( IProject project : EclipseUtil.getSelectedProjects( selection ) )
+		catch( CoreException x )
 		{
-			try
-			{
-				if( project.getNature( SincerityNature.ID ) == null )
-				{
-					projects.add( project );
-					System.out.println( "Added project: " + project );
-				}
-			}
-			catch( CoreException x )
-			{
-				x.printStackTrace();
-			}
+			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 		}
+
+		return null;
 	}
-
-	public void setActivePart( IAction action, IWorkbenchPart workbenchPart )
-	{
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	private final List<IProject> projects = new ArrayList<IProject>();
 }

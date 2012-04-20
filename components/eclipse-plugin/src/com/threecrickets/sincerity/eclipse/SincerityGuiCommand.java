@@ -10,41 +10,28 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-/**
- * Our sample handler extends AbstractHandler, an IHandler base class.
- * 
- * @see org.eclipse.core.commands.IHandler
- * @see org.eclipse.core.commands.AbstractHandler
- */
 public class SincerityGuiCommand extends AbstractHandler
 {
-	/**
-	 * The constructor.
-	 */
-	public SincerityGuiCommand()
-	{
-	}
+	//
+	// AbstractHandler
+	//
 
-	/**
-	 * the command has been executed, so extract extract the needed information
-	 * from the application context.
-	 */
 	public Object execute( ExecutionEvent event ) throws ExecutionException
 	{
 		ISelection selection = HandlerUtil.getCurrentSelection( event );
-		List<IProject> projects = EclipseUtil.getSelectedProjects( selection );
-		if( projects.size() == 1 )
+		try
 		{
-			IProject project = projects.get( 0 );
-			try
+			List<IProject> projects = EclipseUtil.getSelectedProjects( selection, true, null );
+			if( projects.size() == 1 )
 			{
-				SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( SincerityNature.class.getClassLoader() );
+				IProject project = projects.get( 0 );
+				SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( getClass().getClassLoader() );
 				sincerityBoostrap.main( "container:use", project.getLocation().toOSString(), ":", "gui:gui" );
 			}
-			catch( Exception x )
-			{
-				SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
-			}
+		}
+		catch( Exception x )
+		{
+			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 		}
 
 		// IWorkbenchWindow window =

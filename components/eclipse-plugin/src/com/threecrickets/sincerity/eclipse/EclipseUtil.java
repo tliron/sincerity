@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 public class EclipseUtil
 {
-	public static List<IProject> getSelectedProjects( ISelection selection )
+	public static List<IProject> getSelectedProjects( ISelection selection, boolean hasNature, String nature ) throws CoreException
 	{
 		ArrayList<IProject> projects = new ArrayList<IProject>();
 		if( selection instanceof IStructuredSelection )
@@ -34,7 +34,7 @@ public class EclipseUtil
 				if( object instanceof IAdaptable )
 				{
 					IProject project = (IProject) ( (IAdaptable) object ).getAdapter( IProject.class );
-					if( project != null )
+					if( ( project != null ) && ( ( nature == null ) || ( hasNature ? project.getNature( nature ) != null : project.getNature( nature ) == null ) ) )
 						projects.add( project );
 				}
 			}
