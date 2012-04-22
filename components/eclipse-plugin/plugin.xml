@@ -2,16 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-<extension
-	point="org.eclipse.ui.bindings">
-	<key
-		commandId="com.threecrickets.sincerity.commands.gui"
-		contextId="org.eclipse.ui.contexts.window"
-		schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-		sequence="M1+6">
-	</key>
-</extension>
-
 <!-- Menus -->
    
 <extension
@@ -20,8 +10,8 @@
 		locationURI="menu:project?after=projectProperties"
 		adaptable="true">
 		<command
-			commandId="com.threecrickets.sincerity.commands.gui"
-			id="com.threecrickets.sincerity.menu.gui"
+			id="com.threecrickets.sincerity.menu.window"
+			commandId="com.threecrickets.sincerity.commands.open"
 			mnemonic="S">
 			<visibleWhen checkEnabled="true"/>
 		</command>
@@ -32,10 +22,10 @@
 		<toolbar
 			id="com.threecrickets.sincerity.toolbar">
 			<command
-				commandId="com.threecrickets.sincerity.commands.gui"
+				id="com.threecrickets.sincerity.toolbar.window"
+				commandId="com.threecrickets.sincerity.commands.open"
 				icon="icons/sincerity.png"
-				id="com.threecrickets.sincerity.toolbar.gui"
-				tooltip="Say hello world">
+				tooltip="Open Sincerity window for this project">
 			</command>
 		</toolbar>
 	</menuContribution>
@@ -43,8 +33,8 @@
 		locationURI="popup:org.eclipse.ui.projectConfigure?after=additions"
 		adaptable="true">
 		<command
-			commandId="com.threecrickets.sincerity.commands.convert"
-			id="com.threecrickets.sincerity.popup.convert">
+			id="com.threecrickets.sincerity.popup.convert"
+			commandId="com.threecrickets.sincerity.commands.convert">
 			<visibleWhen checkEnabled="true"/>
 		</command>
 	</menuContribution>
@@ -58,7 +48,7 @@
 		objectClass="org.eclipse.core.resources.IProject"
 		adaptable="true">
 		<action
-			id="com.threecrickets.sincerity.commands.gui"
+			id="com.threecrickets.sincerity.commands.open"
 			label="Convert to Sincerity container"
 			menubarPath="org.eclipse.ui.projectConfigure/additions"
 			class="com.threecrickets.sincerity.eclipse.SincerityConvertCommandHandler">
@@ -84,12 +74,17 @@
    	</page>
 </extension>
 
+<extension
+	point="org.eclipse.core.runtime.preferences">
+	<initializer class="com.threecrickets.sincerity.eclipse.SincerityPreferencesInitializer"/>
+</extension>
+
 <!-- Project Nature and Builder -->
 
 <extension
+	point="org.eclipse.core.resources.natures"
 	id="container"
-	name="Sincerity Container Nature"
-	point="org.eclipse.core.resources.natures">
+	name="Sincerity Container Nature">
 	<runtime>
 		<run class="com.threecrickets.sincerity.eclipse.SincerityNature"/> 
 	</runtime>
@@ -101,9 +96,9 @@
 	schema="schema/org.eclipse.core.resources.natures.exsd"/>
 
 <extension
+	point="org.eclipse.core.resources.builders"
 	id="builder"
-	name="Sincerity Builder"
-	point="org.eclipse.core.resources.builders">
+	name="Sincerity Builder">
 	<builder>
 		<run class="com.threecrickets.sincerity.eclipse.SincerityBuilder">
 			<parameter name="optimize" value="true"/>
@@ -141,21 +136,21 @@
 	</category>
 	<command
 		categoryId="com.threecrickets.sincerity.commands"
-		id="com.threecrickets.sincerity.commands.gui"
-		name="Sincerity GUI">
+		id="com.threecrickets.sincerity.commands.open"
+		name="Sincerity">
 	</command>
 	<command
 		categoryId="com.threecrickets.sincerity.commands"
 		id="com.threecrickets.sincerity.commands.convert"
-		name="Convert to Sincerity container">
+		name="Convert to Sincerity container...">
 	</command>
 </extension>
    
 <extension
 	point="org.eclipse.ui.handlers">
 	<handler
-		class="com.threecrickets.sincerity.eclipse.SincerityGuiCommand"
-		commandId="com.threecrickets.sincerity.commands.gui">
+		class="com.threecrickets.sincerity.eclipse.SincerityOpenCommand"
+		commandId="com.threecrickets.sincerity.commands.open">
 		<enabledWhen>
 			<iterate>
 				<adapt type="org.eclipse.core.resources.IProject">

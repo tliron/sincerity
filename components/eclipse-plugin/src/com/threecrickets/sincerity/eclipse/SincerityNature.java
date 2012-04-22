@@ -23,20 +23,21 @@ public class SincerityNature implements IProjectNature
 	{
 		try
 		{
-			SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( SincerityNature.class.getClassLoader() );
+			SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( getClass().getClassLoader() );
 			sincerityBoostrap.main( "container:create", "--force", project.getLocation().toOSString(), "dev" );
 		}
 		catch( Exception x )
 		{
 			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
+			return;
 		}
 
-		if( !project.hasNature( JavaCore.NATURE_ID ) )
-			throw new CoreException( null );
-
-		IJavaProject javaProject = JavaCore.create( project );
-		SincerityClasspathContainer container = new SincerityClasspathContainer( project );
-		EclipseUtil.addClasspathContainer( javaProject, container );
+		if( project.hasNature( JavaCore.NATURE_ID ) )
+		{
+			IJavaProject javaProject = JavaCore.create( project );
+			SincerityClasspathContainer container = new SincerityClasspathContainer( project );
+			EclipseUtil.addClasspathContainer( javaProject, container );
+		}
 
 		EclipseUtil.addBuilder( project, SincerityBuilder.ID );
 	}

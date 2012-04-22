@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class SincerityGuiCommand extends AbstractHandler
+public class SincerityOpenCommand extends AbstractHandler
 {
 	//
 	// AbstractHandler
