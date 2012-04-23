@@ -5,7 +5,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaMainTab;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
 import com.threecrickets.sincerity.eclipse.internal.SincerityBootstrap;
@@ -28,11 +27,13 @@ public class SincerityLaunchTab extends JavaMainTab
 	public void createControl( Composite parent )
 	{
 		super.createControl( parent );
+
+		// Hide the "main class" control group
+		// (This is awkward, but there is no other way to reuse the
+		// functionality of JavaMainTab)
 		Composite composite = (Composite) parent.getChildren()[0];
 		Group mainGroup = (Group) composite.getChildren()[2];
 		mainGroup.setVisible( false );
-		for( Control c : mainGroup.getChildren() )
-			System.out.println( c );
 	}
 
 	@Override
