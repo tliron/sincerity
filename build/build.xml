@@ -10,7 +10,7 @@
 	<property name="scripts" value="../components/scripts" />
 	<property name="sincerity-javascript-library" value="../components/sincerity-javascript-library" />
 	<property name="templates" value="../components/templates" />
-	<property name="eclipsePlugin" value="../components/eclipse-plugin" />
+	<property name="eclipsePlugin" value="../components/eclipse-plugin/plugin" />
 	<property name="agent" value="../components/firewall-friendly-agent" />
 
 	<property name="dependencies" value="../dependencies" />
