@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
-public class ClassUtil
+public abstract class ClassUtil
 {
 	//
 	// Static operations
@@ -70,5 +70,12 @@ public class ClassUtil
 		{
 			throw new SincerityException( x.getCause().getMessage(), x.getCause() );
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private ClassUtil()
+	{
 	}
 }

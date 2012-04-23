@@ -7,7 +7,7 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
-public class SincerityClasspathContainerInitializer extends ClasspathContainerInitializer
+public class SinceritySharedClasspathContainerInitializer extends ClasspathContainerInitializer
 {
 	//
 	// ClasspathContainerInitializer
@@ -16,7 +16,7 @@ public class SincerityClasspathContainerInitializer extends ClasspathContainerIn
 	@Override
 	public void initialize( IPath path, IJavaProject project ) throws CoreException
 	{
-		SincerityClasspathContainer container = new SincerityClasspathContainer( project.getProject() );
+		SinceritySharedClasspathContainer container = new SinceritySharedClasspathContainer();
 		JavaCore.setClasspathContainer( path, new IJavaProject[]
 		{
 			project

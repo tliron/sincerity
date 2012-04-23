@@ -1,4 +1,4 @@
-package com.threecrickets.sincerity.eclipse;
+package com.threecrickets.sincerity.eclipse.internal;
 
 import org.eclipse.osgi.util.NLS;
 
@@ -17,11 +17,9 @@ public abstract class Messages extends NLS
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static final String BUNDLE_NAME = "com.threecrickets.sincerity.eclipse.messages";
-
 	static
 	{
-		NLS.initializeMessages( BUNDLE_NAME, Messages.class );
+		NLS.initializeMessages( Messages.class.getPackage().getName() + ".messages", Messages.class );
 	}
 
 	private Messages()

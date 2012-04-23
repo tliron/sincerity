@@ -11,7 +11,7 @@
 
 package com.threecrickets.sincerity.internal;
 
-public class TreeUtil
+public abstract class TreeUtil
 {
 	//
 	// Constants
@@ -34,4 +34,11 @@ public class TreeUtil
 	public static final String LVV = L + VV;
 
 	public static final String TVV = T + VV;
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private TreeUtil()
+	{
+	}
 }

@@ -10,6 +10,10 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 public class SincerityClasspathFilter extends ViewerFilter
 {
+	//
+	// ViewerFilter
+	//
+
 	@Override
 	public boolean select( Viewer viewer, Object parentElement, Object element )
 	{

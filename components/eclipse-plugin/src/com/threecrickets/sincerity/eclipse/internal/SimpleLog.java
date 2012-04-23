@@ -1,4 +1,4 @@
-package com.threecrickets.sincerity.eclipse;
+package com.threecrickets.sincerity.eclipse.internal;
 
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;

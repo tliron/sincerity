@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import com.threecrickets.sincerity.eclipse.internal.EclipseUtil;
+
 public class SincerityConvertCommand extends AbstractHandler
 {
 	//

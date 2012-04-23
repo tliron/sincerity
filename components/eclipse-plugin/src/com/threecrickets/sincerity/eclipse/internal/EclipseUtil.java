@@ -1,4 +1,4 @@
-package com.threecrickets.sincerity.eclipse;
+package com.threecrickets.sincerity.eclipse.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +21,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-public class EclipseUtil
+import com.threecrickets.sincerity.eclipse.SincerityClasspathContainer;
+
+public abstract class EclipseUtil
 {
 	public static List<IProject> getSelectedProjects( ISelection selection, boolean hasNature, String nature ) throws CoreException
 	{
@@ -141,5 +143,12 @@ public class EclipseUtil
 	public static void log( ILog log, String id, int severity, String message )
 	{
 		log.log( new Status( severity, id, IStatus.OK, message, null ) );
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private EclipseUtil()
+	{
 	}
 }

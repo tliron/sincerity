@@ -7,6 +7,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
+import com.threecrickets.sincerity.eclipse.internal.EclipseUtil;
+import com.threecrickets.sincerity.eclipse.internal.SincerityBootstrap;
+
 public class SincerityNature implements IProjectNature
 {
 	//
@@ -35,8 +38,8 @@ public class SincerityNature implements IProjectNature
 		if( project.hasNature( JavaCore.NATURE_ID ) )
 		{
 			IJavaProject javaProject = JavaCore.create( project );
-			SincerityClasspathContainer container = new SincerityClasspathContainer( project );
-			EclipseUtil.addClasspathContainer( javaProject, container );
+			EclipseUtil.addClasspathContainer( javaProject, new SinceritySharedClasspathContainer() );
+			EclipseUtil.addClasspathContainer( javaProject, new SincerityClasspathContainer( project ) );
 		}
 
 		EclipseUtil.addBuilder( project, SincerityBuilder.ID );

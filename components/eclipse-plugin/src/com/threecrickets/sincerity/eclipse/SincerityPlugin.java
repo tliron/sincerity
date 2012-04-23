@@ -7,6 +7,9 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import com.threecrickets.sincerity.eclipse.internal.Messages;
+import com.threecrickets.sincerity.eclipse.internal.SimpleLog;
+
 public class SincerityPlugin extends AbstractUIPlugin
 {
 	//

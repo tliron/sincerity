@@ -5,6 +5,8 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+import com.threecrickets.sincerity.eclipse.internal.Messages;
+
 public class SincerityPreferencesPage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	//

@@ -7,8 +7,10 @@ Bundle-Activator: com.threecrickets.sincerity.eclipse.SincerityPlugin
 Bundle-Vendor: Three Crickets
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.launching,
+ org.eclipse.debug.ui,
+ org.eclipse.jdt.debug.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Export-Package: com.threecrickets.sincerity.eclipse;

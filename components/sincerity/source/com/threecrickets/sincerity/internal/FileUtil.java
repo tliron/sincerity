@@ -42,7 +42,7 @@ import org.apache.commons.vfs.provider.tar.Tbz2FileProvider;
 import org.apache.commons.vfs.provider.tar.TgzFileProvider;
 import org.apache.commons.vfs.provider.zip.ZipFileProvider;
 
-public class FileUtil
+public abstract class FileUtil
 {
 	public static void unpack( File archiveFile, File destinationDir, File workdDir ) throws IOException
 	{
@@ -268,4 +268,12 @@ public class FileUtil
 	}
 
 	public static final int BUFFER_SIZE = 2048;
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private FileUtil()
+	{
+	}
+
 }

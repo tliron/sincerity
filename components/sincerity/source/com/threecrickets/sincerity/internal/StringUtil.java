@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 
-public class StringUtil
+public abstract class StringUtil
 {
 	public static String join( String[] strings, String delimiter )
 	{
@@ -66,5 +66,12 @@ public class StringUtil
 			if( x != null )
 				printer.println( "Caused by:\r\n" );
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private StringUtil()
+	{
 	}
 }

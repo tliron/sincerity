@@ -14,7 +14,7 @@ package com.threecrickets.sincerity.internal;
 import java.io.File;
 import java.lang.reflect.Field;
 
-public class NativeUtil
+public abstract class NativeUtil
 {
 	public static void addNativePath( File nativePath )
 	{
@@ -76,5 +76,12 @@ public class NativeUtil
 			javaLibraryPath += File.pathSeparator + nativePath;
 			System.setProperty( "java.library.path", javaLibraryPath );
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private NativeUtil()
+	{
 	}
 }

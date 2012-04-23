@@ -1,4 +1,4 @@
-package com.threecrickets.sincerity.eclipse;
+package com.threecrickets.sincerity.eclipse.internal;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,8 +9,16 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 
+import com.threecrickets.sincerity.eclipse.SincerityPlugin;
+
 public class SincerityBootstrap extends URLClassLoader
 {
+	//
+	// Constants
+	//
+
+	public static final String MAIN_CLASS = "com.threecrickets.sincerity.Sincerity";
+
 	//
 	// Construction
 	//
@@ -26,7 +34,7 @@ public class SincerityBootstrap extends URLClassLoader
 
 	public void main( String... arguments ) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException
 	{
-		Class<?> sincerityClass = loadClass( "com.threecrickets.sincerity.Sincerity" );
+		Class<?> sincerityClass = loadClass( MAIN_CLASS );
 		Method mainMethod = sincerityClass.getMethod( "main", String[].class );
 		mainMethod.invoke( null, (Object) arguments );
 	}
