@@ -9,12 +9,19 @@ import org.eclipse.jdt.launching.JavaLaunchDelegate;
 public class SincerityLaunchConfiguration extends JavaLaunchDelegate
 {
 	//
+	// Constants
+	//
+
+	public static final String PROGRAM_OR_URI = "com.threecrickets.sincerity.launch.PROGRAM_OR_URI";
+
+	//
 	// JavaLaunchDelegate
 	//
 
 	@Override
 	public String getProgramArguments( ILaunchConfiguration configuration ) throws CoreException
 	{
-		return "start component";
+		String programOrUri = configuration.getAttribute( PROGRAM_OR_URI, "" );
+		return "delegate:start " + programOrUri;
 	}
 }

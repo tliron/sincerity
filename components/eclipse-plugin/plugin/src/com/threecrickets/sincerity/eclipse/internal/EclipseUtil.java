@@ -20,6 +20,12 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 import com.threecrickets.sincerity.eclipse.SincerityClasspathContainer;
 
@@ -143,6 +149,42 @@ public abstract class EclipseUtil
 	public static void log( ILog log, String id, int severity, String message )
 	{
 		log.log( new Status( severity, id, IStatus.OK, message, null ) );
+	}
+
+	public static Composite createComposite( Composite parent, int columns, int hspan, int fill )
+	{
+		Composite g = new Composite( parent, SWT.NONE );
+		g.setLayout( new GridLayout( columns, false ) );
+		g.setFont( parent.getFont() );
+		GridData gd = new GridData( fill );
+		gd.horizontalSpan = hspan;
+		g.setLayoutData( gd );
+		return g;
+	}
+
+	public static Group createGroup( Composite parent, String text, int columns, int hspan, int fill )
+	{
+		Group g = new Group( parent, SWT.NONE );
+		g.setLayout( new GridLayout( columns, false ) );
+		g.setText( text );
+		g.setFont( parent.getFont() );
+		GridData gd = new GridData( fill );
+		gd.horizontalSpan = hspan;
+		g.setLayoutData( gd );
+		return g;
+	}
+
+	public static Combo createCombo( Composite parent, int style, int hspan, int fill, String[] items )
+	{
+		Combo c = new Combo( parent, style );
+		c.setFont( parent.getFont() );
+		GridData gd = new GridData( fill );
+		gd.horizontalSpan = hspan;
+		c.setLayoutData( gd );
+		if( items != null )
+			c.setItems( items );
+		c.select( 0 );
+		return c;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
