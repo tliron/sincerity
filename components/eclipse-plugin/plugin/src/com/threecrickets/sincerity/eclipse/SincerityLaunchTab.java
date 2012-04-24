@@ -132,7 +132,6 @@ public class SincerityLaunchTab extends JavaMainTab
 		IJavaProject project = getJavaProject();
 		if( project != null )
 		{
-			System.out.println( new File( project.getProject().getLocation().toFile(), "programs" ) );
 			File programsDir = new File( project.getProject().getLocation().toFile(), "programs" );
 			if( programsDir.isDirectory() )
 			{
