@@ -3,12 +3,16 @@
 <plugin>
 
 <!-- Menus -->
-   
+
+<extension-point
+	id="org.eclipse.ui.menus"
+	name="org.eclipse.ui.menus"
+	schema="schema/menus.exsd"/>
+
 <extension
 	point="org.eclipse.ui.menus">
 	<menuContribution
-		locationURI="menu:project?after=projectProperties"
-		adaptable="true">
+		locationURI="menu:project?after=projectProperties">
 		<command
 			id="com.threecrickets.sincerity.menu.window"
 			commandId="com.threecrickets.sincerity.commands.open"
@@ -17,8 +21,7 @@
 		</command>
 	</menuContribution>
 	<menuContribution
-		locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions"
-		adaptable="true">
+		locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
 		<toolbar
 			id="com.threecrickets.sincerity.toolbar">
 			<command
@@ -29,8 +32,7 @@
 		</toolbar>
 	</menuContribution>
 	<menuContribution
-		locationURI="popup:org.eclipse.ui.projectConfigure?after=additions"
-		adaptable="true">
+		locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
 		<command
 			id="com.threecrickets.sincerity.popup.convert"
 			commandId="com.threecrickets.sincerity.commands.convert">
@@ -39,7 +41,7 @@
 	</menuContribution>
 </extension>
 
-<!-- This is the old way of implementing the popup contribution
+<!-- This is a deprecated way of implementing the popup contribution
 <extension
 	point="org.eclipse.ui.popupMenus">
 	<objectContribution
@@ -64,6 +66,16 @@
 
 <!-- Preferences -->
 
+<extension-point
+	id="org.eclipse.ui.preferencePages"
+	name="org.eclipse.ui.preferencePages"
+	schema="schema/preferencePages.exsd"/>
+
+<extension-point
+	id="org.eclipse.core.runtime.preferences"
+	name="org.eclipse.core.runtime.preferences"
+	schema="schema/preferences.exsd"/>
+
 <extension
 	point="org.eclipse.ui.preferencePages">
  	<page
@@ -79,6 +91,16 @@
 
 <!-- Project Nature and Builder -->
 
+<extension-point
+	id="org.eclipse.core.resources.natures"
+	name="org.eclipse.core.resources.natures"
+	schema="schema/natures.exsd"/>
+
+<extension-point
+	id="org.eclipse.core.resources.builders"
+	name="org.eclipse.core.resources.builders"
+	schema="schema/builders.exsd"/>
+
 <extension
 	point="org.eclipse.core.resources.natures"
 	id="nature"
@@ -87,11 +109,6 @@
 		<run class="com.threecrickets.sincerity.eclipse.SincerityNature"/> 
 	</runtime>
 </extension>
-
-<extension-point
-	id="org.eclipse.core.resources.natures"
-	name="Sincerity Natures"
-	schema="schema/org.eclipse.core.resources.natures.exsd"/>
 
 <extension
 	point="org.eclipse.core.resources.builders"
@@ -106,6 +123,16 @@
 </extension>
 
 <!-- Classpath Containers -->
+
+<extension-point
+	id="org.eclipse.jdt.core.classpathContainerInitializer"
+	name="org.eclipse.jdt.core.classpathContainerInitializer"
+	schema="schema/classpathContainerInitializer.exsd"/>
+
+<extension-point
+	id="org.eclipse.jdt.ui.javaElementFilters"
+	name="org.eclipse.jdt.ui.javaElementFilters"
+	schema="schema/javaElementFilters.exsd"/>
 
 <extension
 	point="org.eclipse.jdt.core.classpathContainerInitializer"
@@ -135,6 +162,21 @@
 
 <!-- Launch Configuration -->
 
+<extension-point
+	id="org.eclipse.debug.core.launchConfigurationTypes"
+	name="org.eclipse.debug.core.launchConfigurationTypes"
+	schema="schema/launchConfigurationTypes.exsd"/>
+
+<extension-point
+	id="org.eclipse.debug.ui.launchConfigurationTypeImages"
+	name="org.eclipse.debug.ui.launchConfigurationTypeImages"
+	schema="schema/launchConfigurationTypeImages.exsd"/>
+
+<extension-point
+	id="org.eclipse.debug.core.launchConfigurationTabGroups"
+	name="org.eclipse.debug.core.launchConfigurationTabGroups"
+	schema="schema/launchConfigurationTabGroups.exsd"/>
+
 <extension
 	point="org.eclipse.debug.core.launchConfigurationTypes">
 	<launchConfigurationType
@@ -162,6 +204,16 @@
 </extension>
 
 <!-- Commands and Handlers -->
+
+<extension-point
+	id="org.eclipse.ui.commands"
+	name="org.eclipse.ui.commands"
+	schema="schema/commands.exsd"/>
+
+<extension-point
+	id="org.eclipse.ui.handlers"
+	name="org.eclipse.ui.handlers"
+	schema="schema/handlers.exsd"/>
 
 <extension
 	point="org.eclipse.ui.commands">
