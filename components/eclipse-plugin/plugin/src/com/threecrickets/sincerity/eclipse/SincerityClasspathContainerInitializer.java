@@ -29,13 +29,6 @@ public class SincerityClasspathContainerInitializer extends ClasspathContainerIn
 	@Override
 	public void requestClasspathContainerUpdate( IPath path, IJavaProject project, IClasspathContainer containerSuggestion ) throws CoreException
 	{
-		JavaCore.setClasspathContainer( path, new IJavaProject[]
-		{
-			project
-		}, new IClasspathContainer[]
-		{
-			containerSuggestion
-		}, null );
 	}
 
 	@Override

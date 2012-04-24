@@ -70,13 +70,18 @@ public class SincerityClasspathContainer extends AbstractSincerityClasspathConta
 	{
 		ArrayList<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
 		addJars( jarsDir, apiDir, sourceDir, entries );
-		entries.add( JavaCore.newLibraryEntry( new Path( nativeDir.getAbsolutePath() ), null, null, null, new IClasspathAttribute[]
+
+		if( nativeDir.isDirectory() )
 		{
-			JavaRuntime.newLibraryPathsAttribute( new String[]
+			entries.add( JavaCore.newLibraryEntry( new Path( nativeDir.getAbsolutePath() ), null, null, null, new IClasspathAttribute[]
 			{
-				nativeDir.getAbsolutePath()
-			} ), JavaCore.newClasspathAttribute( IClasspathAttribute.OPTIONAL, "true" )
-		}, false ) );
+				JavaRuntime.newLibraryPathsAttribute( new String[]
+				{
+					nativeDir.getAbsolutePath()
+				} ), JavaCore.newClasspathAttribute( IClasspathAttribute.OPTIONAL, "true" )
+			}, false ) );
+		}
+
 		return entries;
 	}
 

@@ -56,10 +56,10 @@
 		</action>
 		<visibility>
 			<not>
-				<objectState name="nature" value="com.threecrickets.sincerity.container"/>
+				<objectState name="nature" value="com.threecrickets.sincerity.nature"/>
 			</not>
 		</visibility>
-		Another approach: <filter name="projectNature" value="com.threecrickets.sincerity.container"/>
+		Another approach: <filter name="projectNature" value="com.threecrickets.sincerity.nature"/>
 	</objectContribution>
 </extension>
 -->
@@ -259,7 +259,7 @@
 		<enabledWhen>
 			<iterate>
 				<adapt type="org.eclipse.core.resources.IProject">
-					<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.container"/>
+					<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>
 				</adapt>
 			</iterate>
 		</enabledWhen>
@@ -271,7 +271,7 @@
 			<iterate>
 				<adapt type="org.eclipse.core.resources.IProject">
 					<not>
-						<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.container"/>
+						<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>
 					</not>
 				</adapt>
 			</iterate>
