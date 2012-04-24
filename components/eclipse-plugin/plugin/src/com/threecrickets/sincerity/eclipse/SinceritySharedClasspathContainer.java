@@ -40,11 +40,15 @@ public class SinceritySharedClasspathContainer extends AbstractSincerityClasspat
 	{
 		ArrayList<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
 
-		File homeDir = SincerityPlugin.getDefault().getSincerityHome();
-		if( homeDir != null )
+		File root = SincerityPlugin.getDefault().getSincerityHome();
+		if( root != null )
 		{
-			addJars( new File( homeDir, "bootstrap.jar" ), entries );
-			addJars( new File( new File( homeDir, "libraries" ), "jars" ), entries );
+			File jarsDir = new File( new File( root, "libraries" ), "jars" );
+			File apiDir = new File( new File( root, "reference" ), "api" );
+			File sourceDir = new File( new File( root, "reference" ), "source" );
+
+			addJars( new File( root, "bootstrap.jar" ), entries );
+			addJars( jarsDir, apiDir, sourceDir, entries );
 		}
 
 		return entries;

@@ -130,6 +130,11 @@
 	schema="schema/classpathContainerInitializer.exsd"/>
 
 <extension-point
+	id="org.eclipse.jdt.ui.classpathContainerPage"
+	name="org.eclipse.jdt.ui.classpathContainerPage"
+	schema="schema/classpathContainerPage.exsd"/>
+
+<extension-point
 	id="org.eclipse.jdt.ui.javaElementFilters"
 	name="org.eclipse.jdt.ui.javaElementFilters"
 	schema="schema/javaElementFilters.exsd"/>
@@ -148,6 +153,22 @@
 	<classpathContainerInitializer
 		id="com.threecrickets.sincerity.classpathContainer"
 		class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerInitializer"/>
+</extension>
+
+<extension
+	point="org.eclipse.jdt.ui.classpathContainerPage">
+	<classpathContainerPage
+		id="com.threecrickets.sincerity.sharedClasspathContainer"
+		name="Sincerity Shared Libraries"
+		class="com.threecrickets.sincerity.eclipse.SinceritySharedClasspathContainerPage"/>
+</extension>
+
+<extension
+	point="org.eclipse.jdt.ui.classpathContainerPage">
+	<classpathContainerPage
+		id="com.threecrickets.sincerity.classpathContainer"
+		name="Sincerity Container Dependencies"
+		class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerPage"/>
 </extension>
 
 <extension

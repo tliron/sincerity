@@ -1,10 +1,12 @@
 package com.threecrickets.sincerity.eclipse.internal;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
@@ -31,17 +33,14 @@ public abstract class AbstractSincerityClasspathContainer implements IClasspathC
 
 	protected abstract Collection<IClasspathEntry> getClasspathEntriesCollection();
 
-	protected static void addJars( File file, Collection<IClasspathEntry> entries )
+	protected static void addJars( File jarsDir, Collection<IClasspathEntry> entries )
 	{
-		if( file.isDirectory() )
-			for( File child : file.listFiles() )
-				addJars( child, entries );
-		else if( file.getName().endsWith( ".jar" ) )
-		{
-			// TODO: sources and javadocs?
-			IClasspathEntry entry = JavaCore.newLibraryEntry( new Path( file.getAbsolutePath() ), null, ROOT_PATH, new IAccessRule[0], null, false );
-			entries.add( entry );
-		}
+		addJars( jarsDir, null, null, null, entries );
+	}
+
+	protected static void addJars( File jarsDir, File apiDir, File sourceDir, Collection<IClasspathEntry> entries )
+	{
+		addJars( jarsDir, jarsDir, apiDir, sourceDir, entries );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -49,5 +48,57 @@ public abstract class AbstractSincerityClasspathContainer implements IClasspathC
 
 	private final static int KIND = IClasspathContainer.K_APPLICATION;
 
-	private final static Path ROOT_PATH = new Path( "/" );
+	private static void addJars( File file, File jarsDir, File apiDir, File sourceDir, Collection<IClasspathEntry> entries )
+	{
+		if( file.isDirectory() )
+			for( File child : file.listFiles() )
+				addJars( child, jarsDir, apiDir, sourceDir, entries );
+		else if( file.getName().endsWith( ".jar" ) )
+		{
+			IPath sourcePath = null;
+			IClasspathAttribute[] attributes = null;
+
+			if( jarsDir != null )
+			{
+				File version = file.getParentFile();
+				File name = version.getParentFile();
+				File group = name.getParentFile();
+				if( group.getParentFile().equals( jarsDir ) )
+				{
+					File api = new File( new File( new File( apiDir, group.getName() ), name.getName() ), version.getName() );
+					if( api.isDirectory() )
+					{
+						File apiFile = new File( api, name.getName() + ".jar" );
+						if( apiFile.exists() )
+							api = apiFile;
+
+						try
+						{
+							IClasspathAttribute attribute = JavaCore.newClasspathAttribute( IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, api.getAbsoluteFile().toURL().toString() );
+							attributes = new IClasspathAttribute[]
+							{
+								attribute
+							};
+						}
+						catch( MalformedURLException x )
+						{
+						}
+					}
+
+					File source = new File( new File( new File( sourceDir, group.getName() ), name.getName() ), version.getName() );
+					if( source.isDirectory() )
+					{
+						File sourceFile = new File( source, name.getName() + ".jar" );
+						if( sourceFile.exists() )
+							source = sourceFile;
+
+						sourcePath = new Path( source.getAbsolutePath() );
+					}
+				}
+			}
+
+			IClasspathEntry entry = JavaCore.newLibraryEntry( new Path( file.getAbsolutePath() ), sourcePath, null, null, attributes, false );
+			entries.add( entry );
+		}
+	}
 }
