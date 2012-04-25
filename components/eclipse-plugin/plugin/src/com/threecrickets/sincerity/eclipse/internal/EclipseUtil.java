@@ -153,38 +153,45 @@ public abstract class EclipseUtil
 
 	public static Composite createComposite( Composite parent, int columns, int hspan, int fill )
 	{
-		Composite g = new Composite( parent, SWT.NONE );
-		g.setLayout( new GridLayout( columns, false ) );
-		g.setFont( parent.getFont() );
-		GridData gd = new GridData( fill );
-		gd.horizontalSpan = hspan;
-		g.setLayoutData( gd );
-		return g;
+		Composite composite = new Composite( parent, SWT.NONE );
+		GridLayout layout = new GridLayout( columns, false );
+		composite.setLayout( layout );
+		composite.setFont( parent.getFont() );
+		GridData data = new GridData( fill );
+		data.horizontalSpan = hspan;
+		composite.setLayoutData( data );
+		return composite;
+	}
+
+	public static Composite createComposite( Composite parent )
+	{
+		return createComposite( parent, 1, 1, GridData.FILL_BOTH );
 	}
 
 	public static Group createGroup( Composite parent, String text, int columns, int hspan, int fill )
 	{
-		Group g = new Group( parent, SWT.NONE );
-		g.setLayout( new GridLayout( columns, false ) );
-		g.setText( text );
-		g.setFont( parent.getFont() );
-		GridData gd = new GridData( fill );
-		gd.horizontalSpan = hspan;
-		g.setLayoutData( gd );
-		return g;
+		Group group = new Group( parent, SWT.NONE );
+		GridLayout layout = new GridLayout( columns, false );
+		group.setLayout( layout );
+		group.setText( text );
+		group.setFont( parent.getFont() );
+		GridData data = new GridData( fill );
+		data.horizontalSpan = hspan;
+		group.setLayoutData( data );
+		return group;
 	}
 
 	public static Combo createCombo( Composite parent, int style, int hspan, int fill, String[] items )
 	{
-		Combo c = new Combo( parent, style );
-		c.setFont( parent.getFont() );
-		GridData gd = new GridData( fill );
-		gd.horizontalSpan = hspan;
-		c.setLayoutData( gd );
+		Combo combo = new Combo( parent, style );
+		combo.setFont( parent.getFont() );
+		GridData data = new GridData( fill );
+		data.horizontalSpan = hspan;
+		combo.setLayoutData( data );
 		if( items != null )
-			c.setItems( items );
-		c.select( 0 );
-		return c;
+			combo.setItems( items );
+		combo.select( 0 );
+		return combo;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

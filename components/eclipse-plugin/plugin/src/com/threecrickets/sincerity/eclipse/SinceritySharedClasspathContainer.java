@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 
 import com.threecrickets.sincerity.eclipse.internal.AbstractSincerityClasspathContainer;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 public class SinceritySharedClasspathContainer extends AbstractSincerityClasspathContainer
 {
@@ -24,7 +25,7 @@ public class SinceritySharedClasspathContainer extends AbstractSincerityClasspat
 
 	public String getDescription()
 	{
-		return DESCRIPTION;
+		return Text.SharedClasspathName;
 	}
 
 	public IPath getPath()
@@ -53,9 +54,4 @@ public class SinceritySharedClasspathContainer extends AbstractSincerityClasspat
 
 		return entries;
 	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	private final static String DESCRIPTION = "Sincerity Shared Libraries";
 }

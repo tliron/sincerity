@@ -15,7 +15,7 @@ public class SincerityPreferencesInitializer extends AbstractPreferenceInitializ
 		if( home == null )
 			home = System.getenv( HOME_VARIABLE );
 		if( home != null )
-			SincerityPlugin.getDefault().getPreferenceStore().setDefault( SincerityPlugin.SINCERITY_HOME, home );
+			SincerityPlugin.getDefault().getPreferenceStore().setDefault( SincerityPlugin.SINCERITY_HOME_ATTRIBUTE, home );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -1,6 +1,7 @@
 package com.threecrickets.sincerity.eclipse;
 
 import com.threecrickets.sincerity.eclipse.internal.AbstractSincerityClasspathContainerPage;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 public class SincerityClasspathContainerPage extends AbstractSincerityClasspathContainerPage
 {
@@ -10,6 +11,6 @@ public class SincerityClasspathContainerPage extends AbstractSincerityClasspathC
 
 	public SincerityClasspathContainerPage()
 	{
-		super( SincerityClasspathContainer.ID, "Sincerity Container Dependencies", "These are the Sincerity dependent libraries for your project." );
+		super( SincerityClasspathContainer.ID, Text.ClasspathName, Text.ClasspathDescription );
 	}
 }

@@ -1,6 +1,7 @@
 package com.threecrickets.sincerity.eclipse;
 
 import com.threecrickets.sincerity.eclipse.internal.AbstractSincerityClasspathContainerPage;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 public class SinceritySharedClasspathContainerPage extends AbstractSincerityClasspathContainerPage
 {
@@ -10,6 +11,6 @@ public class SinceritySharedClasspathContainerPage extends AbstractSincerityClas
 
 	public SinceritySharedClasspathContainerPage()
 	{
-		super( SinceritySharedClasspathContainer.ID, "Sincerity Shared Libraries", "These are the libraries provided by your Sincerity installation." );
+		super( SinceritySharedClasspathContainer.ID, Text.SharedClasspathName, Text.SharedClasspathDescription );
 	}
 }

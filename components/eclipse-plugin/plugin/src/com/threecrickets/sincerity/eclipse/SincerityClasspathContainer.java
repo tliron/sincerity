@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 
 import com.threecrickets.sincerity.eclipse.internal.AbstractSincerityClasspathContainer;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 public class SincerityClasspathContainer extends AbstractSincerityClasspathContainer
 {
@@ -54,7 +55,7 @@ public class SincerityClasspathContainer extends AbstractSincerityClasspathConta
 
 	public String getDescription()
 	{
-		return DESCRIPTION;
+		return Text.ClasspathName;
 	}
 
 	public IPath getPath()
@@ -87,8 +88,6 @@ public class SincerityClasspathContainer extends AbstractSincerityClasspathConta
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
-
-	private final static String DESCRIPTION = "Sincerity Container Dependencies";
 
 	private final File jarsDir;
 

@@ -28,8 +28,7 @@ public class SincerityOpenCommand extends AbstractHandler
 			if( projects.size() == 1 )
 			{
 				IProject project = projects.get( 0 );
-				SincerityBootstrap sincerityBoostrap = new SincerityBootstrap( getClass().getClassLoader() );
-				sincerityBoostrap.main( "container:use", project.getLocation().toOSString(), ":", "gui:gui" );
+				SincerityBootstrap.run( "container:use", project.getLocation().toOSString(), ":", "gui:gui" );
 			}
 		}
 		catch( Exception x )
@@ -37,10 +36,6 @@ public class SincerityOpenCommand extends AbstractHandler
 			SincerityPlugin.getSimpleLog().log( IStatus.ERROR, x );
 		}
 
-		// IWorkbenchWindow window =
-		// HandlerUtil.getActiveWorkbenchWindowChecked( event );
-		// MessageDialog.openInformation( window.getShell(), "Sincerity",
-		// "Hello, Eclipse world" );
 		return null;
 	}
 }

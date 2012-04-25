@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Group;
 
 import com.threecrickets.sincerity.eclipse.internal.EclipseUtil;
 import com.threecrickets.sincerity.eclipse.internal.SincerityBootstrap;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 // http://www.talendforge.org/svn/tos/branches/branch-1_0/org.epic.debug/src-debug/org/epic/debug/ui/ProjectBlock.java
 
@@ -67,7 +68,7 @@ public class SincerityLaunchTab extends JavaMainTab
 
 		if( programsCombo.getText().trim().length() == 0 )
 		{
-			setErrorMessage( "Program or URI not set" );
+			setErrorMessage( Text.LaunchProgramOrUriError );
 			return false;
 		}
 
@@ -98,7 +99,7 @@ public class SincerityLaunchTab extends JavaMainTab
 		mainGroup.setVisible( false );
 		mainGroup.setEnabled( false );
 
-		Group programsGroup = EclipseUtil.createGroup( composite, "Program or URI", 1, 1, GridData.FILL_HORIZONTAL );
+		Group programsGroup = EclipseUtil.createGroup( composite, Text.LaunchProgramOrUri, 1, 1, GridData.FILL_HORIZONTAL );
 		programsGroup.moveAbove( mainGroup );
 
 		programsCombo = EclipseUtil.createCombo( programsGroup, SWT.DROP_DOWN, 1, GridData.FILL_HORIZONTAL, null );
