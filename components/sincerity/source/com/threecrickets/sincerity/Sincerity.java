@@ -599,42 +599,49 @@ public class Sincerity implements Runnable
 		// 3. Search up filesystem tree from current path
 		//
 
-		File containerRoot = null;
-
-		String path = System.getProperty( CONTAINER_PROPERTY );
-		if( path == null )
-			path = System.getenv( CONTAINER_ENV );
-		if( path != null )
-			containerRoot = new File( path );
-
-		if( containerRoot != null )
+		try
 		{
-			if( !containerRoot.exists() )
-				throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
-			if( !containerRoot.isDirectory() )
-				throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRoot );
-			File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
-			if( !sincerityDir.isDirectory() )
-				throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRoot );
-		}
-		else
-		{
-			File currentDir = new File( "." );
-			containerRoot = currentDir;
-			while( true )
+			File containerRoot = null;
+
+			String path = System.getProperty( CONTAINER_PROPERTY );
+			if( path == null )
+				path = System.getenv( CONTAINER_ENV );
+			if( path != null )
+				containerRoot = new File( path ).getCanonicalFile();
+
+			if( containerRoot != null )
 			{
+				if( !containerRoot.exists() )
+					throw new SincerityException( "Specified root path for the Sincerity container does not point anywhere: " + containerRoot );
+				if( !containerRoot.isDirectory() )
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a directory: " + containerRoot );
 				File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
-				if( sincerityDir.isDirectory() )
-				{
-					// Found it!
-					break;
-				}
-				containerRoot = containerRoot.getParentFile();
-				if( containerRoot == null )
-					throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
+				if( !sincerityDir.isDirectory() )
+					throw new SincerityException( "Specified root path for the Sincerity container does not point to a valid container: " + containerRoot );
 			}
-		}
+			else
+			{
+				File currentDir = new File( "." ).getCanonicalFile();
+				containerRoot = currentDir;
+				while( true )
+				{
+					File sincerityDir = new File( containerRoot, Container.SINCERITY_DIR );
+					if( sincerityDir.isDirectory() )
+					{
+						// Found it!
+						break;
+					}
+					containerRoot = containerRoot.getParentFile();
+					if( containerRoot == null )
+						throw new NoContainerException( "Could not find a Sincerity container for the current directory: " + currentDir );
+				}
+			}
 
-		return containerRoot;
+			return containerRoot;
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "I/O error searching for Sincerity container" );
+		}
 	}
 }
