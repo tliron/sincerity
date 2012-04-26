@@ -13,11 +13,16 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.Launch;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMRunner;
+import org.eclipse.jdt.launching.VMRunnerConfiguration;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -192,6 +197,15 @@ public abstract class EclipseUtil
 			combo.setItems( items );
 		combo.select( 0 );
 		return combo;
+	}
+
+	public static void run( IVMInstall install, String[] classpath, String mainClass, String... arguments ) throws CoreException
+	{
+		IVMRunner runner = install.getVMRunner( ILaunchManager.RUN_MODE );
+		VMRunnerConfiguration configuration = new VMRunnerConfiguration( mainClass, classpath );
+		configuration.setProgramArguments( arguments );
+		Launch launch = new Launch( null, ILaunchManager.RUN_MODE, null );
+		runner.run( configuration, launch, new NullProgressMonitor() );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

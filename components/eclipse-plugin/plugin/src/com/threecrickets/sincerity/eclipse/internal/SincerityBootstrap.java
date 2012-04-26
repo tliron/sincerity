@@ -10,12 +10,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.Launch;
 import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMRunner;
-import org.eclipse.jdt.launching.VMRunnerConfiguration;
 
 import com.threecrickets.sincerity.eclipse.SincerityPlugin;
 
@@ -40,12 +35,8 @@ public class SincerityBootstrap extends URLClassLoader
 				IVMInstall install = SincerityPlugin.getDefault().getAlternateJre();
 				if( install == null )
 					return false;
-				IVMRunner runner = install.getVMRunner( ILaunchManager.RUN_MODE );
-				VMRunnerConfiguration configuration = new VMRunnerConfiguration( MAIN_CLASS, getJarPaths() );
-				configuration.setProgramArguments( arguments );
-				Launch launch = new Launch( null, ILaunchManager.RUN_MODE, null );
 				SincerityPlugin.getSimpleLog().log( IStatus.INFO, "Running Sincerity on external JRE: " + install.getName() );
-				runner.run( configuration, launch, new NullProgressMonitor() );
+				EclipseUtil.run( install, getJarPaths(), MAIN_CLASS, arguments );
 				return true;
 			}
 			else
