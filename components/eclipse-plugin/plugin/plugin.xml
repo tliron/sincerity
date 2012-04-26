@@ -257,7 +257,7 @@
 		class="com.threecrickets.sincerity.eclipse.SincerityOpenCommand"
 		commandId="com.threecrickets.sincerity.commands.open">
 		<enabledWhen>
-			<iterate>
+			<iterate ifEmpty="false">
 				<adapt type="org.eclipse.core.resources.IProject">
 					<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>
 				</adapt>
@@ -268,7 +268,7 @@
 		class="com.threecrickets.sincerity.eclipse.SincerityConvertCommand"
 		commandId="com.threecrickets.sincerity.commands.convert">
 		<enabledWhen>
-			<iterate>
+			<iterate ifEmpty="false">
 				<adapt type="org.eclipse.core.resources.IProject">
 					<not>
 						<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>

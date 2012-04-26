@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Sincerity
-Bundle-SymbolicName: com.threecrickets.sincerity;singleton:=true
+Bundle-Name: Sincerity Plugin
+Bundle-SymbolicName: com.threecrickets.sincerity.plugin;singleton:=true
 Bundle-Version: 1.0.0.beta1
 Bundle-Activator: com.threecrickets.sincerity.eclipse.SincerityPlugin
 Bundle-Vendor: Three Crickets

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.threecrickets.sincerity"
-      label="Sincerity"
+      id="com.threecrickets.sincerity.plugin"
+      label="Sincerity Plugin"
       version="1.0.0.beta1"
       provider-name="Three Crickets">
 
    <description url="http://threecrickets.com/sincerity/">
-      Sincerity can download dependencies and handle bootstrapping for your Eclipse projects.
+      Sincerity can download dependencies and handle bootstrapping for your Eclipse projects. This feature provides Eclipse integration with Sincerity, but not provide the actual Sincerity installation. You may use the Sincerity feature for that, or use your installation of Sincerity.
    </description>
 
    <copyright>
@@ -31,7 +31,7 @@
    </requires>
 
    <plugin
-         id="com.threecrickets.sincerity"
+         id="com.threecrickets.sincerity.plugin"
          download-size="0"
          install-size="0"
          version="0.0.0"

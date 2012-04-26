@@ -18,8 +18,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.threecrickets.sincerity.eclipse.internal.EclipseUtil;
-import com.threecrickets.sincerity.eclipse.internal.Text;
 import com.threecrickets.sincerity.eclipse.internal.PreferencePageWithFields;
+import com.threecrickets.sincerity.eclipse.internal.Text;
 
 public class SincerityPreferencesPage extends PreferencePageWithFields implements IWorkbenchPreferencePage, IPropertyChangeListener
 {
@@ -31,7 +31,7 @@ public class SincerityPreferencesPage extends PreferencePageWithFields implement
 	protected Control createContents( Composite parent )
 	{
 		Composite top = EclipseUtil.createComposite( parent, 1, 1, GridData.FILL_BOTH );
-
+		
 		Group sincerityGroup = EclipseUtil.createGroup( top, Text.PreferencesInstallation, 1, 1, GridData.FILL_HORIZONTAL );
 		addField( new DirectoryFieldEditor( SincerityPlugin.SINCERITY_HOME_ATTRIBUTE, Text.PreferencesHome, EclipseUtil.createComposite( sincerityGroup ) ) );
 
