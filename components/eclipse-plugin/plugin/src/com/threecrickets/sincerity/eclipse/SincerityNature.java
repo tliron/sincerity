@@ -15,7 +15,7 @@ public class SincerityNature implements IProjectNature
 	// Constants
 	//
 
-	public static final String ID = "com.threecrickets.sincerity.nature";
+	public static final String ID = SincerityPlugin.ID + ".nature";
 
 	//
 	// IProjectNature

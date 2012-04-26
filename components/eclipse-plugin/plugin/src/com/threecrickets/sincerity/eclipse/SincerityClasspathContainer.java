@@ -21,7 +21,7 @@ public class SincerityClasspathContainer extends AbstractSincerityClasspathConta
 	// Constants
 	//
 
-	public final static Path ID = new Path( "com.threecrickets.sincerity.classpathContainer" );
+	public final static Path ID = new Path( SincerityPlugin.ID + ".classpathContainer" );
 
 	//
 	// Construction

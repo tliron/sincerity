@@ -99,7 +99,7 @@ public class SincerityLaunchTab extends JavaMainTab
 		mainGroup.setVisible( false );
 		mainGroup.setEnabled( false );
 
-		Group programsGroup = EclipseUtil.createGroup( composite, Text.LaunchProgramOrUri, 1, 1, GridData.FILL_HORIZONTAL );
+		Group programsGroup = EclipseUtil.createGroup( composite, Text.LaunchProgramOrUri, 1, 1, true, false );
 		programsGroup.moveAbove( mainGroup );
 
 		programsCombo = EclipseUtil.createCombo( programsGroup, SWT.DROP_DOWN, 1, GridData.FILL_HORIZONTAL, null );

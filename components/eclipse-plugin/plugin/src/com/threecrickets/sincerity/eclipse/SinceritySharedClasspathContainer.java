@@ -17,7 +17,7 @@ public class SinceritySharedClasspathContainer extends AbstractSincerityClasspat
 	// Constants
 	//
 
-	public final static Path ID = new Path( "com.threecrickets.sincerity.sharedClasspathContainer" );
+	public final static Path ID = new Path( SincerityPlugin.ID + ".sharedClasspathContainer" );
 
 	//
 	// IClasspathContainer
@@ -41,7 +41,7 @@ public class SinceritySharedClasspathContainer extends AbstractSincerityClasspat
 	{
 		ArrayList<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
 
-		File root = SincerityPlugin.getDefault().getSincerityHome();
+		File root = SincerityPlugin.getDefault().getSincerityRoot();
 		if( root != null )
 		{
 			File jarsDir = new File( new File( root, "libraries" ), "jars" );

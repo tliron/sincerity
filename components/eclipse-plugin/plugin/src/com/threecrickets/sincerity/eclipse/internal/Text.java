@@ -10,7 +10,9 @@ public abstract class Text extends NLS
 
 	public static String PreferencesInstallation;
 
-	public static String PreferencesHome;
+	public static String PreferencesUseExternalSincerity;
+
+	public static String PreferencesExternalSincerity;
 
 	public static String PreferencesJre;
 
@@ -30,7 +32,7 @@ public abstract class Text extends NLS
 
 	public static String LaunchProgramOrUriError;
 
-	public static String NoHome;
+	public static String NoSincerity;
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private

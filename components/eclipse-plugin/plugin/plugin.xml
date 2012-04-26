@@ -14,8 +14,8 @@
 	<menuContribution
 		locationURI="menu:project?after=projectProperties">
 		<command
-			id="com.threecrickets.sincerity.menu.window"
-			commandId="com.threecrickets.sincerity.commands.open"
+			id="com.threecrickets.sincerity.plugin.menu.window"
+			commandId="com.threecrickets.sincerity.plugin.commands.open"
 			mnemonic="S">
 			<visibleWhen checkEnabled="true"/>
 		</command>
@@ -25,8 +25,8 @@
 		<toolbar
 			id="com.threecrickets.sincerity.toolbar">
 			<command
-				id="com.threecrickets.sincerity.toolbar.window"
-				commandId="com.threecrickets.sincerity.commands.open"
+				id="com.threecrickets.sincerity.plugin.toolbar.window"
+				commandId="com.threecrickets.sincerity.plugin.commands.open"
 				icon="icons/sincerity.png"
 				tooltip="Open Sincerity window for this project"/>
 		</toolbar>
@@ -34,8 +34,8 @@
 	<menuContribution
 		locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
 		<command
-			id="com.threecrickets.sincerity.popup.convert"
-			commandId="com.threecrickets.sincerity.commands.convert">
+			id="com.threecrickets.sincerity.plugin.popup.convert"
+			commandId="com.threecrickets.sincerity.plugin.commands.convert">
 			<visibleWhen checkEnabled="true"/>
 		</command>
 	</menuContribution>
@@ -79,7 +79,7 @@
 <extension
 	point="org.eclipse.ui.preferencePages">
  	<page
- 		id="com.threecrickets.sincerity.preferencesPage"
+ 		id="com.threecrickets.sincerity.plugin.preferencesPage"
  		name="Sincerity"
 		class="com.threecrickets.sincerity.eclipse.SincerityPreferencesPage"/>
 </extension>
@@ -143,7 +143,7 @@
 	point="org.eclipse.jdt.core.classpathContainerInitializer"
 	id="sharedClasspathContainer">
 	<classpathContainerInitializer
-		id="com.threecrickets.sincerity.sharedClasspathContainer"
+		id="com.threecrickets.sincerity.plugin.sharedClasspathContainer"
 		class="com.threecrickets.sincerity.eclipse.SinceritySharedClasspathContainerInitializer"/>
 </extension>
 
@@ -151,14 +151,14 @@
 	point="org.eclipse.jdt.core.classpathContainerInitializer"
 	id="classpathContainer">
 	<classpathContainerInitializer
-		id="com.threecrickets.sincerity.classpathContainer"
+		id="com.threecrickets.sincerity.plugin.classpathContainer"
 		class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerInitializer"/>
 </extension>
 
 <extension
 	point="org.eclipse.jdt.ui.classpathContainerPage">
 	<classpathContainerPage
-		id="com.threecrickets.sincerity.sharedClasspathContainer"
+		id="com.threecrickets.sincerity.plugin.sharedClasspathContainer"
 		name="Sincerity Shared Libraries"
 		class="com.threecrickets.sincerity.eclipse.SinceritySharedClasspathContainerPage"/>
 </extension>
@@ -166,7 +166,7 @@
 <extension
 	point="org.eclipse.jdt.ui.classpathContainerPage">
 	<classpathContainerPage
-		id="com.threecrickets.sincerity.classpathContainer"
+		id="com.threecrickets.sincerity.plugin.classpathContainer"
 		name="Sincerity Container Dependencies"
 		class="com.threecrickets.sincerity.eclipse.SincerityClasspathContainerPage"/>
 </extension>
@@ -174,7 +174,7 @@
 <extension
 	point="org.eclipse.jdt.ui.javaElementFilters">
 	<filter
-		id="com.threecrickets.sincerity.classpathContainerFilter"
+		id="com.threecrickets.sincerity.plugin.classpathContainerFilter"
 		targetId="org.eclipse.jdt.ui.PackageExplorer"
 		enabled="true"
 		name="Sincerity Container Classpath Filter"
@@ -201,26 +201,26 @@
 <extension
 	point="org.eclipse.debug.core.launchConfigurationTypes">
 	<launchConfigurationType
-		id="com.threecrickets.sincerity.launch"
+		id="com.threecrickets.sincerity.plugin.launch"
 		name="Sincerity"
-		delegate="com.threecrickets.sincerity.eclipse.SincerityLaunchConfiguration"
 		modes="run, debug"
+		delegate="com.threecrickets.sincerity.eclipse.SincerityLaunchConfiguration"
 		sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"/>
 </extension>
 
 <extension
 	point="org.eclipse.debug.ui.launchConfigurationTypeImages">
 	<launchConfigurationTypeImage
-		id="com.threecrickets.sincerity.launchImage"	
-		icon="icons/sincerity.png"
-		configTypeID="com.threecrickets.sincerity.launch"/>
+		id="com.threecrickets.sincerity.plugin.launchImage"	
+		configTypeID="com.threecrickets.sincerity.plugin.launch"
+		icon="icons/sincerity.png"/>
 </extension>
 
 <extension
 	point="org.eclipse.debug.ui.launchConfigurationTabGroups">
 	<launchConfigurationTabGroup
-		id="com.threecrickets.sincerity.launchTabGroup"
-		type="com.threecrickets.sincerity.launch"
+		id="com.threecrickets.sincerity.plugin.launchTabGroup"
+		type="com.threecrickets.sincerity.plugin.launch"
 		class="com.threecrickets.sincerity.eclipse.SincerityLaunchTabGroup"/>
 </extension>
 
@@ -239,15 +239,15 @@
 <extension
 	point="org.eclipse.ui.commands">
 	<category
-		id="com.threecrickets.sincerity.commands"
+		id="com.threecrickets.sincerity.plugin.commands"
 		name="Sincerity"/>
 	<command
-		categoryId="com.threecrickets.sincerity.commands"
-		id="com.threecrickets.sincerity.commands.open"
+		categoryId="com.threecrickets.sincerity.plugin.commands"
+		id="com.threecrickets.sincerity.plugin.commands.open"
 		name="Sincerity"/>
 	<command
-		categoryId="com.threecrickets.sincerity.commands"
-		id="com.threecrickets.sincerity.commands.convert"
+		categoryId="com.threecrickets.sincerity.plugin.commands"
+		id="com.threecrickets.sincerity.plugin.commands.convert"
 		name="Convert to Sincerity container..."/>
 </extension>
    
@@ -255,23 +255,23 @@
 	point="org.eclipse.ui.handlers">
 	<handler
 		class="com.threecrickets.sincerity.eclipse.SincerityOpenCommand"
-		commandId="com.threecrickets.sincerity.commands.open">
+		commandId="com.threecrickets.sincerity.plugin.commands.open">
 		<enabledWhen>
 			<iterate ifEmpty="false">
 				<adapt type="org.eclipse.core.resources.IProject">
-					<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>
+					<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.plugin.nature"/>
 				</adapt>
 			</iterate>
 		</enabledWhen>
 	</handler>
 	<handler
 		class="com.threecrickets.sincerity.eclipse.SincerityConvertCommand"
-		commandId="com.threecrickets.sincerity.commands.convert">
+		commandId="com.threecrickets.sincerity.plugin.commands.convert">
 		<enabledWhen>
 			<iterate ifEmpty="false">
 				<adapt type="org.eclipse.core.resources.IProject">
 					<not>
-						<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.nature"/>
+						<test property="org.eclipse.core.resources.projectNature" value="com.threecrickets.sincerity.plugin.nature"/>
 					</not>
 				</adapt>
 			</iterate>

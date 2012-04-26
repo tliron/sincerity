@@ -156,13 +156,13 @@ public abstract class EclipseUtil
 		log.log( new Status( severity, id, IStatus.OK, message, null ) );
 	}
 
-	public static Composite createComposite( Composite parent, int columns, int hspan, int fill )
+	public static Composite createComposite( Composite parent, int columns, int hspan, boolean grabExcessHorizontalSpace, boolean grabExcessVerticalSpace )
 	{
 		Composite composite = new Composite( parent, SWT.NONE );
 		GridLayout layout = new GridLayout( columns, false );
 		composite.setLayout( layout );
 		composite.setFont( parent.getFont() );
-		GridData data = new GridData( fill );
+		GridData data = new GridData( SWT.BEGINNING, SWT.BEGINNING, grabExcessHorizontalSpace, grabExcessVerticalSpace );
 		data.horizontalSpan = hspan;
 		composite.setLayoutData( data );
 		return composite;
@@ -170,17 +170,17 @@ public abstract class EclipseUtil
 
 	public static Composite createComposite( Composite parent )
 	{
-		return createComposite( parent, 1, 1, GridData.FILL_BOTH );
+		return createComposite( parent, 1, 1, false, false );
 	}
 
-	public static Group createGroup( Composite parent, String text, int columns, int hspan, int fill )
+	public static Group createGroup( Composite parent, String text, int columns, int hspan, boolean grabExcessHorizontalSpace, boolean grabExcessVerticalSpace )
 	{
 		Group group = new Group( parent, SWT.NONE );
 		GridLayout layout = new GridLayout( columns, false );
 		group.setLayout( layout );
 		group.setText( text );
 		group.setFont( parent.getFont() );
-		GridData data = new GridData( fill );
+		GridData data = new GridData( SWT.BEGINNING, SWT.BEGINNING, grabExcessHorizontalSpace, grabExcessVerticalSpace );
 		data.horizontalSpan = hspan;
 		group.setLayoutData( data );
 		return group;

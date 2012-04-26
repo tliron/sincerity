@@ -109,7 +109,7 @@ public class SincerityBootstrap extends URLClassLoader
 	{
 		ArrayList<File> jars = new ArrayList<File>();
 
-		File homeDir = SincerityPlugin.getDefault().getSincerityHome();
+		File homeDir = SincerityPlugin.getDefault().getSincerityRoot();
 		if( homeDir != null )
 		{
 			File jarsDir = new File( new File( homeDir, "libraries" ), "jars" );
