@@ -34,6 +34,14 @@ public abstract class Text extends NLS
 
 	public static String NoSincerity;
 
+	public static String ConvertTitle;
+
+	public static String ConvertAlreadyContainer;
+
+	public static String ConvertChoose;
+
+	public static String ConvertError;
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

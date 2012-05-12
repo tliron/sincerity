@@ -1291,7 +1291,7 @@ of modularity, introducing no special restrictions for users that do not
 \end_layout
 
 \begin_layout Section
-Tutorial
+Getting Started
 \end_layout
 
 \begin_layout Subsection
@@ -5768,6 +5768,66 @@ Extending Sincerity
 
 \begin_layout Standard
 Creating your own
+\end_layout
+
+\begin_layout Section
+Eclipse Integration
+\end_layout
+
+\begin_layout Subsection
+Installing
+\end_layout
+
+\begin_layout Standard
+http://repository.threecrickets.com/eclipse/
+\end_layout
+
+\begin_layout Subsection
+Preferences
+\end_layout
+
+\begin_layout Standard
+Using internal or external Sincerity installation.
+\end_layout
+
+\begin_layout Subsection
+Sincerity Projects
+\end_layout
+
+\begin_layout Subsubsection
+Converting to Sincerity
+\end_layout
+
+\begin_layout Standard
+Adds the Sincerity nature.
+\end_layout
+
+\begin_layout Subsubsection
+Sincerity Classpath
+\end_layout
+
+\begin_layout Standard
+Java projects only.
+\end_layout
+
+\begin_layout Subsection
+Sincerity Launch Configurations
+\end_layout
+
+\begin_layout Standard
+Choose the program or URI.
+\end_layout
+
+\begin_layout Subsection
+Debugging
+\end_layout
+
+\begin_layout Subsubsection
+Breakpoints in Java Code
+\end_layout
+
+\begin_layout Subsubsection
+Breakpoints in non-Java Code
 \end_layout
 
 \begin_layout Section

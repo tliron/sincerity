@@ -7,7 +7,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.threecrickets.sincerity.eclipse.internal.EclipseUtil;
-import com.threecrickets.sincerity.eclipse.internal.SincerityBootstrap;
 
 public class SincerityNature implements IProjectNature
 {
@@ -23,9 +22,6 @@ public class SincerityNature implements IProjectNature
 
 	public void configure() throws CoreException
 	{
-		if( !SincerityBootstrap.run( "container:create", "--force", project.getLocation().toOSString(), "dev" ) )
-			return;
-
 		if( project.hasNature( JavaCore.NATURE_ID ) )
 		{
 			IJavaProject javaProject = JavaCore.create( project );

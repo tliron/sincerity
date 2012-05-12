@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Shell;
 
 import com.threecrickets.sincerity.eclipse.SincerityClasspathContainer;
 
@@ -206,6 +207,13 @@ public abstract class EclipseUtil
 		configuration.setProgramArguments( arguments );
 		Launch launch = new Launch( null, ILaunchManager.RUN_MODE, null );
 		runner.run( configuration, launch, new NullProgressMonitor() );
+	}
+
+	public static void waitUntilDisposed( Shell shell )
+	{
+		while( !shell.isDisposed() )
+			if( !shell.getDisplay().readAndDispatch() )
+				shell.getDisplay().sleep();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
