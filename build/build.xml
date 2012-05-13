@@ -52,7 +52,7 @@
 
 	<target name="classes" depends="dependencies" description="Compile Java code">
 		<mkdir dir="${cache.classes}" />
-		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="false" debug="${compile.debug}">
+		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="yes" debug="${compile.debug}">
 			<classpath refid="dependencies" />
 		</javac>
 		<copy todir="${cache.classes}">
@@ -60,10 +60,10 @@
 		</copy>
 		
 		<mkdir dir="${cache.agent}" />
-		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="false" debug="${compile.debug}" />
+		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="no" debug="${compile.debug}" />
 		
 		<mkdir dir="${cache.eclipsePlugin}" />
-		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="false" debug="${compile.debug}">
+		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="no" debug="${compile.debug}">
 			<classpath>
 				<fileset dir="${eclipse}/plugins" includes="**/*.jar" />
 			</classpath>

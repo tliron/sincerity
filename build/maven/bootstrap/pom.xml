@@ -3,14 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity</groupId>
-	<artifactId>sincerity</artifactId>
+	<groupId>com.threecrickets</groupId>
+	<artifactId>bootstrap</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity</name>
-	<description>Advanced container management for the JVM.</description>
-	<url>http://threecrickets.com/sincerity/</url>
+	<name>Bootstrap</name>
+	<description>Straightforward class bootstrapping library.</description>
+	<url>http://threecrickets.com/</url>
 	<inceptionYear>2011</inceptionYear>
 
 	<scm>
@@ -46,39 +46,6 @@
 			<archive>https://groups.google.com/forum/#!forum/sincerity-community</archive>
 		</mailingList>
 	</mailingLists>
-
-	<dependencies>
-		<dependency>
-			<groupId>com.threecrickets</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>1.0-beta1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.ivy</groupId>
-			<artifactId>ivy</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-vfs</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jsoup</groupId>
-			<artifactId>jsoup</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.scripturian</groupId>
-			<artifactId>scripturian</artifactId>
-			<version>1.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mozilla</groupId>
-			<artifactId>rhino</artifactId>
-			<version>1.7R3</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<directory>../../cache/maven</directory>
@@ -129,47 +96,13 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/libraries/jars/com.threecrickets.sincerity/sincerity/${project.version}/sincerity.jar</file>
+									<file>../../distribution/content/bootstrap.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
-				<executions>
-					<!-- javadoc artifact -->
-					<execution>
-						<id>javadoc</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classifier>javadoc</classifier>
-							<classesDirectory>../../distribution/content/api</classesDirectory>
-						</configuration>
-					</execution>
-
-					<!-- sources artifact -->
-					<execution>
-						<id>source</id>
-						<phase>package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<classifier>sources</classifier>
-							<classesDirectory>../../distribution/content/src</classesDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 

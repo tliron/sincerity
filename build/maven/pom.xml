@@ -49,6 +49,7 @@
 
 	<modules>
 		<module>core</module>
+		<module>bootstrap</module>
 		<module>sincerity-javascript-library</module>
 		<module>sincerity-jsdoc</module>
 		<module>plugins/logging</module>
