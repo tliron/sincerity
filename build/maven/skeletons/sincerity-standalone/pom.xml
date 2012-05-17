@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>sincerity-runtime</artifactId>
+	<groupId>com.threecrickets.sincerity.skeleton</groupId>
+	<artifactId>sincerity-standalone</artifactId>
 	<version>1.0-beta1</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Runtime</name>
+	<name>Sincerity Skeleton: Standalone</name>
 	<description>Allows a Sincerity container to run on its own without requiring a separate Sincerity installation.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
@@ -81,7 +81,7 @@
 							<archive>
 								<manifestEntries>
 									<Package-Folders>package</Package-Folders>
-									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/scripturian/installers/runtime/</Package-Installer>
+									<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/scripturian/installers/sincerity-standalone/</Package-Installer>
 								</manifestEntries>
 							</archive>
 							<descriptors>

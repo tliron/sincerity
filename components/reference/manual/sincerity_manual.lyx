@@ -1857,6 +1857,10 @@ Feature Plugins
 \end_layout
 
 \begin_layout Subsection
+Sincerity Runtime Plugin
+\end_layout
+
+\begin_layout Subsection
 Logging Plugin
 \end_layout
 
@@ -2026,6 +2030,17 @@ Logs will appear under the
 
 , which is a rolling log file with a size of 5MB per file, and a maximum
  of 10 files.
+\end_layout
+
+\begin_layout Quote
+
+\series bold
+Note for Restlet users:
+\series default
+ If you're using the Restlet skeleton, it's recommended to install the Restlet
+ skeleton logging add-on, which depends on this plugin and additionally
+ adds a Restlet extension library that provides high-performance direct
+ access to SLF4J.
 \end_layout
 
 \begin_layout Subsubsection
@@ -4398,7 +4413,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity start restlet
+sincerity start component
 \end_layout
 
 \end_inset
@@ -4519,7 +4534,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add logging : add service : install
+sincerity add restlet.logging : add service : install
 \end_layout
 
 \end_inset
@@ -4540,8 +4555,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add restlet.example : add logging : add service
- : install : service restlet start
+sincerity create mycontainer : add restlet.example : add restlet.logging :
+ add service : install : service component start
 \end_layout
 
 \end_inset
@@ -4560,7 +4575,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use mycontainer : service restlet stop
+sincerity use mycontainer : service component stop
 \end_layout
 
 \end_inset

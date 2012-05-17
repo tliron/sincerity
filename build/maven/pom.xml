@@ -52,7 +52,6 @@
 		<module>bootstrap</module>
 		<module>sincerity-javascript-library</module>
 		<module>sincerity-jsdoc</module>
-		<module>plugins/runtime</module>
 		<module>plugins/logging</module>
 		<module>plugins/logging-mongodb</module>
 		<module>plugins/redistribution</module>
@@ -69,6 +68,7 @@
 		<module>plugins/jsdoc</module>
 		<module>plugins/markup</module>
 		<module>plugins/batik</module>
+		<module>skeletons/sincerity-standalone</module>
 		<module>skeletons/nexus</module>
 		<module>skeletons/nexus-optional</module>
 		<module>skeletons/solr</module>

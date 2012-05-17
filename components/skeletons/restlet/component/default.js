@@ -1,14 +1,10 @@
 
 document.executeOnce('/sincerity/container/')
 
-importClass(
-	org.restlet.Component,
-	java.io.File)
-	
 var initializers = []
 
 // The component
-var component = new Component()
+var component = new org.restlet.Component()
 
 // Assemble the component
 Sincerity.Container.here = sincerity.container.getFile('component')

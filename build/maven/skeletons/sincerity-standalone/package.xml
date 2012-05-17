@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/runtime</directory>
+			<directory>../../../../components/skeletons/sincerity-standalone</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>
@@ -25,6 +25,9 @@
 			<includes>
 				<include>**</include>
 			</includes>
+			<excludes>
+				<exclude>*.old</exclude>
+			</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>../../../distribution/content</directory>
