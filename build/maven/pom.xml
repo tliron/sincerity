@@ -52,6 +52,7 @@
 		<module>bootstrap</module>
 		<module>sincerity-javascript-library</module>
 		<module>sincerity-jsdoc</module>
+		<module>plugins/runtime</module>
 		<module>plugins/logging</module>
 		<module>plugins/logging-mongodb</module>
 		<module>plugins/redistribution</module>
