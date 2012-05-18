@@ -2,8 +2,7 @@
     <shortName>sincerity</shortName>
     <fullName>Sincerity</fullName>
     <version>1.0-beta1</version>
-    <licenseFile>${build_project_directory}/../../components/media/gpl-3.0.txt</licenseFile>
-    <htmlLicenseFile>${build_project_directory}/../../components/media/gpl-3.0.html</htmlLicenseFile>
+    <licenseFile>${build_project_directory}/../../components/notices/license.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>${build_project_directory}/../../components/media/installer.png</leftImage>
     <outputDirectory>${build_project_directory}/../distribution/</outputDirectory>
@@ -120,8 +119,7 @@
         <licenseFile>
             <code>en</code>
             <encoding>utf-8</encoding>
-            <file>${build_project_directory}/../../components/media/gpl-3.0.txt</file>
-            <htmlFile>${build_project_directory}/../../components/media/gpl-3.0.html</htmlFile>
+            <file>${build_project_directory}/../../components/notices/license.txt</file>
         </licenseFile>
     </licenseFileList>
     <parameterList>
