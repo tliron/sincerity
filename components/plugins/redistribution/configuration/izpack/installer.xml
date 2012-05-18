@@ -33,6 +33,7 @@
 				<exclude name="cache/**" />
 				<exclude name="logs/**" />
 				<exclude name="libraries/jars/com.izforge/**" />
+				<exclude name="libraries/scripturian/redistribution.js" />
 				<exclude name="configuration/izpack/**" />
 				<exclude name="installer.jar" />
 			</fileset>

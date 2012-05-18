@@ -6,6 +6,7 @@
     <htmlLicenseFile>${build_project_directory}/../../components/media/gpl-3.0.html</htmlLicenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>${build_project_directory}/../../components/media/installer.png</leftImage>
+    <outputDirectory>${build_project_directory}/../distribution/</outputDirectory>
     <componentList>
         <component>
             <name>default</name>
