@@ -19,6 +19,7 @@ import java.awt.Graphics;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JWindow;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -45,10 +46,14 @@ public class Splash extends JWindow
 		JLabel title = new JLabel( "Starting Sincerity...", SwingConstants.CENTER );
 		title.setBorder( BorderFactory.createEmptyBorder( 20, 20, 0, 20 ) );
 
-		getContentPane().setLayout( new BorderLayout() );
-		getContentPane().setBackground( Color.WHITE );
-		getContentPane().add( title, BorderLayout.NORTH );
-		getContentPane().add( new JLabel( new ImageIcon( Splash.class.getResource( "sincerity.png" ) ) ), BorderLayout.CENTER );
+		JPanel panel = new JPanel();
+		panel.setBackground( Color.WHITE );
+		panel.setBorder( BorderFactory.createLineBorder( Color.BLACK ) );
+		panel.setLayout( new BorderLayout() );
+		panel.add( title, BorderLayout.NORTH );
+		panel.add( new JLabel( new ImageIcon( Splash.class.getResource( "sincerity.png" ) ) ), BorderLayout.CENTER );
+
+		getContentPane().add( panel );
 
 		setAlwaysOnTop( true );
 		setPreferredSize( new Dimension( 350, 350 ) );

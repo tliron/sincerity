@@ -5,3 +5,4 @@ Comment=Sincerity
 Terminal=false
 Exec=/usr/bin/sincerity
 Icon=/usr/lib/sincerity/sincerity.png
+Categories=Application;Development
