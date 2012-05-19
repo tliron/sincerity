@@ -174,31 +174,17 @@
 
 	<target name="distribution" depends="distribution-minimal, javadocs, manual" description="Assemble distribution" />
 	
-	<target name="package" depends="distribution" description="Create distribution package">
+	<target name="package-zip" depends="distribution" description="Create zip distribution package">
 		<zip destfile="${distribution}/${component}-${version}.zip">
 			<zipfileset dir="${distribution.content}" />
 		</zip>
 	</target>
 	
-	<target name="installer-izpack" depends="package" description="Create IzPack installer">
+	<target name="package-izpack" depends="distribution" description="Create IzPack installer">
 		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-install.jar" inheritAll="true" installerType="standard" />
 	</target>
 
-	<target name="installer-installbuilder" depends="package" description="Create InstallBuilder installer">
-		<exec executable="${installbuilder}">
-			<arg value="build" />
-			<arg value="./installbuilder/${component}.xml" />
-			<arg value="linux-x64" />
-			<arg value="--license" />
-			<arg value="./installbuilder/license.xml" />
-		</exec>
-		<exec executable="${installbuilder}">
-			<arg value="build" />
-			<arg value="./installbuilder/${component}.xml" />
-			<arg value="linux" />
-				<arg value="--license" />
-				<arg value="./installbuilder/license.xml" />
-		</exec>
+	<target name="package-installbuilder" depends="distribution" description="Create InstallBuilder installer">
 		<exec executable="${installbuilder}">
 			<arg value="build" />
 			<arg value="./installbuilder/${component}.xml" />
@@ -222,7 +208,7 @@
 			<fileset dir="${distribution}" includes="*.run" />
 		</chmod>
 	</target>
-
+	
 	<target name="build" depends="distribution" description="Build distribution" />
 	
 	<target name="clean" description="Clean">

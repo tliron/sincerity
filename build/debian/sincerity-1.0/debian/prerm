@@ -17,27 +17,21 @@ set -e
 
 case "$1" in
 	purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-		set +e
-		if service prudence-kitchensink status > /dev/null 2>&1; then 
-			service prudence-kitchensink stop
-		fi
-		set -e
+		#set +e
+		#if service sincerity status > /dev/null 2>&1; then 
+		#	service sincerity stop
+		#fi
+		#set -e
 		
-		if id prudence-kitchensink > /dev/null 2>&1; then
-			userdel -f prudence-kitchensink
-		fi
+		#if id sincerity > /dev/null 2>&1; then
+		#	userdel -f sincerity
+		#fi
 		
-		if grep -i "^prudence-kitchensink" /etc/group > /dev/null 2>&1; then
-			groupdel prudence-kitchensink
-		fi
+		#if grep -i "^sincerity" /etc/group > /dev/null 2>&1; then
+		#	groupdel sincerity
+		#fi
 	
-		rm -f /etc/init.d/prudence-kitchensink
-		rm -f /usr/lib/prudence-kitchensink/instance
-		rm -f /usr/lib/prudence-kitchensink/configuration
-		rm -f /usr/lib/prudence-kitchensink/applications
-		rm -f /usr/lib/prudence-kitchensink/common
-		rm -f /usr/lib/prudence-kitchensink/logs
-		rm -f /usr/lib/prudence-kitchensink/cache
+		rm -f /usr/bin/sincerity
 	;;
 	
 	*)

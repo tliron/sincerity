@@ -1,0 +1,8 @@
+sincerity            /usr/lib/sincerity/
+*.jar                /usr/lib/sincerity/
+*.txt                /usr/lib/sincerity/
+libraries/*          /usr/lib/sincerity/libraries/
+reference/*          /usr/lib/sincerity/reference/
+templates/*          /usr/lib/sincerity/templates/
+sincerity.desktop    /usr/share/applications
+sincerity.png        /usr/lib/sincerity

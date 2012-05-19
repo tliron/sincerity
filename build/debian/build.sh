@@ -13,8 +13,23 @@
 set -e
 
 HERE=$(cd "${0%/*}" 2>/dev/null; echo "$PWD")
+cd $HERE/sincerity-1.0
 
-cd $HERE/sincerity
+# Content
 rm -rf content
 cp -r ../../distribution/content .
-dpkg-buildpackage -S -kC11D6BA2 
+cp -r ../sincerity.desktop content/
+cp -r ../../../components/media/sincerity.png content/
+
+# .dsc
+cp debian/control-any debian/control
+dpkg-buildpackage -S -kC11D6BA2
+
+# .deb
+cp debian/control-all debian/control
+dpkg-buildpackage -b -kC11D6BA2
+
+# Cleanup
+rm -rf content
+cd ..
+mv *.deb ../distribution
