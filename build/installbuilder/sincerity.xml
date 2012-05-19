@@ -5,7 +5,6 @@
     <licenseFile>${build_project_directory}/../../components/notices/license.txt</licenseFile>
     <wrapLicenseFileText>0</wrapLicenseFileText>
     <leftImage>${build_project_directory}/../../components/media/installer.png</leftImage>
-    <outputDirectory>${build_project_directory}/../distribution/</outputDirectory>
     <componentList>
         <component>
             <name>default</name>
@@ -53,6 +52,12 @@
                         <distributionFile>
                             <origin>${build_project_directory}/../distribution/content/sincerity</origin>
                         </distributionFile>
+						<distributionFile>
+							<origin>${build_project_directory}/sincerity.desktop</origin>
+						</distributionFile>
+						<distributionFile>
+							<origin>${build_project_directory}/../../components/media/sincerity.png</origin>
+						</distributionFile>
                     </distributionFileList>
                 </folder>
                 <folder>
@@ -80,6 +85,16 @@
             </folderList>
             <startMenuShortcutList>
                 <startMenuShortcut>
+                    <comment>Sincerity</comment>
+                    <name>Sincerity</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/sincerity</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}</windowsPath>
+                </startMenuShortcut>
+                <startMenuShortcut>
                     <comment>Uninstall ${product_fullname}</comment>
                     <name>Uninstall ${product_fullname}</name>
                     <runAsAdmin>0</runAsAdmin>
@@ -97,6 +112,7 @@
             <promptUser>0</promptUser>
             <validVersionList>
                 <validVersion>
+                    <bitness></bitness>
                     <maxVersion></maxVersion>
                     <minVersion>1.5</minVersion>
                     <requireJDK>0</requireJDK>
@@ -110,10 +126,53 @@
             <insertAt>end</insertAt>
             <path>${installdir}</path>
         </addDirectoryToPath>
+        <iniFileSet>
+            <file>${installdir}/sincerity.desktop</file>
+            <section>Desktop Entry</section>
+            <key>Exec</key>
+            <value>${installdir}/sincerity</value>
+            <ruleEvaluationLogic>or</ruleEvaluationLogic>
+            <ruleList>
+                <platformTest type="linux"/>
+                <platformTest type="linux-x64"/>
+            </ruleList>
+        </iniFileSet>
+        <iniFileSet>
+            <file>${installdir}/sincerity.desktop</file>
+            <section>Desktop Entry</section>
+            <key>Icon</key>
+            <value>${installdir}/sincerity.png</value>
+            <ruleEvaluationLogic>or</ruleEvaluationLogic>
+            <ruleList>
+                <platformTest type="linux"/>
+                <platformTest type="linux-x64"/>
+            </ruleList>
+        </iniFileSet>
+        <runProgram>
+        	<program>xdg-desktop-menu</program>
+        	<programArguments>install --novendor "${installdir}/sincerity.desktop"</programArguments>
+            <ruleEvaluationLogic>or</ruleEvaluationLogic>
+            <ruleList>
+                <platformTest type="linux"/>
+                <platformTest type="linux-x64"/>
+            </ruleList>
+        </runProgram>
     </postInstallationActionList>
+    <postUninstallationActionList>
+        <runProgram>
+        	<program>xdg-desktop-menu</program>
+        	<programArguments>uninstall sincerity.desktop</programArguments>
+            <ruleEvaluationLogic>or</ruleEvaluationLogic>
+            <ruleList>
+                <platformTest type="linux"/>
+                <platformTest type="linux-x64"/>
+            </ruleList>
+        </runProgram>
+    </postUninstallationActionList>
     <disableSplashScreen>1</disableSplashScreen>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
+    <outputDirectory>${build_project_directory}/../distribution/</outputDirectory>
     <vendor>Three Crickets</vendor>
     <licenseFileList>
         <licenseFile>
