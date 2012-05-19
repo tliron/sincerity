@@ -32,4 +32,4 @@ dpkg-buildpackage -b -kC11D6BA2
 # Cleanup
 rm -rf content
 cd ..
-mv *.deb ../distribution
+mv sincerity_1.0-1_all.deb ../distribution/sincerity-1.0-beta1.deb
