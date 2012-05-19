@@ -12,14 +12,7 @@
 
 set -e
 
-VERSION=$1
-
-if [ -z "$VERSION" ]; then
-	echo Must provide version
-	exit 1
-fi
-
 HERE=$(cd "${0%/*}" 2>/dev/null; echo "$PWD")
 cd $HERE
 
-dput sincerity sincerity-1.0-${VERSION}_source.changes
+dput sincerity sincerity-1.0beta1-1_source.changes
