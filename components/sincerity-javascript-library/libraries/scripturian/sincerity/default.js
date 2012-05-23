@@ -11,6 +11,14 @@
 // at http://threecrickets.com/
 //
 
+/**
+ * @namespace
+ * 
+ * @author Tal Liron
+ * @version 1.0
+ */
+var Sincerity = {}
+
 document.executeOnce('/sincerity/calendar/')
 document.executeOnce('/sincerity/classes/')
 document.executeOnce('/sincerity/cryptography/')

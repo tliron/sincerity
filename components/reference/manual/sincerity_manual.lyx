@@ -592,7 +592,7 @@ All this work happens before the JVM even starts.
  Thus, it's usually handled by writing a shell script, which is almost always
  immediately runnable.
  Depending on how many operating systems you want to support, this may mean,
- at the very least, writing one for *nix systems and one for Windows systems.
+ at the very least, writing one for nix systems and one for Windows systems.
  This is highly specialized work, and a development project with its own
  challenges, so some projects choose to avoid scripts, and develop native
  binaries that handle bootstrapping.
@@ -5777,6 +5777,11 @@ Access to features of the Rhino JavaScript engine, such as the call stack
 The Sincerity JsDoc Template
 \end_layout
 
+\begin_layout Standard
+Note that you need to host the documentation via HTTP.
+ File does not work.
+\end_layout
+
 \begin_layout Section
 Extending Sincerity
 \end_layout
@@ -5846,6 +5851,677 @@ Breakpoints in non-Java Code
 \end_layout
 
 \begin_layout Section
+Packaging
+\end_layout
+
+\begin_layout Standard
+There are two main reasons you would want to create Sincerity packages:
+\end_layout
+
+\begin_layout Enumerate
+You've created a useful skeleton, skeleton add-on or plugin, which you would
+ like to share with others for use in their Sincerity containers.
+ A package, of course, is the most natural way to do so.
+ You could then host your package on your own repository, or submit it for
+ inclusion in other public repositories.
+\end_layout
+
+\begin_layout Enumerate
+Packages are very useful for deploying your application internally, especially
+ in ephemeral 
+\begin_inset Quotes eld
+\end_inset
+
+cloud
+\begin_inset Quotes erd
+\end_inset
+
+ environments.
+ Programmers working on different modules could package their results, using
+ a clear versioning system.
+ You would then host the packages in your own private repository, using
+ Nexus or even a plain directory.
+ Deployment, including upgrades, would thus involve nothing more than running
+ 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity install
+\begin_inset Quotes erd
+\end_inset
+
+ on the relevant containers.
+ It also allows easy downgrading of applications, or setting modules to
+ specific versions for testing and debugging.
+\end_layout
+
+\begin_layout Quote
+Note that 
+\begin_inset Quotes eld
+\end_inset
+
+packaging
+\begin_inset Quotes erd
+\end_inset
+
+ here refers specifically to creating Sincerity packages, which you can
+ then install into Sincerity containers as dependencies.
+ If what you want is to distribute the entire container, then see the Distributi
+on Plugin, and also the Sincerity Runtime Plugin.
+\end_layout
+
+\begin_layout Subsection
+The Sincerity Packaging Plugin
+\end_layout
+
+\begin_layout Standard
+\SpecialChar \ldots{}
+does not exist yet, as of Sincerity 1.0-beta1.
+ This is something on our roadmap, and technically entirely viable.
+ The idea is to allow for a friendly GUI, as well as a strong CLI.
+\end_layout
+
+\begin_layout Standard
+Until then, you can use Maven, as detailed below.
+ It's slightly awkward, in that it requires editing complex XML files, but
+ for the purpose of creating simple packages it should be very straightforward.
+\end_layout
+
+\begin_layout Subsection
+How to Create a Sincerity Package Using Maven
+\end_layout
+
+\begin_layout Standard
+It's relatively easy to use 
+\begin_inset CommandInset href
+LatexCommand href
+name "Maven"
+target "http://maven.apache.org/"
+
+\end_inset
+
+ to create a Sincerity package, with the help of the 
+\begin_inset CommandInset href
+LatexCommand href
+name "maven-assembly-plugin"
+target "http://maven.apache.org/plugins/maven-assembly-plugin/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+You can start with the following 
+\begin_inset Quotes eld
+\end_inset
+
+pom.xml
+\begin_inset Quotes erd
+\end_inset
+
+ file as a skeleton:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+<project
+\end_layout
+
+\begin_layout Plain Layout
+
+	xmlns="http://maven.apache.org/POM/4.0.0"
+\end_layout
+
+\begin_layout Plain Layout
+
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+\end_layout
+
+\begin_layout Plain Layout
+
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v
+4_0_0.xsd">
+\end_layout
+
+\begin_layout Plain Layout
+
+	<modelVersion>4.0.0</modelVersion>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<groupId>org.myorg.myapp</groupId>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<artifactId>myapp</artifactId>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<version>1.0.0</version>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<packaging>pom</packaging>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<name>My Cool Application</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<description>This is an application packaged for use with Sincerity.</descriptio
+n>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<dependencies>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<dependency>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<groupId>com.threecrickets.savory</groupId>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<artifactId>savory-framework</artifactId>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<version>1.0-beta1</version>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</dependency>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</dependencies>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<build>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<directory>cache</directory>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<plugins>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<plugin>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<groupId>org.apache.maven.plugins</groupId>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<artifactId>maven-assembly-plugin</artifactId>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<version>2.2.1</version>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<executions>
+\end_layout
+
+\begin_layout Plain Layout
+
+					<execution>
+\end_layout
+
+\begin_layout Plain Layout
+
+						<id>jar</id>
+\end_layout
+
+\begin_layout Plain Layout
+
+						<phase>package</phase>
+\end_layout
+
+\begin_layout Plain Layout
+
+						<goals>
+\end_layout
+
+\begin_layout Plain Layout
+
+							<goal>single</goal>
+\end_layout
+
+\begin_layout Plain Layout
+
+						</goals>
+\end_layout
+
+\begin_layout Plain Layout
+
+						<configuration>
+\end_layout
+
+\begin_layout Plain Layout
+
+							<appendAssemblyId>false</appendAssemblyId>
+\end_layout
+
+\begin_layout Plain Layout
+
+							<archive>
+\end_layout
+
+\begin_layout Plain Layout
+
+								<manifestEntries>
+\end_layout
+
+\begin_layout Plain Layout
+
+									<Package-Folders>package</Package-Folders>
+\end_layout
+
+\begin_layout Plain Layout
+
+								</manifestEntries>
+\end_layout
+
+\begin_layout Plain Layout
+
+							</archive>
+\end_layout
+
+\begin_layout Plain Layout
+
+							<descriptors>
+\end_layout
+
+\begin_layout Plain Layout
+
+								<descriptor>package.xml</descriptor>
+\end_layout
+
+\begin_layout Plain Layout
+
+							</descriptors>
+\end_layout
+
+\begin_layout Plain Layout
+
+						</configuration>
+\end_layout
+
+\begin_layout Plain Layout
+
+					</execution>
+\end_layout
+
+\begin_layout Plain Layout
+
+				</executions>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</plugin>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</plugins>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</build>
+\end_layout
+
+\begin_layout Plain Layout
+
+</project> 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Some things you'll want to customize:
+\end_layout
+
+\begin_layout Itemize
+You can add as many dependencies as you like.
+ Note that they can plain JVM jars, Sincerity packages, Python packages,
+ Ruby gems, etc.: anything supported by Sincerity.
+ In this case, we are including the Savory Framework, which is a Sincerity
+ package (which in turn has dependencies).
+ You can also have no dependencies at all.
+\end_layout
+
+\begin_layout Itemize
+Under <manifestEntries> you can add anything that adheres to the packaging
+ specification.
+ For example, you may want to call a package installation script, like so:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<Package-Installer>com.threecrickets.sincerity.Sincerity delegate:start /libraries/
+scripturian/installers/myapp/</Package-Installer>
+\end_layout
+
+\end_inset
+
+(If you do so, you'll need a 
+\begin_inset Quotes eld
+\end_inset
+
+libraries/scripturian/installers/myapp.js
+\begin_inset Quotes erd
+\end_inset
+
+ file in your package, otherwise Sincerity will report an error when trying
+ to install it.)
+\end_layout
+
+\begin_layout Itemize
+The <directory> is a work directory used by Maven for creating your final
+ package.
+ You may want to specify it as 
+\begin_inset Quotes eld
+\end_inset
+
+/tmp
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It is relative to the location of the 
+\begin_inset Quotes eld
+\end_inset
+
+pom.xml
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Itemize
+If you want to share your package in a public repository, you'd likely want
+ to add additional information about your package.
+ Consult the Maven pom.xml guide for more options.
+\end_layout
+
+\begin_layout Standard
+You will also need to create a 
+\begin_inset Quotes eld
+\end_inset
+
+package.xml
+\begin_inset Quotes erd
+\end_inset
+
+ file in the same directory:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?>
+\end_layout
+
+\begin_layout Plain Layout
+
+<assembly
+\end_layout
+
+\begin_layout Plain Layout
+
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+\end_layout
+
+\begin_layout Plain Layout
+
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+\end_layout
+
+\begin_layout Plain Layout
+
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembl
+y/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	<id>jar</id>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<formats>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<format>jar</format>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</formats>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<baseDirectory>package</baseDirectory>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<fileSets>
+\end_layout
+
+\begin_layout Plain Layout
+
+		<fileSet>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<directory>path-to-package</directory>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<outputDirectory>.</outputDirectory>
+\end_layout
+
+\begin_layout Plain Layout
+
+			<includes>
+\end_layout
+
+\begin_layout Plain Layout
+
+				<include></include>
+\end_layout
+
+\begin_layout Plain Layout
+
+			</includes>
+\end_layout
+
+\begin_layout Plain Layout
+
+		</fileSet>
+\end_layout
+
+\begin_layout Plain Layout
+
+	</fileSets>
+\end_layout
+
+\begin_layout Plain Layout
+
+</assembly>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You'll want to change 
+\begin_inset Quotes eld
+\end_inset
+
+path-to-package
+\begin_inset Quotes erd
+\end_inset
+
+ to point to the base of your distribution directory.
+ Note that it is relative to the location of 
+\begin_inset Quotes eld
+\end_inset
+
+package.xml
+\begin_inset Quotes erd
+\end_inset
+
+ file, and must have the final directory structure you want in the Sincerity
+ container into which your package will be installed.
+\end_layout
+
+\begin_layout Standard
+Note that you can create much more complex <fileSets> than this one.
+ Consult the 
+\begin_inset CommandInset href
+LatexCommand href
+name "assembly descriptor format documentation"
+target "http://maven.apache.org/plugins/maven-assembly-plugin/assembly.html"
+
+\end_inset
+
+ for more information.
+\end_layout
+
+\begin_layout Standard
+You can now build and deploy your package into a local file repository by
+ running the following Maven command from the directory in which you have
+ your 
+\begin_inset Quotes eld
+\end_inset
+
+pom.xml
+\begin_inset Quotes erd
+\end_inset
+
+ file:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+mvn deploy -DaltDeploymentRepository=myrepo::default::file:/path-to-local-reposi
+tory/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that if this is the first time you've run Maven, it will take some
+ time to download all the necessary plugins it needs.
+ Consequent runs will be much faster.
+\end_layout
+
+\begin_layout Standard
+Of course, you can also deploy to a repository server, such as Nexus, which
+ you can easily install with Sincerity's Nexus skeleton.
+ You can also configure Maven to always use a default target repository
+ for deployment.
+\end_layout
+
+\begin_layout Standard
+Maven is a complex tool that can do a whole lot more than this, but this
+ should get you started.
+\end_layout
+
+\begin_layout Section
 Repositories
 \end_layout
 
@@ -5894,7 +6570,125 @@ Appendix: Specifications
 \end_layout
 
 \begin_layout Subsection
-Packages
+Sincerity Packages
+\end_layout
+
+\begin_layout Standard
+Packages are collections of artifacts.
+ They are defined using special tags in standard JVM resource manifests.
+ Additionally, packages support special install/uninstall hooks for calling
+ arbitrary entry points, allowing for custom behavior.
+ Indeed, a package can include no artifacts, and only implement these hooks.
+\end_layout
+
+\begin_layout Standard
+Packages allow you to work around various limitations in repositories such
+ as iBiblio/Maven, in which the smallest deployable unit is a Jar.
+ The package specification allows you to include as many files as you need
+ in a single Jar, greatly simplifying your deployment scheme.
+\end_layout
+
+\begin_layout Standard
+Note that two different ways are supported for specifying artifacts: they
+ can specified as files, thus referring to actual zipped entries with the
+ Jar file in which the manifest resides, or that can be specified as general
+ resources, in which case they will be general resource URLs to be loaded
+ by the classloader, and thus they can reside anywhere in the classpath.
+\end_layout
+
+\begin_layout Standard
+Also note what 
+\begin_inset Quotes eld
+\end_inset
+
+volatile
+\begin_inset Quotes erd
+\end_inset
+
+ means in this context: a 
+\begin_inset Quotes eld
+\end_inset
+
+volatile
+\begin_inset Quotes erd
+\end_inset
+
+ artifact is one that should be installed once and only once.
+ This means that subsequent attempts to install the package, beyond the
+ first, should ignore these artifacts.
+ This is useful for marking configuration files, example files, and other
+ files that the user should be allow to delete without worrying that they
+ would reappear on every change to the dependency structure.
+\end_layout
+
+\begin_layout Standard
+Supported manifest tags:
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Files
+\series default
+: a comma separated list of file paths within this Jar.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Folders:
+\series default
+ a comma separated list of folder paths within this Jar.
+ Specifies all artifacts under these folders, recursively.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Resources
+\series default
+: a comma separated list of resource paths to be retrieved via the classloader.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Volatile-Files
+\series default
+: all these artifacts will be marked as volatile.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Volatile-Folders
+\series default
+: all artifacts under these paths will be marked as volatile.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Installer
+\series default
+: specifies a class name which has a main() entry point.
+ Simple string arguments can be optionally appended, separated by spaces.
+ The installer will be called when the package is to be installed, 
+\emph on
+after
+\emph default
+ all artifacts have been unpacked.
+ Any thrown exception would cause installation to fail.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Package-Uninstaller
+\series default
+: specifies a class name which has a main() entry point.
+ Simple string arguments can be optionally appended, separated by spaces.
+ The uninstaller will be called when the package is to be uninstalled.
 \end_layout
 
 \end_body
