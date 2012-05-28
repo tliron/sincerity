@@ -85,6 +85,7 @@
 
 		<plugins>
 			<!-- Delegate to the Ant build script -->
+			<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -112,6 +113,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+			-->
 
 			<!-- jar artifact -->
 			<plugin>
@@ -157,7 +159,7 @@
 
 					<!-- sources artifact -->
 					<execution>
-						<id>source</id>
+						<id>sources</id>
 						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
