@@ -267,6 +267,17 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	}
 
 	/**
+	 * Escapes regular expression special characters.
+	 * 
+	 * @param string The string
+	 * @returns {String}
+	 */
+	Public.escapeRegExp = function(string) {
+		// See: http://stackoverflow.com/a/2593661/849021
+		return Public.exists(string) ? String(string).replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") : ''
+	}
+
+	/**
 	 * True if the string starts with the prefix.
 	 * 
 	 * @param string The string
@@ -719,6 +730,16 @@ String.prototype.escapeDoubleQuotes = String.prototype.escapeDoubleQuotes || fun
  */ 
 String.prototype.escapeNewlines = String.prototype.escapeNewlines || function() {
 	return Sincerity.Objects.escapeNewlines(this)
+}
+
+/**
+ * Escapes regular expression special characters. 
+ * 
+ * @methodOf String#
+ * @see Sincerity.Objects#escapeRegExp
+ */ 
+String.prototype.escapeRegExp = String.prototype.escapeRegExp || function() {
+	return Sincerity.Objects.escapeRegExp(this)
 }
 
 /**

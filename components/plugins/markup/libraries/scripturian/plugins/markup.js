@@ -15,7 +15,7 @@ var languageNames = {
 	confluence: 'Confluence',
 	mediawiki: 'MediaWiki',
 	twiki: 'TWiki',
-	trac: 'TracWiki',
+	tracwiki: 'TracWiki',
 	textile: 'Textile',
 	bugzilla: 'Textile Bugzilla Dialect'
 }
