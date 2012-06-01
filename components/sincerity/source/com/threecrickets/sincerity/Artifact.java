@@ -12,7 +12,9 @@
 package com.threecrickets.sincerity;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import com.threecrickets.sincerity.exception.UnpackingException;
@@ -136,12 +138,28 @@ public class Artifact implements Comparable<Artifact>
 
 		try
 		{
-			file.getParentFile().mkdirs();
-			org.apache.ivy.util.FileUtil.copy( url, file, null );
+			InputStream in = url.openStream();
+			try
+			{
+				file.getParentFile().mkdirs();
+				FileOutputStream out = new FileOutputStream( file );
+				try
+				{
+					org.apache.ivy.util.FileUtil.copy( in, out, null );
+				}
+				finally
+				{
+					out.close();
+				}
+			}
+			finally
+			{
+				in.close();
+			}
 		}
 		catch( IOException x )
 		{
-			throw new UnpackingException( "Could not copy artifact from " + url + " to " + file, x );
+			throw new UnpackingException( "Could not copy artifact from " + url + " to " + file + ": " + x.getMessage(), x );
 		}
 	}
 
