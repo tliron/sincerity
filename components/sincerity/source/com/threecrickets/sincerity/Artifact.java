@@ -136,6 +136,7 @@ public class Artifact implements Comparable<Artifact>
 
 		try
 		{
+			file.getParentFile().mkdirs();
 			org.apache.ivy.util.FileUtil.copy( url, file, null );
 		}
 		catch( IOException x )
