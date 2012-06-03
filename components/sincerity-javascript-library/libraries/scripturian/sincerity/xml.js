@@ -239,7 +239,7 @@ Sincerity.XML = Sincerity.XML || function() {
 	}
 
 	/**
-	 * Represents an XML node (JavaScript wrapper over teh JVM org.w3c.dom.Node).
+	 * Represents an XML node (JavaScript wrapper over the JVM org.w3c.dom.Node).
 	 * 
 	 * @class
 	 * @name Sincerity.XML.Node
@@ -422,7 +422,30 @@ Sincerity.XML = Sincerity.XML || function() {
 
 			return text
 		}
-		
+
+		/**
+		 * Transforms the node and its children into an XML document, optionally
+		 * making it human-readable in multiline, indented format.
+		 * 
+		 * @param {Number} [indent=0] If greater than 0, the number of spaces per indent in human-readable multiline format
+		 * @returns {String} An XML representation
+		 */
+		Public.toXML = function(indent) {
+			indent = indent || 0
+			
+			var source = new javax.xml.transform.dom.DOMSource(this.node)
+			var result = new javax.xml.transform.stream.StreamResult(new java.io.StringWriter())
+
+			var transformer = transformerFactory.newTransformer()
+			if (indent > 0) {
+				transformer.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, 'yes')
+				transformer.setOutputProperty('{http://xml.apache.org/xslt}indent-amount', indent) // Known bug! Setting this is absolutely necessary
+			}
+			transformer.transform(source, result)
+			
+			return String(result.writer.toString())
+		}
+
 		return Public
 	}())
 	
