@@ -430,7 +430,7 @@ Sincerity.XML = Sincerity.XML || function() {
 		 * @param {Number} [indent=0] If greater than 0, the number of spaces per indent in human-readable multiline format
 		 * @returns {String} An XML representation
 		 */
-		Public.toXML = function(indent) {
+		Public.toXml = function(indent) {
 			indent = indent || 0
 			
 			var source = new javax.xml.transform.dom.DOMSource(this.node)
