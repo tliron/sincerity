@@ -27,7 +27,7 @@ var Sincerity = Sincerity || {}
  * instead and choose more horizontal ways of code organization and reuse, via closures, raw prototypes
  * and duck typing. Use OOP only when it adds coherence to your code.
  * <p>
- * That said, Sinceriy supports all OOP principles:
+ * That said, Sincerity supports all OOP principles:
  * <ol>
  * <li>Encapsulation: This is already available, because functions are first-class citizens in JavaScript.
  * A dict can contain both data properties and functions. Additionally, the "this" keyword is automatically
@@ -36,7 +36,9 @@ var Sincerity = Sincerity || {}
  * <li>Inheritance: There are two obvious ways to implement this in JavaScript -- by simply copying functions
  * over from another dict (which we could have done with {@link Sincerity.Objects#merge}) or at once by
  * setting the constructor's prototype. The latter offers better performance and more coherence, which is
- * why we chose it.</li>
+ * why we chose it. Additionally, for all methods, we hook up the overridden member via the ".overridden"
+ * field in the function object itself. You can access it from inside the method as
+ * "arguments.callee.overridden". Note that this also works for the "._construct" constructor.</li>
  * <li>Polymorphism: Loose polymorphism is provided naturally via JavaScript's duck typing, which is
  * heavily used outside of OOP proper. What we add here is basic type information: the "instanceof"
  * keyword can be used to identify which constructor was used for an instance, and additionally returns
@@ -70,6 +72,9 @@ var Sincerity = Sincerity || {}
  *   Public._construct = function(pet) {
  *     // This will be a public property
  *     this.pet = pet
+ *     
+ *     // Let's call the parent's constructor
+ *     arguments.callee.overridden.call(this)
  *   }
  *   
  *   // Inheritance annotation
@@ -209,18 +214,30 @@ Sincerity.Classes = Sincerity.Classes || function() {
     	}
     	else {
         	// Make sure instanceof will work (it compares constructors)
+        	TheClass.prototype.constructor = TheClass
     		
     		// TODO: do we need to hook this up to the external class var somehow?!?!?!
-        	TheClass.prototype.constructor = TheClass
     	}
     	
     	// Access to original definition
     	TheClass.prototype.definition = definition
+    	
+    	// Access to overridden constructor
+    	if (definition._construct && definition._inherit) {
+    		definition._construct.overridden = definition._inherit
+    	}
 
     	// Public members go in the prototype (overriding inherited members of the same name)
     	for (var c in definition) {
     		if (c[0] != '_') {
-    			TheClass.prototype[c] = definition[c]
+    			var member = definition[c]
+    			
+    			// Access to overridden member for functions
+    			if ((typeof member == 'function') && definition._inherit && definition._inherit.prototype[c]) {
+    				member.overridden = definition._inherit.prototype[c]
+    			}
+    			
+    			TheClass.prototype[c] = member
     		}
     	}
     	
