@@ -443,12 +443,18 @@ Sincerity.Objects = Sincerity.Objects || function() {
 			if (keys) {
 				for (var k in keys) {
 					var key = keys[k]
-					to[key] = from[key]
+					var value = from[key]
+					if (undefined !== value) {
+						to[key] = value
+					}
 				}
 			}
 			else {
 				for (var f in from) {
-					to[f] = from[f]
+					var value = from[f]
+					if (undefined !== value) {
+						to[f] = value
+					}
 				}
 			}
 		}
