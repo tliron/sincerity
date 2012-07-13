@@ -100,6 +100,7 @@ public class ArtifactsPlugin implements Plugin1
 
 	public void printArtifacts( Dependencies dependencies, Writer writer, boolean verbose ) throws SincerityException
 	{
+		@SuppressWarnings("resource")
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
 		{

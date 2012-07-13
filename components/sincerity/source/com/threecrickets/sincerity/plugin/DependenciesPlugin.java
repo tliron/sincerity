@@ -224,6 +224,7 @@ public class DependenciesPlugin implements Plugin1
 
 	public void printLicenses( Dependencies depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
+		@SuppressWarnings("resource")
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAll() )
 		{
