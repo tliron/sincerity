@@ -74,7 +74,7 @@ public abstract class AbstractSincerityClasspathContainer implements IClasspathC
 
 						try
 						{
-							IClasspathAttribute attribute = JavaCore.newClasspathAttribute( IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, api.getAbsoluteFile().toURL().toString() );
+							IClasspathAttribute attribute = JavaCore.newClasspathAttribute( IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME, api.getAbsoluteFile().toURI().toURL().toString() );
 							attributes = new IClasspathAttribute[]
 							{
 								attribute
