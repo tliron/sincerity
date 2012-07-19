@@ -147,7 +147,8 @@ Ext.onReady(function() {
 		storeId: 'namespaces',
 		proxy: {
 			type: 'rest',
-			url: 'data/namespaces.json'
+			url: 'data/namespaces.json',
+			appendId: false
 			//noCache: false
 		},
 		autoLoad: true,
