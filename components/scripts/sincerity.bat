@@ -16,11 +16,9 @@ REM #
 REM # Find Sincerity home
 REM #
 
-SET ORIGINAL="%CD%"
-REM CD /D "%0%"
-SET SINCERITY_HOME="%CD%"
-
-REM Z:\Projects\Collaborative\Sincerity\build\distribution\content
+SET ORIGINAL=%CD%
+REM CD /D %0%
+SET SINCERITY_HOME=%CD%
 
 REM #
 REM # Libraries
