@@ -69,21 +69,26 @@ public class Splash extends JWindow
 	public void paint( Graphics g )
 	{
 		super.paint( g );
-		SwingUtilities.invokeLater( new Runnable()
-		{
-			public void run()
-			{
 
-				try
+		if( runnable != null )
+		{
+			final Runnable toRun = runnable;
+			runnable = null;
+			SwingUtilities.invokeLater( new Runnable()
+			{
+				public void run()
 				{
-					runnable.run();
+					try
+					{
+						toRun.run();
+					}
+					finally
+					{
+						dispose();
+					}
 				}
-				finally
-				{
-					dispose();
-				}
-			}
-		} );
+			} );
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -91,5 +96,5 @@ public class Splash extends JWindow
 
 	private static final long serialVersionUID = 1L;
 
-	private final Runnable runnable;
+	private Runnable runnable;
 }
