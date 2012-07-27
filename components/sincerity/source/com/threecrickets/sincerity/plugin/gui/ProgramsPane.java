@@ -34,7 +34,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
  * @see DelegatePlugin
  * @see ProgramDialog
  */
-public class ProgramsPane extends JPanel implements EnhancedNodeListener
+public class ProgramsPane extends JPanel implements Refreshable, EnhancedNodeListener
 {
 	//
 	// Construction
@@ -55,28 +55,10 @@ public class ProgramsPane extends JPanel implements EnhancedNodeListener
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
-
-		refresh();
 	}
 
 	//
-	// EnhancedNodeListener
-	//
-
-	public void nodeActivated( Object value )
-	{
-		try
-		{
-			new ProgramDialog( sincerity, (String) value );
-		}
-		catch( SincerityException x )
-		{
-			GuiUtil.error( x );
-		}
-	}
-
-	//
-	// Operations
+	// Refreshable
 	//
 
 	public void refresh()
@@ -90,6 +72,22 @@ public class ProgramsPane extends JPanel implements EnhancedNodeListener
 
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
+	}
+
+	//
+	// EnhancedNodeListener
+	//
+
+	public void nodeActivated( Object value )
+	{
+		try
+		{
+			new ProgramDialog( sincerity, (String) value );
 		}
 		catch( SincerityException x )
 		{

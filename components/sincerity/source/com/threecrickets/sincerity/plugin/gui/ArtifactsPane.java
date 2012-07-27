@@ -47,7 +47,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
  * @author Tal Liron
  * @see ArtifactsPlugin
  */
-public class ArtifactsPane extends JPanel implements ItemListener
+public class ArtifactsPane extends JPanel implements Refreshable, ItemListener
 {
 	//
 	// Construction
@@ -83,27 +83,10 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		buttons.add( new WrappedText( "Note that this list only reflects artifacts that have been installed by Sincerity." ) );
 
 		add( buttons, BorderLayout.EAST );
-
-		refresh();
 	}
 
 	//
-	// ItemListener
-	//
-
-	public void itemStateChanged( ItemEvent event )
-	{
-		ItemSelectable item = event.getItemSelectable();
-		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
-		if( item == groupByTypeCheckBox )
-			groupByType = selected;
-		else if( item == showPackageContentsCheckBox )
-			showPackageContents = selected;
-		refresh();
-	}
-
-	//
-	// Operations
+	// Refreshable
 	//
 
 	public void refresh()
@@ -147,6 +130,21 @@ public class ArtifactsPane extends JPanel implements ItemListener
 		{
 			GuiUtil.error( x );
 		}
+	}
+
+	//
+	// ItemListener
+	//
+
+	public void itemStateChanged( ItemEvent event )
+	{
+		ItemSelectable item = event.getItemSelectable();
+		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
+		if( item == groupByTypeCheckBox )
+			groupByType = selected;
+		else if( item == showPackageContentsCheckBox )
+			showPackageContents = selected;
+		refresh();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

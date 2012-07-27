@@ -47,7 +47,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
  * @see ContainerPlugin
  * @see ResolvedDependencies
  */
-public class LicensesPane extends JPanel implements ItemListener
+public class LicensesPane extends JPanel implements Refreshable, ItemListener
 {
 	//
 	// Construction
@@ -87,8 +87,28 @@ public class LicensesPane extends JPanel implements ItemListener
 		buttons.add( new WrappedText( "Note that this list only reflects dependencies that have already been installed." ) );
 
 		add( buttons, BorderLayout.EAST );
+	}
 
-		refresh();
+	//
+	// Refreshable
+	//
+
+	public void refresh()
+	{
+		try
+		{
+			SortedNode root = new SortedNode();
+
+			for( License license : dependencies.getResolvedDependencies().getLicenses() )
+				root.add( GuiUtil.createLicenseNode( license, dependencies, true, showDependencies, showArtifacts, showPackageContents ) );
+
+			tree.setModel( new DefaultTreeModel( root ) );
+			GuiUtil.expandTree( tree, true );
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
 	}
 
 	//
@@ -109,28 +129,6 @@ public class LicensesPane extends JPanel implements ItemListener
 		else if( item == showPackageContentsCheckBox )
 			showPackageContents = selected;
 		refresh();
-	}
-
-	//
-	// Operations
-	//
-
-	public void refresh()
-	{
-		try
-		{
-			SortedNode root = new SortedNode();
-
-			for( License license : dependencies.getResolvedDependencies().getLicenses() )
-				root.add( GuiUtil.createLicenseNode( license, dependencies, true, showDependencies, showArtifacts, showPackageContents ) );
-
-			tree.setModel( new DefaultTreeModel( root ) );
-			GuiUtil.expandTree( tree, true );
-		}
-		catch( SincerityException x )
-		{
-			GuiUtil.error( x );
-		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

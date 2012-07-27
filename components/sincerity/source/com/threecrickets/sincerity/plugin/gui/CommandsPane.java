@@ -49,7 +49,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
  * @author Tal Liron
  * @see HelpPlugin
  */
-public class CommandsPane extends JPanel implements ItemListener, EnhancedNodeListener
+public class CommandsPane extends JPanel implements Refreshable, ItemListener, EnhancedNodeListener
 {
 	//
 	// Construction
@@ -82,8 +82,36 @@ public class CommandsPane extends JPanel implements ItemListener, EnhancedNodeLi
 		buttons.add( new WrappedText( "Double click a command to run it." ) );
 
 		add( buttons, BorderLayout.EAST );
+	}
 
-		refresh();
+	//
+	// Refreshable
+	//
+
+	public void refresh()
+	{
+		try
+		{
+			SortedNode root = new SortedNode();
+			if( groupByPlugin )
+			{
+				for( Plugin1 plugin : sincerity.getPlugins().values() )
+					root.add( GuiUtil.createPluginNode( plugin, true ) );
+			}
+			else
+			{
+				for( Plugin1 plugin : sincerity.getPlugins().values() )
+					for( String command : plugin.getCommands() )
+						root.add( GuiUtil.createCommandNode( command, plugin, true ) );
+			}
+
+			tree.setModel( new DefaultTreeModel( root ) );
+			GuiUtil.expandTree( tree, true );
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
 	}
 
 	//
@@ -124,36 +152,6 @@ public class CommandsPane extends JPanel implements ItemListener, EnhancedNodeLi
 					GuiUtil.error( x );
 				}
 			}
-		}
-	}
-
-	//
-	// Operations
-	//
-
-	public void refresh()
-	{
-		try
-		{
-			SortedNode root = new SortedNode();
-			if( groupByPlugin )
-			{
-				for( Plugin1 plugin : sincerity.getPlugins().values() )
-					root.add( GuiUtil.createPluginNode( plugin, true ) );
-			}
-			else
-			{
-				for( Plugin1 plugin : sincerity.getPlugins().values() )
-					for( String command : plugin.getCommands() )
-						root.add( GuiUtil.createCommandNode( command, plugin, true ) );
-			}
-
-			tree.setModel( new DefaultTreeModel( root ) );
-			GuiUtil.expandTree( tree, true );
-		}
-		catch( SincerityException x )
-		{
-			GuiUtil.error( x );
 		}
 	}
 

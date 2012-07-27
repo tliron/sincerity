@@ -36,7 +36,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
  * @author Tal Liron
  * @see RepositoriesPlugin
  */
-public class RepositoriesPane extends JPanel
+public class RepositoriesPane extends JPanel implements Refreshable
 {
 	//
 	// Construction
@@ -61,12 +61,10 @@ public class RepositoriesPane extends JPanel
 		buttons.setLayout( new BoxLayout( buttons, BoxLayout.Y_AXIS ) );
 
 		add( buttons, BorderLayout.EAST );
-
-		refresh();
 	}
 
 	//
-	// Operations
+	// Refreshable
 	//
 
 	public void refresh()

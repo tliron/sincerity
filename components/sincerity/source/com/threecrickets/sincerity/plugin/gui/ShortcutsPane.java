@@ -38,7 +38,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
  * @author Tal Liron
  * @see ShortcutsPlugin
  */
-public class ShortcutsPane extends JPanel implements ItemListener
+public class ShortcutsPane extends JPanel implements Refreshable, ItemListener
 {
 	//
 	// Construction
@@ -68,25 +68,10 @@ public class ShortcutsPane extends JPanel implements ItemListener
 		buttons.add( groupByTypeCheckBox );
 
 		add( buttons, BorderLayout.EAST );
-
-		refresh();
 	}
 
 	//
-	// ItemListener
-	//
-
-	public void itemStateChanged( ItemEvent event )
-	{
-		ItemSelectable item = event.getItemSelectable();
-		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
-		if( item == groupByTypeCheckBox )
-			groupByType = selected;
-		refresh();
-	}
-
-	//
-	// Operations
+	// Refreshable
 	//
 
 	public void refresh()
@@ -114,6 +99,19 @@ public class ShortcutsPane extends JPanel implements ItemListener
 		{
 			GuiUtil.error( x );
 		}
+	}
+
+	//
+	// ItemListener
+	//
+
+	public void itemStateChanged( ItemEvent event )
+	{
+		ItemSelectable item = event.getItemSelectable();
+		boolean selected = event.getStateChange() == ItemEvent.SELECTED;
+		if( item == groupByTypeCheckBox )
+			groupByType = selected;
+		refresh();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -45,7 +45,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
  * @see ContainerPlugin
  * @see ResolvedDependencies
  */
-public class DependenciesPane extends JPanel implements ItemListener
+public class DependenciesPane extends JPanel implements Refreshable, ItemListener
 {
 	//
 	// Construction
@@ -93,8 +93,28 @@ public class DependenciesPane extends JPanel implements ItemListener
 		buttons.add( new WrappedText( "Note that this list only reflects dependencies that have already been installed." ) );
 
 		add( buttons, BorderLayout.EAST );
+	}
 
-		refresh();
+	//
+	// Refreshable
+	//
+
+	public void refresh()
+	{
+		try
+		{
+			SortedNode root = new SortedNode();
+
+			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
+				root.add( GuiUtil.createDependencyNode( resolvedDependency, dependencies, true, asTree && includeSub, showLicenses, showArtifacts, showPackageContents ) );
+
+			tree.setModel( new DefaultTreeModel( root ) );
+			GuiUtil.expandTree( tree, true );
+		}
+		catch( SincerityException x )
+		{
+			GuiUtil.error( x );
+		}
 	}
 
 	//
@@ -119,28 +139,6 @@ public class DependenciesPane extends JPanel implements ItemListener
 		else if( item == showLicensesCheckBox )
 			showLicenses = selected;
 		refresh();
-	}
-
-	//
-	// Operations
-	//
-
-	public void refresh()
-	{
-		try
-		{
-			SortedNode root = new SortedNode();
-
-			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
-				root.add( GuiUtil.createDependencyNode( resolvedDependency, dependencies, true, asTree && includeSub, showLicenses, showArtifacts, showPackageContents ) );
-
-			tree.setModel( new DefaultTreeModel( root ) );
-			GuiUtil.expandTree( tree, true );
-		}
-		catch( SincerityException x )
-		{
-			GuiUtil.error( x );
-		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

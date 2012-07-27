@@ -32,7 +32,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
  * @author Tal Liron
  * @see TemplatesPlugin
  */
-public class TemplatesPane extends JPanel
+public class TemplatesPane extends JPanel implements Refreshable
 {
 	//
 	// Construction
@@ -50,12 +50,10 @@ public class TemplatesPane extends JPanel
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
-
-		refresh();
 	}
 
 	//
-	// Operations
+	// Refreshable
 	//
 
 	public void refresh()

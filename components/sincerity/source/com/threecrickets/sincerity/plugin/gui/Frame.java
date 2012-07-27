@@ -28,6 +28,7 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.plugin.gui.internal.LazyTabbedPane;
 
 /**
  * The main frame for the Sincerity GUI.
@@ -55,7 +56,7 @@ public class Frame extends JFrame implements Runnable
 		setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
 		setIconImage( new ImageIcon( Frame.class.getResource( "sincerity.png" ) ).getImage() );
 
-		tabs = new JTabbedPane();
+		tabs = new LazyTabbedPane();
 		toolbar = new JPanel( new FlowLayout( FlowLayout.LEADING, 10, 0 ) );
 
 		JPanel top = new JPanel();
