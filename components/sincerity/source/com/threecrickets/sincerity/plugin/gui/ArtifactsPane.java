@@ -29,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.TreeUI;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.ivy.core.module.descriptor.Artifact;
@@ -60,6 +61,7 @@ public class ArtifactsPane extends JPanel implements Refreshable, ItemListener
 		this.dependencies = dependencies;
 
 		tree = new JTree();
+		tree.setLargeModel( true );
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
 
@@ -123,8 +125,11 @@ public class ArtifactsPane extends JPanel implements Refreshable, ItemListener
 					root.add( GuiUtil.createArtifactNode( artifact, dependencies, showPackageContents ) );
 			}
 
+			TreeUI ui = tree.getUI();
+			tree.setUI( null );
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
+			tree.setUI( ui );
 		}
 		catch( SincerityException x )
 		{

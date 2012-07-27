@@ -26,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.plaf.TreeUI;
 import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Dependencies;
@@ -58,6 +59,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 		this.dependencies = dependencies;
 
 		tree = new JTree();
+		tree.setLargeModel( true );
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
 
@@ -108,8 +110,11 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
 				root.add( GuiUtil.createDependencyNode( resolvedDependency, dependencies, true, asTree && includeSub, showLicenses, showArtifacts, showPackageContents ) );
 
+			TreeUI ui = tree.getUI();
+			tree.setUI( null );
 			tree.setModel( new DefaultTreeModel( root ) );
 			GuiUtil.expandTree( tree, true );
+			tree.setUI( ui );
 		}
 		catch( SincerityException x )
 		{
