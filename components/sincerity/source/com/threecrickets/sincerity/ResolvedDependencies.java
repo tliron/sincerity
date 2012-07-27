@@ -203,39 +203,48 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 
 	public List<ResolvedDependency> getAll()
 	{
-		ArrayList<ResolvedDependency> allDependencies = new ArrayList<ResolvedDependency>();
-		for( ResolvedDependency resolvedDependency : this )
-			addAllDependencies( resolvedDependency, allDependencies );
+		if( allDependencies == null )
+		{
+			allDependencies = new ArrayList<ResolvedDependency>();
+			for( ResolvedDependency resolvedDependency : this )
+				addAllDependencies( resolvedDependency, allDependencies );
+		}
 		return allDependencies;
 	}
 
 	public List<Artifact> getArtifacts()
 	{
-		ArrayList<Artifact> artifacts = new ArrayList<Artifact>();
-		for( ResolvedDependency resolvedDependency : getAll() )
-			for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
-				artifacts.add( artifact );
+		if( artifacts == null )
+		{
+			artifacts = new ArrayList<Artifact>();
+			for( ResolvedDependency resolvedDependency : getAll() )
+				for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+					artifacts.add( artifact );
+		}
 		return artifacts;
 	}
 
 	public List<License> getLicenses()
 	{
-		ArrayList<License> licenses = new ArrayList<License>();
-		for( ResolvedDependency resolvedDependency : getAll() )
+		if( licenses == null )
 		{
-			for( License license : resolvedDependency.descriptor.getLicenses() )
+			licenses = new ArrayList<License>();
+			for( ResolvedDependency resolvedDependency : getAll() )
 			{
-				boolean exists = false;
-				for( License l : licenses )
+				for( License license : resolvedDependency.descriptor.getLicenses() )
 				{
-					if( l.getUrl().equals( license.getUrl() ) )
+					boolean exists = false;
+					for( License l : licenses )
 					{
-						exists = true;
-						break;
+						if( l.getUrl().equals( license.getUrl() ) )
+						{
+							exists = true;
+							break;
+						}
 					}
+					if( !exists )
+						licenses.add( license );
 				}
-				if( !exists )
-					licenses.add( license );
 			}
 		}
 		return licenses;
@@ -308,6 +317,12 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	// Private
 
 	private final List<ResolvedDependency> roots = new ArrayList<ResolvedDependency>();
+
+	private ArrayList<ResolvedDependency> allDependencies;
+
+	private ArrayList<Artifact> artifacts;
+
+	private ArrayList<License> licenses;
 
 	private static void addAllDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
 	{
