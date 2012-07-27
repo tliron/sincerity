@@ -68,7 +68,7 @@ public class Command
 
 	public Command( String name, boolean isGreedy, Sincerity sincerity )
 	{
-		String[] split = name.split( COMMANDS_SEPARATOR, 2 );
+		String[] split = name.split( PLUGIN_COMMAND_SEPARATOR, 2 );
 		if( split.length == 2 )
 		{
 			plugin = split[0];

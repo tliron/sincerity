@@ -427,6 +427,10 @@ public class Sincerity implements Runnable
 						isGreedy = true;
 						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
 					}
+
+					if( argument.equals( "--help" ) || argument.equals( "-h" ) )
+						argument = "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help";
+
 					command = new Command( argument, isGreedy, this );
 				}
 				else
