@@ -53,7 +53,7 @@ public class HelpPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"version", "help"
+			"version", "help", "verbosity"
 		};
 	}
 
@@ -71,6 +71,17 @@ public class HelpPlugin implements Plugin1
 			for( Plugin1 plugin : command.getSincerity().getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
 					command.getSincerity().getOut().println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
+		}
+		else if( "verbosity".equals( commandName ) )
+		{
+			String[] arguments = command.getArguments();
+			if( arguments.length < 1 )
+				command.getSincerity().getOut().println( command.getSincerity().getVerbosity() );
+			else
+			{
+				int verbosity = Integer.parseInt( arguments[0] );
+				command.getSincerity().setVerbosity( verbosity );
+			}
 		}
 		else
 			throw new UnknownCommandException( command );

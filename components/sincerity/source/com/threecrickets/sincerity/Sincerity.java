@@ -562,8 +562,10 @@ public class Sincerity implements Runnable
 		}
 		catch( SincerityException x )
 		{
-			getErr().println( x.getMessage() );
-			// printStackTrace( x );
+			if( getVerbosity() >= 2 )
+				printStackTrace( x );
+			else
+				getErr().println( x.getMessage() );
 		}
 		catch( Throwable x )
 		{
