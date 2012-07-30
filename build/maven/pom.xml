@@ -71,6 +71,7 @@
 		<module>skeletons/sincerity-standalone</module>
 		<module>skeletons/nexus</module>
 		<module>skeletons/nexus-optional</module>
+		<module>skeletons/orientdb</module>
 		<module>skeletons/solr</module>
 		<module>skeletons/hadoop</module>
 		<module>skeletons/rails</module>

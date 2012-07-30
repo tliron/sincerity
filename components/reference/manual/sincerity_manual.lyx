@@ -3846,6 +3846,198 @@ target "http://hadoop.apache.org/common/docs/current/single_node_setup.html#Pseu
 \end_layout
 
 \begin_layout Subsection
+OrientDB Skeleton
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "OrientDB"
+target "http://www.orientdb.org/"
+
+\end_inset
+
+ is a powerful document- and graph-oriented (
+\begin_inset Quotes eld
+\end_inset
+
+NoSQL
+\begin_inset Quotes erd
+\end_inset
+
+) database server.
+ As a graph database, it supports the entire 
+\begin_inset CommandInset href
+LatexCommand href
+name "Tinkerpop"
+target "http://tinkerpop.com/"
+
+\end_inset
+
+ stack, allowing you to easily port your application between different database
+ implementations.
+ For those coming from traditional RDBMS, OrientDB supports a SQL-like language,
+ and allows enforcing schemas on your collections.
+\end_layout
+
+\begin_layout Standard
+If you're interested in a more traditional RDMS, check out Sincerity's H2
+ skeleton.
+\end_layout
+
+\begin_layout Standard
+The Sincerity OrientDB skeleton makes it easy to set up and run a single
+ OrientDB instance, either running on its own or as a node in a multi-master
+ cluster.
+ To install an OrientDB instance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add orientdb : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start the server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start orientdb
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default web port is 2480, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:2480/studio/"
+
+\end_inset
+
+ to see the OrientDB Studio application.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+To configure your instance, see 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/orientdb/
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+H2 Skeleton
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset href
+LatexCommand href
+name "H2"
+target "http://www.h2database.com/"
+
+\end_inset
+
+ is a lightweight-yet-powerful relational database management system (RDBMS).
+ It can run both as a standalone server (supporting a PostgreSQL compatibility
+ mode), or embedded in your JVM program.
+\end_layout
+
+\begin_layout Standard
+If you're interested in non-relational (
+\begin_inset Quotes eld
+\end_inset
+
+NoSQL
+\begin_inset Quotes erd
+\end_inset
+
+) databases, check out Sincerity's OrientDB skeleton.
+\end_layout
+
+\begin_layout Standard
+The Sincerity H2 skeleton is specifically designed to make it easy to run
+ H2 in standalone server mode.
+ To install an H2 instance:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add h2 : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start the server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start h2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The default web port is 8082, so point your browser to 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8082/"
+
+\end_inset
+
+ to see the H2 Console application.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Subsection
 Jetty Web Server Skeleton
 \end_layout
 
