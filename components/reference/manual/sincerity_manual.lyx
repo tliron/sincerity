@@ -3918,7 +3918,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity start orientdb
+sincerity start server
 \end_layout
 
 \end_inset
@@ -3935,6 +3935,57 @@ target "http://localhost:2480/studio/"
 \end_inset
 
  to see the OrientDB Studio application.
+\end_layout
+
+\begin_layout Standard
+To start the console:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity console
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the console, to connect to the demo database 
+\begin_inset Quotes eld
+\end_inset
+
+tinkerpop
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+orientdb> connect remote:localhost/tinkerpop admin admin
+\end_layout
+
+\begin_layout Plain Layout
+
+orientdb> info
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
