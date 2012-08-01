@@ -1,9 +1,7 @@
 
-importClass(java.lang.System)
+document.executeOnce('/sincerity/jvm/')
 
-System.setProperty('ORIENTDB_HOME', sincerity.container.root)
-System.setProperty('orientdb.config.file', sincerity.container.getConfigurationFile('orientdb', 'server.conf'))
-System.setProperty('orientdb.www.path', sincerity.container.getFile('web'))
+importClass(java.lang.System)
 
 function getInterfaceVersion() {
 	return 1
@@ -31,6 +29,7 @@ function server(command) {
 	try {
 		command.sincerity.run('logging:logging')
 	} catch(x) {}
+	properties(command)
 	command.sincerity.run('delegate:main', ['com.orientechnologies.orient.server.OServerMain'])
 }
 
@@ -39,6 +38,7 @@ function console(command) {
 	for (var i in command.arguments) {
 		arguments.push(command.arguments[i])
 	}
+	properties(command)
 	command.sincerity.run('delegate:main', arguments)
 }
 
@@ -47,5 +47,21 @@ function gremlin(command) {
 	for (var i in command.arguments) {
 		arguments.push(command.arguments[i])
 	}
+	properties(command)
 	command.sincerity.run('delegate:main', arguments)
+}
+
+function properties(command) {
+	System.setProperty('ORIENTDB_HOME', sincerity.container.root)
+	System.setProperty('orientdb.config.file', sincerity.container.getConfigurationFile('orientdb', 'server.conf'))
+	System.setProperty('orientdb.www.path', sincerity.container.getFile('web'))
+	
+	var file = command.sincerity.container.getConfigurationFile('orientdb', 'properties.conf')
+	if (file.exists()) {
+		var properties = Sincerity.JVM.loadProperties(file)
+		for (var e = properties.propertyNames(); e.hasMoreElements(); ) {
+			var name = e.nextElement()
+			System.setProperty(name, properties.get(name))
+		}
+	}
 }
