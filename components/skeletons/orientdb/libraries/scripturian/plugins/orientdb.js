@@ -28,6 +28,9 @@ function run(command) {
 }
 
 function server(command) {
+	try {
+		command.sincerity.run('logging:logging')
+	} catch(x) {}
 	command.sincerity.run('delegate:main', ['com.orientechnologies.orient.server.OServerMain'])
 }
 
