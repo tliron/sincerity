@@ -312,7 +312,26 @@ Sincerity.JVM = Sincerity.JVM || function() {
 		}
 		return dict
 	}
-	
+
+	/**
+	 * Loads a JVM Properties sheet from a file.
+	 * 
+	 * @param {String|java.io.File} file The file or its path
+	 * @returns {java.util.Properties}
+	 */
+	Public.loadProperties = function(file) {
+		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		var properties = new java.util.Properties()
+		var reader = new java.io.BufferedReader(java.io.FileReader(file))
+		try {
+			properties.load(reader)
+		}
+		finally {
+			reader.close()
+		}
+		return properties
+	}
+
 	/**
 	 * Loads a resource as a JVM Properties sheet.
 	 * 
