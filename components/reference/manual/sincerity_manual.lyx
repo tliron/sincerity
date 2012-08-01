@@ -3865,7 +3865,7 @@ NoSQL
 \begin_inset Quotes erd
 \end_inset
 
-) database server.
+) database server designed for scalability.
  As a graph database, it supports the entire 
 \begin_inset CommandInset href
 LatexCommand href
@@ -3874,20 +3874,28 @@ target "http://tinkerpop.com/"
 
 \end_inset
 
- stack, allowing you to easily port your application between different database
- implementations.
- For those coming from traditional RDBMS, OrientDB supports a SQL-like language,
- and allows enforcing schemas on your collections.
+ stack, including the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Gremlin"
+target "https://github.com/tinkerpop/gremlin/wiki"
+
+\end_inset
+
+ graph traversal language, allowing you to easily port your application
+ between different database implementations.
+ For users needing features from traditional RDBMS, OrientDB also supports
+ SQL and allows enforcing schemas on your collections.
 \end_layout
 
 \begin_layout Standard
-If you're interested in a more traditional RDMS, check out Sincerity's H2
- skeleton.
+If you're interested in a more traditional RDBMS, check out Sincerity's
+ H2 skeleton.
 \end_layout
 
 \begin_layout Standard
 The Sincerity OrientDB skeleton makes it easy to set up and run a single
- OrientDB instance, either running on its own or as a node in a multi-master
+ OrientDB instance, which can run on its own or as a node in a multi-master
  cluster.
  To install an OrientDB instance:
 \end_layout
@@ -3957,7 +3965,7 @@ sincerity console
 \end_layout
 
 \begin_layout Standard
-In the console, to connect to the demo database 
+In the console, to connect to the demo 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3965,7 +3973,7 @@ tinkerpop
 \begin_inset Quotes erd
 \end_inset
 
-:
+ database:
 \end_layout
 
 \begin_layout Standard
@@ -3980,7 +3988,7 @@ orientdb> connect remote:localhost/tinkerpop admin admin
 
 \begin_layout Plain Layout
 
-orientdb> info
+orientdb> gremlin g.V[1]
 \end_layout
 
 \end_inset
@@ -3993,15 +4001,150 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
-To configure your instance, see 
+The OrientDB plugin also supports a 
 \begin_inset Quotes eld
 \end_inset
 
-/configuration/orientdb/
+gremlin
 \begin_inset Quotes erd
 \end_inset
 
-.
+ command to get a pure Gremlin console, though note you can also run Gremlin
+ code in the general OrientDB console by prefixing it with the 
+\begin_inset Quotes eld
+\end_inset
+
+gremlin
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Standard
+To configure your instance, start with 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/orientdb/server.conf
+\begin_inset Quotes erd
+\end_inset
+
+ (XML).
+ The default 
+\begin_inset Quotes eld
+\end_inset
+
+server.conf
+\begin_inset Quotes erd
+\end_inset
+
+ also references 
+\begin_inset Quotes eld
+\end_inset
+
+database.conf
+\begin_inset Quotes erd
+\end_inset
+
+ (JSON) and 
+\begin_inset Quotes eld
+\end_inset
+
+hazelcast.conf
+\begin_inset Quotes erd
+\end_inset
+
+ (XML).
+\end_layout
+
+\begin_layout Standard
+Additionally, 
+\begin_inset Quotes eld
+\end_inset
+
+properties.conf
+\begin_inset Quotes erd
+\end_inset
+
+ (properties sheet) can be used to set JVM system properties used by OrientDB.
+\end_layout
+
+\begin_layout Standard
+Databases will be stored in the 
+\begin_inset Quotes eld
+\end_inset
+
+/databases/
+\begin_inset Quotes erd
+\end_inset
+
+ directory in your Sincerity container.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+Two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging : add service : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install an OrientDB node with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create mycontainer : add orientdb : add logging : add service
+ : install : service orientdb start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : service orientdb stop
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -4092,15 +4235,189 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
+The H2 plugin supports all the tools that come with H2.
+ You can use 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity help
+\begin_inset Quotes erd
+\end_inset
+
+ to get a list of them.
+ For example, to create a cluster:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create-cluster 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	-urlSource jdbc:h2:tcp://localhost:9101/test 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	-urlTarget jdbc:h2:tcp://localhost:9102/test 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	-user sa 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+	-serverList localhost:9101,localhost:9102
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 To configure your server, see 
 \begin_inset Quotes eld
 \end_inset
 
-/configuration/h2/server/conf
+/configuration/h2/server.conf
 \begin_inset Quotes erd
 \end_inset
 
 .
+ Lines that are not empty and do not begin with 
+\begin_inset Quotes eld
+\end_inset
+
+#
+\begin_inset Quotes erd
+\end_inset
+
+ will be added as command line arguments to the 
+\begin_inset Quotes eld
+\end_inset
+
+server
+\begin_inset Quotes erd
+\end_inset
+
+ tool.
+ In fact, you can create 
+\begin_inset Quotes eld
+\end_inset
+
+.conf
+\begin_inset Quotes erd
+\end_inset
+
+ files for all the H2 tools if you wish to set default command arguments
+ for them.
+ For example, 
+\begin_inset Quotes eld
+\end_inset
+
+create-cluster.conf
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+By default, databases will be stored in the 
+\begin_inset Quotes eld
+\end_inset
+
+/databases/
+\begin_inset Quotes erd
+\end_inset
+
+ directory in your Sincerity container.
+ However, note that H2's JDBC URI allows you to access database stored anywhere
+ in the filesystem.
+ If this is a security concern, you may want to consider running the H2
+ server in a locked-down operating system user.
+\end_layout
+
+\begin_layout Subsubsection
+Extras
+\end_layout
+
+\begin_layout Standard
+Two plugins are strongly recommended: logging and service.
+ To install them:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add logging : add service : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following command will install an H2 database server with the recommended
+ plugins into a Sincerity container created in the current directory, and
+ then start it a service:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create mycontainer : add h2 : add logging : add service : install
+ : service h2 start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To stop it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use mycontainer : service h2 stop
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection

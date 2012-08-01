@@ -94,7 +94,7 @@ function h2(command, className, confName) {
 
 	if ((confName == 'server') || (confName == 'console')) {
 		arguments.push('-baseDir')
-		arguments.push(command.sincerity.container.getFile('data'))
+		arguments.push(command.sincerity.container.getFile('databases'))
 	}
 
 	for (var i in command.arguments) {
