@@ -3918,7 +3918,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity start server
+sincerity start orientdb
 \end_layout
 
 \end_inset
@@ -4082,10 +4082,25 @@ target "http://localhost:8082/"
 \end_inset
 
  to see the H2 Console application.
+ Note that the web console application is useful not just for H2: it be
+ used to connect to any JDBC URI, as long as you have the JDBC driver installed
+ in your Sincerity container.
 \end_layout
 
 \begin_layout Subsubsection
 Fleshing Out
+\end_layout
+
+\begin_layout Standard
+To configure your server, see 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/h2/server/conf
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsection
