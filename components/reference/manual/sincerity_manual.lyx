@@ -3167,6 +3167,74 @@ You've most likely come to Sincerity for the skeletons: they provide the
  languages as your project grows.
 \end_layout
 
+\begin_layout Subsubsection
+Web Platforms
+\end_layout
+
+\begin_layout Itemize
+Prudence
+\end_layout
+
+\begin_layout Itemize
+Restlet
+\end_layout
+
+\begin_layout Itemize
+Jetty (static web)
+\end_layout
+
+\begin_layout Itemize
+Jetty (servlet/JSP container)
+\end_layout
+
+\begin_layout Subsubsection
+Web Frameworks
+\end_layout
+
+\begin_layout Itemize
+Savory
+\end_layout
+
+\begin_layout Itemize
+Django
+\end_layout
+
+\begin_layout Itemize
+Rails
+\end_layout
+
+\begin_layout Subsubsection
+Databases
+\end_layout
+
+\begin_layout Itemize
+OrientDB
+\end_layout
+
+\begin_layout Itemize
+H2
+\end_layout
+
+\begin_layout Subsubsection
+Middleware
+\end_layout
+
+\begin_layout Itemize
+Hadoop
+\end_layout
+
+\begin_layout Itemize
+Solr
+\end_layout
+
+\begin_layout Itemize
+Felix
+\end_layout
+
+\begin_layout Itemize
+Nexus
+\end_layout
+
 \begin_layout Subsection
 Nexus Skeleton
 \end_layout
@@ -4638,7 +4706,7 @@ sincerity use mycontainer : service jetty stop
 \end_layout
 
 \begin_layout Subsection
-Jetty Servlet Skeleton
+Jetty Servlet/JSP Skeleton
 \end_layout
 
 \begin_layout Standard
