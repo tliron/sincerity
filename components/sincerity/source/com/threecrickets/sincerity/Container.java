@@ -25,6 +25,7 @@ import org.apache.ivy.core.event.IvyListener;
 import org.apache.ivy.core.event.download.EndArtifactDownloadEvent;
 import org.apache.ivy.core.event.download.StartArtifactDownloadEvent;
 import org.apache.ivy.core.event.resolve.EndResolveDependencyEvent;
+import org.apache.ivy.core.event.resolve.StartResolveDependencyEvent;
 import org.apache.ivy.plugins.repository.TransferEvent;
 import org.apache.ivy.plugins.repository.TransferListener;
 import org.apache.ivy.plugins.resolver.BasicResolver;
@@ -328,6 +329,17 @@ public class Container implements IvyListener, TransferListener
 				String file = (String) attributes.get( "file" );
 				sincerity.getOut().println( "Installing artifact: " + getRelativePath( file ) );
 			}
+		}
+		else if( StartResolveDependencyEvent.NAME.equals( name ) )
+		{
+			String organization = (String) attributes.get( "organisation" );
+			String module = (String) attributes.get( "module" );
+			String revision = (String) attributes.get( "revision" );
+			if( "latest.integration".equals( revision ) )
+				revision = "";
+			else
+				revision = ", " + revision;
+			sincerity.getOut().println( "Checking: " + organization + ":" + module + revision );
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )
 		{

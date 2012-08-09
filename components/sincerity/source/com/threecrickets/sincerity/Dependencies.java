@@ -431,7 +431,7 @@ public class Dependencies
 
 	public void install( boolean overwrite ) throws SincerityException
 	{
-		container.getSincerity().getOut().println( "Making sure all dependencies are installed..." );
+		container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
 
 		ivy.pushContext();
 		ResolveReport report;
