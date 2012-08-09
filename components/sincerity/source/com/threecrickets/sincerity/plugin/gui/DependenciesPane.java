@@ -26,6 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -36,6 +37,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.plugin.ContainerPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.plugin.gui.internal.PleaseWaitTreeModel;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 import com.threecrickets.sincerity.plugin.gui.internal.WrappedText;
 
@@ -62,6 +64,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 		tree.setLargeModel( true );
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
+		tree.setModel( new PleaseWaitTreeModel() );
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );
@@ -143,7 +146,15 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 			showPackageContents = selected;
 		else if( item == showLicensesCheckBox )
 			showLicenses = selected;
-		refresh();
+
+		tree.setModel( new PleaseWaitTreeModel() );
+		SwingUtilities.invokeLater( new Runnable()
+		{
+			public void run()
+			{
+				refresh();
+			}
+		} );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

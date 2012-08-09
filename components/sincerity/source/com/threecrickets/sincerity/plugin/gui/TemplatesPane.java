@@ -24,6 +24,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.plugin.TemplatesPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.plugin.gui.internal.PleaseWaitTreeModel;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
 /**
@@ -47,6 +48,7 @@ public class TemplatesPane extends JPanel implements Refreshable
 		tree = new JTree();
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
+		tree.setModel( new PleaseWaitTreeModel() );
 
 		JScrollPane scrollableTree = new JScrollPane( tree );
 		add( scrollableTree, BorderLayout.CENTER );

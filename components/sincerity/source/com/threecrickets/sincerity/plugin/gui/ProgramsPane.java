@@ -25,6 +25,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.EnhancedNode;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedNodeListener;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.plugin.gui.internal.PleaseWaitTreeModel;
 import com.threecrickets.sincerity.plugin.gui.internal.SortedNode;
 
 /**
@@ -51,6 +52,7 @@ public class ProgramsPane extends JPanel implements Refreshable, EnhancedNodeLis
 		tree = new JTree();
 		tree.setCellRenderer( new EnhancedTreeCellRenderer() );
 		tree.setRootVisible( false );
+		tree.setModel( new PleaseWaitTreeModel() );
 		EnhancedNode.addListener( tree, this );
 
 		JScrollPane scrollableTree = new JScrollPane( tree );

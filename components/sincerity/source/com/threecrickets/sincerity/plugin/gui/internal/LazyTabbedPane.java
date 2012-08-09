@@ -15,6 +15,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -43,11 +44,17 @@ public class LazyTabbedPane extends JTabbedPane implements ChangeListener
 		Component component = getSelectedComponent();
 		if( component instanceof Refreshable )
 		{
-			Refreshable refreshable = (Refreshable) component;
+			final Refreshable refreshable = (Refreshable) component;
 			if( !( initialized.contains( refreshable ) ) )
 			{
-				initialized.add( refreshable );
-				refreshable.refresh();
+				SwingUtilities.invokeLater( new Runnable()
+				{
+					public void run()
+					{
+						initialized.add( refreshable );
+						refreshable.refresh();
+					}
+				} );
 			}
 		}
 	}
