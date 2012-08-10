@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.internal.FileUtil;
 
 /**
  * This class helps a {@link Dependencies} instance keep track of installed
@@ -196,7 +197,16 @@ public class ManagedArtifacts
 					}
 
 					container.getSincerity().getOut().println( "Deleting artifact: " + file );
-					file.delete();
+					if( !file.delete() )
+						throw new SincerityException( "Could not delete file: " + file );
+					try
+					{
+						FileUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );
+					}
+					catch( IOException x )
+					{
+						throw new SincerityException( x.getMessage(), x );
+					}
 				}
 			}
 		}
