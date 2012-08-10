@@ -42,6 +42,11 @@ import org.apache.commons.vfs.provider.tar.Tbz2FileProvider;
 import org.apache.commons.vfs.provider.tar.TgzFileProvider;
 import org.apache.commons.vfs.provider.zip.ZipFileProvider;
 
+/**
+ * File utilities.
+ * 
+ * @author Tal Liron
+ */
 public abstract class FileUtil
 {
 	public static void unpack( File archiveFile, File destinationDir, File workdDir ) throws IOException
@@ -136,6 +141,20 @@ public abstract class FileUtil
 		finally
 		{
 			manager.close();
+		}
+	}
+
+	public static void deleteEmptyDirectoryRecursive( File directory ) throws IOException
+	{
+		if( ( directory != null ) && directory.isDirectory() )
+		{
+			File[] files = directory.listFiles();
+			if( ( files == null ) || ( files.length == 0 ) )
+			{
+				if( !directory.delete() )
+					throw new IOException( "Could not delete empty directory: " + directory );
+				deleteEmptyDirectoryRecursive( directory.getParentFile() );
+			}
 		}
 	}
 

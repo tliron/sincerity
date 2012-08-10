@@ -17,6 +17,11 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
 
+/**
+ * Pipes a {@link Reader} to a {@link Writer}.
+ * 
+ * @author Tal Liron
+ */
 public class Pipe implements Runnable
 {
 	//

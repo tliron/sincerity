@@ -11,6 +11,11 @@
 
 package com.threecrickets.sincerity.internal;
 
+/**
+ * Console tree utilities.
+ * 
+ * @author Tal Liron
+ */
 public abstract class TreeUtil
 {
 	//

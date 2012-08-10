@@ -17,6 +17,11 @@ import java.lang.reflect.Method;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 
+/**
+ * Class utilities.
+ * 
+ * @author Tal Liron
+ */
 public abstract class ClassUtil
 {
 	//

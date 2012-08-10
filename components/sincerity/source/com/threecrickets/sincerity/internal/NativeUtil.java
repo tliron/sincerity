@@ -14,6 +14,11 @@ package com.threecrickets.sincerity.internal;
 import java.io.File;
 import java.lang.reflect.Field;
 
+/**
+ * Native utilities.
+ * 
+ * @author Tal Liron
+ */
 public abstract class NativeUtil
 {
 	public static void addNativePath( File nativePath )

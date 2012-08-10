@@ -15,6 +15,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
 
+/**
+ * String utilities.
+ * 
+ * @author Tal Liron
+ */
 public abstract class StringUtil
 {
 	public static String join( String[] strings, String delimiter )

@@ -16,6 +16,11 @@ import com.threecrickets.scripturian.ExecutionController;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.sincerity.Sincerity;
 
+/**
+ * Puts the "sincerity" service in the execution context.
+ * 
+ * @author Tal Liron
+ */
 public class SincerityExecutionController implements ExecutionController
 {
 	//

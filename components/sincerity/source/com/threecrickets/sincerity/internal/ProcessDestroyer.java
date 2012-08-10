@@ -11,6 +11,11 @@
 
 package com.threecrickets.sincerity.internal;
 
+/**
+ * Destroys a {@link Process}.
+ * 
+ * @author Tal Liron
+ */
 public class ProcessDestroyer extends Thread
 {
 	//
