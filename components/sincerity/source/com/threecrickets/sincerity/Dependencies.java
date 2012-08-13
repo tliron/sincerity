@@ -334,9 +334,10 @@ public class Dependencies
 			return false;
 
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
-		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, false, true );
+		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, "latest.integration".equals( version ), true );
 		dependency.addDependencyConfiguration( "default", "*" );
 		moduleDescriptor.addDependency( dependency );
+
 		save();
 
 		return true;
