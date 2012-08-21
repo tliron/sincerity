@@ -15,4 +15,7 @@ appender.name = 'socket'
 appender.remoteHost = 'localhost'
 appender.port = 4560 // The default for log4j server is 4560. The default for Ganymede is 4445.
 appender.locationInfo = true
+
+// This is a low-priority root appender
+rootAppenders.push(appender)
 */

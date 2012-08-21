@@ -2212,6 +2212,34 @@ logging.conf
  if you wish to use it.
 \end_layout
 
+\begin_layout Standard
+The logging plugin also comes with a simple 
+\begin_inset Quotes eld
+\end_inset
+
+log
+\begin_inset Quotes erd
+\end_inset
+
+ command to test your logging configuration.
+ Example usage:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity log "Hello, log!"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Extras
 \end_layout
@@ -2219,7 +2247,87 @@ Extras
 \begin_layout Standard
 In distributed environments, such as grids and clouds, you may prefer to
  centralize your logging.
- To aid this common use case, Sincerity comes with a 
+ To aid this common use case, Sincerity comes with two logging server solutions.
+\end_layout
+
+\begin_layout Paragraph
+log4j Server
+\end_layout
+
+\begin_layout Standard
+You can create a simple log4j TCP-based socket server, which comes with
+ the logging plugin:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create logserver : add logging : install : start log4j-server
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that we're creating the log4j server in a separate container, and starting
+ it as a separate process.
+\end_layout
+
+\begin_layout Standard
+On this log4j server, you want to configure all the appenders as on the
+ client processes.
+ Then, on all your client processes, you want to disable all the appenders
+ except the socket appender (
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/logging/appenders/socket.js
+\begin_inset Quotes erd
+\end_inset
+
+).
+ Uncomment all the code there to enable it and make it the default root
+ appender.
+\end_layout
+
+\begin_layout Standard
+The result is that all logging messages will be sent from the clients to
+ the server, where they will logged normally.
+\end_layout
+
+\begin_layout Standard
+Additionally, it's recommend to run the log4j server with Sincerity's service
+ plugin:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create logserver : add logging : add service : install : service
+ log4j-server start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+MongoDB Appender
+\end_layout
+
+\begin_layout Standard
+You can install a 
 \begin_inset CommandInset href
 LatexCommand href
 name "MongoDB"
