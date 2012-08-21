@@ -239,34 +239,77 @@ What Sincerity Stands For
 \end_layout
 
 \begin_layout Standard
-<p> After using used Sincerity for a while, you'll wonder how you could
- ever have lived without it.
- </p><p> Indeed, Sincerity arrives after years of us having to repeat the
- same development and deployment tasks over and over again for every new
- project: download, unzip, copy, rename and configure, hopefully while staying
- organized as to dependencies and versions.
- Solutions like Maven create their own problems: "enterprise"-style complexity,
- enormous XML configuration files, and a Java-centrism that is becoming
- a burden as more of us are developing for the JVM without Java.
- </p><p> We decided that enough was enough! Sincerity intends: </p><ul>
- <li>To simplify and unify the <b>installation</b> of JVM applications,
- services and libraries.
+After using used Sincerity for a while, you'll wonder how you could ever
+ have lived without it.
+\end_layout
+
+\begin_layout Standard
+Indeed, Sincerity arrives after years of us having to repeat the same developmen
+t and deployment tasks over and over again for every new project: download,
+ unzip, copy, rename and configure, hopefully while staying organized as
+ to dependencies and versions.
+ Solutions like Maven create their own problems: 
+\begin_inset Quotes eld
+\end_inset
+
+enterprise
+\begin_inset Quotes erd
+\end_inset
+
+-style complexity, enormous XML configuration files, and a Java-centrism
+ that is becoming a burden as more of us are developing for the JVM without
+ Java.
+\end_layout
+
+\begin_layout Standard
+We decided that enough was enough! Sincerity intends:
+\end_layout
+
+\begin_layout Enumerate
+To simplify and unify the 
+\series bold
+installation
+\series default
+ of JVM applications, services and libraries.
  You should never have to download idiosyncratic distributions and read
  through pages of installation instructions.
- A simpler recipe should be enough.</li> <li>To simplify and unify <b>deployment<
-/b> via the JVM.
+ A simpler recipe should be enough.
+\end_layout
+
+\begin_layout Enumerate
+To simplify and unify 
+\series bold
+deployment
+\series default
+ via the JVM.
  It seems that every application and service has its own set of bootsrapping
  scripts, service wrappers, logging configuration, directory structures,
  etc.
  We can't entirely smooth out the quirks, but we can make your deployment
- experience consistent.</li> <li>To be <b>language agnostic</b>.
- The JVM is no longer the domain of Java.
+ experience consistent.
+\end_layout
+
+\begin_layout Enumerate
+To be 
+\series bold
+language agnostic
+\series default
+.
+ The JVM is no longer the exclusive domain of Java.
  A rich ecosystem of languages has grown around it, and Sincerity lets you
  manage installation and deployment without ever having to write or think
- in Java if you don't want to.</li> <li>To be <b>culturally agnostic</b>.
- The JVM is no longer the domain of enterprise applications.
+ in Java if you don't want to.
+\end_layout
+
+\begin_layout Enumerate
+To be 
+\series bold
+culturally agnostic
+\series default
+.
+ The JVM is not the exclusive domain of enterprise applications.
  If you think and work like an agile Internet startup, Sincerity is here
- for you.</li> </ul>
+ for you.
 \end_layout
 
 \begin_layout Section
@@ -5046,7 +5089,7 @@ sincerity add restlet : install
 \end_layout
 
 \begin_layout Standard
-To start you server:
+To start your Restlet component and its servers:
 \end_layout
 
 \begin_layout Standard
@@ -5056,7 +5099,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity start component
+sincerity start restlet
 \end_layout
 
 \end_inset
