@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/skeletons/lwjgl</directory>
+			<directory>@ROOT@/components/skeletons/lwjgl</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

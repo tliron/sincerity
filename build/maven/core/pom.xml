@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity</groupId>
 	<artifactId>sincerity</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity</name>
@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.threecrickets</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>1.0-beta1</version>
+			<version>@VERSION@</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ivy</groupId>
@@ -81,7 +81,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- Delegate to the Ant build script -->
@@ -131,7 +131,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/libraries/jars/com.threecrickets.sincerity/sincerity/${project.version}/sincerity.jar</file>
+									<file>@CONTENT@/libraries/jars/com.threecrickets.sincerity/sincerity/${project.version}/sincerity.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>
@@ -153,7 +153,7 @@
 						</goals>
 						<configuration>
 							<classifier>javadoc</classifier>
-							<classesDirectory>../../distribution/content/api</classesDirectory>
+							<classesDirectory>@CONTENT@/reference/api/com.threecrickets.sincerity/sincerity/${project.version}</classesDirectory>
 						</configuration>
 					</execution>
 
@@ -166,7 +166,7 @@
 						</goals>
 						<configuration>
 							<classifier>sources</classifier>
-							<classesDirectory>../../distribution/content/src</classesDirectory>
+							<classesDirectory>@CONTENT@/reference/source/com.threecrickets.sincerity/sincerity/${project.version}</classesDirectory>
 						</configuration>
 					</execution>
 				</executions>

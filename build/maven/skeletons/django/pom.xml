@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>sincerity-django</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton: Django</name>
@@ -76,7 +76,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- jar artifact -->

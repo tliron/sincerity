@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>sincerity-standalone</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton: Standalone</name>
@@ -51,17 +51,17 @@
 		<dependency>
 			<groupId>com.threecrickets.sincerity</groupId>
 			<artifactId>sincerity</artifactId>
-			<version>1.0-beta1</version>
+			<version>@VERSION@</version>
 		</dependency>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.library</groupId>
 			<artifactId>sincerity-javascript-library</artifactId>
-			<version>1.0-beta1</version>
+			<version>@VERSION@</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<directory>../../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- jar artifact -->

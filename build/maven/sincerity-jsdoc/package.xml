@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../components/sincerity-jsdoc</directory>
+			<directory>@ROOT@/components/sincerity-jsdoc</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

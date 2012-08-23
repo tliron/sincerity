@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.skeleton</groupId>
 	<artifactId>sincerity-nexus-optional</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Skeleton Add-on: Nexus Optional</name>

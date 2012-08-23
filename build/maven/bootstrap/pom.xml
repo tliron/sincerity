@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets</groupId>
 	<artifactId>bootstrap</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Bootstrap</name>
@@ -48,7 +48,7 @@
 	</mailingLists>
 
 	<build>
-		<directory>../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- Delegate to the Ant build script -->
@@ -98,7 +98,7 @@
 							<artifacts>
 								<artifact>
 									<type>jar</type>
-									<file>../../distribution/content/bootstrap.jar</file>
+									<file>@CONTENT@/bootstrap.jar</file>
 								</artifact>
 							</artifacts>
 						</configuration>

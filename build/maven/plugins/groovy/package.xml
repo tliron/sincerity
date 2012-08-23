@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/groovy</directory>
+			<directory>@ROOT@/components/plugins/groovy</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

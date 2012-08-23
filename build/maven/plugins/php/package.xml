@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/php</directory>
+			<directory>@ROOT@/components/plugins/php</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/skeletons/orientdb</directory>
+			<directory>@ROOT@/components/skeletons/orientdb</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

@@ -3,25 +3,28 @@
 
 	<property file="custom.properties" />
 
-	<property name="component.source" value="../components/${component}/source" />
-	<property name="component.resources" value="../components/${component}/resources" />
-	<property name="component.notices" value="../components/notices" />
-	<property name="reference" value="../components/reference" />
-	<property name="scripts" value="../components/scripts" />
-	<property name="sincerity-javascript-library" value="../components/sincerity-javascript-library" />
-	<property name="templates" value="../components/templates" />
-	<property name="eclipsePlugin" value="../components/eclipse-plugin/plugin" />
-	<property name="agent" value="../components/firewall-friendly-agent" />
+	<property name="root" location=".." />
+	<property name="component.source" value="${root}/components/${component}/source" />
+	<property name="component.resources" value="${root}/components/${component}/resources" />
+	<property name="component.notices" value="${root}/components/notices" />
+	<property name="reference" value="${root}/components/reference" />
+	<property name="scripts" value="${root}/components/scripts" />
+	<property name="sincerity-javascript-library" value="${root}/components/sincerity-javascript-library" />
+	<property name="templates" value="${root}/components/templates" />
+	<property name="eclipsePlugin" value="${root}/components/eclipse-plugin/plugin" />
+	<property name="agent" value="${root}/components/firewall-friendly-agent" />
 
-	<property name="dependencies" value="../dependencies" />
+	<property name="dependencies" value="${root}/dependencies" />
 
-	<property name="cache" value="./cache" />
+	<property name="cache" value="${root}/build/cache" />
 	<property name="cache.classes" value="${cache}/classes" />
 	<property name="cache.eclipsePlugin" value="${cache}/eclipse-plugin" />
 	<property name="cache.agent" value="${cache}/agent" />
 	<property name="cache.jars" value="${cache}/jars" />
+	<property name="cache.maven.pom" location="${cache}/maven/pom" />
+	<property name="cache.maven.build" location="${cache}/maven/build" />
 
-	<property name="distribution" value="./distribution" />
+	<property name="distribution" value="${root}/build/distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
 	<property name="distribution.libraries" value="${distribution.content}/libraries" />
 	<property name="distribution.jars" value="${distribution.libraries}/jars/${maven.group}/${maven.artifact}/${version}" />
@@ -134,8 +137,12 @@
 		<mkdir dir="${distribution.manual}" />
 		<copy todir="${distribution.manual}">
 			<fileset dir="${reference}/manual" excludes="*~" />
+			<filterchain>
+					<replacetokens>
+						<token key="VERSION" value="${version}" />
+					</replacetokens>
+			</filterchain>
 		</copy>
-		<replace dir="${distribution.manual}" includes="${component}_manual.lyx" token="%VERSION%" value="${version}" />
 		<antcall target="manual-lyx" />
 		<antcall target="manual-elyxer" />
 	</target>
@@ -174,13 +181,26 @@
 		</chmod>
 	</target>
 
-	<target name="distribution" depends="distribution-minimal, javadocs, manual" description="Assemble distribution">
-		<exec executable="${maven}" dir="maven" failifexecutionfails="false">
+	<target name="distribution" depends="distribution-minimal, javadocs, manual" description="Assemble distribution" />
+
+	<target name="deploy" if="maven" depends="distribution" description="Deploy to Maven repository">
+		<copy todir="${cache.maven.pom}">
+			<fileset dir="maven" excludes="*~" />
+			<filterchain>
+					<replacetokens>
+						<token key="VERSION" value="${version}" />
+						<token key="ROOT" value="${root}" />
+						<token key="CACHE" value="${cache.maven.build}" />
+						<token key="CONTENT" value="${distribution.content}" />
+					</replacetokens>
+			</filterchain>
+		</copy>
+		<exec executable="${maven}" dir="${cache.maven.pom}" failifexecutionfails="false">
 			<arg value="deploy" />
 			<arg value="-DaltDeploymentRepository=${maven.repo}" />
 		</exec>
 	</target>
-	
+
 	<target name="package-zip" depends="distribution" description="Create zip distribution package">
 		<zip destfile="${distribution}/${component}-${version}.zip">
 			<zipfileset dir="${distribution.content}" />

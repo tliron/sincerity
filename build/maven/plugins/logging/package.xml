@@ -13,7 +13,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>../../../../components/plugins/logging</directory>
+			<directory>@ROOT@/components/plugins/logging</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>**</include>

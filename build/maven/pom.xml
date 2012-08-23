@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity</groupId>
 	<artifactId>sincerity-project</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Project</name>

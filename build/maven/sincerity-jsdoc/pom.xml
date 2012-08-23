@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.library</groupId>
 	<artifactId>sincerity-jsdoc</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity JsDoc Template</name>
@@ -61,7 +61,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- jar artifact -->

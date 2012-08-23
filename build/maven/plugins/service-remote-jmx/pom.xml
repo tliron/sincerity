@@ -5,7 +5,7 @@
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
 	<artifactId>sincerity-service-remote-jmx</artifactId>
-	<version>1.0-beta1</version>
+	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
 	<name>Sincerity Plugin Add-on: Service Remote JMX</name>
@@ -61,7 +61,7 @@
 	</dependencies>
 
 	<build>
-		<directory>../../../cache/maven</directory>
+		<directory>@CACHE@</directory>
 
 		<plugins>
 			<!-- jar artifact -->
