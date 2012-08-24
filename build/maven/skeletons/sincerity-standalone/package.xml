@@ -30,7 +30,7 @@
 			</excludes>
 		</fileSet>
 		<fileSet>
-			<directory>../../../distribution/content</directory>
+			<directory>@CONTENT@</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>bootstrap.jar</include>
