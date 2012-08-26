@@ -212,16 +212,23 @@
 	</target>
 
 	<target name="package-installbuilder" depends="distribution" description="Create InstallBuilder installer">
+		<copy todir="${cache}" file="./installbuilder/${component}.xml">
+			<filterchain>
+					<replacetokens>
+						<token key="VERSION" value="${version}" />
+					</replacetokens>
+			</filterchain>
+		</copy>
 		<exec executable="${installbuilder}">
 			<arg value="build" />
-			<arg value="./installbuilder/${component}.xml" />
+			<arg value="${cache}/${component}.xml" />
 			<arg value="windows" />
 			<arg value="--license" />
 			<arg value="./installbuilder/license.xml" />
 		</exec>
 		<exec executable="${installbuilder}">
 			<arg value="build" />
-			<arg value="./installbuilder/${component}.xml" />
+			<arg value="${cache}/${component}.xml" />
 			<arg value="osx" />
 			<arg value="--license" />
 			<arg value="./installbuilder/license.xml" />
