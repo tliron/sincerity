@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
 	<version>2.0.0</version>
-	<nexusVersion>2.0.2</nexusVersion>
+	<nexusVersion>2.1.2</nexusVersion>
 	<globalConnectionSettings>
 		<connectionTimeout>20000</connectionTimeout>
 		<retrievalRetryCount>3</retrievalRetryCount>
@@ -34,9 +34,6 @@
 			<writePolicy>READ_ONLY</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<remoteStorage>
 				<provider>apacheHttpClient3x</provider>
 				<url>http://repo1.maven.org/maven2/</url>
@@ -66,9 +63,6 @@
 			<writePolicy>READ_ONLY</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<remoteStorage>
 				<provider>apacheHttpClient3x</provider>
 				<url>http://repository.apache.org/snapshots/</url>
@@ -98,9 +92,6 @@
 			<writePolicy>READ_ONLY</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<remoteStorage>
 				<provider>apacheHttpClient3x</provider>
 				<url>http://nexus.codehaus.org/snapshots/</url>
@@ -129,9 +120,6 @@
 			<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<externalConfiguration>
 				<proxyMode>ALLOW</proxyMode>
 				<artifactMaxAge>-1</artifactMaxAge>
@@ -156,9 +144,6 @@
 			<writePolicy>ALLOW_WRITE</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<externalConfiguration>
 				<proxyMode>ALLOW</proxyMode>
 				<artifactMaxAge>1440</artifactMaxAge>
@@ -183,9 +168,6 @@
 			<writePolicy>ALLOW_WRITE_ONCE</writePolicy>
 			<indexable>true</indexable>
 			<searchable>true</searchable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<externalConfiguration>
 				<proxyMode>ALLOW</proxyMode>
 				<artifactMaxAge>-1</artifactMaxAge>
@@ -208,9 +190,6 @@
 			<exposed>true</exposed>
 			<browseable>true</browseable>
 			<writePolicy>READ_ONLY</writePolicy>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<externalConfiguration>
 				<masterRepositoryId>central</masterRepositoryId>
 				<syncAtStartup>false</syncAtStartup>
@@ -229,9 +208,6 @@
 			<browseable>true</browseable>
 			<writePolicy>READ_ONLY</writePolicy>
 			<indexable>true</indexable>
-			<localStorage>
-				<provider>file</provider>
-			</localStorage>
 			<externalConfiguration>
 				<mergeMetadata>true</mergeMetadata>
 				<memberRepositories>
@@ -413,7 +389,7 @@
 		<hostname>smtp-host</hostname>
 		<port>25</port>
 		<username>smtp-username</username>
-		<password>{BL5+z5DdsRsH7hWK3v36TgErfTXjjmNoVAO9GTSDrNk=}</password>
+		<password>{4aYHv6BJMG8HkYjEdjQ1jK7r7ukB8NXPlzpR+xZb3eE=}</password>
 		<systemEmailAddress>system@nexus.org</systemEmailAddress>
 	</smtpConfiguration>
 	<errorReporting>

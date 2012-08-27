@@ -40,13 +40,10 @@
 	<property name="distribution.eclipsePlugin" value="${distribution}/eclipse-plugin" />
 	<property name="distribution.agent" value="${distribution}/firewall-friendly-agent" />
 
-	<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
-	<taskdef resource="org/vafer/jdeb/ant/antlib.xml" uri="antlib:org.vafer.jdeb.ant" classpath="${dependencies}/libraries/jars/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
-	<taskdef resource="org/freecompany/redline/ant/antlib.xml" uri="antlib:org.freecompany.redline.ant" classpath="${dependencies}/libraries/jars/org.freecompany.redline/redline/${redline.version}/redline.jar" />
+	<taskdef uri="antlib:org.apache.ivy.ant" resource="org/apache/ivy/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
+	<taskdef uri="antlib:org.vafer.jdeb.ant" resource="org/vafer/jdeb/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
+	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.freecompany.redline/redline/${redline.version}/redline.jar" />
 	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies}/libraries/jars/org.codehaus.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
-	<!--<taskdef name="deb" classname="org.vafer.jdeb.ant.DebAntTask" classpath="${dependencies}/libraries/jars/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />-->
-	<!--<taskdef name="rpm2" classname="com.jguild.jrpm.tools.RPMTask" classpath="${dependencies}/libraries/jars/com.jguild.jrpm/jrpm/${jrpm.version}/jrpm.jar" />
-	<taskdef name="rpm" classname="org.freecompany.redline.ant.RedlineTask" classpath="${dependencies}/libraries/jars/org.freecompany.redline/redline/1.1.9/redline.jar" />-->
 
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
