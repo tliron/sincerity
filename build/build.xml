@@ -52,6 +52,23 @@
 	</taskdef>
 	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml" classpath="${dependencies.jars}/org.freecompany.redline/redline/${redline.version}/redline.jar" />
 	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies.jars}/org.codehaus.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
+	
+	<property name="googlecode" location="${dependencies}/libraries/python/googlecode_upload.py" />
+	<macrodef name="googlecode">
+		<attribute name="description" />
+		<attribute name="label" />
+		<attribute name="suffix" />
+		<sequential>
+			<exec executable="${googlecode}">
+				<arg value="--project=sincerity" />
+				<arg value="--user=${googlecode.username}" />
+				<arg value="--password=${googlecode.password}" />
+				<arg value="--summary=@{description} for version ${version}" />
+				<arg value="--labels=${version.short},@{label}" />
+				<arg value="${distribution}/${component}-${version}@{suffix}" />
+			</exec>
+		</sequential>
+	</macrodef>
 
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
@@ -127,7 +144,7 @@
 	</target>
 	
 	<target name="manual-lyx" if="lyx">
-		<exec executable="${lyx}" failifexecutionfails="false">
+		<exec executable="${lyx}">
 			<arg value="--export" />
 			<arg value="pdf" />
 			<arg value="${distribution.manual}/${component}_manual.lyx" />
@@ -135,7 +152,7 @@
 	</target>
 	
 	<target name="manual-elyxer" if="elyxer">
-		<exec executable="${elyxer}" failifexecutionfails="false">
+		<exec executable="${elyxer}">
 			<arg value="--unicode" />
 			<arg value="--title" />
 			<arg value="${documentation.title} Manual" />
@@ -196,35 +213,12 @@
 
 	<target name="distribution" depends="distribution-minimal, javadocs, manual" description="Assemble distribution" />
 
-	<target name="deploy" if="maven" depends="distribution" description="Deploy to Maven repository">
-		<copy todir="${cache.maven.pom}">
-			<fileset dir="maven" excludes="*~" />
-			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version}" />
-						<token key="ROOT" value="${root}" />
-						<token key="CACHE" value="${cache.maven.build}" />
-						<token key="CONTENT" value="${distribution.content}" />
-					</replacetokens>
-			</filterchain>
-		</copy>
-		<exec executable="${maven}" dir="${cache.maven.pom}" failifexecutionfails="false">
-			<arg value="deploy" />
-			<arg value="-DaltDeploymentRepository=${maven.repo}" />
-		</exec>
-	</target>
-
 	<target name="package-zip" depends="distribution" description="Create zip distribution package">
 		<zip destfile="${distribution}/${component}-${version}.zip">
 			<zipfileset dir="${distribution.content}" />
 		</zip>
 	</target>
 	
-	<target name="package-izpack" depends="distribution" description="Create IzPack installer">
-		<!-- This is not used as part of the official distribution, but some people might want it! -->
-		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-install.jar" inheritAll="true" installerType="standard" />
-	</target>
-
 	<target name="package-deb-with-changes" if="jdeb.key">
 		<jdeb:jdeb
 			keyring="${jdeb.keyring}"
@@ -263,7 +257,7 @@
 			<fileset dir="linux/deb" excludes="*~" />
 			<filterchain>
 					<replacetokens>
-						<token key="VERSION" value="${version}" />
+						<token key="VERSION" value="${version.short}" />
 					</replacetokens>
 			</filterchain>
 		</copy>
@@ -273,7 +267,7 @@
 
 	<target name="package-rpm" depends="distribution" description="Create RPM package">
 		<redline:rpm
-			group="Three Crickets" name="${component}" version="${version}" release="0"
+			group="Three Crickets" name="${component}" version="${version.short}" release="0"
 			license="LGPLv3+"
 			summary="Sincerity is a container and dependency manager for the JVM."
 			postinstallscript="./linux/rpm/postinst"
@@ -282,10 +276,14 @@
 			<zipfileset dir="${distribution.content}" prefix="/usr/lib/${component}" />
 			<zipfileset file="./linux/${component}.desktop" prefix="/usr/share/applications" />
 		</redline:rpm>
-		<move file="${distribution}/${component}-${version}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
+		<move file="${distribution}/${component}-${version.short}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
 	</target>
 
-	<target name="package-installbuilder" depends="distribution" description="Create InstallBuilder installer">
+	<target name="package-universal-installer" depends="distribution" description="Create IzPack installer">
+		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-installer.jar" inheritAll="true" installerType="standard" />
+	</target>
+
+	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer">
 		<copy todir="${cache}" file="./installbuilder/${component}.xml">
 			<filterchain>
 					<replacetokens>
@@ -316,7 +314,36 @@
 			<fileset dir="${distribution}" includes="*.run" />
 		</chmod>
 	</target>
-	
+
+	<target name="package" depends="package-zip, package-deb, package-rpm, package-universal-installer, package-platform-installers" description="Create all packages and installers" />
+
+	<target name="deploy-maven" if="maven" depends="distribution" description="Deploy to Maven repository">
+		<copy todir="${cache.maven.pom}">
+			<fileset dir="maven" excludes="*~" />
+			<filterchain>
+					<replacetokens>
+						<token key="VERSION" value="${version}" />
+						<token key="ROOT" value="${root}" />
+						<token key="CACHE" value="${cache.maven.build}" />
+						<token key="CONTENT" value="${distribution.content}" />
+					</replacetokens>
+			</filterchain>
+		</copy>
+		<exec executable="${maven}" dir="${cache.maven.pom}" failifexecutionfails="false">
+			<arg value="deploy" />
+			<arg value="-DaltDeploymentRepository=${maven.repo}" />
+		</exec>
+	</target>
+
+	<target name="deploy-googlecode" if="googlecode.password" description="Deploy to Google Code">
+		<googlecode description="Windows installer" label="windows" suffix="-windows-installer.exe" />
+		<googlecode description="Mac OS X installer" label="mac" suffix="-osx-installer.zip" />
+		<googlecode description="Debian package" label="deb" suffix=".deb" />
+		<googlecode description="RPM package" label="rpm" suffix=".rpm" />
+		<googlecode description="Zip distribution" label="zip" suffix=".zip" />
+		<googlecode description="Universal installer" label="universal" suffix="-installer.jar" />
+	</target>
+
 	<target name="build" depends="distribution" description="Build distribution" />
 	
 	<target name="clean" description="Clean">
