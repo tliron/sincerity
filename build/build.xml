@@ -5,6 +5,7 @@
 	xmlns:redline='antlib:org.freecompany.redline.ant'>
 
 	<property file="custom.properties" />
+	<property file="private.properties" />
 
 	<property name="root" location=".." />
 	<property name="component.source" value="${root}/components/${component}/source" />
@@ -18,6 +19,7 @@
 	<property name="agent" value="${root}/components/firewall-friendly-agent" />
 
 	<property name="dependencies" value="${root}/dependencies" />
+	<property name="dependencies.jars" value="${dependencies}/libraries/jars" />
 
 	<property name="cache" value="${root}/build/cache" />
 	<property name="cache.classes" value="${cache}/classes" />
@@ -40,10 +42,16 @@
 	<property name="distribution.eclipsePlugin" value="${distribution}/eclipse-plugin" />
 	<property name="distribution.agent" value="${distribution}/firewall-friendly-agent" />
 
-	<taskdef uri="antlib:org.apache.ivy.ant" resource="org/apache/ivy/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
-	<taskdef uri="antlib:org.vafer.jdeb.ant" resource="org/vafer/jdeb/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
-	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml" classpath="${dependencies}/libraries/jars/org.freecompany.redline/redline/${redline.version}/redline.jar" />
-	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies}/libraries/jars/org.codehaus.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
+	<taskdef uri="antlib:org.apache.ivy.ant" resource="org/apache/ivy/ant/antlib.xml" classpath="${dependencies.jars}/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
+	<taskdef uri="antlib:org.vafer.jdeb.ant" resource="org/vafer/jdeb/ant/antlib.xml">
+		<classpath>
+			<pathelement location="${dependencies.jars}/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcpg-jdk15+/${bouncycastle.version}/bcpg-jdk15+.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcprov-jdk15+/${bouncycastle.version}/bcprov-jdk15+.jar" />
+		</classpath>
+	</taskdef>
+	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml" classpath="${dependencies.jars}/org.freecompany.redline/redline/${redline.version}/redline.jar" />
+	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies.jars}/org.codehaus.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
 
 	<target name="ivy" description="Settings for Ivy">
 		<ivy:settings file="ivy/settings.xml" />
@@ -217,16 +225,15 @@
 		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-install.jar" inheritAll="true" installerType="standard" />
 	</target>
 
-	<target name="package-deb" depends="distribution" description="Create Debian package">
-		<copy todir="${cache}/deb">
-			<fileset dir="linux/deb" excludes="*~" />
-			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version}" />
-					</replacetokens>
-			</filterchain>
-		</copy>
-		<jdeb:jdeb destfile="${distribution}/${component}-${version}.deb" control="${cache}/deb" verbose="true">
+	<target name="package-deb-with-changes" if="jdeb.key">
+		<jdeb:jdeb
+			keyring="${jdeb.keyring}"
+			key="${jdeb.key}"
+			passphrase="${jdeb.passphrase}"
+			control="${cache}/deb"
+			changesIn="linux/changes.txt"
+			changesOut="${distribution}/${component}-${version}.changes"
+			destfile="${distribution}/${component}-${version}.deb">
 			<data type="directory" src="${distribution.content}">
 				<mapper prefix="/usr/lib/${component}" />
 			</data>
@@ -237,15 +244,45 @@
 		</jdeb:jdeb>
 	</target>
 
-	<target name="package-rpm" description="Create RPM package">
-			<redline:rpm group="Three Crickets" name="sincerity" version="${version}" release="0"
-				destination="${distribution}"
-				postinstallscript="./linux/rpm/postinst"
-				preuninstallscript="./linux/rpm/prerm">
-				<zipfileset dir="${distribution.content}" prefix="/usr/lib/${component}" />
-				<zipfileset file="./linux/${component}.desktop" prefix="/usr/share/applications" />
-			</redline:rpm>
-			<move file="${distribution}/${component}-${version}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
+	<target name="package-deb-without-changes" unless="jdeb.key">
+		<jdeb:jdeb
+			control="${cache}/deb"
+			destfile="${distribution}/${component}-${version}.deb">
+			<data type="directory" src="${distribution.content}">
+				<mapper prefix="/usr/lib/${component}" />
+			</data>
+			<data type="directory" src="linux">
+				<include name="${component}.desktop" />
+				<mapper prefix="/usr/share/applications" />
+			</data>
+		</jdeb:jdeb>
+	</target>
+
+	<target name="package-deb" depends="distribution" description="Create Debian package">
+		<copy todir="${cache}/deb">
+			<fileset dir="linux/deb" excludes="*~" />
+			<filterchain>
+					<replacetokens>
+						<token key="VERSION" value="${version}" />
+					</replacetokens>
+			</filterchain>
+		</copy>
+		<antcall target="package-deb-with-changes" />
+		<antcall target="package-deb-without-changes" />
+	</target>
+
+	<target name="package-rpm" depends="distribution" description="Create RPM package">
+		<redline:rpm
+			group="Three Crickets" name="${component}" version="${version}" release="0"
+			license="LGPLv3+"
+			summary="Sincerity is a container and dependency manager for the JVM."
+			postinstallscript="./linux/rpm/postinst"
+			preuninstallscript="./linux/rpm/prerm"
+			destination="${distribution}">
+			<zipfileset dir="${distribution.content}" prefix="/usr/lib/${component}" />
+			<zipfileset file="./linux/${component}.desktop" prefix="/usr/share/applications" />
+		</redline:rpm>
+		<move file="${distribution}/${component}-${version}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
 	</target>
 
 	<target name="package-installbuilder" depends="distribution" description="Create InstallBuilder installer">
