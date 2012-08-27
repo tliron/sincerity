@@ -1,0 +1,7 @@
+Package: sincerity
+Version: @VERSION@-1
+Section: devel
+Priority: optional
+Architecture: all
+Description: Sincerity is a container and dependency manager for the JVM.
+Maintainer: Tal Liron <tal.liron@gmail.com>
