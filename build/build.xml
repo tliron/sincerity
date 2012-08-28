@@ -83,27 +83,31 @@
 		</path>
 	</target>
 
-	<target name="classes" depends="dependencies" description="Compile Java code">
-		<mkdir dir="${cache.classes}" />
-		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="yes" debug="${compile.debug}">
-			<classpath refid="dependencies" />
-		</javac>
-		<copy todir="${cache.classes}">
-			<fileset dir="${component.resources}" />
-		</copy>
-		
-		<mkdir dir="${cache.agent}" />
-		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="no" debug="${compile.debug}" />
-		
+	<target name="classes-eclipse" if="eclipse.home" description="Compile Eclipse Plugin Java code">
 		<mkdir dir="${cache.eclipsePlugin}" />
-		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${jvm.version}" target="${jvm.version}" includeAntRuntime="no" debug="${compile.debug}">
+		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}">
 			<classpath>
-				<fileset dir="${eclipse}/plugins" includes="**/*.jar" />
+				<fileset dir="${eclipse.home}/plugins" includes="**/*.jar" />
 			</classpath>
 		</javac>
 		<copy todir="${cache.eclipsePlugin}">
 			<fileset dir="${eclipsePlugin}" includes="icons/**, schema/**, plugin.xml" />
 		</copy>
+	</target>
+		
+	<target name="classes" depends="dependencies" description="Compile Java code">
+		<mkdir dir="${cache.classes}" />
+		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${compile.version}" target="${compile.version}" includeAntRuntime="yes" debug="${compile.debug}">
+			<classpath refid="dependencies" />
+		</javac>
+		<copy todir="${cache.classes}">
+			<fileset dir="${component.resources}" />
+		</copy>
+
+		<mkdir dir="${cache.agent}" />
+		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" />
+
+		<antcall target="classes-eclipse" />
 	</target>
 
 	<target name="version">
@@ -122,7 +126,7 @@
 	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
 		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${jvm.version}" windowtitle="${documentation.title} ${version}" doctitle="${documentation.title} ${version}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
-			<link href="${jvm.docs}" />
+			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
 			<link href="http://jsoup.org/apidocs/" />
 			<link href="http://threecrickets.com/scripturian/api/" />
@@ -168,15 +172,19 @@
 		<copy todir="${distribution.manual}">
 			<fileset dir="${reference}/manual" excludes="*~" />
 			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version}" />
-					</replacetokens>
+				<replacetokens>
+					<token key="VERSION" value="${version}" />
+				</replacetokens>
 			</filterchain>
 		</copy>
 		<antcall target="manual-lyx" />
 		<antcall target="manual-elyxer" />
 	</target>
-	
+
+	<target name="libraries-eclipse-plugin" if="eclipse.home" description="Create Eclipse Plugin jars">
+		<jar destfile="${distribution.eclipsePlugin}/sincerity-eclipse-plugin.jar" basedir="${cache.eclipsePlugin}" manifest="${eclipsePlugin}/META-INF/MANIFEST.MF" />
+	</target>
+
 	<target name="libraries" depends="classes, version" description="Create jars">
 		<mkdir dir="${distribution.jars}" />
 		<jar destfile="${distribution.jars}/${maven.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
@@ -189,7 +197,7 @@
 		<mkdir dir="${distribution.agent}" />
 		<jar destfile="${distribution.agent}/firewall-friendly-agent.jar" basedir="${cache.agent}" manifest="${agent}/resources/META-INF/MANIFEST.MF" />
 
-		<jar destfile="${distribution.eclipsePlugin}/sincerity-eclipse-plugin.jar" basedir="${cache.eclipsePlugin}" manifest="${eclipsePlugin}/META-INF/MANIFEST.MF" />
+		<antcall target="libraries-eclipse-plugin" />
 	</target>
 
 	<target name="distribution-minimal" depends="libraries" description="Assemble distribution">
@@ -234,6 +242,7 @@
 			keyring="${jdeb.keyring}"
 			key="${jdeb.key}"
 			passphrase="${jdeb.passphrase}"
+			signPackage="false"
 			control="${cache}/deb"
 			changesIn="linux/changes.txt"
 			changesOut="${distribution}/${component}-${version}.changes"
@@ -268,9 +277,9 @@
 		<copy todir="${cache}/deb">
 			<fileset dir="linux/deb" excludes="*~" />
 			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version.short}" />
-					</replacetokens>
+				<replacetokens>
+					<token key="VERSION" value="${version.short}" />
+				</replacetokens>
 			</filterchain>
 		</copy>
 		<antcall target="package-deb-signed" />
@@ -314,9 +323,9 @@
 	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer">
 		<copy todir="${cache}" file="./installbuilder/${component}.xml">
 			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version}" />
-					</replacetokens>
+				<replacetokens>
+					<token key="VERSION" value="${version}" />
+				</replacetokens>
 			</filterchain>
 		</copy>
 		<exec executable="${installbuilder}">
@@ -349,15 +358,15 @@
 		<copy todir="${cache.maven.pom}">
 			<fileset dir="maven" excludes="*~" />
 			<filterchain>
-					<replacetokens>
-						<token key="VERSION" value="${version}" />
-						<token key="ROOT" value="${root}" />
-						<token key="CACHE" value="${cache.maven.build}" />
-						<token key="CONTENT" value="${distribution.content}" />
-					</replacetokens>
+				<replacetokens>
+					<token key="VERSION" value="${version}" />
+					<token key="ROOT" value="${root}" />
+					<token key="CACHE" value="${cache.maven.build}" />
+					<token key="CONTENT" value="${distribution.content}" />
+				</replacetokens>
 			</filterchain>
 		</copy>
-		<exec executable="${maven}" dir="${cache.maven.pom}" failifexecutionfails="false">
+		<exec executable="${maven}" dir="${cache.maven.pom}">
 			<arg value="deploy" />
 			<arg value="-DaltDeploymentRepository=${maven.repo}" />
 		</exec>

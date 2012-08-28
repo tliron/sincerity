@@ -2,7 +2,7 @@
 
 <installation version="1.0">
 	<info>
-		<appname>@{title}</appname>
+		<appname>@{documentation.title}</appname>
 		<appversion>@{version}</appversion>
 		<url>http://threecrickets.com/@{component}/</url>
 		<javaversion>1.5</javaversion>
