@@ -233,28 +233,36 @@
 			<arg value="builder" />
 			<arg value="-k" />
 			<arg value="${jdeb.key}" />
+			<arg value="-g" />
+			<arg value="--no-tty" />
 			<arg value="${distribution}/${component}-${version}.deb" />
 		</exec>
 	</target>
 	
 	<target name="package-deb-signed" if="jdeb.key">
+		<!-- signPackage="false" -->
 		<jdeb:jdeb
 			keyring="${jdeb.keyring}"
 			key="${jdeb.key}"
 			passphrase="${jdeb.passphrase}"
-			signPackage="false"
 			control="${cache}/deb"
 			changesIn="linux/changes.txt"
 			changesOut="${distribution}/${component}-${version}.changes"
 			destfile="${distribution}/${component}-${version}.deb">
-			<data type="directory" src="${distribution.content}">
-				<mapper prefix="/usr/lib/${component}" />
-			</data>
-			<data type="directory" src="linux">
+			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}">
+				<exclude name="sincerity" />
+			</tarfileset>
+			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}" filemode="755">
+				<include name="sincerity" />
+			</tarfileset>
+			<tarfileset dir="linux" prefix="/usr/share/applications">
 				<include name="${component}.desktop" />
-				<mapper prefix="/usr/share/applications" />
-			</data>
+			</tarfileset>
+			<tarfileset dir="linux" prefix="/usr/share/doc/${component}">
+				<include name="copyright" />
+			</tarfileset>
 		</jdeb:jdeb>
+		<antcall target="package-deb-sign" />
 	</target>
 
 	<target name="package-deb-unsigned" unless="jdeb.key">
@@ -263,13 +271,18 @@
 			changesIn="linux/changes.txt"
 			changesOut="${distribution}/${component}-${version}.changes"
 			destfile="${distribution}/${component}-${version}.deb">
-			<data type="directory" src="${distribution.content}">
-				<mapper prefix="/usr/lib/${component}" />
-			</data>
-			<data type="directory" src="linux">
+			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}">
+				<exclude name="sincerity" />
+			</tarfileset>
+			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}" filemode="755">
+				<include name="sincerity" />
+			</tarfileset>
+			<tarfileset dir="linux" prefix="/usr/share/applications">
 				<include name="${component}.desktop" />
-				<mapper prefix="/usr/share/applications" />
-			</data>
+			</tarfileset>
+			<tarfileset dir="linux" prefix="/usr/share/doc/${component}">
+				<include name="copyright" />
+			</tarfileset>
 		</jdeb:jdeb>
 	</target>
 
@@ -284,7 +297,6 @@
 		</copy>
 		<antcall target="package-deb-signed" />
 		<antcall target="package-deb-unsigned" />
-		<antcall target="package-deb-sign" />
 	</target>
 
 	<target name="package-rpm-sign" if="rpm">

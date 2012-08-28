@@ -3,5 +3,7 @@ Version: @VERSION@-1
 Section: devel
 Priority: optional
 Architecture: all
-Description: Sincerity is a container and dependency manager for the JVM.
+Description: Container and dependency manager for the JVM.
+ Supports installing, deploying and bootstrapping JVM applications,
+ services and libraries.
 Maintainer: Tal Liron <tal.liron@gmail.com>
