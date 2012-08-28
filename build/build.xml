@@ -218,8 +218,18 @@
 			<zipfileset dir="${distribution.content}" />
 		</zip>
 	</target>
+
+	<target name="package-deb-sign" if="dpkg-sig">
+		<exec executable="${dpkg-sig}">
+			<arg value="--sign" />
+			<arg value="builder" />
+			<arg value="-k" />
+			<arg value="${jdeb.key}" />
+			<arg value="${distribution}/${component}-${version}.deb" />
+		</exec>
+	</target>
 	
-	<target name="package-deb-with-changes" if="jdeb.key">
+	<target name="package-deb-signed" if="jdeb.key">
 		<jdeb:jdeb
 			keyring="${jdeb.keyring}"
 			key="${jdeb.key}"
@@ -238,9 +248,11 @@
 		</jdeb:jdeb>
 	</target>
 
-	<target name="package-deb-without-changes" unless="jdeb.key">
+	<target name="package-deb-unsigned" unless="jdeb.key">
 		<jdeb:jdeb
 			control="${cache}/deb"
+			changesIn="linux/changes.txt"
+			changesOut="${distribution}/${component}-${version}.changes"
 			destfile="${distribution}/${component}-${version}.deb">
 			<data type="directory" src="${distribution.content}">
 				<mapper prefix="/usr/lib/${component}" />
@@ -261,21 +273,37 @@
 					</replacetokens>
 			</filterchain>
 		</copy>
-		<antcall target="package-deb-with-changes" />
-		<antcall target="package-deb-without-changes" />
+		<antcall target="package-deb-signed" />
+		<antcall target="package-deb-unsigned" />
+		<antcall target="package-deb-sign" />
+	</target>
+
+	<target name="package-rpm-sign" if="rpm">
+		<exec executable="${rpm}" inputstring="${rpm.passphrase}">
+			<arg value="--addsign" />
+			<arg value="-D" />
+			<arg value="_signature gpg" />
+			<arg value="-D" />
+			<arg value="_gpg_name ${rpm.key}" />
+			<arg value="${distribution}/${component}-${version.short}-0.noarch.rpm" />
+		</exec>
 	</target>
 
 	<target name="package-rpm" depends="distribution" description="Create RPM package">
 		<redline:rpm
 			group="Three Crickets" name="${component}" version="${version.short}" release="0"
-			license="LGPLv3+"
 			summary="Sincerity is a container and dependency manager for the JVM."
-			postinstallscript="./linux/rpm/postinst"
-			preuninstallscript="./linux/rpm/prerm"
+			description="Sincerity is a container and dependency manager for the JVM."
+			license="LGPLv3+"
+			vendor="Three Crickets LLC"
+			packager="Tal Liron &lt;tal.liron@gmail.com&gt;"
+			postinstallscript="linux/rpm/postinst"
+			preuninstallscript="linux/rpm/prerm"
 			destination="${distribution}">
 			<zipfileset dir="${distribution.content}" prefix="/usr/lib/${component}" />
-			<zipfileset file="./linux/${component}.desktop" prefix="/usr/share/applications" />
+			<zipfileset file="linux/${component}.desktop" prefix="/usr/share/applications" />
 		</redline:rpm>
+		<antcall target="package-rpm-sign" />
 		<move file="${distribution}/${component}-${version.short}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
 	</target>
 
@@ -336,12 +364,12 @@
 	</target>
 
 	<target name="deploy-googlecode" if="googlecode.password" description="Deploy to Google Code">
-		<googlecode description="Windows installer" label="windows" suffix="-windows-installer.exe" />
-		<googlecode description="Mac OS X installer" label="mac" suffix="-osx-installer.zip" />
-		<googlecode description="Debian package" label="deb" suffix=".deb" />
-		<googlecode description="RPM package" label="rpm" suffix=".rpm" />
-		<googlecode description="Zip distribution" label="zip" suffix=".zip" />
 		<googlecode description="Universal installer" label="universal" suffix="-installer.jar" />
+		<googlecode description="Zip distribution" label="zip" suffix=".zip" />
+		<googlecode description="RPM package" label="rpm" suffix=".rpm" />
+		<googlecode description="Debian package" label="deb" suffix=".deb" />
+		<googlecode description="Mac OS X installer" label="mac" suffix="-osx-installer.zip" />
+		<googlecode description="Windows installer" label="windows" suffix="-windows-installer.exe" />
 	</target>
 
 	<target name="build" depends="distribution" description="Build distribution" />

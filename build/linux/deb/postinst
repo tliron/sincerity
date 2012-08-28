@@ -13,14 +13,9 @@ set -e
 # for details, see http://www.debian.org/doc/debian-policy/ or
 # the debian-policy package
 
-
 case "$1" in
 	configure)
-		#if ! id sincerity > /dev/null 2>&1; then
-		#	useradd -rU sincerity
-		#fi
-		#chown -R sincerity:sincerity /usr/lib/sincerity
-		
+		chmod a+x /usr/lib/sincerity/sincerity
 		ln -fs /usr/lib/sincerity/sincerity /usr/bin/sincerity
 	;;
 
