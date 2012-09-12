@@ -71,7 +71,7 @@
 		<dependency>
 			<groupId>com.threecrickets.scripturian</groupId>
 			<artifactId>scripturian</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mozilla</groupId>
