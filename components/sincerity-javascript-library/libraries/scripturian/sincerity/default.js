@@ -19,6 +19,7 @@
  */
 var Sincerity = {}
 
+document.executeOnce('/sincerity/annotations/')
 document.executeOnce('/sincerity/calendar/')
 document.executeOnce('/sincerity/classes/')
 document.executeOnce('/sincerity/cryptography/')

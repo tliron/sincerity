@@ -41,7 +41,7 @@ if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 	 * @class
 	 * @name Sincerity.Iterators.JsonArray
 	 * @param params
-	 * @param {String|java.io.File} [params.file] The file or its path (ignore if params.reader is used)
+	 * @param {String|java.io.File} [params.file] The file or its path (ignored if params.reader is used)
 	 * @param {java.io.Reader} [params.reader] A reader
 	 */
 	Sincerity.Iterators.JsonArray = Sincerity.Classes.define(function() {
@@ -60,7 +60,7 @@ if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 				this.reader = Sincerity.Files.openForTextReading(params.file, params.gzip)
 			}
 			
-			this.tokener = new com.mongodb.rhino.util.JSONTokener(this.reader)
+			this.tokener = new com.threecrickets.rhino.internal.JsonTokener(this.reader)
 
 			// Make sure it's an array
 			var c = nextClean.call(this)
