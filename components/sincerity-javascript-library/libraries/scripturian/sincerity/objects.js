@@ -55,7 +55,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	}
 	
 	/**
-	 * Cloning of dicts, arrays and dates.
+	 * Cloning of dicts, arrays, dates and regexps.
 	 * 
 	 * @param value The value
 	 * @param {Boolean} [deep=true] True to allow recursive deep cloning
@@ -69,6 +69,10 @@ Sincerity.Objects = Sincerity.Objects || function() {
 			var copy = new Date()
 			copy.setTime(value.getTime())
 			return copy
+		}
+		
+		if (value instanceof RegExp) {
+			return new RegExp(value)
 		}
 	
 		deep = Public.ensure(deep, true)
