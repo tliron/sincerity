@@ -24,9 +24,9 @@ var Sincerity = Sincerity || {}
  * The default delimiter is designed to allow annotations to be inserted into
  * Scripturian block comments, in which the comment begins with an equal sign
  * and the annotation name is separated from its value by a space:
- * <p>
- * <%# = my.value.name TheValue %>
- * <p>
+ * <pre>
+ * &lt;%# = my.value.name This is the value %&gt;
+ * </pre>
  * However, you can supply your own custom regular expression.
  * 
  * @namespace
