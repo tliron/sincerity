@@ -13,7 +13,7 @@ function getInterfaceVersion() {
 }
 
 function getCommands() {
-	return ['logging', 'log']
+	return ['logging', 'log', 'server']
 }
 
 function run(command) {
@@ -23,6 +23,9 @@ function run(command) {
 			break
 		case 'log':
 			log(command)
+			break
+		case 'server':
+			server(command)
 			break
 	}
 }
@@ -77,4 +80,34 @@ function log(command) {
 	}
 
 	java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0]);
+}
+
+function server(command) {
+	importClass(
+		org.apache.log4j.LogManager,
+		org.apache.log4j.net.SocketNode,
+		java.net.ServerSocket,
+		java.lang.Thread)
+
+	command.parse = true
+	var port = command.properties.get('port') || 4560
+
+	logging(command)
+
+	var repository = LogManager.loggerRepository
+
+	println('Starting log4j server on port ' + port)
+
+	var serverSocket = new ServerSocket(port)
+	try {
+		while (true) {
+			var socket = serverSocket.accept()
+			var socketNode = new SocketNode(socket, repository)
+			var thread = new Thread(socketNode, 'log4j Server')
+			thread.start()
+		}
+	}
+	finally {
+		serverSocket.close()
+	}
 }
