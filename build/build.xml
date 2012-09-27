@@ -333,7 +333,7 @@
 	</target>
 
 	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer">
-		<copy todir="${cache}" file="./installbuilder/${component}.xml">
+		<copy todir="${cache}" file="${root}/build/installbuilder/${component}.xml">
 			<filterchain>
 				<replacetokens>
 					<token key="VERSION" value="${version}" />
@@ -352,7 +352,7 @@
 			<arg value="${cache}/${component}.xml" />
 			<arg value="osx" />
 			<arg value="--license" />
-			<arg value="./installbuilder/license.xml" />
+			<arg value="${root}/build/installbuilder/license.xml" />
 			<arg value="--setvars" />
 			<arg value="project.outputDirectory=${cache}" />
 		</exec>
