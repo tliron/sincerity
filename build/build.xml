@@ -4,10 +4,11 @@
 	xmlns:jdeb='antlib:org.vafer.jdeb.ant'
 	xmlns:redline='antlib:org.freecompany.redline.ant'>
 
-	<property file="custom.properties" />
-	<property file="private.properties" />
+	<property name="root" location="${basedir}/.." />
 
-	<property name="root" location=".." />
+	<property file="${root}/build/private.properties" />
+	<property file="${root}/build/custom.properties" />
+
 	<property name="component.source" value="${root}/components/${component}/source" />
 	<property name="component.resources" value="${root}/components/${component}/resources" />
 	<property name="component.notices" value="${root}/components/notices" />
@@ -71,11 +72,11 @@
 	</macrodef>
 
 	<target name="ivy" description="Settings for Ivy">
-		<ivy:settings file="ivy/settings.xml" />
+		<ivy:settings file="${root}/build/ivy/settings.xml" />
 	</target>
 
 	<target name="dependencies" depends="ivy" description="Resolve dependencies">
-		<ivy:resolve file="ivy/${component}.xml" type="jar" log="download-only" resolveId="${component}" />
+		<ivy:resolve file="${root}/build/ivy/${component}.xml" type="jar" log="download-only" resolveId="${component}" />
 		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" />
 		<path id="dependencies">
 			<path refid="dependencies-ivy" />
@@ -332,7 +333,7 @@
 		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-installer.jar" inheritAll="true" installerType="standard" />
 	</target>
 
-	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer">
+	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer" if="installbuilder">
 		<copy todir="${cache}" file="${root}/build/installbuilder/${component}.xml">
 			<filterchain>
 				<replacetokens>
