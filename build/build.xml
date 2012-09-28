@@ -5,7 +5,7 @@
 	xmlns:redline='antlib:org.freecompany.redline.ant'>
 
 	<property name="root" location="${basedir}/.." />
-
+	
 	<property file="${root}/build/private.properties" />
 	<property file="${root}/build/custom.properties" />
 
@@ -33,12 +33,12 @@
 	<property name="distribution" value="${root}/build/distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
 	<property name="distribution.libraries" value="${distribution.content}/libraries" />
-	<property name="distribution.jars" value="${distribution.libraries}/jars/${maven.group}/${maven.artifact}/${version}" />
+	<property name="distribution.jars" value="${distribution.libraries}/jars/${maven.group}/${maven.artifact}/${version}${version.postfix}" />
 	<property name="distribution.jars.pattern" value="${distribution.libraries}/jars/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
-	<property name="distribution.api" value="${distribution.reference}/api/${maven.group}/${maven.artifact}/${version}" />
-	<property name="distribution.manual" value="${distribution.reference}/manuals/${maven.group}/${maven.artifact}/${version}" />
-	<property name="distribution.source" value="${distribution.reference}/source/${maven.group}/${maven.artifact}/${version}" />
+	<property name="distribution.api" value="${distribution.reference}/api/${maven.group}/${maven.artifact}/${version}${version.postfix}" />
+	<property name="distribution.manual" value="${distribution.reference}/manuals/${maven.group}/${maven.artifact}/${version}${version.postfix}" />
+	<property name="distribution.source" value="${distribution.reference}/source/${maven.group}/${maven.artifact}/${version}${version.postfix}" />
 	<property name="distribution.templates" value="${distribution.content}/templates" />
 	<property name="distribution.eclipsePlugin" value="${distribution}/eclipse-plugin" />
 	<property name="distribution.agent" value="${distribution}/firewall-friendly-agent" />
@@ -64,9 +64,9 @@
 				<arg value="--project=${component}" />
 				<arg value="--user=${googlecode.username}" />
 				<arg value="--password=${googlecode.password}" />
-				<arg value="--summary=@{description} for version ${version}" />
-				<arg value="--labels=${version.short},@{label}" />
-				<arg value="${distribution}/${component}-${version}@{suffix}" />
+				<arg value="--summary=@{description} for version ${version}${version.postfix}" />
+				<arg value="--labels=${version.short}${version.short.postfix},@{label}" />
+				<arg value="${distribution}/${component}-${version}${version.postfix}@{suffix}" />
 			</exec>
 		</sequential>
 	</macrodef>
@@ -114,7 +114,7 @@
 	<target name="version">
 		<mkdir dir="${cache.classes}" />
 		<propertyfile file="${cache.classes}/com/threecrickets/sincerity/version.conf">
-			<entry key="version" value="${version}" />
+			<entry key="version" value="${version}${version.postfix}" />
 			<entry key="built" type="date" value="now" pattern="MMM dd yyyy, HH:mm:ss, 'TZ'Z" />
 		</propertyfile>
 	</target>
@@ -125,7 +125,7 @@
 	</target>
 
 	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
-		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${jvm.version}" windowtitle="${documentation.title} ${version}" doctitle="${documentation.title} ${version}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
+		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${jvm.version}" windowtitle="${documentation.title} ${version}${version.postfix}" doctitle="${documentation.title} ${version}${version.postfix}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
 			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
@@ -174,7 +174,7 @@
 			<fileset dir="${reference}/manual" excludes="*~" />
 			<filterchain>
 				<replacetokens>
-					<token key="VERSION" value="${version}" />
+					<token key="VERSION" value="${version}${version.postfix}" />
 				</replacetokens>
 			</filterchain>
 		</copy>
@@ -223,7 +223,7 @@
 	<target name="distribution" depends="distribution-minimal, javadocs, manual" description="Assemble distribution" />
 
 	<target name="package-zip" depends="distribution" description="Create zip distribution package">
-		<zip destfile="${distribution}/${component}-${version}.zip">
+		<zip destfile="${distribution}/${component}-${version}${version.postfix}.zip">
 			<zipfileset dir="${distribution.content}" />
 		</zip>
 	</target>
@@ -236,7 +236,7 @@
 			<arg value="${jdeb.key}" />
 			<arg value="-g" />
 			<arg value="--no-tty" />
-			<arg value="${distribution}/${component}-${version}.deb" />
+			<arg value="${distribution}/${component}-${version}${version.postfix}.deb" />
 		</exec>
 	</target>
 	
@@ -248,8 +248,8 @@
 			passphrase="${jdeb.passphrase}"
 			control="${cache}/deb"
 			changesIn="linux/changes.txt"
-			changesOut="${distribution}/${component}-${version}.changes"
-			destfile="${distribution}/${component}-${version}.deb">
+			changesOut="${distribution}/${component}-${version}${version.postfix}.changes"
+			destfile="${distribution}/${component}-${version}${version.postfix}.deb">
 			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}">
 				<exclude name="sincerity" />
 			</tarfileset>
@@ -270,8 +270,8 @@
 		<jdeb:jdeb
 			control="${cache}/deb"
 			changesIn="linux/changes.txt"
-			changesOut="${distribution}/${component}-${version}.changes"
-			destfile="${distribution}/${component}-${version}.deb">
+			changesOut="${distribution}/${component}-${version}${version.postfix}.changes"
+			destfile="${distribution}/${component}-${version}${version.postfix}.deb">
 			<tarfileset dir="${distribution.content}" prefix="/usr/lib/${component}">
 				<exclude name="sincerity" />
 			</tarfileset>
@@ -292,7 +292,7 @@
 			<fileset dir="linux/deb" excludes="*~" />
 			<filterchain>
 				<replacetokens>
-					<token key="VERSION" value="${version.short}" />
+					<token key="VERSION" value="${version.short}${version.short.postfix}" />
 				</replacetokens>
 			</filterchain>
 		</copy>
@@ -307,13 +307,13 @@
 			<arg value="_signature gpg" />
 			<arg value="-D" />
 			<arg value="_gpg_name ${rpm.key}" />
-			<arg value="${distribution}/${component}-${version.short}-0.noarch.rpm" />
+			<arg value="${distribution}/${component}-${version.short}${version.short.postfix}-0.noarch.rpm" />
 		</exec>
 	</target>
 
 	<target name="package-rpm" depends="distribution" description="Create RPM package">
 		<redline:rpm
-			group="Three Crickets" name="${component}" version="${version.short}" release="0"
+			group="Three Crickets" name="${component}" version="${version.short}${version.short.postfix}" release="0"
 			summary="Sincerity is a container and dependency manager for the JVM."
 			description="Sincerity is a container and dependency manager for the JVM."
 			license="LGPLv3+"
@@ -326,18 +326,18 @@
 			<zipfileset file="linux/${component}.desktop" prefix="/usr/share/applications" />
 		</redline:rpm>
 		<antcall target="package-rpm-sign" />
-		<move file="${distribution}/${component}-${version.short}-0.noarch.rpm" toFile="${distribution}/${component}-${version}.rpm" />
+		<move file="${distribution}/${component}-${version.short}${version.short.postfix}-0.noarch.rpm" toFile="${distribution}/${component}-${version}${version.postfix}.rpm" />
 	</target>
 
 	<target name="package-universal-installer" depends="distribution" description="Create IzPack installer">
-		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}-installer.jar" inheritAll="true" installerType="standard" />
+		<izpack basedir="${basedir}" input="${basedir}/izpack/${component}.xml" output="${distribution}/${component}-${version}${version.postfix}-installer.jar" inheritAll="true" installerType="standard" />
 	</target>
 
 	<target name="package-platform-installers" depends="distribution" description="Create InstallBuilder installer" if="installbuilder">
 		<copy todir="${cache}" file="${root}/build/installbuilder/${component}.xml">
 			<filterchain>
 				<replacetokens>
-					<token key="VERSION" value="${version}" />
+					<token key="VERSION" value="${version}${version.postfix}" />
 				</replacetokens>
 			</filterchain>
 		</copy>
@@ -357,8 +357,8 @@
 			<arg value="--setvars" />
 			<arg value="project.outputDirectory=${cache}" />
 		</exec>
-		<zip destfile="${distribution}/${component}-${version}-osx-installer.zip">
-			<zipfileset dir="${cache}/${component}-${version}-osx-installer.app" prefix="${component}-${version}-osx-installer.app" />
+		<zip destfile="${distribution}/${component}-${version}${version.postfix}-osx-installer.zip">
+			<zipfileset dir="${cache}/${component}-${version}${version.postfix}-osx-installer.app" prefix="${component}-${version}${version.postfix}-osx-installer.app" />
 		</zip>
 		<chmod perm="ugo+rx">
 			<fileset dir="${distribution}" includes="*.run" />
@@ -372,7 +372,7 @@
 			<fileset dir="maven" excludes="*~" />
 			<filterchain>
 				<replacetokens>
-					<token key="VERSION" value="${version}" />
+					<token key="VERSION" value="${version}${version.postfix}" />
 					<token key="ROOT" value="${root}" />
 					<token key="CACHE" value="${cache.maven.build}" />
 					<token key="CONTENT" value="${distribution.content}" />
