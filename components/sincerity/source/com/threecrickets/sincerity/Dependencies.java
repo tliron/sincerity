@@ -126,12 +126,13 @@ public class Dependencies
 
 		// Default resolve options
 		defaultResolveOptions = new ResolveOptions();
+		defaultResolveOptions.setResolveMode( ResolveOptions.RESOLVEMODE_DYNAMIC );
 		defaultResolveOptions.setConfs( new String[]
 		{
 			"default"
 		} );
 		defaultResolveOptions.setCheckIfChanged( true );
-		defaultResolveOptions.setLog( LogOptions.LOG_QUIET );
+		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() == 0 ? LogOptions.LOG_QUIET : LogOptions.LOG_DEFAULT );
 	}
 
 	//

@@ -129,6 +129,7 @@ public class Repositories
 		resolver.setEventManager( ivy.getEventManager() );
 		resolver.setName( name );
 		resolver.setM2compatible( true );
+		resolver.setCheckmodified( true );
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
@@ -165,6 +166,7 @@ public class Repositories
 		resolver.setSettings( ivy.getSettings() );
 		resolver.setEventManager( ivy.getEventManager() );
 		resolver.setName( name );
+		resolver.setCheckmodified( true );
 		if( url != null )
 			resolver.setRoot( url );
 		resolver.setChecksums( "none" );
