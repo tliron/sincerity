@@ -368,6 +368,8 @@
 	<target name="package" depends="package-zip, package-deb, package-rpm, package-universal-installer, package-platform-installers" description="Create all packages and installers" />
 
 	<target name="deploy-maven" if="maven" depends="distribution" description="Deploy to Maven repository">
+		<delete dir="${cache.maven.pom}" />
+		<delete dir="${cache.maven.build}" />
 		<copy todir="${cache.maven.pom}">
 			<fileset dir="maven" excludes="*~" />
 			<filterchain>
