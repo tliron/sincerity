@@ -41,7 +41,7 @@ public abstract class XmlUtil
 
 	public static void saveHumanReadable( Document document, File file ) throws TransformerFactoryConfigurationError, TransformerException, IOException
 	{
-		// Various indendation and UTF8 encoding bugs are worked around here
+		// Various indentation and UTF8 encoding bugs are worked around here
 		TransformerFactory factory = TransformerFactory.newInstance();
 		factory.setAttribute( "indent-number", new Integer( 4 ) );
 		Transformer transformer = factory.newTransformer();
