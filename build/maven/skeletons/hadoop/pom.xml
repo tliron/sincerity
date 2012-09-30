@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-standalone</artifactId>
-			<version>1.0.1</version>
+			<version>[1.0,1.1)</version>
 		</dependency>
 		<dependency>
 			<groupId>com.threecrickets.sincerity.plugin</groupId>
@@ -97,5 +97,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>dependencies</id>
+			<url>@DEPENDENCIES@</url>
+		</repository>
+	</repositories>
 
 </project>

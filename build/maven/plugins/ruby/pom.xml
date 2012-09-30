@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>org.jruby</groupId>
 			<artifactId>jruby-standalone</artifactId>
-			<version>1.6.8</version>
+			<version>[1.6,1.7)</version>
 		</dependency>
 	</dependencies>
 
@@ -88,5 +88,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>dependencies</id>
+			<url>@DEPENDENCIES@</url>
+		</repository>
+	</repositories>
 
 </project>

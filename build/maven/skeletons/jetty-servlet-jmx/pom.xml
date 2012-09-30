@@ -56,8 +56,15 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-jmx</artifactId>
-			<version>8.1.4</version>
+			<version>[8.1,8.2)</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>dependencies</id>
+			<url>@DEPENDENCIES@</url>
+		</repository>
+	</repositories>
 
 </project>

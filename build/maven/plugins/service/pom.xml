@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>com.tanukisoftware</groupId>
 			<artifactId>wrapper-base</artifactId>
-			<version>3.5.15</version>
+			<version>[3.5,3.6)</version>
 		</dependency>
 	</dependencies>
 
@@ -87,5 +87,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>dependencies</id>
+			<url>@DEPENDENCIES@</url>
+		</repository>
+	</repositories>
 
 </project>
