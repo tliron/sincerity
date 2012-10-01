@@ -184,21 +184,27 @@ public class ManagedArtifacts
 					file = container.getAbsoluteFile( file );
 
 					if( !file.exists() )
+					{
+						if( container.getSincerity().getVerbosity() >= 2 )
+							container.getSincerity().getOut().println( "Artifact already deleted: " + file );
 						continue;
+					}
 
-					if( entry.url != null )
+					if( ( entry.url != null ) && FileUtil.isUrlValid( entry.url ) )
 					{
 						// Keep changed artifacts
 						if( new Artifact( file, entry.url, false, container ).isDifferent() )
 						{
-							container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
+							if( container.getSincerity().getVerbosity() >= 2 )
+								container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
 							continue;
 						}
 					}
 
-					container.getSincerity().getOut().println( "Deleting artifact: " + file );
+					if( container.getSincerity().getVerbosity() >= 2 )
+						container.getSincerity().getOut().println( "Deleting artifact: " + file );
 					if( !file.delete() )
-						throw new SincerityException( "Could not delete file: " + file );
+						throw new SincerityException( "Could not delete artifact: " + file );
 					try
 					{
 						FileUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );

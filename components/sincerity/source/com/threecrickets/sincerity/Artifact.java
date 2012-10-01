@@ -116,17 +116,26 @@ public class Artifact implements Comparable<Artifact>
 	{
 		if( file.exists() )
 		{
-			// TODO: back up in cache if overwriting!!!
-
 			if( overwrite )
 			{
-				if( container.getSincerity().getVerbosity() >= 2 )
-					container.getSincerity().getOut().println( "Installing artifact (overwriting): " + path );
+				if( isDifferent() )
+				{
+					if( container.getSincerity().getVerbosity() >= 2 )
+						container.getSincerity().getOut().println( "Overwriting artifact: " + path );
+
+					// TODO: backup changed artifacts in cache!
+				}
+				else
+				{
+					if( container.getSincerity().getVerbosity() >= 2 )
+						container.getSincerity().getOut().println( "Artifact is unchanged: " + path );
+					return;
+				}
 			}
 			else
 			{
 				if( container.getSincerity().getVerbosity() >= 2 )
-					container.getSincerity().getOut().println( "Not installing modified artifact: " + path );
+					container.getSincerity().getOut().println( "Artifact already exists: " + path );
 				return;
 			}
 		}

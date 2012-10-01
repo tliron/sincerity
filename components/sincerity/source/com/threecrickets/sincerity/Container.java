@@ -157,7 +157,12 @@ public class Container implements IvyListener, TransferListener
 
 	public Bootstrap getBootstrap() throws SincerityException
 	{
-		Bootstrap bootstrap = Bootstrap.getBootstrap( root );
+		return getBootstrap( false );
+	}
+
+	public Bootstrap getBootstrap( boolean forceCreate ) throws SincerityException
+	{
+		Bootstrap bootstrap = forceCreate ? null : Bootstrap.getBootstrap( root );
 		if( bootstrap == null )
 		{
 			bootstrap = dependencies.createBootstrap();
@@ -301,6 +306,16 @@ public class Container implements IvyListener, TransferListener
 		return programs;
 	}
 
+	public boolean hasChanged()
+	{
+		return hasChanged;
+	}
+
+	public void initializeProgress()
+	{
+		hasChanged = false;
+	}
+
 	//
 	// IvyListener
 	//
@@ -328,6 +343,7 @@ public class Container implements IvyListener, TransferListener
 			{
 				String file = (String) attributes.get( "file" );
 				sincerity.getOut().println( "Installing artifact: " + getRelativePath( file ) );
+				hasChanged = true;
 			}
 		}
 		else if( StartResolveDependencyEvent.NAME.equals( name ) )
@@ -384,6 +400,8 @@ public class Container implements IvyListener, TransferListener
 	private final Shortcuts shortcuts;
 
 	private LanguageManager languageManager;
+
+	private boolean hasChanged;
 
 	private void configure()
 	{

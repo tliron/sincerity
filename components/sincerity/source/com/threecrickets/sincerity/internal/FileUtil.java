@@ -177,6 +177,19 @@ public abstract class FileUtil
 				files.add( file );
 	}
 
+	public static boolean isUrlValid( URL url )
+	{
+		try
+		{
+			url.openStream().close();
+			return true;
+		}
+		catch( IOException x )
+		{
+			return false;
+		}
+	}
+
 	public static boolean isSameContent( URL url, File file ) throws IOException
 	{
 		try

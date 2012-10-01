@@ -132,7 +132,7 @@ public class Dependencies
 			"default"
 		} );
 		defaultResolveOptions.setCheckIfChanged( true );
-		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() == 0 ? LogOptions.LOG_QUIET : LogOptions.LOG_DEFAULT );
+		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() < 1 ? LogOptions.LOG_QUIET : LogOptions.LOG_DEFAULT );
 	}
 
 	//
@@ -215,7 +215,9 @@ public class Dependencies
 				artifacts.add( new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container ) );
 		}
 
-		for( Package pack : getPackages() )
+		Packages packages = getPackages();
+
+		for( Package pack : packages )
 		{
 			for( Artifact artifact : pack )
 			{
@@ -227,7 +229,7 @@ public class Dependencies
 		}
 
 		if( install )
-			for( Package pack : getPackages() )
+			for( Package pack : packages )
 				pack.install();
 
 		return artifacts;
@@ -435,6 +437,8 @@ public class Dependencies
 	{
 		container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
 
+		container.initializeProgress();
+
 		ivy.pushContext();
 		ResolveReport report;
 		try
@@ -457,18 +461,30 @@ public class Dependencies
 		if( report.hasError() )
 			throw new SincerityException( "Some dependencies could not be installed" );
 
-		if( report.hasChanged() )
+		updateBootstrap();
+
+		if( container.hasChanged() || report.hasChanged() )
+		{
+			// Make sure to handle package deletions first
+			managedArtifacts.update( getArtifacts() );
+
 			updateBootstrap();
+
+			// Now artifacts in packages will be properly deleted
+			managedArtifacts.update( getArtifacts( true, overwrite ) );
+
+			printDisclaimer( container.getSincerity().getOut() );
+		}
 		else
+		{
+			// Just handle artifact installations
+			managedArtifacts.update( getArtifacts( true, overwrite ) );
+
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 
-		managedArtifacts.update( getArtifacts( true, overwrite ) );
-
-		if( report.hasChanged() )
-		{
-			printDisclaimer( container.getSincerity().getOut() );
-			updateBootstrap();
 		}
+
+		updateBootstrap();
 	}
 
 	public Bootstrap createBootstrap() throws SincerityException
@@ -490,7 +506,7 @@ public class Dependencies
 
 	public void updateBootstrap() throws SincerityException
 	{
-		Bootstrap bootstrap = container.getBootstrap();
+		Bootstrap bootstrap = container.getBootstrap( true );
 		for( File file : getClasspaths( false ) )
 			bootstrap.addFile( file );
 
