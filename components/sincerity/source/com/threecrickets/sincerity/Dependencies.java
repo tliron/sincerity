@@ -461,16 +461,14 @@ public class Dependencies
 		if( report.hasError() )
 			throw new SincerityException( "Some dependencies could not be installed" );
 
-		updateBootstrap();
-
 		if( container.hasChanged() || report.hasChanged() )
 		{
 			// Make sure to handle package deletions first
+			updateBootstrap();
 			managedArtifacts.update( getArtifacts() );
 
-			updateBootstrap();
-
 			// Now artifacts in packages will be properly deleted
+			updateBootstrap();
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
 
 			printDisclaimer( container.getSincerity().getOut() );
@@ -478,13 +476,11 @@ public class Dependencies
 		else
 		{
 			// Just handle artifact installations
+			updateBootstrap();
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
 
 			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
-
 		}
-
-		updateBootstrap();
 	}
 
 	public Bootstrap createBootstrap() throws SincerityException

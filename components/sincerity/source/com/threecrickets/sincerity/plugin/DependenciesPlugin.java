@@ -121,16 +121,19 @@ public class DependenciesPlugin implements Plugin1
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.install( overwrite );
+			command.getSincerity().reboot();
 		}
 		else if( "uninstall".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.uninstall();
+			command.getSincerity().reboot();
 		}
 		else if( "reset".equals( commandName ) )
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.reset();
+			command.getSincerity().reboot();
 		}
 		else if( "add".equals( commandName ) )
 		{

@@ -281,8 +281,6 @@ public class Sincerity implements Runnable
 		{
 			throw new SincerityException( "Could not access container root: " + containerRoot );
 		}
-
-		reboot();
 	}
 
 	public Container getContainer() throws SincerityException
@@ -508,12 +506,17 @@ public class Sincerity implements Runnable
 
 	public void reboot() throws SincerityException
 	{
-		// Convert remaining commands back into arguments
+		// Remove current command
+		Command first = commands.get( 0 );
+		if( first != null )
+			commands.remove( first );
+
+		// Convert remaining commands into arguments to be re-parsed
 		ArrayList<String> arguments = new ArrayList<String>();
 		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
 		{
-			Command command = i.next();
-			for( String argument : command.toArguments() )
+			Command c = i.next();
+			for( String argument : c.toArguments() )
 				arguments.add( argument );
 			if( i.hasNext() )
 				arguments.add( Command.COMMANDS_SEPARATOR );
