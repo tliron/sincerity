@@ -132,7 +132,7 @@ public class Dependencies
 			"default"
 		} );
 		defaultResolveOptions.setCheckIfChanged( true );
-		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() < 1 ? LogOptions.LOG_QUIET : LogOptions.LOG_DEFAULT );
+		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() >= 1 ? LogOptions.LOG_DEFAULT : LogOptions.LOG_QUIET );
 	}
 
 	//

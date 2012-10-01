@@ -322,9 +322,6 @@ public class Container implements IvyListener, TransferListener
 
 	public void progress( IvyEvent event )
 	{
-		if( sincerity.getVerbosity() < 1 )
-			return;
-
 		String name = event.getName();
 		Map<?, ?> attributes = event.getAttributes();
 		if( StartArtifactDownloadEvent.NAME.equals( name ) )
@@ -334,7 +331,8 @@ public class Container implements IvyListener, TransferListener
 			if( "false".equals( attributes.get( "metadata" ) ) )
 			{
 				String origin = (String) attributes.get( "origin" );
-				sincerity.getOut().println( "Downloading " + origin );
+				if( sincerity.getVerbosity() >= 1 )
+					sincerity.getOut().println( "Downloading " + origin );
 			}
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
@@ -342,7 +340,8 @@ public class Container implements IvyListener, TransferListener
 			if( "false".equals( attributes.get( "metadata" ) ) && "successful".equals( attributes.get( "status" ) ) )
 			{
 				String file = (String) attributes.get( "file" );
-				sincerity.getOut().println( "Installing artifact: " + getRelativePath( file ) );
+				if( sincerity.getVerbosity() >= 1 )
+					sincerity.getOut().println( "Installing artifact: " + getRelativePath( file ) );
 				hasChanged = true;
 			}
 		}
@@ -355,7 +354,8 @@ public class Container implements IvyListener, TransferListener
 				revision = "";
 			else
 				revision = ", " + revision;
-			sincerity.getOut().println( "Checking: " + organization + ":" + module + revision );
+			if( sincerity.getVerbosity() >= 2 )
+				sincerity.getOut().println( "Checking: " + organization + ":" + module + revision );
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )
 		{

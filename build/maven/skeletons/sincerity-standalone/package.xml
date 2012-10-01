@@ -18,6 +18,9 @@
 			<includes>
 				<include>**</include>
 			</includes>
+			<excludes>
+				<exclude>**/.gitignore</exclude>
+			</excludes>
 		</fileSet>
 		<fileSet>
 			<directory>@ROOT@/components/scripts</directory>
@@ -27,6 +30,7 @@
 			</includes>
 			<excludes>
 				<exclude>*.old</exclude>
+				<exclude>**/.gitignore</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet>
@@ -35,6 +39,9 @@
 			<includes>
 				<include>bootstrap.jar</include>
 			</includes>
+			<excludes>
+				<exclude>**/.gitignore</exclude>
+			</excludes>
 		</fileSet>
 	</fileSets>
 
