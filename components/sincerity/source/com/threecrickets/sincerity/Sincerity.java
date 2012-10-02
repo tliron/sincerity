@@ -458,10 +458,10 @@ public class Sincerity implements Runnable
 
 		if( command.plugin != null )
 		{
-			Plugin1 thePlugin = getPlugins().get( command.plugin );
-			if( thePlugin == null )
+			Plugin1 plugin = getPlugins().get( command.plugin );
+			if( plugin == null )
 				throw new UnknownCommandException( command );
-			thePlugin.run( command );
+			plugin.run( command );
 		}
 		else
 		{

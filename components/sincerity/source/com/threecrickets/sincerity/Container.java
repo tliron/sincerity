@@ -332,7 +332,7 @@ public class Container implements IvyListener, TransferListener
 			{
 				String origin = (String) attributes.get( "origin" );
 				if( sincerity.getVerbosity() >= 1 )
-					sincerity.getOut().println( "Downloading " + origin );
+					sincerity.getOut().println( "Downloading from: " + origin );
 			}
 		}
 		else if( EndArtifactDownloadEvent.NAME.equals( name ) )
