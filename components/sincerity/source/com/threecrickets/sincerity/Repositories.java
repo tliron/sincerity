@@ -130,9 +130,9 @@ public class Repositories
 		resolver.setName( name );
 		resolver.setM2compatible( true );
 		resolver.setCheckmodified( true );
+		resolver.setChecksums( "none" );
 		if( url != null )
 			resolver.setRoot( url );
-		resolver.setChecksums( "none" );
 		boolean added = addResolver( section, resolver, true );
 
 		if( added )
@@ -140,11 +140,12 @@ public class Repositories
 			try
 			{
 				Appender appender = new Appender( "ibiblio" );
-				appender.element.setAttribute( "checksums", "none" );
+				appender.element.setAttribute( "name", name );
 				if( url != null )
 					appender.element.setAttribute( "root", url );
 				appender.element.setAttribute( "m2compatible", "true" );
-				appender.element.setAttribute( "name", name );
+				appender.element.setAttribute( "checkmodified", "true" );
+				appender.element.setAttribute( "checksums", "none" );
 				appender.save();
 			}
 			catch( Exception x )
@@ -167,9 +168,9 @@ public class Repositories
 		resolver.setEventManager( ivy.getEventManager() );
 		resolver.setName( name );
 		resolver.setCheckmodified( true );
+		resolver.setChecksums( "none" );
 		if( url != null )
 			resolver.setRoot( url );
-		resolver.setChecksums( "none" );
 		boolean added = addResolver( section, resolver, true );
 
 		if( added )
@@ -177,10 +178,11 @@ public class Repositories
 			try
 			{
 				Appender appender = new Appender( "pypi" );
-				appender.element.setAttribute( "checksums", "none" );
+				appender.element.setAttribute( "name", name );
 				if( url != null )
 					appender.element.setAttribute( "root", url );
-				appender.element.setAttribute( "name", name );
+				appender.element.setAttribute( "checkmodified", "true" );
+				appender.element.setAttribute( "checksums", "none" );
 				appender.save();
 			}
 			catch( Exception x )

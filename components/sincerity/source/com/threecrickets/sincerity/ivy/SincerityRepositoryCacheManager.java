@@ -91,6 +91,16 @@ public class SincerityRepositoryCacheManager extends DefaultRepositoryCacheManag
 		return IvyPatternHelper.substitute( pattern, artifact, origin );
 	}
 
+	/*
+	 * @Override public ResolvedModuleRevision cacheModuleDescriptor(
+	 * DependencyResolver resolver, final ResolvedResource mdRef,
+	 * DependencyDescriptor dd, Artifact moduleArtifact, ResourceDownloader
+	 * downloader, CacheMetadataOptions options ) throws ParseException { return
+	 * super.cacheModuleDescriptor( resolver, mdRef, new
+	 * ChangingDependencyDescriptor( dd ), moduleArtifact, downloader, options
+	 * ); }
+	 */
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

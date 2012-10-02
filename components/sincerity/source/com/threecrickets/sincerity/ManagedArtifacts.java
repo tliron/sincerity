@@ -185,7 +185,7 @@ public class ManagedArtifacts
 
 					if( !file.exists() )
 					{
-						if( container.getSincerity().getVerbosity() >= 2 )
+						if( container.getSincerity().getVerbosity() >= 3 )
 							container.getSincerity().getOut().println( "Artifact already deleted: " + file );
 						continue;
 					}
@@ -195,13 +195,13 @@ public class ManagedArtifacts
 						// Keep changed artifacts
 						if( new Artifact( file, entry.url, false, container ).isDifferent() )
 						{
-							if( container.getSincerity().getVerbosity() >= 2 )
+							if( container.getSincerity().getVerbosity() >= 3 )
 								container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
 							continue;
 						}
 					}
 
-					if( container.getSincerity().getVerbosity() >= 2 )
+					if( container.getSincerity().getVerbosity() >= 3 )
 						container.getSincerity().getOut().println( "Deleting artifact: " + file );
 					if( !file.delete() )
 						throw new SincerityException( "Could not delete artifact: " + file );
