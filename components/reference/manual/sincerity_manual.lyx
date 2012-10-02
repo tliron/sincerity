@@ -6580,8 +6580,47 @@ Note that you need to host the documentation via HTTP.
 Extending Sincerity
 \end_layout
 
+\begin_layout Subsection
+Developing Plugins
+\end_layout
+
 \begin_layout Standard
-Creating your own
+Make sure you understand that dependencies may be installed in arbitrary
+ order.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+document.executeOnce('/sincerity/jvm/')
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+try {
+\end_layout
+
+\begin_layout Plain Layout
+
+	document.executeOnce('/mongo-db/')
+\end_layout
+
+\begin_layout Plain Layout
+
+} catch(x) { /* the dependency may not have been installed yet! */ }
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -7313,6 +7352,10 @@ Of course, you can also deploy to a repository server, such as Nexus, which
 \begin_layout Standard
 Maven is a complex tool that can do a whole lot more than this, but this
  should get you started.
+\end_layout
+
+\begin_layout Standard
+[Add note about support for -SNAPSHOT]
 \end_layout
 
 \begin_layout Section
