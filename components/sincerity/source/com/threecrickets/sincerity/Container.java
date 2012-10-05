@@ -354,7 +354,7 @@ public class Container implements IvyListener, TransferListener
 				revision = "";
 			else
 				revision = ", " + revision;
-			if( sincerity.getVerbosity() >= 2 )
+			if( sincerity.getVerbosity() >= 1 )
 				sincerity.getOut().println( "Checking: " + organization + ":" + module + revision );
 		}
 		else if( EndResolveDependencyEvent.NAME.equals( name ) )

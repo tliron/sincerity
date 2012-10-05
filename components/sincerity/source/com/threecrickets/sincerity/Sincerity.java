@@ -168,7 +168,6 @@ public class Sincerity implements Runnable
 			container = sincerity.container;
 			containerRoot = sincerity.containerRoot;
 			plugins = sincerity.plugins;
-			verbosity = sincerity.verbosity;
 		}
 
 		commands = parseCommands( arguments );
@@ -197,14 +196,11 @@ public class Sincerity implements Runnable
 
 	public int getVerbosity()
 	{
+		Integer verbosity = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.verbosity" );
 		if( verbosity == null )
 		{
-			verbosity = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.verbosity" );
-			if( verbosity == null )
-			{
-				verbosity = 1;
-				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
-			}
+			verbosity = 1;
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
 		}
 
 		return verbosity;
@@ -212,8 +208,7 @@ public class Sincerity implements Runnable
 
 	public void setVerbosity( int verbosity )
 	{
-		this.verbosity = verbosity;
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", this.verbosity );
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
 	}
 
 	public PrintWriter getOut()
@@ -593,8 +588,6 @@ public class Sincerity implements Runnable
 	private Container container;
 
 	private Plugins plugins;
-
-	private Integer verbosity;
 
 	private Frame frame;
 
