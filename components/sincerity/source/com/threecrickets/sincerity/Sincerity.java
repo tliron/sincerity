@@ -66,9 +66,11 @@ public class Sincerity implements Runnable
 	// Constants
 	//
 
-	public static final String CONTAINER_PROPERTY = "sincerity.container";
+	public static final String CONTAINER_PROPERTY = "sincerity.container.root";
 
 	public static final String CONTAINER_ENV = "SINCERITY_CONTAINER";
+
+	public static final String CONTAINER_ATTRIBUTE = "com.threecrickets.sincerity.containerRoot";
 
 	public static final String DEBUG_PROPERTY = "sincerity.debug";
 
@@ -257,7 +259,7 @@ public class Sincerity implements Runnable
 	{
 		if( containerRoot == null )
 		{
-			containerRoot = (File) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.containerRoot" );
+			containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ATTRIBUTE );
 			if( containerRoot == null )
 				setContainerRoot( findContainerRoot() );
 		}
@@ -269,7 +271,7 @@ public class Sincerity implements Runnable
 		try
 		{
 			File canonicalContainerRoot = containerRoot.getCanonicalFile();
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.containerRoot", canonicalContainerRoot );
+			Bootstrap.getAttributes().put( CONTAINER_ATTRIBUTE, canonicalContainerRoot );
 			System.setProperty( CONTAINER_PROPERTY, canonicalContainerRoot.toString() );
 		}
 		catch( IOException x )
@@ -596,7 +598,7 @@ public class Sincerity implements Runnable
 		//
 		// Look for container in this order:
 		//
-		// 1. 'sincerity.container' JVM property
+		// 1. 'sincerity.container.root' JVM property
 		// 2. 'SINCERITY_CONTAINER' environment variable
 		// 3. Search up filesystem tree from current path
 		//
