@@ -1,6 +1,6 @@
 
 println()
-println('To start your Restlet component, run: "sincerity start restlet"')
+println('To start your Restlet component, run: "sincerity delegate:start restlet"')
 println()
 
 document.executeOnce('/sincerity/files/')

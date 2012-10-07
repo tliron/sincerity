@@ -2,7 +2,7 @@
 //
 // The socket appender is useful in conjunction with a log4j server:
 //
-//   sincerity start log4j-server
+//   sincerity delegate:start log4j-server
 //
 // And also with the Ganymede plugin for Eclipse:
 //

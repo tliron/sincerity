@@ -1,6 +1,6 @@
 
 println()
-print('To start your web server, run: "sincerity start jetty"')
+print('To start your web server, run: "sincerity delegate:start jetty"')
 println()
 
 document.executeOnce('/sincerity/files/')

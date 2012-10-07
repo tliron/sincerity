@@ -1,6 +1,6 @@
 
 println()
-println('To start your LWJGL game, run: "sincerity start lwjgl"')
+println('To start your LWJGL game, run: "sincerity delegate:start lwjgl"')
 println()
 
 document.executeOnce('/sincerity/files/')

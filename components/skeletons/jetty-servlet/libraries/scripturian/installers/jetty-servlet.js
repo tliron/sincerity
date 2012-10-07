@@ -1,6 +1,6 @@
 
 println()
-println('To start your servlet container, run: "sincerity start jetty"')
+println('To start your servlet container, run: "sincerity delegate:start jetty"')
 println()
 
 document.executeOnce('/sincerity/files/')
