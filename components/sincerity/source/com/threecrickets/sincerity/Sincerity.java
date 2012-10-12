@@ -273,6 +273,12 @@ public class Sincerity implements Runnable
 			File canonicalContainerRoot = containerRoot.getCanonicalFile();
 			Bootstrap.getAttributes().put( CONTAINER_ATTRIBUTE, canonicalContainerRoot );
 			System.setProperty( CONTAINER_PROPERTY, canonicalContainerRoot.toString() );
+			this.containerRoot = canonicalContainerRoot;
+
+			// Depends on the container root
+			container = null;
+
+			reboot();
 		}
 		catch( IOException x )
 		{
@@ -315,7 +321,7 @@ public class Sincerity implements Runnable
 	{
 		try
 		{
-			return getContainer().getDependencies().getPlugins();
+			return getContainer().getPlugins();
 		}
 		catch( NoContainerException x )
 		{
@@ -501,14 +507,14 @@ public class Sincerity implements Runnable
 		run( command );
 	}
 
+	public void skip( Command command )
+	{
+		commands.remove( command );
+	}
+
 	public void reboot() throws SincerityException
 	{
-		// Remove current command
-		Command first = commands.get( 0 );
-		if( first != null )
-			commands.remove( first );
-
-		// Convert remaining commands into arguments to be re-parsed
+		// Convert commands into arguments to be re-parsed
 		ArrayList<String> arguments = new ArrayList<String>();
 		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
 		{

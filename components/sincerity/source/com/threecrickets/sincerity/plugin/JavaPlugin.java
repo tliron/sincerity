@@ -19,7 +19,6 @@ import java.util.Collection;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
-import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -84,8 +83,6 @@ public class JavaPlugin implements Plugin1
 			else
 				classesDir = container.getFile( "libraries", "classes" );
 
-			Dependencies dependencies = container.getDependencies();
-
 			try
 			{
 				Class<?> javac = container.getBootstrap().loadClass( "com.sun.tools.javac.Main" );
@@ -95,14 +92,15 @@ public class JavaPlugin implements Plugin1
 				compileArguments.add( "-d" );
 				compileArguments.add( classesDir.getAbsolutePath() );
 				compileArguments.add( "-classpath" );
-				compileArguments.add( dependencies.getClasspath( true ) );
+				compileArguments.add( container.getDependencies().getClasspath( true ) );
 				addSources( javaDir, compileArguments );
 
 				classesDir.mkdirs();
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
 
-				dependencies.updateBootstrap();
+				command.skip();
+				command.getSincerity().reboot();
 			}
 			catch( ClassNotFoundException x )
 			{

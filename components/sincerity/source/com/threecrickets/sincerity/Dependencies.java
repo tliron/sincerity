@@ -177,13 +177,6 @@ public class Dependencies
 		return resolvedDependencies;
 	}
 
-	public Plugins getPlugins() throws SincerityException
-	{
-		if( plugins == null )
-			plugins = new Plugins( container );
-		return plugins;
-	}
-
 	public File getResolutionReport()
 	{
 		ivy.pushContext();
@@ -423,14 +416,14 @@ public class Dependencies
 	public void prune() throws SincerityException
 	{
 		managedArtifacts.update( getArtifacts() );
-		updateBootstrap();
+		container.updateBootstrap();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
 		managedArtifacts.clean();
-		updateBootstrap();
+		container.updateBootstrap();
 	}
 
 	public void install( boolean overwrite ) throws SincerityException
@@ -461,13 +454,13 @@ public class Dependencies
 		if( report.hasError() )
 			throw new SincerityException( "Some dependencies could not be installed" );
 
-		updateBootstrap();
+		container.updateBootstrap();
 
 		if( container.hasChanged() || report.hasChanged() )
 		{
 			// Make sure to handle package deletions first
 			managedArtifacts.update( getArtifacts() );
-			updateBootstrap();
+			container.updateBootstrap();
 
 			// Now artifacts in packages will be properly deleted
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
@@ -482,33 +475,7 @@ public class Dependencies
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
 		}
 
-		updateBootstrap();
-	}
-
-	public Bootstrap createBootstrap() throws SincerityException
-	{
-		List<File> classpaths = getClasspaths( false );
-		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
-		try
-		{
-			for( File file : classpaths )
-				urls.add( file.toURI().toURL() );
-		}
-		catch( MalformedURLException x )
-		{
-			throw new SincerityException( "Parsing error while initializing bootstrap", x );
-		}
-
-		return new Bootstrap( urls );
-	}
-
-	public void updateBootstrap() throws SincerityException
-	{
-		Bootstrap bootstrap = container.getBootstrap( true );
-		for( File file : getClasspaths( false ) )
-			bootstrap.addFile( file );
-
-		plugins = null;
+		container.updateBootstrap();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -527,8 +494,6 @@ public class Dependencies
 	private DefaultModuleDescriptor moduleDescriptor;
 
 	private ResolvedDependencies resolvedDependencies;
-
-	private Plugins plugins;
 
 	private boolean printedDisclaimer;
 

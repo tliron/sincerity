@@ -154,6 +154,15 @@ public class Command
 	}
 
 	//
+	// Operations
+	//
+
+	public void skip()
+	{
+		sincerity.skip( this );
+	}
+
+	//
 	// Object
 	//
 

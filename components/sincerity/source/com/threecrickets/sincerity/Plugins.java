@@ -31,7 +31,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
  * Note that this class implements an <i>unmodifiable</i> map.
  * 
  * @author Tal Liron
- * @see Dependencies#getPlugins()
+ * @see Container#getPlugins()
  * @see Sincerity#getPlugins()
  */
 public class Plugins extends AbstractMap<String, Plugin1>
@@ -46,7 +46,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 
 		ClassLoader classLoader = container.getBootstrap();
 
-		// Scripturian plugins
+		// Delegated plugins
 		File pluginsDir = container.getLibrariesFile( "scripturian", "plugins" );
 		if( pluginsDir.isDirectory() )
 		{

@@ -13,6 +13,7 @@ package com.threecrickets.sincerity;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ import org.apache.ivy.plugins.resolver.BasicResolver;
 import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.trigger.Trigger;
 import org.apache.ivy.util.DefaultMessageLogger;
-import org.apache.ivy.util.Message;
 
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.scripturian.LanguageManager;
@@ -71,11 +71,6 @@ public class Container implements IvyListener, TransferListener
 	//
 	// Construction
 	//
-
-	public Container( Sincerity sincerity ) throws SincerityException
-	{
-		this( sincerity, null, Message.MSG_WARN );
-	}
 
 	public Container( Sincerity sincerity, File root, int debugLevel ) throws SincerityException
 	{
@@ -155,6 +150,13 @@ public class Container implements IvyListener, TransferListener
 		return shortcuts;
 	}
 
+	public Plugins getPlugins() throws SincerityException
+	{
+		if( plugins == null )
+			plugins = new Plugins( this );
+		return plugins;
+	}
+
 	public Bootstrap getBootstrap() throws SincerityException
 	{
 		return getBootstrap( false );
@@ -165,10 +167,39 @@ public class Container implements IvyListener, TransferListener
 		Bootstrap bootstrap = forceCreate ? null : Bootstrap.getBootstrap( root );
 		if( bootstrap == null )
 		{
-			bootstrap = dependencies.createBootstrap();
+			bootstrap = createBootstrap();
 			Bootstrap.setBootstrap( root, bootstrap );
+
+			// These depend on the bootstrap
+			plugins = null;
+			languageManager = null;
 		}
 		return bootstrap;
+	}
+
+	public Bootstrap createBootstrap() throws SincerityException
+	{
+		List<File> classpaths = getDependencies().getClasspaths( false );
+		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
+		try
+		{
+			for( File file : classpaths )
+				urls.add( file.toURI().toURL() );
+		}
+		catch( MalformedURLException x )
+		{
+			throw new SincerityException( "Parsing error while initializing bootstrap", x );
+		}
+
+		return new Bootstrap( urls );
+	}
+
+	public void updateBootstrap() throws SincerityException
+	{
+		getBootstrap( true );
+		/*
+		 * for( File file : getClasspaths( false ) ) bootstrap.addFile( file );
+		 */
 	}
 
 	public LanguageManager getLanguageManager() throws SincerityException
@@ -398,6 +429,8 @@ public class Container implements IvyListener, TransferListener
 	private final Dependencies dependencies;
 
 	private final Shortcuts shortcuts;
+
+	private Plugins plugins;
 
 	private LanguageManager languageManager;
 

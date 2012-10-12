@@ -160,7 +160,8 @@ public class Bootstrap extends URLClassLoader
 	 */
 	public Bootstrap( Collection<URL> urls )
 	{
-		super( inheritUrls( urls ), getMasterBootstrap() );
+		super( inheritUrls( urls ), Bootstrap.class.getClassLoader() );
+		// super( inheritUrls( urls ), getMasterBootstrap() );
 	}
 
 	//
