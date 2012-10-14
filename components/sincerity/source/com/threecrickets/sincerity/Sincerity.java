@@ -429,6 +429,7 @@ public class Sincerity implements Runnable
 						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
 					}
 
+					// Special handling for --help
 					if( argument.equals( "--help" ) || argument.equals( "-h" ) )
 						argument = "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help";
 
@@ -507,13 +508,16 @@ public class Sincerity implements Runnable
 		run( command );
 	}
 
-	public void skip( Command command )
+	public void removeCommand( Command command )
 	{
 		commands.remove( command );
 	}
 
 	public void reboot() throws SincerityException
 	{
+		if( commands.isEmpty() )
+			return;
+
 		// Convert commands into arguments to be re-parsed
 		ArrayList<String> arguments = new ArrayList<String>();
 		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
@@ -530,6 +534,9 @@ public class Sincerity implements Runnable
 			// Go native!
 			File nativeDir = getContainer().getLibrariesFile( "native" );
 			NativeUtil.addNativePath( nativeDir );
+
+			if( getVerbosity() >= 3 )
+				getOut().println( "Rebooting..." );
 
 			// Bootstrap into container
 			getContainer().getBootstrap().bootstrap( arguments.toArray( new String[arguments.size()] ) );

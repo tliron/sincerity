@@ -99,7 +99,7 @@ public class JavaPlugin implements Plugin1
 
 				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
 
-				command.skip();
+				command.getSincerity().removeCommand( command );
 				command.getSincerity().reboot();
 			}
 			catch( ClassNotFoundException x )
