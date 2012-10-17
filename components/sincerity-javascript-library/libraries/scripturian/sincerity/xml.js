@@ -547,7 +547,7 @@ Sincerity.XML = Sincerity.XML || function() {
 
 	var builderFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
 	var builder = builderFactory.newDocumentBuilder()
-	var outputFactory = javax.xml.stream.XMLOutputFactory.newFactory()
+	var outputFactory = javax.xml.stream.XMLOutputFactory.newInstance()
 	var transformerFactory = javax.xml.transform.TransformerFactory.newInstance()
 	
 	return Public
