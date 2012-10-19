@@ -342,9 +342,25 @@ public class Container implements IvyListener, TransferListener
 		return hasChanged;
 	}
 
+	public void setChanged( boolean hasChanged )
+	{
+		this.hasChanged = hasChanged;
+	}
+
+	public boolean hasInstalled()
+	{
+		return hasInstalled;
+	}
+
+	public void setInstalled( boolean hasSecondResolvePhase )
+	{
+		this.hasInstalled = hasSecondResolvePhase;
+	}
+
 	public void initializeProgress()
 	{
 		hasChanged = false;
+		hasInstalled = true;
 	}
 
 	//
@@ -435,6 +451,8 @@ public class Container implements IvyListener, TransferListener
 	private LanguageManager languageManager;
 
 	private boolean hasChanged;
+
+	private boolean hasInstalled;
 
 	private void configure()
 	{

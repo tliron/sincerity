@@ -330,7 +330,7 @@ public class Dependencies
 			return false;
 
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
-		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, "latest.integration".equals( version ), true );
+		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, false, true );
 		dependency.addDependencyConfiguration( "default", "*" );
 		moduleDescriptor.addDependency( dependency );
 
@@ -426,17 +426,16 @@ public class Dependencies
 		container.updateBootstrap();
 	}
 
-	public void install( boolean overwrite ) throws SincerityException
+	private ResolveReport resolve() throws SincerityException
 	{
-		container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
-
-		container.initializeProgress();
-
 		ivy.pushContext();
-		ResolveReport report;
 		try
 		{
-			report = ivy.resolve( moduleDescriptor, defaultResolveOptions );
+			ResolveReport report = ivy.resolve( moduleDescriptor, defaultResolveOptions );
+			if( report.hasError() )
+				throw new SincerityException( "Some dependencies could not be installed" );
+			return report;
+
 		}
 		catch( ParseException x )
 		{
@@ -450,13 +449,21 @@ public class Dependencies
 		{
 			ivy.popContext();
 		}
+	}
 
-		if( report.hasError() )
-			throw new SincerityException( "Some dependencies could not be installed" );
+	public void install( boolean overwrite ) throws SincerityException
+	{
+		container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
+
+		container.initializeProgress();
+
+		// Resolve
+		if( resolve().hasChanged() )
+			container.setChanged( true );
 
 		container.updateBootstrap();
 
-		if( container.hasChanged() || report.hasChanged() )
+		if( container.hasChanged() )
 		{
 			// Make sure to handle package deletions first
 			managedArtifacts.update( getArtifacts() );
@@ -465,7 +472,8 @@ public class Dependencies
 			// Now artifacts in packages will be properly deleted
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
 
-			printDisclaimer( container.getSincerity().getOut() );
+			if( container.hasInstalled() )
+				printDisclaimer( container.getSincerity().getOut() );
 		}
 		else
 		{

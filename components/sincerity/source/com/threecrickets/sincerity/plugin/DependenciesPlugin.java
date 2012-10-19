@@ -19,6 +19,7 @@ import java.util.Iterator;
 import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ResolvedDependencies;
@@ -119,10 +120,11 @@ public class DependenciesPlugin implements Plugin1
 			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			dependencies.install( overwrite );
+			Container container = command.getSincerity().getContainer();
+			container.getDependencies().install( overwrite );
 
-			command.getSincerity().removeCommand( command );
+			if( container.hasInstalled() )
+				command.getSincerity().removeCommand( command );
 			command.getSincerity().reboot();
 		}
 		else if( "uninstall".equals( commandName ) )

@@ -107,6 +107,8 @@ public class PyPiResolver extends BasicResolver
 
 	public static final String SETUP_FILENAME = "setup.py";
 
+	public static final String TYPE_NAME = "pypi";
+
 	//
 	// Construction
 	//
@@ -174,7 +176,7 @@ public class PyPiResolver extends BasicResolver
 	@Override
 	public String getTypeName()
 	{
-		return "pypi";
+		return TYPE_NAME;
 	}
 
 	@Override
@@ -405,13 +407,13 @@ public class PyPiResolver extends BasicResolver
 						}
 					}
 
-					if( eggFile != null && !installed )
+					if( ( eggFile != null ) && !installed )
 					{
 						// Let's crack open the egg to examine its dependencies
 						System.out.println( "Finding dependencies in Python egg: " + artifactName + " " + eggFile );
 						dependencyIds.addAll( getDependenciesFromEgg( eggFile ) );
 
-						// TODO: licenses!!!!
+						// TODO: licenses!
 					}
 
 					// Add artifact
@@ -419,9 +421,10 @@ public class PyPiResolver extends BasicResolver
 					artifactDescriptors.add( artifactDescriptor );
 				}
 
-				// Every has been OK so far, but we'll need a resource for the
-				// module descriptor. Of course, PyPI doesn't have one, so we'll
-				// construct one and put it in the builder section of our cache.
+				// Everything has been OK so far, but we'll need a resource for
+				// the module descriptor. Of course, PyPI doesn't have one, so
+				// we'll construct one and put it in the builder section of our
+				// cache.
 
 				// The builder module descriptor
 				DefaultModuleDescriptor moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id, artifactDescriptors.toArray( new DependencyArtifactDescriptor[artifactDescriptors.size()] ) );
@@ -675,9 +678,12 @@ public class PyPiResolver extends BasicResolver
 		if( setupFile != null )
 		{
 			Sincerity sincerity = Sincerity.getCurrent();
-			if( sincerity != null )
+			if( sincerity == null )
+				throw new RuntimeException( "The PyPiResolver must run in a Sincerity environment" );
+
+			try
 			{
-				try
+				if( sincerity.getPlugins().containsKey( "python" ) )
 				{
 					// Notes:
 					//
@@ -691,22 +697,36 @@ public class PyPiResolver extends BasicResolver
 					sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", "-c", "import os, setuptools; os.chdir('" + setupFile.getParent().replace( "'", "\\'" ) + "');" );
 
 					if( eggsDir != null )
+					{
+						System.out.println( "Building egg in Python: " + setupFile.getPath() );
 						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggsDir.getPath() );
+					}
 					else
+					{
+						System.out.println( "Installing in Python: " + setupFile.getPath() );
 						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
+					}
+
+					// Return the built egg
+					// (there might be more than one!)
+					if( ( eggsDir != null ) && eggsDir.isDirectory() )
+						for( File file : eggsDir.listFiles() )
+							if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
+								return file;
 				}
-				catch( SincerityException x )
+				else
 				{
-					x.printStackTrace();
+					if( sincerity.getContainer().hasInstalled() )
+					{
+						System.out.println( "A second install phase has been triggred in order to handle Python dependencies." );
+						sincerity.getContainer().setInstalled( false );
+					}
 				}
 			}
-
-			// Return the built egg
-			// (there might be more than one!)
-			if( ( eggsDir != null ) && eggsDir.isDirectory() )
-				for( File file : eggsDir.listFiles() )
-					if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
-						return file;
+			catch( SincerityException x )
+			{
+				x.printStackTrace();
+			}
 		}
 
 		return null;
