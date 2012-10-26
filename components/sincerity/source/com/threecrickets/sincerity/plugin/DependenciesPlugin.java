@@ -124,7 +124,10 @@ public class DependenciesPlugin implements Plugin1
 			container.getDependencies().install( overwrite );
 
 			if( container.hasFinishedInstalling() )
+			{
+				container.setInstallations( 0 );
 				command.getSincerity().removeCommand( command );
+			}
 			command.getSincerity().reboot();
 		}
 		else if( "uninstall".equals( commandName ) )
