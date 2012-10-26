@@ -123,7 +123,7 @@ public class DependenciesPlugin implements Plugin1
 			Container container = command.getSincerity().getContainer();
 			container.getDependencies().install( overwrite );
 
-			if( container.hasInstalled() )
+			if( container.hasFinishedInstalling() )
 				command.getSincerity().removeCommand( command );
 			command.getSincerity().reboot();
 		}

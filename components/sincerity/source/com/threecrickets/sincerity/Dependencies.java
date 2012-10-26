@@ -453,7 +453,9 @@ public class Dependencies
 
 	public void install( boolean overwrite ) throws SincerityException
 	{
-		container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
+		int installations = container.getInstallations();
+		if( installations == 0 )
+			container.getSincerity().getOut().println( "Making sure all dependencies are installed and upgraded..." );
 
 		container.initializeProgress();
 
@@ -462,6 +464,19 @@ public class Dependencies
 			container.setChanged( true );
 
 		container.updateBootstrap();
+
+		/*
+		 * for( ResolvedDependency r : getResolvedDependencies().getAll() ) {
+		 * System.out.println(r.descriptor.getRevision()); }
+		 */
+
+		/*
+		 * for( DependencyDescriptor dependencyDescriptor : getDescriptors() ) {
+		 * if( "python".equals(
+		 * dependencyDescriptor.getDependencyId().getOrganisation() ) )
+		 * System.out.println( dependencyDescriptor + " " +
+		 * dependencyDescriptor.getExtraAttribute( "installed" ) ); }
+		 */
 
 		if( container.hasChanged() )
 		{
@@ -472,18 +487,22 @@ public class Dependencies
 			// Now artifacts in packages will be properly deleted
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
 
-			if( container.hasInstalled() )
+			if( container.hasFinishedInstalling() )
 				printDisclaimer( container.getSincerity().getOut() );
+
 		}
 		else
 		{
-			container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
-
 			// Just handle artifact installations
 			managedArtifacts.update( getArtifacts( true, overwrite ) );
+
+			if( container.hasFinishedInstalling() )
+				container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
 		}
 
 		container.updateBootstrap();
+
+		container.addInstallation();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

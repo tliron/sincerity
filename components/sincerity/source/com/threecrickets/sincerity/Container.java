@@ -177,31 +177,6 @@ public class Container implements IvyListener, TransferListener
 		return bootstrap;
 	}
 
-	public Bootstrap createBootstrap() throws SincerityException
-	{
-		List<File> classpaths = getDependencies().getClasspaths( false );
-		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
-		try
-		{
-			for( File file : classpaths )
-				urls.add( file.toURI().toURL() );
-		}
-		catch( MalformedURLException x )
-		{
-			throw new SincerityException( "Parsing error while initializing bootstrap", x );
-		}
-
-		return new Bootstrap( urls );
-	}
-
-	public void updateBootstrap() throws SincerityException
-	{
-		getBootstrap( true );
-		/*
-		 * for( File file : getClasspaths( false ) ) bootstrap.addFile( file );
-		 */
-	}
-
 	public LanguageManager getLanguageManager() throws SincerityException
 	{
 		if( languageManager == null )
@@ -243,6 +218,14 @@ public class Container implements IvyListener, TransferListener
 		for( String part : parts )
 			file = new File( file, part );
 		return file;
+	}
+
+	public File getSincerityFile( String... parts )
+	{
+		String[] newParts = new String[parts.length + 1];
+		newParts[0] = SINCERITY_DIR;
+		System.arraycopy( parts, 0, newParts, 1, parts.length );
+		return getFile( newParts );
 	}
 
 	public File getConfigurationFile( String... parts )
@@ -347,20 +330,72 @@ public class Container implements IvyListener, TransferListener
 		this.hasChanged = hasChanged;
 	}
 
-	public boolean hasInstalled()
+	public boolean hasFinishedInstalling()
 	{
-		return hasInstalled;
+		return hasFinishedInstalling;
 	}
 
-	public void setInstalled( boolean hasSecondResolvePhase )
+	public void setHasFinishedInstalling( boolean hasFinishedInstalling )
 	{
-		this.hasInstalled = hasSecondResolvePhase;
+		this.hasFinishedInstalling = hasFinishedInstalling;
+	}
+
+	public int getInstallations()
+	{
+		String installationsName = getInstallationsName();
+		Integer installations = (Integer) Bootstrap.getAttributes().get( installationsName );
+		if( installations == null )
+		{
+			installations = 0;
+			Bootstrap.getAttributes().put( installationsName, installations );
+		}
+
+		return installations;
+	}
+
+	public void setInstallations( int installations )
+	{
+		Bootstrap.getAttributes().put( getInstallationsName(), installations );
+	}
+
+	//
+	// Operations
+	//
+
+	public void addInstallation()
+	{
+		setInstallations( getInstallations() + 1 );
 	}
 
 	public void initializeProgress()
 	{
 		hasChanged = false;
-		hasInstalled = true;
+		hasFinishedInstalling = true;
+	}
+
+	public Bootstrap createBootstrap() throws SincerityException
+	{
+		List<File> classpaths = getDependencies().getClasspaths( false );
+		ArrayList<URL> urls = new ArrayList<URL>( classpaths.size() );
+		try
+		{
+			for( File file : classpaths )
+				urls.add( file.toURI().toURL() );
+		}
+		catch( MalformedURLException x )
+		{
+			throw new SincerityException( "Parsing error while initializing bootstrap", x );
+		}
+
+		return new Bootstrap( urls );
+	}
+
+	public void updateBootstrap() throws SincerityException
+	{
+		getBootstrap( true );
+		/*
+		 * for( File file : getClasspaths( false ) ) bootstrap.addFile( file );
+		 */
 	}
 
 	//
@@ -452,7 +487,7 @@ public class Container implements IvyListener, TransferListener
 
 	private boolean hasChanged;
 
-	private boolean hasInstalled;
+	private boolean hasFinishedInstalling;
 
 	private void configure()
 	{
@@ -470,5 +505,10 @@ public class Container implements IvyListener, TransferListener
 			if( resolver instanceof BasicResolver )
 				( (BasicResolver) resolver ).setEventManager( ivy.getEventManager() );
 		}
+	}
+
+	private String getInstallationsName()
+	{
+		return Container.class.getCanonicalName() + ".installations:" + root;
 	}
 }

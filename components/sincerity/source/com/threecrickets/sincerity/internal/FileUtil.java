@@ -299,6 +299,19 @@ public abstract class FileUtil
 		}
 	}
 
+	public static void touch( File file ) throws IOException
+	{
+		if( file.exists() )
+			file.setLastModified( System.currentTimeMillis() );
+		else
+		{
+			File parent = file.getParentFile();
+			if( parent != null )
+				parent.mkdirs();
+			file.createNewFile();
+		}
+	}
+
 	public static final int BUFFER_SIZE = 2048;
 
 	// //////////////////////////////////////////////////////////////////////////

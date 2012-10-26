@@ -213,6 +213,23 @@ public class Sincerity implements Runnable
 		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
 	}
 
+	public int getInstalls()
+	{
+		Integer installs = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.installs" );
+		if( installs == null )
+		{
+			installs = 0;
+			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.installs", installs );
+		}
+
+		return installs;
+	}
+
+	public void setInstalls( int installs )
+	{
+		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.installs", installs );
+	}
+
 	public PrintWriter getOut()
 	{
 		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.out" );

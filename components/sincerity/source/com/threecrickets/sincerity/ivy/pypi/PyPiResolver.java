@@ -14,6 +14,7 @@ package com.threecrickets.sincerity.ivy.pypi;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +43,7 @@ import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.resolve.DownloadOptions;
 import org.apache.ivy.core.resolve.ResolveData;
+import org.apache.ivy.core.resolve.ResolvedModuleRevision;
 import org.apache.ivy.core.search.ModuleEntry;
 import org.apache.ivy.core.search.OrganisationEntry;
 import org.apache.ivy.core.search.RevisionEntry;
@@ -108,6 +110,8 @@ public class PyPiResolver extends BasicResolver
 	public static final String SETUP_FILENAME = "setup.py";
 
 	public static final String TYPE_NAME = "pypi";
+
+	public static final String PLACEHOLDER_REVISION = "placeholder";
 
 	//
 	// Construction
@@ -203,6 +207,8 @@ public class PyPiResolver extends BasicResolver
 	@Override
 	public RevisionEntry[] listRevisions( ModuleEntry moduleEntry )
 	{
+		// System.out.println( "listRevisions " + moduleEntry );
+
 		String moduleName = moduleEntry.getModule();
 		Pattern pattern = PyPi.getArtifactPattern( moduleName );
 		PyPi pyPi = getPyPi();
@@ -223,7 +229,6 @@ public class PyPiResolver extends BasicResolver
 
 	public void publish( Artifact artifact, File src, boolean overwrite ) throws IOException
 	{
-		System.out.println( "publish " + artifact );
 	}
 
 	@Override
@@ -240,12 +245,65 @@ public class PyPiResolver extends BasicResolver
 		return null;
 	}
 
+	@Override
+	public ResolvedModuleRevision getDependency( DependencyDescriptor dd, ResolveData data ) throws ParseException
+	{
+		// System.out.println( "getDependency " + dd );
+		ResolvedModuleRevision rev = super.getDependency( dd, data );
+		return rev;
+	}
+
+	@Override
+	protected ResolvedModuleRevision findModuleInCache( DependencyDescriptor dd, ResolveData data, boolean anyResolver )
+	{
+		// System.out.println( "findModuleInCache " + dd );
+		ResolvedModuleRevision rev = super.findModuleInCache( dd, data, false );
+		if( ( rev != null ) && PLACEHOLDER_REVISION.equals( rev.getId().getRevision() ) )
+			return null;
+		return rev;
+	}
+
+	@Override
+	protected boolean shouldReturnResolvedModule( DependencyDescriptor dd, ResolvedModuleRevision mr )
+	{
+		// System.out.println( "shouldReturnResolvedModule " + dd + " " + mr );
+
+		// If this method returns false, the cache will *not* be used,
+		// triggering a re-resolution for the dependency
+
+		if( PLACEHOLDER_REVISION.equals( mr.getId().getRevision() ) )
+		{
+			// System.out.println( "Trying to install Python package: " +
+			// dd.getDependencyId().getName() );
+			return false;
+		}
+		return super.shouldReturnResolvedModule( dd, mr );
+	}
+
 	@SuppressWarnings("unchecked")
 	public ResolvedResource findIvyFileRef( DependencyDescriptor dependencyDescriptor, ResolveData resolveData )
 	{
 		ModuleRevisionId id = dependencyDescriptor.getDependencyRevisionId();
 		if( !getOrganisation().equals( id.getOrganisation() ) )
 			return null;
+
+		// System.out.println( "findIvyFileRef " + dependencyDescriptor );
+
+		try
+		{
+			Sincerity sincerity = getSincerityIfPythonPlugin();
+			if( sincerity == null )
+			{
+				// Return placeholder
+				id = ModuleRevisionId.newInstance( id, PLACEHOLDER_REVISION );
+				return createModuleDescriptorResource( id, null, null );
+			}
+		}
+		catch( Exception x )
+		{
+			x.printStackTrace();
+			return null;
+		}
 
 		boolean eggMode = id.getName().startsWith( PyPi.EGG_MODE_PREFIX );
 
@@ -370,8 +428,8 @@ public class PyPiResolver extends BasicResolver
 						}
 						else
 						{
-							easyInstall( eggFile );
-							installed = true;
+							if( easyInstall( eggFile ) )
+								installed = true;
 						}
 					}
 					else if( BUILDER_ARCHIVE_TYPE.equals( type ) )
@@ -379,7 +437,10 @@ public class PyPiResolver extends BasicResolver
 						if( eggMode )
 						{
 							// We'll try to build an egg from the archive
-							eggFile = setupPy( builderFile, getBuilderSourceDir( id ), getBuilderEggDir( id ) );
+							File eggDir = getBuilderEggDir( id );
+							if( setupPy( builderFile, getBuilderSourceDir( id ), eggDir ) )
+								eggFile = findEgg( eggDir );
+
 							if( eggFile != null )
 							{
 								// Cache the built egg
@@ -402,8 +463,8 @@ public class PyPiResolver extends BasicResolver
 						else
 						{
 							// Install the archive
-							setupPy( builderFile, getBuilderSourceDir( id ), null );
-							installed = true;
+							if( setupPy( builderFile, getBuilderSourceDir( id ), null ) )
+								installed = true;
 						}
 					}
 
@@ -426,28 +487,7 @@ public class PyPiResolver extends BasicResolver
 				// we'll construct one and put it in the builder section of our
 				// cache.
 
-				// The builder module descriptor
-				DefaultModuleDescriptor moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id, artifactDescriptors.toArray( new DependencyArtifactDescriptor[artifactDescriptors.size()] ) );
-				for( ModuleRevisionId dependencyId : dependencyIds )
-				{
-					DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, dependencyId, false, false, true );
-					dependency.addDependencyConfiguration( "default", "*" );
-					moduleDescriptor.addDependency( dependency );
-				}
-
-				// Write module descriptor to file
-				File descriptorFile = getBuilderIvyFile( id );
-				if( descriptorFile.getParentFile() != null )
-					descriptorFile.getParentFile().mkdirs();
-				XmlModuleDescriptorWriter.write( moduleDescriptor, descriptorFile );
-				descriptorFile.setLastModified( pyPi.getModuleLastModified( id.getName() ) );
-
-				// An artifact for the module descriptor file
-				DefaultArtifact moduleArtifact = new DefaultArtifact( id, null, descriptorFile.getName(), "ivy", "descriptor", descriptorFile.toURI().toURL(), null );
-
-				// A resolved resource for the artifact
-				// (Apparently, it has to be a UrlResource, not a FileResource)
-				return new ResolvedResource( new URLResource( moduleArtifact.getUrl() ), version );
+				return createModuleDescriptorResource( id, artifactDescriptors, dependencyIds );
 
 				// MetadataArtifactDownloadReport report = new
 				// MetadataArtifactDownloadReport( moduleArtifact );
@@ -621,38 +661,79 @@ public class PyPiResolver extends BasicResolver
 		throw new RuntimeException( "PyPiResolver requires a SincerityRepositoryCacheManager to be configured" );
 	}
 
-	private static void easyInstall( File eggFile ) throws IOException
+	private ResolvedResource createModuleDescriptorResource( ModuleRevisionId id, ArrayList<DependencyArtifactDescriptor> artifactDescriptors, ArrayList<ModuleRevisionId> dependencyIds ) throws IOException
 	{
-		Sincerity sincerity = Sincerity.getCurrent();
+		// The builder module descriptor
+		DefaultModuleDescriptor moduleDescriptor;
+		if( artifactDescriptors == null )
+			moduleDescriptor = new DefaultModuleDescriptor( id, "release", null, true );
+		else
+			moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( id, artifactDescriptors.toArray( new DependencyArtifactDescriptor[artifactDescriptors.size()] ) );
+
+		// Dependencies
+		if( dependencyIds != null )
+		{
+			for( ModuleRevisionId dependencyId : dependencyIds )
+			{
+				DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, dependencyId, false, false, true );
+				dependency.addDependencyConfiguration( "default", "*" );
+				moduleDescriptor.addDependency( dependency );
+			}
+		}
+
+		// Write module descriptor to file
+		File descriptorFile = getBuilderIvyFile( id );
+		if( descriptorFile.getParentFile() != null )
+			descriptorFile.getParentFile().mkdirs();
+		XmlModuleDescriptorWriter.write( moduleDescriptor, descriptorFile );
+
+		if( !PLACEHOLDER_REVISION.equals( id.getRevision() ) )
+			descriptorFile.setLastModified( pyPi.getModuleLastModified( id.getName() ) );
+
+		// The module descriptor file is itself an artifact
+		DefaultArtifact moduleArtifact = new DefaultArtifact( id, null, descriptorFile.getName(), "ivy", "descriptor", descriptorFile.toURI().toURL(), null );
+
+		// A resolved resource for the descriptor file artifact
+		// (Apparently, it *has* to be a URLResource, not a
+		// FileResource)
+		return new ResolvedResource( new URLResource( moduleArtifact.getUrl() ), id.getRevision() );
+	}
+
+	private static boolean easyInstall( File eggFile ) throws IOException
+	{
+		Sincerity sincerity = getSincerityIfPythonPlugin();
 		if( sincerity != null )
 		{
 			try
 			{
 				sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "easy_install", eggFile.getPath() );
+				return true;
 			}
 			catch( SincerityException x )
 			{
 				x.printStackTrace();
 			}
 		}
+
+		return false;
 	}
 
-	private static File setupPy( File archiveFile, File sourceDir, File eggsDir ) throws IOException
+	private static File findEgg( File eggDir )
 	{
-		// Do we have a cached built egg?
-		if( ( eggsDir != null ) && eggsDir.isDirectory() )
-			for( File file : eggsDir.listFiles() )
-				return file;
+		// (There might be more than one!)
+		if( ( eggDir != null ) && eggDir.isDirectory() )
+			for( File file : eggDir.listFiles() )
+				if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
+					return file;
+		return null;
+	}
 
+	private static boolean setupPy( File archiveFile, File sourceDir, File eggsDir ) throws IOException
+	{
 		// Unpack only if we haven't already unpacked into the cache
-		if( !sourceDir.isDirectory() )
+		if( ( archiveFile != null ) && !sourceDir.isDirectory() )
 			FileUtil.unpack( archiveFile, sourceDir, sourceDir );
 
-		return setupPy( sourceDir, eggsDir );
-	}
-
-	private static File setupPy( File sourceDir, File eggsDir ) throws IOException
-	{
 		// Find setup.py
 		File setupFile = null;
 		if( sourceDir.isDirectory() )
@@ -677,13 +758,10 @@ public class PyPiResolver extends BasicResolver
 
 		if( setupFile != null )
 		{
-			Sincerity sincerity = Sincerity.getCurrent();
-			if( sincerity == null )
-				throw new RuntimeException( "The PyPiResolver must run in a Sincerity environment" );
-
-			try
+			Sincerity sincerity = getSincerityIfPythonPlugin();
+			if( sincerity != null )
 			{
-				if( sincerity.getPlugins().containsKey( "python" ) )
+				try
 				{
 					// Notes:
 					//
@@ -707,29 +785,16 @@ public class PyPiResolver extends BasicResolver
 						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
 					}
 
-					// Return the built egg
-					// (there might be more than one!)
-					if( ( eggsDir != null ) && eggsDir.isDirectory() )
-						for( File file : eggsDir.listFiles() )
-							if( file.getName().endsWith( EGG_FULL_EXTENSION ) )
-								return file;
+					return true;
 				}
-				else
+				catch( SincerityException x )
 				{
-					if( sincerity.getContainer().hasInstalled() )
-					{
-						System.out.println( "A second install phase has been triggred in order to handle Python dependencies." );
-						sincerity.getContainer().setInstalled( false );
-					}
+					x.printStackTrace();
 				}
-			}
-			catch( SincerityException x )
-			{
-				x.printStackTrace();
 			}
 		}
 
-		return null;
+		return false;
 	}
 
 	private List<ModuleRevisionId> getDependenciesFromEgg( File eggFile ) throws IOException
@@ -778,5 +843,39 @@ public class PyPiResolver extends BasicResolver
 			pths.add( pth );
 			FileUtil.writeLines( pthFile, pths );
 		}
+	}
+
+	private static Sincerity getSincerityIfPythonPlugin() throws IOException
+	{
+		Sincerity sincerity = Sincerity.getCurrent();
+		if( sincerity == null )
+			throw new RuntimeException( "PyPiResolver must run in a Sincerity environment" );
+
+		try
+		{
+			if( sincerity.getPlugins().containsKey( "python" ) )
+				return sincerity;
+			else
+			{
+				if( sincerity.getContainer().hasFinishedInstalling() )
+				{
+					int installations = sincerity.getContainer().getInstallations();
+
+					if( installations > 0 )
+						System.out.println( "Cannot install Python dependencies without Python!" );
+					else
+					{
+						System.out.println( "A second installation phase has been triggered in order to install Python dependencies" );
+						sincerity.getContainer().setHasFinishedInstalling( false );
+					}
+				}
+			}
+		}
+		catch( SincerityException x )
+		{
+			x.printStackTrace();
+		}
+
+		return null;
 	}
 }
