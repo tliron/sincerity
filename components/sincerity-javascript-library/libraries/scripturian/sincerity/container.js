@@ -102,7 +102,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	
     var hereStack = []
 
-	function pushHere (dir) {
+	function pushHere(dir) {
 		hereStack.push(Public.here)
 		Public.here = dir
 	}
