@@ -221,7 +221,12 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * file-to-memory mapping facilities.
 	 * <p>
 	 * Note that it does not return a string, but a buffer (which can be cast to a JavaScript
-	 * String if required). 
+	 * String if required).
+	 * <p> 
+	 * Note: There is no way to force the release of a MappedByteBuffer. Unfortunately, under
+	 * Windows this causes the file to remain locked against writing.
+	 * <p>
+	 * See: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4724038
 	 * 
 	 * @param {String|java.io.File} file The file or its path
 	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
