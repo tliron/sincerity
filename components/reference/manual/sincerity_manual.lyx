@@ -5243,8 +5243,8 @@ prudence
 \begin_inset Quotes erd
 \end_inset
 
- skeleton) builds on Restlet, letting you do all of the above with your
- choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ skeleton in Sincerity) builds on Restlet, letting you do all of the above
+ with your choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
 \begin_layout Subsubsection
@@ -5256,7 +5256,6 @@ While Restlet requires you to write your resources in Java (see Prudence
  for an alternative that supports other languages), there is no reason for
  your bootstrapping code---the code that assembles your component, servers,
  clients, hosts and routes---to be so rigid.
- Restlet ships as a library, not as a deployable container.
  The API for boostrapping your component is simple and elegant enough, but
  without Sincerity you would have to likely have to write it in Java, or
  implement your own bootstrapping mechanism.
@@ -5268,10 +5267,332 @@ JavaScript, Sincerity's natural language, provides a much more lightweight
  all you want to change is your configuration.
  Of course, once your component is up and running, JavaScript plays no more
  role.
- (We mention that in case you're worried about performance, though you shouldn't
+ We mention that in case you're worried about performance, though you shouldn't
  be: the language engine is likely not the source of any bottlenecks in
- your application's performance.
- If you're ready to leave Java behind, take a look at the Prudence skeleton.)
+ your application's performance
+\end_layout
+
+\begin_layout Standard
+The skeleton follows the structure of Restlet, which in turn closely adheres
+ to Roy Fielding's original terminology for 
+\begin_inset CommandInset href
+LatexCommand href
+name "Representational State Transfer (REST)"
+target "http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+/component/
+\begin_inset Quotes erd
+\end_inset
+
+ directory is the basis for your REST component.
+\end_layout
+
+\begin_layout Standard
+Under 
+\begin_inset Quotes eld
+\end_inset
+
+/component/servers/
+\begin_inset Quotes erd
+\end_inset
+
+ you can create files for HTTP servers bound to your component.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "API documentation"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Server.html"
+
+\end_inset
+
+.
+ The default is a single HTTP server is created on port 8080, but you can
+ create additional servers.
+ The technology used for the servers is called a 
+\begin_inset Quotes eld
+\end_inset
+
+connector,
+\begin_inset Quotes erd
+\end_inset
+
+ and is pluggable in Restlet.
+ Connectors cannot be selected by API calls; rather, they are installed
+ automatically if they are discovered in the classpath.
+ By default, the Sincerity skeleton for Restlet relies on Restlet's internal
+ connector, but it is not recommended for production applications.
+ See 
+\begin_inset Quotes eld
+\end_inset
+
+Extras
+\begin_inset Quotes erd
+\end_inset
+
+ below on how to install other connectors.
+\end_layout
+
+\begin_layout Standard
+Under 
+\begin_inset Quotes eld
+\end_inset
+
+/component/hosts/
+\begin_inset Quotes erd
+\end_inset
+
+ you can create files for virtual hosts.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "API documentation"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/routing/VirtualHost.html"
+
+\end_inset
+
+.
+ The default host has no filters, meaning that 
+\emph on
+all 
+\emph default
+requests from 
+\emph on
+all 
+\emph default
+servers will be routed to it.
+ If you need several virtual hosts, you will want to make the default host
+ less inclusive, or do away with a default host entirely.
+ (The default host is merely a Restlet convenience and is not required for
+ a component.) Applications can be attached to one or more hosts (see below).
+\end_layout
+
+\begin_layout Standard
+Under 
+\begin_inset Quotes eld
+\end_inset
+
+/component/clients/
+\begin_inset Quotes erd
+\end_inset
+
+ you can create files for clients supported by your component.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "API documentation"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Client.html"
+
+\end_inset
+
+.
+ As with servers, client technologies are 
+\begin_inset Quotes eld
+\end_inset
+
+connectors
+\begin_inset Quotes erd
+\end_inset
+
+ installed on the classpath.
+ Each connector handles a specific URI protocol, such as 
+\begin_inset Quotes eld
+\end_inset
+
+http:
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+https:
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+file:
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The skeleton defines no clients by default, but you can create files here
+ for each client you need.
+ See the Restlet example (in 
+\begin_inset Quotes eld
+\end_inset
+
+Extras
+\begin_inset Quotes erd
+\end_inset
+
+ below) for the usage of a 
+\begin_inset Quotes eld
+\end_inset
+
+file:
+\begin_inset Quotes erd
+\end_inset
+
+ client.
+ (The 
+\begin_inset Quotes eld
+\end_inset
+
+file:
+\begin_inset Quotes erd
+\end_inset
+
+ client is required internally by the Restlet Directory resource.) Note that
+ the Restlet internal connector can handle 
+\begin_inset Quotes eld
+\end_inset
+
+http:
+\begin_inset Quotes erd
+\end_inset
+
+, but not 
+\begin_inset Quotes eld
+\end_inset
+
+https:
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To add support for 
+\begin_inset Quotes eld
+\end_inset
+
+https:
+\begin_inset Quotes erd
+\end_inset
+
+, you can install the Apache HttpClient connector.
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+/component/services/
+\begin_inset Quotes erd
+\end_inset
+
+ is used to configure 
+\begin_inset CommandInset href
+LatexCommand href
+name "Restlet services"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/service/package-summary.html"
+
+\end_inset
+
+, such as ConnegService, TunnelService, EncoderService, etc.
+ By default only the LogService is configured.
+\end_layout
+
+\begin_layout Standard
+Finally, 
+\begin_inset Quotes eld
+\end_inset
+
+/component/applications/
+\begin_inset Quotes erd
+\end_inset
+
+ is where you can create your Restlet applications.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "API documentation"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Application.html"
+
+\end_inset
+
+.
+ Though you can attach applications directly to your component, it is recommende
+d that you attach them to virtual hosts, even if it's just the default host,
+ as it allows you more routing flexibility.
+ Also, though there is no requirement to do so, most Restlet applications
+ will probably have a 
+\begin_inset CommandInset href
+LatexCommand href
+name "Router"
+target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/routing/Router.html"
+
+\end_inset
+
+ as their inbound root.
+ It is crucial that you understand how routing works in Restlet: from server,
+ through host, through application, through router, and finally to your
+ RESTful resources.
+ Please refer to the Restlet documentation for full details.
+ Note that the skeleton does not include any application by default: see
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Extras
+\begin_inset Quotes erd
+\end_inset
+
+ below for a full example.
+\end_layout
+
+\begin_layout Standard
+It may be useful during development to start only a few select applications.
+ This can be done by setting the 
+\begin_inset Quotes eld
+\end_inset
+
+RESTLET_APPLICATIONS
+\begin_inset Quotes erd
+\end_inset
+
+ environment variable or the 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.applications
+\begin_inset Quotes erd
+\end_inset
+
+ JVM property to a comma-separated list of application directory names.
+ For example, a command line to run 
+\emph on
+only
+\emph default
+ the Restlet example application:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+RESTLET_APPLICATIONS=restlet-example sincerity start restlet
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -5317,6 +5638,62 @@ The example at
 \end_layout
 
 \begin_layout Standard
+The skeleton does not install any connectors by default, relying instead
+ on the default connector.
+ To install the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Jetty"
+target "http://jetty.codehaus.org/jetty/"
+
+\end_inset
+
+ server connector:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add restlet.jetty : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To install the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache HttpClient"
+target "http://hc.apache.org/httpcomponents-client-ga/"
+
+\end_inset
+
+ connector:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add restlet.httpclient : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Additionally, two plugins are strongly recommended: logging and service.
  To install them:
 \end_layout
@@ -5337,6 +5714,28 @@ sincerity add restlet.logging : add service : install
 \end_layout
 
 \begin_layout Standard
+(Note that 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.logging
+\begin_inset Quotes erd
+\end_inset
+
+ is preferred over Sincerity's 
+\begin_inset Quotes eld
+\end_inset
+
+logging
+\begin_inset Quotes erd
+\end_inset
+
+ plugin.
+ The former relies on the latter, but adds a Restlet library that provides
+ a direct chute to SLF4J, whici is more efficient than bridging.)
+\end_layout
+
+\begin_layout Standard
 The following command will install the Restlet example with the recommended
  plugins into a Sincerity container created in the current directory, and
  then start it a service:
@@ -5350,7 +5749,7 @@ status open
 \begin_layout Plain Layout
 
 sincerity create mycontainer : add restlet.example : add restlet.logging :
- add service : install : service component start
+ add service : install : service restlet start
 \end_layout
 
 \end_inset
@@ -5369,7 +5768,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity use mycontainer : service component stop
+sincerity use mycontainer : service restlet stop
 \end_layout
 
 \end_inset
