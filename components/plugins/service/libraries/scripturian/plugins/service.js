@@ -99,19 +99,21 @@ function service(command) {
 				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('com.tanukisoftware', 'wrapper-base')
 				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, version])
 				command.sincerity.run('dependencies:install')
-				var nativeDir = command.sincerity.container.getLibrariesFile('native')
-				if (nativeDir.directory) {
-					var files = nativeDir.listFiles()
-					for (var f in files) {
-						var file = files[f]
-						if (file.name.startsWith('wrapper-')) {
-							Sincerity.Files.makeExecutable(file)
-						}
-					}
-				}
 			}
 			if (!binary.exists()) {
 				throw new CommandException(command, 'The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+			}
+		}
+		
+		// Make sure our native executables are executable
+		var nativeDir = command.sincerity.container.getLibrariesFile('native')
+		if (nativeDir.directory) {
+			var files = nativeDir.listFiles()
+			for (var f in files) {
+				var file = files[f]
+				if (file.name.startsWith('wrapper-')) {
+					Sincerity.Files.makeExecutable(file)
+				}
 			}
 		}
 	
@@ -248,6 +250,10 @@ function getOs() {
 		}
 		else if (architecture.indexOf('ppc') != -1) {
 			architecture = 'ppc'
+		}
+		else if (architecture.indexOf('arm') != -1) {
+			// TODO: the JVM has no way to distinguish between armhf and armel :(
+			architecture = 'armhf'
 		}
 		else {
 			architecture = 'ia'
