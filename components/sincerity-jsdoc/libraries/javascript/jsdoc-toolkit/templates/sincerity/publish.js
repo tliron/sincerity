@@ -1,7 +1,7 @@
 //
 // This file is part of the Sincerity JsDoc Template
 //
-// Copyright 2011-2012 Three Crickets LLC.
+// Copyright 2011-2013 Three Crickets LLC.
 //
 // The contents of this file are subject to the terms of the LGPL version 3.0:
 // http://www.gnu.org/copyleft/lesser.html
@@ -122,7 +122,7 @@ function getNode(fullName, create) {
 	var parent = parentFullName ? getNode(parentFullName, create) : root
 			
 	JSDOC.opt.D.extscript = JSDOC.opt.D.extscript || 'scripts/ext-js/ext-all.js'
-	JSDOC.opt.D.extstyle = JSDOC.opt.D.extstyle || 'style/ext-js/style/css/ext-all.css'
+	JSDOC.opt.D.extstyle = JSDOC.opt.D.extstyle || 'style/ext-js/ext-theme-neptune/ext-theme-neptune-all.css'
 
 	if (!parent) {
 		return null
@@ -187,14 +187,14 @@ IO.copyRecursive = function(inPath, outPath) {
 //
 
 function publish(symbolSet) {
-	var baseDir = JSDOC.opt.t || (SYS.pwd + '..' + SYS.slash + 'templates' + SYS.slash + 'savory')
+	var baseDir = JSDOC.opt.t || (SYS.pwd + '..' + SYS.slash + 'templates' + SYS.slash + 'sincerity')
 	var contentDir = baseDir + SYS.slash + 'content'
 	var libDir = baseDir + SYS.slash + 'lib'
 	var webDir = baseDir + SYS.slash + '..' + SYS.slash + '..' + SYS.slash + '..' + SYS.slash + '..' + SYS.slash + 'web'
 	var extScriptsDir = webDir + SYS.slash + 'scripts' + SYS.slash + 'ext-js'
 	var extStyleDir = webDir + SYS.slash + 'style' + SYS.slash + 'ext-js'
 
-	var outputDir = JSDOC.opt.d || (SYS.pwd + '..' + SYS.slash + 'out' + SYS.slash + 'savory')
+	var outputDir = JSDOC.opt.d || (SYS.pwd + '..' + SYS.slash + 'out' + SYS.slash + 'sincerity')
 	var styleDir = outputDir + SYS.slash + 'style'
 	var mediaDir = outputDir + SYS.slash + 'media'
 	var scriptsDir = outputDir + SYS.slash + 'scripts'
