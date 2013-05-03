@@ -320,10 +320,10 @@
 			vendor="Three Crickets LLC"
 			packager="Tal Liron &lt;tal.liron@gmail.com&gt;"
 			postinstallscript="linux/rpm/postinst"
-			preuninstallscript="linux/rpm/prerm"
 			destination="${distribution}">
 			<zipfileset dir="${distribution.content}" prefix="/usr/lib/${component}" />
 			<zipfileset file="linux/${component}.desktop" prefix="/usr/share/applications" />
+			<link path="/usr/bin/${component}" target="/usr/lib/${component}/${component}" permissions="755" /> <!-- "-rwxr-xr-x" = 755 octal, 493 decimal -->
 		</redline:rpm>
 		<antcall target="package-rpm-sign" />
 		<move file="${distribution}/${component}-${component.version.short}${component.version.short.postfix}-0.noarch.rpm" toFile="${distribution}/${component}-${component.version}${component.version.postfix}.rpm" />

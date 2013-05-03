@@ -1,2 +1,1 @@
 chmod a+x /usr/lib/sincerity/sincerity
-ln -fs /usr/lib/sincerity/sincerity /usr/bin/sincerity
