@@ -1900,7 +1900,11 @@ Feature Plugins
 \end_layout
 
 \begin_layout Subsection
-Sincerity Runtime Plugin
+Sincerity Standalone Plugin
+\end_layout
+
+\begin_layout Standard
+See also the redistribution plugin for a different approach to distribution.
 \end_layout
 
 \begin_layout Subsection
@@ -2538,10 +2542,11 @@ JSW
 \end_inset
 
 ).
-\end_layout
-
-\begin_layout Standard
-While you can, of course, naïvely start any program using the 
+ JSW deploys a native process to monitor your daemon's health, is able to
+ detect failures and hangs, and restarts in such cases.
+ It supports many configuration options to control the JVM process, as well
+ as support for JMX-based management for the wrapper.
+ While you can start any program using the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2549,26 +2554,23 @@ sincerity start
 \begin_inset Quotes erd
 \end_inset
 
- command, it is strongly recommended that you use this plugin for production
- environments.
- JSW deploys a native process to monitor your daemon's health, able to detect
- failures and hangs, and can restart it if in such cases.
- It supports many configuration options to control the JVM process, as well
- as support for JMX-based management.
+ command, it is strongly recommended that you use this plugin instead for
+ production environments.
+ It's so good, we wish it were included in the JVM!
 \end_layout
 
 \begin_layout Standard
-JSW runs on an impressive array of operating systems: Linux, Mac OS X, Windows,
- Solaris, AIX, FreeBSD, HPUX, z/OS and z/Linux, supporting several 32bit
- and 64bit machine architectures for each.
+JSW runs on an impressive array of JVM-capable operating systems: Linux,
+ Mac OS X, Windows, Solaris, AIX, FreeBSD, HPUX, z/OS and z/Linux, supporting
+ several 32bit and 64bit machine architectures for each.
  Of course, you do not want to install support for 
 \emph on
 all 
 \emph default
 of these platforms in your container, and so this plugin cleverly detects
  the underlying operating system and downloads the necessary native libraries
- on-demand.
- An error message will be displayed for unsupported platforms.
+ on-demand the first time it is run.
+ An error message will be displayed on unsupported platforms.
 \end_layout
 
 \begin_layout Standard
@@ -2717,14 +2719,14 @@ sincerity service myprogram console
 
 \end_layout
 
-\begin_layout Standard
+\begin_layout Quote
 Note that Sincerity uses the Community Edition of JSW, which is licensed
  under the GPL (v2).
  Make sure that you understand the special implications of this license
  if you intend to redistribute your product.
- Furthermore, some Windows platforms (64bit x86 and Itanium) are not supported
- by the Community Edition.
- A commercial license is also available without these limitations.
+ Furthermore, some Windows platforms (64bit x86 and Itanium) supported by
+ the Standard/Professional Editions are not supported by the Community Edition.
+ A commercial license is available for purchase without these limitations.
  See the 
 \begin_inset CommandInset href
 LatexCommand href
@@ -2785,6 +2787,270 @@ Additionally, this plugin provides a flexible way for you to send arguments
 \end_inset
 
  extension will be merged and added.
+ The plugin comes installed with a few sensible defaults, and additionally
+ other plugs may add their own 
+\begin_inset Quotes eld
+\end_inset
+
+.conf
+\begin_inset Quotes erd
+\end_inset
+
+ files to support the service plugin.
+\end_layout
+
+\begin_layout Standard
+It may be useful to run your Sincerity service as an operating system service.
+ On Unix-like systems, you can use a 
+\begin_inset Quotes eld
+\end_inset
+
+system init script.
+\begin_inset Quotes erd
+\end_inset
+
+ Below is a script template you may use.
+ In our case, we are naming it 
+\begin_inset Quotes eld
+\end_inset
+
+/etc/init.d/restlet
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+#!/bin/sh
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+### BEGIN INIT INFO
+\end_layout
+
+\begin_layout Plain Layout
+
+# Provides:          restlet
+\end_layout
+
+\begin_layout Plain Layout
+
+# Required-Start:    $local_fs $remote_fs $network $syslog
+\end_layout
+
+\begin_layout Plain Layout
+
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+\end_layout
+
+\begin_layout Plain Layout
+
+# Default-Start:     2 3 4 5
+\end_layout
+
+\begin_layout Plain Layout
+
+# Default-Stop:      0 1 6
+\end_layout
+
+\begin_layout Plain Layout
+
+# Short-Description: starts the Restlet component
+\end_layout
+
+\begin_layout Plain Layout
+
+# Description:       starts the Restlet component using start-stop-daemon
+\end_layout
+
+\begin_layout Plain Layout
+
+### END INIT INFO
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+SINCERITY=/path/to/sincerity/sincerity
+\end_layout
+
+\begin_layout Plain Layout
+
+CONTAINER=/path/to/container
+\end_layout
+
+\begin_layout Plain Layout
+
+SERVICE=restlet
+\end_layout
+
+\begin_layout Plain Layout
+
+OWNER=myuser
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+COMMAND=$1
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+sudo -u "$OWNER" "$SINCERITY" use "$CONTAINER" : service "$SERVICE" "$COMMAND"
+\end_layout
+
+\begin_layout Plain Layout
+
+exit 0 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You can start/stop your service by running this script directly, for example:
+ 
+\begin_inset Quotes eld
+\end_inset
+
+sudo /etc/init.d/restlet start
+\begin_inset Quotes erd
+\end_inset
+
+.
+ On some operating systems, you may also use your 
+\begin_inset Quotes eld
+\end_inset
+
+service
+\begin_inset Quotes erd
+\end_inset
+
+ command, for example: 
+\begin_inset Quotes eld
+\end_inset
+
+sudo service restlet start
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Make sure to edit the variables to point to the paths on your system.
+ Note that the 
+\begin_inset Quotes eld
+\end_inset
+
+OWNER
+\begin_inset Quotes erd
+\end_inset
+
+ user will be used to run your service, and for security reasons you are
+ strongly advised not to use 
+\begin_inset Quotes eld
+\end_inset
+
+root
+\begin_inset Quotes erd
+\end_inset
+
+.
+ It is best to create a special user for your service, and to set its permission
+s according to only what it needs: read access to Sincerity and the container,
+ and write access to the container's 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/
+\begin_inset Quotes erd
+\end_inset
+
+, and other relevant directories.
+\end_layout
+
+\begin_layout Standard
+To have your service start automatically when the system starts depends
+ on your operating system.
+ For Linux, according the Linux Standard Base (LSB) specification, you need
+ the 
+\begin_inset Quotes eld
+\end_inset
+
+###
+\begin_inset Quotes erd
+\end_inset
+
+ comment block listed above.
+ Type 
+\begin_inset Quotes eld
+\end_inset
+
+man insserv
+\begin_inset Quotes erd
+\end_inset
+
+ for the documentation the block format.
+ For consistency, make sure to change the 
+\begin_inset Quotes eld
+\end_inset
+
+Provides:
+\begin_inset Quotes erd
+\end_inset
+
+ entry to match the name of the file.
+ To process this file and the block, run 
+\begin_inset Quotes eld
+\end_inset
+
+sudo update-rc.d restlet defaults
+\begin_inset Quotes erd
+\end_inset
+
+, which wraps 
+\begin_inset Quotes eld
+\end_inset
+
+insserv
+\begin_inset Quotes erd
+\end_inset
+
+ internally.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2819,11 +3085,48 @@ Note that this add-on is only required for
 \emph on
 remote
 \emph default
- JMX (local JMX is automatically supported by JSW).
- Remote JMX introduces several challenges, especially when working behind
+ JMX: 
+\emph on
+local
+\emph default
+ JMX is automatically supported by JSW.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "official documentation"
+target "http://docs.oracle.com/javase/1.5.0/docs/guide/management/agent.html"
+
+\end_inset
+
+ for more information.
+ Note also that the pitfalls of remote JMX (connectivity, security) can
+ be elegantly circumvented via ssh tunneling.
+\end_layout
+
+\begin_layout Standard
+Remote JMX introduces several challenges, especially when working behind
  firewalls.
- We've specially engineered this add-on using a dedicated JVM agent, which
- allows the RMI Registry to run on port 1651, with the JMX port at 1650.
+ We've specially engineered this add-on by including a custom JVM agent,
+ which allows the RMI Registry to run on a specific port, 1651, while the
+ JMX port is at 1650.
+ This is necessary because the default agent allocates the RMI Registry
+ port randomly, making it impossible to configure firewalls.
+ Note that you would then need to specify the RMI Registry port in the connectio
+n URI, for example: 
+\begin_inset Quotes eld
+\end_inset
+
+service:jmx:rmi://mysite.org:1650/jndi/rmi://mysite.org:1651/jmxrmi
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For public servers, you most likely would also want to encrypt your JMX
+ connections via SSL, as well as add password authentication.
+ We've included the necessary options as comments in the configuration.
 \end_layout
 
 \begin_layout Standard
@@ -2839,12 +3142,16 @@ To configure, edit:
 \end_layout
 
 \begin_layout Subsection
-Distribution Plugin
+Re
+d
+\lang english
+istribution Plugin
 \end_layout
 
 \begin_layout Standard
-This plugin lets you package your Sincerity container for convenient distributio
-n.
+This plugin lets you package your Sincerity container for convenient redistribut
+ion.
+ See the Sincerity standalone plugin for a different approach to distribution.
 \end_layout
 
 \begin_layout Standard
@@ -2872,7 +3179,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add distribution : install
+sincerity add redistribution : install
 \end_layout
 
 \end_inset
@@ -2911,8 +3218,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create nexus : add nexus : add logging : add service : add distributio
-n : install : izpack "Nexus Repository Manager"
+sincerity create nexus : add nexus : add logging : add service : add redistribut
+ion : install : izpack "Nexus Repository Manager"
 \end_layout
 
 \end_inset
@@ -2930,7 +3237,7 @@ installer.jar
 \end_inset
 
  file in your container's root directory, which you can distribute.
- To install your application:
+ To install your application from this jar:
 \end_layout
 
 \begin_layout Standard
@@ -2949,8 +3256,8 @@ java -jar installer.jar
 \end_layout
 
 \begin_layout Standard
-(Note that on some platforms double-clicking this file would also run it
- appropriately.)
+(Note that on some desktop environments double-clicking this file would
+ also run it.)
 \end_layout
 
 \begin_layout Standard
