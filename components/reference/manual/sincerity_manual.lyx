@@ -199,7 +199,10 @@ Linux, BSD (OS X), OpenSolaris and Windows are explicitly supported with
 
 \begin_layout Standard
 Additionally, Sincerity has plugins to ease the pain of common deployment
- headaches: use a simple command to configure your container for <i>all</i>
+ headaches: use a simple command to configure your container for 
+\emph on
+all
+\emph default
  JVM logging frameworks, for remote management via JMX, and for running
  your application as a daemon/service using Tanuki Java Service Wrapper,
  Apache Daemon, or YASJW.
@@ -214,7 +217,7 @@ When you're done, Sincerity plugins can also package and publish your libraries
 \end_layout
 
 \begin_layout Subsection
-Painless Deployment
+An Ecosystem
 \end_layout
 
 \begin_layout Standard
@@ -324,7 +327,7 @@ Sincerity was born of many years of experience writing complex software
 \begin_layout Standard
 You can go ahead and just use it; it will feel quite natural and trivial.
  However, what follows is some of the more complicated impetus behind it,
- that can help you understand why a tool such as Sincerity became necessary.
+ which may help you understand why a tool such as Sincerity became necessary.
 \end_layout
 
 \begin_layout Subsection
@@ -914,7 +917,7 @@ interpreted
 \begin_inset Quotes erd
 \end_inset
 
-: many of these languages compile some or all of such code on-the-fly.
+: many of these languages compile some or all of your code on-the-fly.
  So, why has Sincerity standardized on JavaScript, rather than Groovy, Scala,
  Clojure, Lua, Python, Ruby or others?
 \end_layout
@@ -1233,7 +1236,7 @@ Which, of course, introduces its own set of problems.
 \begin_layout Standard
 One very useful side effect of having the framework control classloading
  is that entire bundles can be loaded and unloaded during runtime.
- Indeed, OSGi defines protocols far starting, stopping and hotswapping services.
+ Indeed, OSGi defines protocols for starting, stopping and hotswapping services.
  This is a powerful feature in itself, and is indeed the entire motivation
  for using OSGi in some cases.
  (Though, if that's your reason, you might want to look at other, simpler
@@ -1686,6 +1689,220 @@ A strict structure, non-negotiable, non-configurable.
 \end_layout
 
 \begin_layout Section
+Programming
+\end_layout
+
+\begin_layout Subsection
+Scripturian
+\end_layout
+
+\begin_layout Subsection
+sincerity object
+\end_layout
+
+\begin_layout Subsection
+The Sincerity JavaScript Library
+\end_layout
+
+\begin_layout Standard
+Sincerity relies on JavaScript, and while JavaScript does not have a standard
+ library, you do have access to the entire JVM standard library.
+\end_layout
+
+\begin_layout Standard
+Still, this isn't quite good enough: using JVM libraries works, but they
+ do involve using paradigms that have not been optimized for JavaScript.
+\end_layout
+
+\begin_layout Standard
+For Sincerity, we decided that we can do better, and so we present you with
+ a collection of useful code called the Sincerity JavaScript Library (SJL).
+ We should point out from the start that this is not a general-purpose JavaScrip
+t library: it relies on the JVM libraries, and only works in the JVM.
+ There are also a few optimizations specific to the Rhino engine, which
+ is the only JavaScript engine for the JVM at the moment, but we plan to
+ support JavaScript engines that will be available in the future, such as
+ Oracle's Nashorn, which is planned to be included in Oracle's version 8
+ release.
+\end_layout
+
+\begin_layout Standard
+What follows is a general introduction to the library.
+ See the API documentation for full details.
+ Also make sure to check out Sincerity's JsDoc plugin which makes it easy
+ for you to generate similar documentation for your own JavaScript codebase.
+\end_layout
+
+\begin_layout Standard
+Note that the Sincerity Foundation Library is used by at least two other
+ JavaScript frameworks: the Prudence JavaScript Library (PJL), and the Sincerity
+ Framework, which builds on the Prudence JavaScript Library.
+\end_layout
+
+\begin_layout Paragraph
+Objects
+\end_layout
+
+\begin_layout Standard
+Enhanced support for standard JavaScript types: strings, arrays, dicts and
+ dates.
+ This library monkey-patches the standard types with many useful methods.
+\end_layout
+
+\begin_layout Paragraph
+Classes
+\end_layout
+
+\begin_layout Standard
+This straightforward-but-powerful library lets you use the object-oriented
+ programming (OOP) paradigm in JavaScript.
+ It lets you define classes with public and private members, inherit classes,
+ and even provides a mechanism for generation of constructors.
+ Generally, note that the Sincerity Framework does not use OOP indiscriminately:
+ classes are used only when they make sense and add elegance.
+\end_layout
+
+\begin_layout Paragraph
+Iterators
+\end_layout
+
+\begin_layout Standard
+Iterators let you write coherent code that can efficiently comprehend and
+ operate on sequences of any size.
+ Its design borrows stylistically from functional programming languages.
+\end_layout
+
+\begin_layout Paragraph
+Files
+\end_layout
+
+\begin_layout Standard
+Low-level access to the filesystem, including high-performance reading and
+ writing of files using memory-mapped files.
+\end_layout
+
+\begin_layout Paragraph
+Templates
+\end_layout
+
+\begin_layout Standard
+Straightforward-but-powerful string interpolation.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+println('Hello, {user}'.cast({user: 'Sincerity'})
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+JSON
+\end_layout
+
+\begin_layout Standard
+High-performance JSON parsing and rendering using the 
+\begin_inset CommandInset href
+LatexCommand href
+name "JSON Rhino library"
+target "http://code.google.com/p/json-rhino/"
+
+\end_inset
+
+, which is written in Java.
+\end_layout
+
+\begin_layout Paragraph
+XML
+\end_layout
+
+\begin_layout Standard
+High-performance XML parsing and rendering using the standard JVM libraries.
+\end_layout
+
+\begin_layout Paragraph
+Calendar
+\end_layout
+
+\begin_layout Standard
+Enhancements to JavaScript's standard Date type.
+\end_layout
+
+\begin_layout Paragraph
+Localization
+\end_layout
+
+\begin_layout Standard
+Easy access to the JVM's localization libraries, including formatting for
+ dates, times and currencies.
+\end_layout
+
+\begin_layout Paragraph
+Cryptography
+\end_layout
+
+\begin_layout Standard
+Easy access to the JVM's cryptography libraries, including shortcuts for
+ common hashing, encryption and decryption tasks.
+\end_layout
+
+\begin_layout Paragraph
+JVM
+\end_layout
+
+\begin_layout Standard
+Easy conversions between JVM and JavaScript types, and also access to a
+ few operating system services.
+\end_layout
+
+\begin_layout Paragraph
+Validation
+\end_layout
+
+\begin_layout Standard
+A general-purpose user input validation library for commonly used types,
+ such as numbers and email addresses.
+\end_layout
+
+\begin_layout Paragraph
+Mail
+\end_layout
+
+\begin_layout Standard
+Easy access to JavaMail, including sending of mixed-media plain-text/HTML
+ emails.
+ Uses the templates library to let you easily create email templates.
+\end_layout
+
+\begin_layout Paragraph
+Lucene
+\end_layout
+
+\begin_layout Standard
+Easy access to the Lucene search engine.
+ Supports the iterators library, so you can easily index very large collections
+ of documents.
+\end_layout
+
+\begin_layout Paragraph
+Rhino
+\end_layout
+
+\begin_layout Standard
+Access to features of the Rhino JavaScript engine, such as the call stack
+ and exception details.
+\end_layout
+
+\begin_layout Section
 Core Plugins
 \end_layout
 
@@ -1716,6 +1933,170 @@ install
 
 , etc.
  as reserved command names.
+\end_layout
+
+\begin_layout Standard
+We've oragnized them here in the order by which you'd likely use them.
+\end_layout
+
+\begin_layout Subsection
+Container
+\end_layout
+
+\begin_layout Subsubsection
+container:create
+\end_layout
+
+\begin_layout Subsubsection
+container:use
+\end_layout
+
+\begin_layout Subsubsection
+container:clone
+\end_layout
+
+\begin_layout Subsubsection
+container:clean
+\end_layout
+
+\begin_layout Subsection
+Repositories
+\end_layout
+
+\begin_layout Subsubsection
+repositories:repositories
+\end_layout
+
+\begin_layout Subsubsection
+repositories:attach
+\end_layout
+
+\begin_layout Subsubsection
+repositories:detach
+\end_layout
+
+\begin_layout Subsection
+Dependencies
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:dependencies
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:licenses
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:install
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:uninstall
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:reset
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:add
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:revise
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:remove
+\end_layout
+
+\begin_layout Subsection
+Packages
+\end_layout
+
+\begin_layout Subsubsection
+packages:unpack
+\end_layout
+
+\begin_layout Subsection
+Artifacts
+\end_layout
+
+\begin_layout Subsubsection
+artifacts:artifacts
+\end_layout
+
+\begin_layout Subsubsection
+artifacts:prune
+\end_layout
+
+\begin_layout Subsection
+Delegate
+\end_layout
+
+\begin_layout Subsubsection
+delegate:main
+\end_layout
+
+\begin_layout Subsubsection
+delegate:start
+\end_layout
+
+\begin_layout Subsubsection
+delegate:execute
+\end_layout
+
+\begin_layout Subsubsection
+delegate:programs
+\end_layout
+
+\begin_layout Subsubsection
+delegate:languages
+\end_layout
+
+\begin_layout Subsection
+Templates
+\end_layout
+
+\begin_layout Subsubsection
+templates:templates
+\end_layout
+
+\begin_layout Subsubsection
+templates:templatize
+\end_layout
+
+\begin_layout Subsection
+Help
+\end_layout
+
+\begin_layout Subsubsection
+help:version
+\end_layout
+
+\begin_layout Subsubsection
+help:help
+\end_layout
+
+\begin_layout Subsubsection
+help:verbosity
+\end_layout
+
+\begin_layout Subsection
+GUI
+\end_layout
+
+\begin_layout Subsubsection
+gui:gui
+\end_layout
+
+\begin_layout Subsection
+Java
+\end_layout
+
+\begin_layout Subsubsection
+java:compile
 \end_layout
 
 \begin_layout Section
@@ -3142,10 +3523,7 @@ To configure, edit:
 \end_layout
 
 \begin_layout Subsection
-Re
-d
-\lang english
-istribution Plugin
+Redistribution Plugin
 \end_layout
 
 \begin_layout Standard
@@ -6087,6 +6465,10 @@ sincerity use mycontainer : service restlet stop
 Felix Skeleton
 \end_layout
 
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
 \begin_layout Subsection
 Prudence Skeleton
 \end_layout
@@ -6106,11 +6488,16 @@ target "http://threecrickets.com/prudence/"
 \end_layout
 
 \begin_layout Standard
-Prudence is underlying platform for the 
+The Prudence skeleton is an extension of the Restlet skeleton, so the documentat
+ion there applies here.
+\end_layout
+
+\begin_layout Standard
+Prudence is underlying platform for 
 \begin_inset CommandInset href
 LatexCommand href
-name "Savory Framework"
-target "http://threecrickets.com/savory/"
+name "Diligence"
+target "http://threecrickets.com/diligence/"
 
 \end_inset
 
@@ -6118,23 +6505,24 @@ target "http://threecrickets.com/savory/"
 \end_layout
 
 \begin_layout Standard
-(Historically, it's actually the other way around! Sincerity was designed
- by Three Crickets precisely in order to make Prudence 2.0 sanely modular,
- building on many lessons learned while deploying Prudence 1.0 and 1.1.
+(Historically, it was actually the other way around.
+ Sincerity was designed by Three Crickets precisely in order to make Prudence
+ 2.0 sanely modular, building on many lessons learned while deploying Prudence
+ 1.0 and 1.1.
  It was clear during development that there was nothing in the proposed
  solution that was specific to Prudence.
  And so Sincerity was born as a generic tool useful for many JVM projects.)
 \end_layout
 
 \begin_layout Subsection
-Savory Framework Skeleton
+Diligence Skeleton
 \end_layout
 
 \begin_layout Standard
 \begin_inset CommandInset href
 LatexCommand href
-name "The Savory Framework"
-target "http://threecrickets.com/savory/"
+name "Diligence"
+target "http://threecrickets.com/diligence/"
 
 \end_inset
 
@@ -6191,8 +6579,12 @@ large sites), authentication and authorization, and support for several
 \end_layout
 
 \begin_layout Standard
-(Like Sincerity and Prudence, the Savory Framework is developed by Three
- Crickets.
+The Diligence skeleton is an extension of the Prudence and Restlet skeletons,
+ so the documentation there applies here.
+\end_layout
+
+\begin_layout Standard
+(Like Sincerity and Prudence, Diligence is developed by Three Crickets.
  The three products together form a powerful web application stack on top
  of the JVM.)
 \end_layout
@@ -7072,208 +7464,10 @@ s to contribute, and also allow such plugins to be distributed as simple
 \end_layout
 
 \begin_layout Section
-The Sincerity JavaScript Library
+Libraries
 \end_layout
 
-\begin_layout Standard
-Sincerity relies on JavaScript, and while JavaScript does not have a standard
- library, you do have access to the entire JVM standard library.
-\end_layout
-
-\begin_layout Standard
-Still, this isn't quite good enough: using JVM libraries works, but they
- do involve using paradigms that have not been optimized for JavaScript.
-\end_layout
-
-\begin_layout Standard
-For Sincerity, we decided that we can do better, and so we present you with
- a collection of useful code called the Sincerity JavaScript Library (SJL).
- We should point out from the start that this is not a general-purpose JavaScrip
-t library: it relies on the JVM libraries, and only works in the JVM.
- There are also a few optimizations specific to the Rhino engine, which
- is the only JavaScript engine for the JVM at the moment, but we plan to
- support JavaScript engines that will be available in the future, such as
- Oracle's Nashorn, which is planned to be included in Oracle's version 8
- release.
-\end_layout
-
-\begin_layout Standard
-What follows is a general introduction to the library.
- See the API documentation for full details.
- Also make sure to check out Sincerity's JsDoc plugin which makes it easy
- for you to generate similar documentation for your own JavaScript codebase.
-\end_layout
-
-\begin_layout Standard
-Note that the Sincerity Foundation Library is used by at least two other
- JavaScript frameworks: the Prudence JavaScript Library (PJL), and the Sincerity
- Framework, which builds on the Prudence JavaScript Library.
-\end_layout
-
-\begin_layout Paragraph
-Objects
-\end_layout
-
-\begin_layout Standard
-Enhanced support for standard JavaScript types: strings, arrays, dicts and
- dates.
- This library monkey-patches the standard types with many useful methods.
-\end_layout
-
-\begin_layout Paragraph
-Classes
-\end_layout
-
-\begin_layout Standard
-This straightforward-but-powerful library lets you use the object-oriented
- programming (OOP) paradigm in JavaScript.
- It lets you define classes with public and private members, inherit classes,
- and even provides a mechanism for generation of constructors.
- Generally, note that the Sincerity Framework does not use OOP indiscriminately:
- classes are used only when they make sense and add elegance.
-\end_layout
-
-\begin_layout Paragraph
-Iterators
-\end_layout
-
-\begin_layout Standard
-Iterators let you write coherent code that can efficiently comprehend and
- operate on sequences of any size.
- Its design borrows stylistically from functional programming languages.
-\end_layout
-
-\begin_layout Paragraph
-Files
-\end_layout
-
-\begin_layout Standard
-Low-level access to the filesystem, including high-performance reading and
- writing of files using memory-mapped files.
-\end_layout
-
-\begin_layout Paragraph
-Templates
-\end_layout
-
-\begin_layout Standard
-Straightforward-but-powerful string interpolation.
- For example:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-println('Hello, {user}'.cast({user: 'Sincerity'})
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-JSON
-\end_layout
-
-\begin_layout Standard
-High-performance JSON parsing and rendering using the 
-\begin_inset CommandInset href
-LatexCommand href
-name "JSON Rhino library"
-target "http://code.google.com/p/json-rhino/"
-
-\end_inset
-
-, which is written in Java.
-\end_layout
-
-\begin_layout Paragraph
-XML
-\end_layout
-
-\begin_layout Standard
-High-performance XML parsing and rendering using the standard JVM libraries.
-\end_layout
-
-\begin_layout Paragraph
-Calendar
-\end_layout
-
-\begin_layout Standard
-Enhancements to JavaScript's standard Date type.
-\end_layout
-
-\begin_layout Paragraph
-Localization
-\end_layout
-
-\begin_layout Standard
-Easy access to the JVM's localization libraries, including formatting for
- dates, times and currencies.
-\end_layout
-
-\begin_layout Paragraph
-Cryptography
-\end_layout
-
-\begin_layout Standard
-Easy access to the JVM's cryptography libraries, including shortcuts for
- common hashing, encryption and decryption tasks.
-\end_layout
-
-\begin_layout Paragraph
-JVM
-\end_layout
-
-\begin_layout Standard
-Easy conversions between JVM and JavaScript types, and also access to a
- few operating system services.
-\end_layout
-
-\begin_layout Paragraph
-Validation
-\end_layout
-
-\begin_layout Standard
-A general-purpose user input validation library for commonly used types,
- such as numbers and email addresses.
-\end_layout
-
-\begin_layout Paragraph
-Mail
-\end_layout
-
-\begin_layout Standard
-Easy access to JavaMail, including sending of mixed-media plain-text/HTML
- emails.
- Uses the templates library to let you easily create email templates.
-\end_layout
-
-\begin_layout Paragraph
-Lucene
-\end_layout
-
-\begin_layout Standard
-Easy access to the Lucene search engine.
- Supports the iterators library, so you can easily index very large collections
- of documents.
-\end_layout
-
-\begin_layout Paragraph
-Rhino
-\end_layout
-
-\begin_layout Standard
-Access to features of the Rhino JavaScript engine, such as the call stack
- and exception details.
-\end_layout
-
-\begin_layout Section
+\begin_layout Subsection
 The Sincerity JsDoc Template
 \end_layout
 
@@ -8109,7 +8303,7 @@ Community Repositories
 \end_layout
 
 \begin_layout Section
-Appendix: Specifications
+Specifications
 \end_layout
 
 \begin_layout Subsection
