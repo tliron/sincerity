@@ -6028,6 +6028,42 @@ Extras
 \end_layout
 
 \begin_layout Standard
+A quick and easy way to change the port for the default server is to set
+ the environment variable is 
+\begin_inset Quotes eld
+\end_inset
+
+RESTLET_PORT
+\begin_inset Quotes erd
+\end_inset
+
+ (or the 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.port
+\begin_inset Quotes erd
+\end_inset
+
+ JVM property):
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+RESTLET_PORT=80 sincerity start restlet
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Under 
 \begin_inset Quotes eld
 \end_inset
@@ -6249,7 +6285,7 @@ RESTLET_APPLICATIONS
 \begin_inset Quotes erd
 \end_inset
 
- environment variable or the 
+ environment variable (or the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -6257,7 +6293,7 @@ restlet.applications
 \begin_inset Quotes erd
 \end_inset
 
- JVM property to a comma-separated list of application directory names.
+ JVM property) to a comma-separated list of application directory names.
  For example, a command line to run 
 \emph on
 only

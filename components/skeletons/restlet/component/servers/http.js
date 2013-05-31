@@ -30,5 +30,5 @@ component.servers.add(server)
 server.context.parameters.add('useForwardedForHeader', 'true')
 
 if (sincerity.verbosity >= 1) {
-	println('Server "{0}" on port {1}'.cast(server.name, server.port))
+	println('Server: "{0}" {1} on port {2}'.cast(server.name, server.protocols.get(0), server.port))
 }
