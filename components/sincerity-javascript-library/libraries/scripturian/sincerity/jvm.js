@@ -33,7 +33,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Loads a JVM class, using the current thread context.
 	 * 
 	 * @param {String} name The class name
-	 * @returns {java.lang.Class} The class or null if not found
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The class or null if not found
 	 */
 	Public.getClass = function(name) {
     	var classLoader = java.lang.Thread.currentThread().contextClassLoader
@@ -49,7 +49,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Opens a JVM resource for input, using the current thread context.
 	 * 
 	 * @param {String} name The resource name
-	 * @returns {java.io.InputStream} The stream or null if not found
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/InputStream.html">java.io.InputStream</a>} The stream or null if not found
 	 */
     Public.getResourceAsStream = function(name) {
     	var classLoader = java.lang.Thread.currentThread().contextClassLoader
@@ -64,7 +64,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * True if the value is an instance of the JVM class (or its sub-classes). 
 	 * 
-	 * @param {String|java.lang.Class} The JVM class or its name
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The JVM class or its name
 	 * @returns {Boolean}
 	 */
 	Public.instanceOf = function(value, theClass) {
@@ -78,7 +78,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates an instance of a JVM class.
 	 * 
-	 * @param {String|java.lang.Class} The JVM class or its name
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The JVM class or its name
 	 */
 	Public.newInstance = function(theClass) {
 		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
@@ -125,7 +125,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM ArrayList (not thread-safe) or a CopyOnWriteArrayList (thread-safe).
 	 * 
-	 * @returns {java.util.List}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/List.html">java.util.List</a>}
 	 */
 	Public.newList = function(threadSafe, initialCapacity) {
 		if (initialCapacity) {
@@ -140,7 +140,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM HashSet (not thread-safe) or a CopyOnWriteArraySet (thread-safe).
 	 * 
-	 * @returns {java.util.Set}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Set.html">java.util.Set</a>}
 	 */
 	Public.newSet = function(threadSafe, initialCapacity) {
 		if (initialCapacity) {
@@ -155,7 +155,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JavaScript array into a new JVM ArrayList (not thread-safe) or a CopyOnWriteArrayList (thread-safe).
 	 * 
-	 * @returns {java.util.List}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/List.html">java.util.List</a>}
 	 */
 	Public.toList = function(array, threadSafe) {
 		var list = Public.newList(threadSafe, array.length)
@@ -177,7 +177,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM HashMap (not thread-safe) or a ConcurrentHashMap (thread-safe).
 	 * 
-	 * @returns {java.util.Map}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Map.html">java.util.Map</a>}
 	 */
 	Public.newMap = function(threadSafe, initialCapacity) {
 		if (initialCapacity) {
@@ -191,7 +191,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JavaScript dict into a new JVM HashMap (not thread-safe) or a ConcurrentHashMap (thread-safe).
 	 * 
-	 * @returns {java.util.Map}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Map.html">java.util.Map</a>}
 	 */
 	Public.toMap = function(dict, threadSafe) {
 		var map = Public.newMap(threadSafe)
@@ -219,7 +219,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Creates a JVM Lock.
 	 * 
 	 * @param {Boolean} [readWrite=false] True to create a read-write lock
-	 * @returns {java.util.concurrent.locks.ReentrantLock|java.util.concurrent.locks.ReentrantReadWriteLock}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/concurrent/locks/ReentrantReadWriteLock.html">java.util.concurrent.locks.ReentrantReadWriteLock</a>}
 	 */
 	Public.newLock = function(readWrite) {
 		return readWrite ? new java.util.concurrent.locks.ReentrantReadWriteLock() : java.util.concurrent.locks.ReentrantLock()
@@ -229,7 +229,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Returns a JVM charset.
 	 * 
 	 * @param {String} [name] Leave empty to get default charset (most likely UTF-8)
-	 * @returns {java.nio.charset.Charset}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>}
 	 */
 	Public.getCharset = function(name) {
 		return Sincerity.Objects.exists(name) ? java.nio.charset.Charset.forName(name) : java.nio.charset.Charset.defaultCharset()
@@ -239,7 +239,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Converts a JVM byte array into a JavaScript string.
 	 * 
 	 * @param {byte[]} The bytes
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are encoded
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are encoded
 	 * @returns {String}
 	 * @see #getCharset
 	 */
@@ -252,7 +252,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Converts a JVM byte array into an array of JavaScript strings, each representing a line.
 	 * 
 	 * @param {byte[]} The bytes
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are encoded
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are encoded
 	 * @returns {String[]}
 	 * @see #getCharset
 	 */
@@ -276,7 +276,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a string into a JVM byte array.
 	 * 
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
 	 * @see #getCharset
 	 */
 	Public.toBytes = function(string, charset) {
@@ -288,7 +288,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Converts a JavaScript dict into a JVM Properties sheet.
 	 * 
 	 * @param {Object} dict The dictionary
-	 * @returns {java.util.Properties}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>}
 	 */
 	Public.toProperties = function(dict) {
 		var properties = new java.util.Properties()
@@ -301,7 +301,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JVM Properties sheet into a new JavaScript dict.
 	 * 
-	 * @param {java.util.Properties} properties The properties sheet
+	 * @param {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>} properties The properties sheet
 	 * @returns {Object}
 	 */
 	Public.fromProperties = function(properties) {
@@ -316,8 +316,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Loads a JVM Properties sheet from a file.
 	 * 
-	 * @param {String|java.io.File} file The file or its path
-	 * @returns {java.util.Properties}
+	 * @param {String|{<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>}
 	 */
 	Public.loadProperties = function(file) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
@@ -336,7 +336,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Loads a resource as a JVM Properties sheet.
 	 * 
 	 * @param {String} name The resource name
-	 * @returns {java.util.Properties}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>}
 	 */
 	Public.getResourceAsProperties = function(name) {
 		var properties = new java.util.Properties()
@@ -355,7 +355,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts JVM Locale into a JavaScript dict.
 	 * 
-	 * @param {java.util.Locale} locale The JVM locale
+	 * @param {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Locale.html">java.util.Locale</a>} locale The JVM locale
 	 * @returns {Object} In the form {language: 'code' ,country: 'code', variant: 'code'}
 	 */
 	Public.fromLocale = function(locale) {
@@ -379,7 +379,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String} value.language The language code
 	 * @param {String} [value.country] The country code
 	 * @param {String} [value.variant] The variant code
-	 * @returns {java.util.Locale}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Locale.html">java.util.Locale</a>}
 	 */
 	Public.toLocale = function(value) {
 		if (value) {
@@ -435,7 +435,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String} command The command (an alias or its path location)
 	 * @param {String[]} [args] Optional arguments to the command
 	 * @param [environment] An optional dict of environment vars to set for executing the command
-	 * @param {String|java.io.File} [directory] The directory (or its path) in which to execute the command
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} [directory] The directory (or its path) in which to execute the command
 	 * @returns {String[]} The command's output, line by line
 	 */
 	Public.exec = function(command, args, environment, directory) {

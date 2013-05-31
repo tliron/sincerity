@@ -31,7 +31,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Deletes a file or a directory.
 	 * 
-	 * @param {String|java.io.File} file The file or directory or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or directory or its path
 	 * @param {Boolean} [recursive=false] True to recursively delete a directory
 	 * @returns {Boolean} True if the file or directory was completely deleted, or if it
 	 *          didn't exist in the first place;
@@ -59,8 +59,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Copies a file or directory. Directories are always copied recursively.
 	 * 
-	 * @param {String|java.io.File} fromFile The source file or directory or its path
-	 * @param {String|java.io.File} toFile The destination file or directory or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} fromFile The source file or directory or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} toFile The destination file or directory or its path
 	 * @returns {Boolean} True if the file or directory was completely copied;
 	 *          note that false could mean that parts of the copy succeeded
 	 */
@@ -115,8 +115,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * Moves a file or directory. Does a simple, fast rename if the source and destination
 	 * are in the same filesystem, otherwise does a full copy-and-remove.
 	 * 
-	 * @param {String|java.io.File} fromFile The source file or directory or its path
-	 * @param {String|java.io.File} toFile The destination file or directory or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} fromFile The source file or directory or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} toFile The destination file or directory or its path
 	 * @param {Boolean} [recursive=false] True to recursively copy a directory and its files
 	 * @returns {Boolean} True if the file or directory was moved;
 	 *          note that false could mean that parts of the move succeeded
@@ -141,11 +141,23 @@ Sincerity.Files = Sincerity.Files || function() {
 		return Public.remove(fromFile, recursive)
 	}
 	
+	/**
+	 * Erases the contents of a file, effectively setting its length to 0.
+	 * 
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 */
 	Public.erase = function(file) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 		new java.io.FileWriter(file).close()		
 	}
 	
+	/**
+	 * Turns on the file's executable permission.
+	 * <p>
+	 * Implementation note: on Windows works only from JVM version 6 and upward.
+	 * 
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 */
 	Public.makeExecutable = function(file) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 		if (file.exists()) {
@@ -160,8 +172,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	}
 	
 	/**
-	 * Creates a temporary file in the operating system's default temporary file directory using
-	 * a nonce. The file will be deleted when the JVM shuts down.
+	 * Creates a temporary file in the operating system's default temporary file directory with
+	 * a unique temporary filename. The file will be deleted when the JVM shuts down.
 	 * 
 	 * @param {String} prefix Must be at least 3 characters long
 	 * @param {String} [suffix='.tmp']
@@ -176,9 +188,9 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Opens a file for writing text, optionally with gzip compression.
 	 * 
-	 * @param {String|java.io.File} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>
 	 * @param {Boolean} [gzip=false] True to gzip the output
-	 * @returns {java.io.PrintWriter}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>}
 	 */
 	Public.openForTextWriting = function(file, gzip) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
@@ -198,9 +210,9 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Opens a file for reading text, optionally with gzip decompression.
 	 * 
-	 * @param {String|java.io.File} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 * @param {Boolean} [gzip=false] True to gunzip the input
-	 * @returns {java.io.Reader}
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/Reader.html">java.io.Reader</a>}
 	 */
 	Public.openForTextReading = function(file, gzip) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
@@ -228,9 +240,9 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * <p>
 	 * See: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4724038
 	 * 
-	 * @param {String|java.io.File} file The file or its path
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
-	 * @returns {java.nio.CharBuffer}
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/CharBuffer.html">java.nio.CharBuffer</a>}
 	 */
 	Public.loadText = function(file, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
@@ -248,10 +260,10 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Fast grep from file to file.
 	 * 
-	 * @param {String|java.io.File} inputFile The input file or its path
-	 * @param {String|java.io.File} outputFile The output file or its path (will be overwritten)
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} inputFile The input file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} outputFile The output file or its path (will be overwritten)
 	 * @param {RegExp} pattern Only include lines that match this pattern
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
 	 */
 	Public.grep = function(inputFile, outputFile, pattern, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
@@ -278,11 +290,11 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Fast tail.
 	 * 
-	 * @param {String|java.io.File} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 * @param {Number} position Position in the file at which to start
 	 * @param {Boolean} forward True to go forward from position, false to go backward
 	 * @param {Number} count Number of lines
-	 * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
 	 */
 	Public.tail = function(file, position, forward, count, charset) {
 		var randomAccessFile = new java.io.RandomAccessFile(file, 'r')

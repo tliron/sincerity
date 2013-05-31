@@ -50,7 +50,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	/**
 	 * Executes all documents represented by the file, while keeping track of the current TODO
 	 * 
-	 * @param {String|java.io.File} The path to execute, relative to the 'here' location.
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} The path to execute, relative to the 'here' location.
 	 */
 	Public.execute = function(file) {
     	importClass(java.io.File)
