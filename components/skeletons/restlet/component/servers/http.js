@@ -3,7 +3,24 @@ importClass(
 	org.restlet.Server,
 	org.restlet.data.Protocol)
 
-var server = new Server(Protocol.HTTP, 8080)
+// Allow setting of port
+var port = System.getProperty('restlet.port')
+if (!Sincerity.Objects.exists(port)) {
+	port = System.getenv('RESTLET_PORT')
+}
+if (Sincerity.Objects.exists(port)) {
+	port = parseInt(port)
+	if (isNaN(port)) {
+		port = null
+	}
+}
+
+// Default port
+if (!Sincerity.Objects.exists(port)) {
+	port = 8080
+}
+
+var server = new Server(Protocol.HTTP, port)
 server.name = 'default'
 component.servers.add(server)
 
@@ -11,3 +28,7 @@ component.servers.add(server)
 // mod_proxy. This guarantees that request.clientInfo.upstreamAddress returns
 // the upstream address behind the proxy.
 server.context.parameters.add('useForwardedForHeader', 'true')
+
+if (sincerity.verbosity >= 1) {
+	println('Server "{0}" on port {1}'.cast(server.name, server.port))
+}
