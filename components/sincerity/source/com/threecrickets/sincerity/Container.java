@@ -47,6 +47,9 @@ import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
  * coexist via the {@link Bootstrap} mechanism. This is in order to allow
  * Sincerity to "reboot" itself using a new classpath in case the
  * {@link Container} is changed. See {@link Sincerity#reboot()}.
+ * <p>
+ * Because the set of plugins in a container depends on its classpath, this is
+ * also where you can access them, via {@link #getPlugins()}.
  * 
  * @author Tal Liron
  */

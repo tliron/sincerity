@@ -278,6 +278,19 @@ public class Bootstrap extends URLClassLoader
 		}
 
 		ArrayList<URL> urls = new ArrayList<URL>();
+
+		File classesDir = new File( new File( homeDir, "libraries" ), "classes" );
+		if( classesDir.isDirectory() )
+		{
+			try
+			{
+				urls.add( classesDir.toURI().toURL() );
+			}
+			catch( MalformedURLException x )
+			{
+			}
+		}
+
 		listJars( jarsDir, urls );
 
 		/*

@@ -97,10 +97,9 @@ public class JavaPlugin implements Plugin1
 
 				classesDir.mkdirs();
 
-				compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
-
-				command.getSincerity().removeCommand( command );
-				command.getSincerity().reboot();
+				Object r = compileMethod.invoke( null, (Object) compileArguments.toArray( new String[compileArguments.size()] ) );
+				if( (Integer) r != 0 )
+					throw new SincerityException( "Java compilation error" );
 			}
 			catch( ClassNotFoundException x )
 			{
@@ -108,7 +107,7 @@ public class JavaPlugin implements Plugin1
 			}
 			catch( SecurityException x )
 			{
-				throw new SincerityException( "Could not access to Java compiler", x );
+				throw new SincerityException( "Could not access Java compiler", x );
 			}
 			catch( NoSuchMethodException x )
 			{
@@ -120,7 +119,7 @@ public class JavaPlugin implements Plugin1
 			}
 			catch( IllegalAccessException x )
 			{
-				throw new SincerityException( "Could not access to Java compiler", x );
+				throw new SincerityException( "Could not access Java compiler", x );
 			}
 			catch( InvocationTargetException x )
 			{

@@ -61,9 +61,6 @@ import com.threecrickets.sincerity.internal.XmlUtil;
  * artifacts, use {@link #getArtifacts()} or {@link #getPackages()}. See also
  * the {@link ManagedArtifacts} class.
  * <p>
- * Because the set of plugins in a container depends on its classpath, this is
- * also where you can access them, via {@link #getPlugins()}.
- * <p>
  * The Ivy configuration is stored in
  * "/configuration/sincerity/dependencies.conf". For low-level access to the Ivy
  * descriptors, see {@link #getDescriptors()}.
@@ -275,9 +272,15 @@ public class Dependencies
 
 		// Classes directory
 		File classesDir = container.getLibrariesFile( "classes" );
-		if( classesDir.isDirectory() )
-			if( !classpaths.contains( classesDir ) )
-				classpaths.add( classesDir );
+
+		// Note: if the directory doesn't exist when the class loader is first
+		// initialized, then it won't be able to pick up class files added to it
+		// later; so, we want to make sure it's there
+		if( !classesDir.isDirectory() )
+			classesDir.mkdirs();
+
+		if( !classpaths.contains( classesDir ) )
+			classpaths.add( classesDir );
 
 		// Jar directory
 		FileUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );

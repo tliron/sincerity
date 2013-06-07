@@ -1,12 +1,9 @@
 
 document.executeOnce('/sincerity/jvm/')
 
-var javaSourceDir = Sincerity.Container.getFileFromHere('..', 'java')
+sincerity.run('java:compile', [Sincerity.Container.getFileFromHere('..', 'java')])
 
-try {
-	sincerity.run('java:compile', [javaSourceDir])
-	app.inboundRoot.attach('/resource/', Sincerity.JVM.getClass('example.ExampleResource'))
-}
-catch (x) {
-	x.javaException.printStackTrace()
+var theClass = Sincerity.JVM.getClass('example.ExampleResource')
+if (Sincerity.Objects.exists(theClass)) {
+	app.inboundRoot.attach('/resource/', theClass)
 }

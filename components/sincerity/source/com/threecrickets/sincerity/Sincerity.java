@@ -532,6 +532,11 @@ public class Sincerity implements Runnable
 
 	public void reboot() throws SincerityException
 	{
+		reboot( false );
+	}
+
+	public void reboot( boolean forceNewBootstrap ) throws SincerityException
+	{
 		if( commands.isEmpty() )
 			return;
 
@@ -556,7 +561,7 @@ public class Sincerity implements Runnable
 				getOut().println( "Rebooting..." );
 
 			// Bootstrap into container
-			getContainer().getBootstrap().bootstrap( arguments.toArray( new String[arguments.size()] ) );
+			getContainer().getBootstrap( forceNewBootstrap ).bootstrap( arguments.toArray( new String[arguments.size()] ) );
 		}
 		catch( Exception x )
 		{

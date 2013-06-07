@@ -1,4 +1,6 @@
 
+document.executeOnce('/sincerity/templates/')
+
 importClass(
 	org.restlet.Server,
 	org.restlet.data.Protocol)
