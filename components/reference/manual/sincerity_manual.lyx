@@ -3209,7 +3209,10 @@ JavaScript Plugin
 \end_layout
 
 \begin_layout Standard
-Sincerity implements JavaScript via 
+Though JavaScript was originally designed to be run in web browsers, it
+ is a powerful general-purpose C-syntax language with Scheme-like closures
+ that supports many programming paradigms.
+ Sincerity implements JavaScript via 
 \begin_inset CommandInset href
 LatexCommand href
 name "Rhino"
@@ -3224,20 +3227,12 @@ target "https://developer.mozilla.org/en/docs/Rhino"
 \begin_layout Standard
 
 \emph on
-Important: You do not need this plugin to install JavaScript support.
+Important: You do not need this plugin to install JavaScript support for
+ Sincerity.
 
 \emph default
  It does, however, provide you with a new command to get easy access to
  a JavaScript shell.
- JavaScript is Sincerity's 
-\begin_inset Quotes eld
-\end_inset
-
-native
-\begin_inset Quotes erd
-\end_inset
-
- language, already installed, so this plugin is especially lightweight.
 \end_layout
 
 \begin_layout Standard
@@ -3331,7 +3326,9 @@ Python Plugin
 \end_layout
 
 \begin_layout Standard
-Sincerity implements Python via 
+Python is a general-purpose multi-paradigm dynamic language with an exceptionall
+y clean syntax and a rich ecosystem.
+ Sincerity implements Python via 
 \begin_inset CommandInset href
 LatexCommand href
 name "Jython"
@@ -3472,7 +3469,15 @@ easy_install
 \end_inset
 
  included in this plugin as a Sincerity command.
- For example, let's install the Flickr API:
+ For example, let's install 
+\begin_inset CommandInset href
+LatexCommand href
+name "Beej's Flickr API"
+target "http://stuvel.eu/flickrapi"
+
+\end_inset
+
+:
 \end_layout
 
 \begin_layout Standard
@@ -3551,8 +3556,33 @@ print 'hello world'
 
 \end_layout
 
+\begin_layout Standard
+You can also place such files in your 
+\begin_inset Quotes eld
+\end_inset
+
+/executables/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory and run them using Sincerity's 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:execute
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
 \begin_layout Subsection
 Ruby Plugin
+\end_layout
+
+\begin_layout Standard
+Ruby is a general-purpose multi-paradigm dynamic language with a exceptionally
+ full set of features and a rich ecosystem.
 \end_layout
 
 \begin_layout Standard
@@ -3676,8 +3706,15 @@ gem
 \end_inset
 
  included in this plugin as a Sincerity command.
- For example, let's install the flickru, a command line tool for accessing
- Flickr:
+ For example, let's install 
+\begin_inset CommandInset href
+LatexCommand href
+name "Flickraw"
+target "http://hanklords.github.io/flickraw/"
+
+\end_inset
+
+, an API for accessing Flickr:
 \end_layout
 
 \begin_layout Standard
@@ -3687,7 +3724,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity gem install flickru
+sincerity gem install flickraw
 \end_layout
 
 \end_inset
@@ -3696,11 +3733,11 @@ sincerity gem install flickru
 \end_layout
 
 \begin_layout Standard
-Eggs will be installed into your container under the 
+Gems will be installed into your container under the 
 \begin_inset Quotes eld
 \end_inset
 
-/libraries/python/Lib/site-packages/
+/libraries/ruby/lib/ruby/gems/shared/
 \begin_inset Quotes erd
 \end_inset
 
@@ -3708,7 +3745,79 @@ Eggs will be installed into your container under the
 \end_layout
 
 \begin_layout Standard
-Ruby uses the following shebang:
+Note that not all software written for Ruby runs well on the JRuby engine
+ (though in some cases it may actually run 
+\emph on
+better
+\emph default
+ in JRuby).
+ See the software's documentation for more details.
+\end_layout
+
+\begin_layout Standard
+Other standard Ruby commands supported by the plugin are: 
+\begin_inset Quotes eld
+\end_inset
+
+ast
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+irb
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+rake
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+rdoc
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\begin_inset Quotes eld
+\end_inset
+
+ri
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+testrb
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+The Sincerity Ruby plugin makes sure that the execution environment will
+ work with the JRuby ecosystem.
+ Specifically, JRuby executable files start with the 
+\begin_inset Quotes eld
+\end_inset
+
+env
+\begin_inset Quotes erd
+\end_inset
+
+ shebang, for example:
 \end_layout
 
 \begin_layout Standard
@@ -3721,13 +3830,26 @@ status open
 #!/usr/bin/env jruby
 \end_layout
 
+\begin_layout Plain Layout
+
+puts 'Hello, world'
+\end_layout
+
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-But if you use Sincerity's 
+You can place such files in your 
+\begin_inset Quotes eld
+\end_inset
+
+/executables/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory and run them using Sincerity's 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3735,16 +3857,7 @@ delegate:execute
 \begin_inset Quotes erd
 \end_inset
 
- command, it will work fine, because 
-\begin_inset Quotes eld
-\end_inset
-
-/executables/jruby
-\begin_inset Quotes erd
-\end_inset
-
- is included in the environment's path, and that script in turn properly
- bootstraps the container's Ruby.
+ command.
 \end_layout
 
 \begin_layout Subsection
@@ -3752,7 +3865,9 @@ PHP Plugin
 \end_layout
 
 \begin_layout Standard
-Sincerity 1.0 implements PHP via 
+Though PHP was designed for generating web pages, it is also useful as a
+ general-purpose templating language.
+ Sincerity implements PHP via 
 \begin_inset CommandInset href
 LatexCommand href
 name "Quercus"
@@ -3763,6 +3878,7 @@ target "http://quercus.caucho.com/"
 .
  Note that the free version of Quercus is included, but you may easily swap
  it for a purchased professional release if you have it.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -3784,6 +3900,126 @@ sincerity add php : install
 
 \end_layout
 
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that this PHP shell does not use Scripturian, nor does it have access
+ to any Sincerity APIs.
+ To run PHP files in Sincerity's Scripturian environment use the 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:start
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The shell can run script files provided as arguments.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity php -h
+\begin_inset Quotes erd
+\end_inset
+
+ for more information.
+ For example, let's create a file named 
+\begin_inset Quotes eld
+\end_inset
+
+test.php
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<?php
+\end_layout
+
+\begin_layout Plain Layout
+
+print "Hello, World!
+\backslash
+n";
+\end_layout
+
+\begin_layout Plain Layout
+
+?>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And then run it like so:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add php : install : php test.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+PHP has a very extensive ecosystem hosted on 
+\begin_inset CommandInset href
+LatexCommand href
+name "PEAR"
+target "http://pear.php.net/"
+
+\end_inset
+
+, often in PHP archive (.phar) format.
+ Though Sincerity does not yet support PEAR directly, you can install PEAR
+ libraries using standard PHP and then copy them over to your Sincerity
+ container.
+\end_layout
+
 \begin_layout Subsection
 Groovy Plugin
 \end_layout
@@ -3798,7 +4034,8 @@ target "http://groovy.codehaus.org/"
 
  is a dynamic language with a syntax familiar to Java programmers, but with
  features inspired by Python, Ruby and Smalltalk.
- It provides exceptionally good integration with Java libraries.
+ It provides exceptionally good integration with libraries written in Java,
+ such that any JVM library is immediately also a Groovy library.
 \end_layout
 
 \begin_layout Standard
@@ -3820,6 +4057,58 @@ sincerity add groovy : install
 
 \end_layout
 
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity groovy
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Fleshing Out
+\end_layout
+
+\begin_layout Standard
+The shell can run script files and also evaluate inline scripts as arguments.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity groovy
+\begin_inset Quotes erd
+\end_inset
+
+ to see the command's possible arguments.
+ An example of an inline script:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add groovy : install : groovy -e "println 'Hello, world'"
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Clojure Plugin
 \end_layout
@@ -3833,7 +4122,8 @@ target "http://clojure.org/"
 \end_inset
 
  is a modern Lisp designed for concurrency and performance.
- It is a superbly expressive functional language.
+ It is a superbly expressive language that supports robust functional programmin
+g as well as other paradigms.
 \end_layout
 
 \begin_layout Standard
@@ -3855,12 +4145,136 @@ sincerity add clojure : install
 
 \end_layout
 
+\begin_layout Standard
+To use:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity groovy
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsubsection
 Fleshing Out
 \end_layout
 
 \begin_layout Standard
-Clojars
+The shell (actually a REPL) can run script files and also evaluate inline
+ scripts as arguments.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity clojure -h
+\begin_inset Quotes erd
+\end_inset
+
+ to see the command's possible arguments.
+ An example of an inline script:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add clojure : install : clojure -e '(println "Hello, World")'
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Clojure has a very extensive ecosystem hosted on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Clojars"
+target "https://clojars.org/"
+
+\end_inset
+
+.
+ It is a standard Maven-type repository that is naturally supported by Sincerity
+, and attached by default if you use the 
+\begin_inset Quotes eld
+\end_inset
+
+add clojure
+\begin_inset Quotes erd
+\end_inset
+
+ shortcut.
+ For example, let's install the 
+\begin_inset CommandInset href
+LatexCommand href
+name "flickr-clj"
+target "https://github.com/stanistan/flickr-clj"
+
+\end_inset
+
+, an API to access Flickr:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add clojure : add org.clojars.stanistan flickr-clj : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A shortcut is also available for attaching Clojars explicitly:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity attach clojars : attach maven-central
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that many Clojars libraries also rely on Maven Central, so it's a good
+ idea to attach it as well.
+ Both are attached when you use 
+\begin_inset Quotes eld
+\end_inset
+
+add clojure
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
