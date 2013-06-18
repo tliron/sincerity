@@ -2377,8 +2377,7 @@ We've organized them here in the order by which you'd likely use them.
 \end_layout
 
 \begin_layout Standard
-Required arguments are noted with square brackets, while optional arguments
- are in double square brackets.
+Optional arguments are marked by square brackets.
 \end_layout
 
 \begin_layout Subsection
@@ -2411,6 +2410,15 @@ Repositories
 
 \begin_layout Standard
 Manages repositories within the current container.
+ Adds a 
+\begin_inset Quotes eld
+\end_inset
+
+Repositories
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
 \end_layout
 
 \begin_layout Standard
@@ -2469,16 +2477,311 @@ Detaches (removes) a repository from the current container.
 Dependencies
 \end_layout
 
+\begin_layout Standard
+Manages dependencies for the current container.
+ Adds 
+\begin_inset Quotes eld
+\end_inset
+
+Dependencies
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+Licenses
+\begin_inset Quotes erd
+\end_inset
+
+ tabs to the Sincerity GUI.
+\end_layout
+
 \begin_layout Subsubsection
 dependencies:dependencies
+\end_layout
+
+\begin_layout Standard
+Lists all dependencies in the current container as a tree structure.
+ Dependencies that are 
+\emph on
+not 
+\emph default
+installed will be listed in parentheses.
 \end_layout
 
 \begin_layout Subsubsection
 dependencies:licenses
 \end_layout
 
+\begin_layout Standard
+Lists all licenses per all dependencies in the current container.
+ Note that dependencies may be available via more than one license.
+\end_layout
+
+\begin_layout Quote
+Please be aware that you should not treat the output of this command as
+ legally binding.
+ Package managers do their best to provide you with correct and useful informati
+on, but you should yourself investigate the licensing available per each
+ library you use.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--verbose
+\series default
+: By default only the name of the license will be printed.
+ With this switch, the URL will be printed, too, if available.
+\end_layout
+
 \begin_layout Subsubsection
 dependencies:install
+\end_layout
+
+\begin_layout Standard
+This powerful command downloads and installs the current container's dependencie
+s and their sub-dependencies from the online repositories to which it is
+ attached.
+ It should thus be used after 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:add
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+repositories:attach
+\begin_inset Quotes erd
+\end_inset
+
+ have been used.
+ This command also handles upgrades and resolves version conflicts.
+\end_layout
+
+\begin_layout Standard
+Installation happens in several phases:
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Checking
+\series default
+: First, it searches for your dependencies in all attached repositories
+ 
+\emph on
+in order
+\emph default
+.
+ It uses the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/repositories.conf
+\begin_inset Quotes erd
+\end_inset
+
+ files as a starting point.
+ Though you can edit these directly (or copy them from elsewhere), you may
+ prefer to use the 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:add
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+repositories:attach
+\begin_inset Quotes erd
+\end_inset
+
+ commands to manipulate them instead.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Meta-data
+\series default
+: When found, the meta-data (in Maven this is a .pom file) for the package
+ is downloaded and stored in a local cache (under 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/sincerity/packages/
+\begin_inset Quotes erd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Recursion
+\series default
+: If your dependency has sub-dependencies, they are added.
+ Phases 1 to 3 are repeated for each.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Resolution
+\series default
+: Now that we have a complete dependency tree, it will be 
+\begin_inset Quotes eld
+\end_inset
+
+resolved.
+\begin_inset Quotes erd
+\end_inset
+
+ This means that duplicate dependencies will be skipped, highest possible
+ versions for dependencies will be selected.
+ Note that upgrades are handled by this phase: if a newer version of a certain
+ dependency is found, it will be selected instead of the previously installed
+ one.
+ Rarely, this phase may fail with an error due to version conflicts that
+ cannot be resolved.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Download/Delete
+\series default
+: The dependencies selected for installation in the resolution phase will
+ be downloaded, and those that were previously installed and are no longer
+ needed (for an upgrade) will be deleted.
+ You can use the 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:dependencies
+\begin_inset Quotes erd
+\end_inset
+
+ command to see the whole dependency tree, including dependencies that were
+ selected to not be installed by the resolution phase.
+ A more detailed report will be made available in 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/sincerity/resolution/threecrickets-sincerity-container-default.xml
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Note that this XML report uses XSL and CSS to make it nicely readable in
+ a web browser.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Unpack
+\series default
+: Installed packages will be unpacked.
+ This is identical to the 
+\begin_inset Quotes eld
+\end_inset
+
+packages:unpack
+\begin_inset Quotes erd
+\end_inset
+
+ command, and may cause new artifacts to appear in your container, as well
+ as arbitrary code to be executed via installer hooks in a package.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Prune
+\series default
+: Unused artifacts will be deleted, 
+\emph on
+unless you have changed them
+\emph default
+.
+ This is identical to the 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:prune
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Standard
+Under the hood, Sincerity relies on 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy"
+target "http://ant.apache.org/ivy/"
+
+\end_inset
+
+ to handle phases 1 to 5, and it may be useful to refer to documentation
+ there if you require specialized configuration and handling.
+\end_layout
+
+\begin_layout Standard
+Note that remote repositories introduce consider delay for phases 1, 2 and
+ 5.
+ Furthermore, the more repositories you attach, the longer phase 1 will
+ take, as each repository is checked.
+ For these reasons, as well as saving you from network/server failure by
+ 3rd party providers, it is strongly recommend that you run a local proxy
+ for the repositories you use.
+ You can install one easily with Sincerity using the Nexus skeleton.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--overwrite
+\series default
+: This affects phase 6.
+ See 
+\begin_inset Quotes eld
+\end_inset
+
+packages:unpack
+\begin_inset Quotes erd
+\end_inset
+
+ for more information.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2494,11 +2797,11 @@ dependencies:add
 \end_layout
 
 \begin_layout Subsubsection
-dependencies:revise
+dependencies:remove
 \end_layout
 
 \begin_layout Subsubsection
-dependencies:remove
+dependencies:revise
 \end_layout
 
 \begin_layout Subsection
@@ -2511,6 +2814,107 @@ Manages packages in the current container.
 
 \begin_layout Subsubsection
 packages:unpack
+\end_layout
+
+\begin_layout Standard
+Unpacks all Sincerity packages in 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/jars/
+\begin_inset Quotes erd
+\end_inset
+
+.
+ If the package has an installer hook, it will be executed after the artifacts
+ are unpacked.
+\end_layout
+
+\begin_layout Standard
+You usually would not have to run this command by itself, because it is
+ part of 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:install
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, it may be useful in case you are manipulating the contents of
+ 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/jars/
+\begin_inset Quotes erd
+\end_inset
+
+ manually.
+\end_layout
+
+\begin_layout Standard
+It is also useful in case you've made various changes to unpacked artifacts
+ and want to restore them to their initial unpacked state.
+ A good way to do this is to delete all the files that you want to restore
+ and then run 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity unpack
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+[Filter]
+\series default
+: Currently unused.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--overwrite
+\series default
+: By default the command will not overwrite existing files.
+ This behavior ensures that you do not lose your custom work.
+ However, you can override this behavior using this switch.
+ 
+\emph on
+Be careful:
+\emph default
+ this will overwrite files unpacked by 
+\emph on
+all 
+\emph default
+packages.
+ If you only want to overwrite a select few files, it is best to delete
+ them and then run 
+\begin_inset Quotes eld
+\end_inset
+
+unpack
+\begin_inset Quotes erd
+\end_inset
+
+ 
+\emph on
+without
+\emph default
+ this switch.
 \end_layout
 
 \begin_layout Subsection
@@ -2574,7 +2978,40 @@ artifacts:prune
 \end_layout
 
 \begin_layout Standard
-Makes sure that 
+Deletes artifacts that were previously installed by Sincerity but for which
+ their dependencies no longer exist.
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+Note that artifacts that were changed since installation will not be deleted.
+ 
+\emph default
+This behavior ensures that you do not lose your custom work.
+\end_layout
+
+\begin_layout Standard
+You usually would not have to run this command by itself, because it is
+ part of 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:install
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, it may be useful in case you are manipulating the contents of
+ 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/jars/
+\begin_inset Quotes erd
+\end_inset
+
+ manually.
 \end_layout
 
 \begin_layout Subsection
@@ -2584,6 +3021,15 @@ Delegate
 \begin_layout Standard
 Manages entry points into the current container, and is the primary means
  to run applications in it.
+ Adds a 
+\begin_inset Quotes eld
+\end_inset
+
+Programs
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2602,9 +3048,13 @@ delegate:start
 Executes a Scripturian document.
 \end_layout
 
-\begin_layout Standard
-The argument is a document URI, either relative to the container root or
- to the 
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+Document name: The argument is a document name, either relative to the current
+ container root or to the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2613,6 +3063,26 @@ The argument is a document URI, either relative to the container root or
 \end_inset
 
  subdirectory.
+ As usual with Scripturian, filename extensions should not be used.
+ If the name points to a directory, then the default file in that directory
+ will be executed.
+ For example, 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity start component
+\begin_inset Quotes erd
+\end_inset
+
+ would execute 
+\begin_inset Quotes eld
+\end_inset
+
+/component/default.js
+\begin_inset Quotes erd
+\end_inset
+
+ from within the current container.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2658,7 +3128,19 @@ Templates
 
 \begin_layout Standard
 Manages templates in the Sincerity installation.
- Templates are used by the 
+ Adds a 
+\begin_inset Quotes eld
+\end_inset
+
+Templates
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
+\end_layout
+
+\begin_layout Standard
+Templates are used by the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -2697,11 +3179,37 @@ Turns the current container into a Sincerity template.
 \end_layout
 
 \begin_layout Subsection
+Shortcuts
+\end_layout
+
+\begin_layout Standard
+Manages shortcuts for the current container.
+ Adds a 
+\begin_inset Quotes eld
+\end_inset
+
+Shortcuts
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
+\end_layout
+
+\begin_layout Subsection
 Help
 \end_layout
 
 \begin_layout Standard
 Provides general information about your Sincerity installation.
+ Adds a 
+\begin_inset Quotes eld
+\end_inset
+
+Commands
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2710,7 +3218,28 @@ help:version
 
 \begin_layout Standard
 Lists Sincerity version information.
- This included the numerical version and the build timestamp.
+ This includes the numerical version and the build timestamp.
+ An example of output:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+built=Jun 18 2013, 15:28:46, TZ+0800
+\end_layout
+
+\begin_layout Plain Layout
+
+version=1.0-dev5 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -2777,379 +3306,124 @@ used to control messages to standard output and standard error.
 GUI
 \end_layout
 
+\begin_layout Standard
+Manages the Sincerity GUI.
+\end_layout
+
 \begin_layout Subsubsection
 gui:gui
+\end_layout
+
+\begin_layout Standard
+Starts the Sincerity GUI.
+ The GUI will go through all available plugins and try to call the optional
+ gui() entry point if they have them, allowing plugins to enhance the GUI
+ as is appropriate.
+\end_layout
+
+\begin_layout Standard
+Note that this command blocks until the GUI is shut down.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+--
+\series bold
+ui=
+\series default
+: Let's you change the Swing look-and-feel.
+ Look-and-feels supported on most JVMs are: 
+\begin_inset Quotes eld
+\end_inset
+
+metal
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+nimbus
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Note that if no look-and-feel is specified, or the specified look-and-feel
+ is not found, then Sincerity will attempt to default to the native look-and-fee
+l, 
+\emph on
+unless the native platform is GTK
+\emph default
+.
+ We found the GTK look-and-feel to be so riddled with bugs that we decided
+ to spare you from it.
 \end_layout
 
 \begin_layout Subsection
 Java
 \end_layout
 
+\begin_layout Standard
+Support for the Java programming language.
+\end_layout
+
 \begin_layout Subsubsection
 java:compile
 \end_layout
 
-\begin_layout Section
-Programming
-\end_layout
-
-\begin_layout Subsection
-Scripturian
-\end_layout
-
-\begin_layout Subsection
-The Sincerity JavaScript Library
+\begin_layout Standard
+Compiles Java source files (.java) into JVM class files (.class) using the
+ current container's classpath.
 \end_layout
 
 \begin_layout Standard
-Sincerity relies on JavaScript for bootstrapping and plugins, and while
- JavaScript does not have a standard library, you do have access to the
- entire JVM standard library.
-\end_layout
-
-\begin_layout Standard
-Still, this isn't quite good enough: using JVM libraries works, but they
- do involve using paradigms that have not been optimized for JavaScript.
-\end_layout
-
-\begin_layout Standard
-For Sincerity, we decided that we can do better, and so we present you with
- a collection of useful code called the Sincerity JavaScript Library.
- We should point out from the start that this is not a general-purpose JavaScrip
-t library: it relies on the JVM libraries, and only works in the JVM.
- There are also a few optimizations specific to the Rhino engine, which
- is the only JavaScript engine for the JVM at the moment, but we plan to
- support Oracle's Nashorn, which is scheduled to be included in JVM 8.
-\end_layout
-
-\begin_layout Standard
-What follows is a general introduction to the library.
- See the API documentation for full details.
- Also make sure to check out Sincerity's JsDoc plugin which makes it easy
- for you to generate similar documentation for your own JavaScript codebase.
-\end_layout
-
-\begin_layout Standard
-Note that the Sincerity Foundation Library is used by at least two other
- JavaScript frameworks: the Prudence JavaScript Library, and the Diligence
- Framework, which builds on the Prudence JavaScript Library.
+Note that you must have a full JDK to use this command: a JRE usually does
+ not come with a Java compiler.
 \end_layout
 
 \begin_layout Paragraph
-Objects
+Arguments
 \end_layout
 
-\begin_layout Standard
-Enhanced support for standard JavaScript types: strings, arrays, dicts and
- dates.
- This library monkey-patches the standard types with many useful methods.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Objects API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Objects"
+\begin_layout Enumerate
 
+\series bold
+[Source directory]
+\series default
+: Recursively compiles all .java files in this directory (relative to the
+ container root).
+ Defaults to 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/java/
+\begin_inset Quotes erd
 \end_inset
 
 .
 \end_layout
 
-\begin_layout Paragraph
-Classes
-\end_layout
+\begin_layout Enumerate
 
-\begin_layout Standard
-This straightforward-but-powerful library lets you use the object-oriented
- programming (OOP) paradigm in JavaScript.
- It lets you define classes with public and private members, inherit classes,
- and even provides a mechanism for generation of constructors.
- Generally, the Sincerity JavaScript Library does not use OOP indiscriminately:
- classes are used only when they make sense and add elegance.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Classes API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Classes"
+\series bold
+[Classes directory]
+\series default
+: Output .class files here.
+ Defaults to 
+\begin_inset Quotes eld
+\end_inset
 
+/libraries/classes/
+\begin_inset Quotes erd
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Paragraph
-Iterators
-\end_layout
-
-\begin_layout Standard
-Iterators let you write coherent code that can efficiently comprehend and
- operate on sequences of any size.
- Its design borrows stylistically from functional programming languages.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Iterators API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Iterators"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-Files
-\end_layout
-
-\begin_layout Standard
-Low-level access to the filesystem, including high-performance reading and
- writing of files using memory-mapped files.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Files API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Files"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-Templates
-\end_layout
-
-\begin_layout Standard
-Straightforward and flexible string interpolation.
- For example:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-println('Hello, {user}'.cast({user: 'Sincerity'})
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Templates API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Templates"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-JSON
-\end_layout
-
-\begin_layout Standard
-High-performance JSON parsing and rendering using the 
-\begin_inset CommandInset href
-LatexCommand href
-name "JSON Rhino library"
-target "http://code.google.com/p/json-rhino/"
-
-\end_inset
-
-, which is written in Java.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.JSON API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.JSON"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-XML
-\end_layout
-
-\begin_layout Standard
-High-performance XML parsing and rendering using the standard JVM libraries.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Objects API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Objects"
-
-\end_inset
-
-
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.XML API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.XML"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-Calendar
-\end_layout
-
-\begin_layout Standard
-Enhancements to JavaScript's standard Date type.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Calendar API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Calendar"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-Localization
-\end_layout
-
-\begin_layout Standard
-Easy access to the JVM's localization libraries, including formatting for
- dates, times and currencies.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Localization API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Localization"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Paragraph
-Cryptography
-\end_layout
-
-\begin_layout Standard
-Easy access to the JVM's cryptography libraries, including shortcuts for
- common hashing, encryption and decryption tasks.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Cryptography API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Cryptography"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-JVM
-\end_layout
-
-\begin_layout Standard
-Easy conversions between JVM and JavaScript types, and also access to a
- few operating system services.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Localization API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Localization"
-
-\end_inset
-
-
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.JVM API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.JVM"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-Validation
-\end_layout
-
-\begin_layout Standard
-A general-purpose user input validation library for commonly used types,
- such as numbers and email addresses.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Validation API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Validation"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-Mail
-\end_layout
-
-\begin_layout Standard
-Easy access to JavaMail, including sending of mixed-media plain-text/HTML
- emails.
- Uses the templates library to let you easily create email templates.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Mail API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Mail"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-Lucene
-\end_layout
-
-\begin_layout Standard
-Easy access to the Lucene search engine.
- Supports the iterators library, so you can easily index very large collections
- of documents.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Lucene API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Lucene"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Paragraph
-Rhino
-\end_layout
-
-\begin_layout Standard
-Access to features of the Rhino JavaScript engine, such as the call stack
- and exception details.
- 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Rhino API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Rhino"
-
-\end_inset
-
-
+ Note that Sincerity will always include this directory in its classpath,
+ so it may be a good idea to keep this default.
 \end_layout
 
 \begin_layout Section
@@ -9511,6 +9785,369 @@ The Sincerity JsDoc Template
 \begin_layout Standard
 Note that you need to host the documentation via HTTP.
  File does not work.
+\end_layout
+
+\begin_layout Section
+Programming
+\end_layout
+
+\begin_layout Subsection
+Scripturian
+\end_layout
+
+\begin_layout Subsection
+The Sincerity JavaScript Library
+\end_layout
+
+\begin_layout Standard
+Sincerity relies on JavaScript for bootstrapping and plugins, and while
+ JavaScript does not have a standard library, you do have access to the
+ entire JVM standard library.
+\end_layout
+
+\begin_layout Standard
+Still, this isn't quite good enough: using JVM libraries works, but they
+ do involve using paradigms that have not been optimized for JavaScript.
+\end_layout
+
+\begin_layout Standard
+For Sincerity, we decided that we can do better, and so we present you with
+ a collection of useful code called the Sincerity JavaScript Library.
+ We should point out from the start that this is not a general-purpose JavaScrip
+t library: it relies on the JVM libraries, and only works in the JVM.
+ There are also a few optimizations specific to the Rhino engine, which
+ is the only JavaScript engine for the JVM at the moment, but we plan to
+ support Oracle's Nashorn, which is scheduled to be included in JVM 8.
+\end_layout
+
+\begin_layout Standard
+What follows is a general introduction to the library.
+ See the API documentation for full details.
+ Also make sure to check out Sincerity's JsDoc plugin which makes it easy
+ for you to generate similar documentation for your own JavaScript codebase.
+\end_layout
+
+\begin_layout Standard
+Note that the Sincerity Foundation Library is used by at least two other
+ JavaScript frameworks: the Prudence JavaScript Library, and the Diligence
+ Framework, which builds on the Prudence JavaScript Library.
+\end_layout
+
+\begin_layout Paragraph
+Objects
+\end_layout
+
+\begin_layout Standard
+Enhanced support for standard JavaScript types: strings, arrays, dicts and
+ dates.
+ This library monkey-patches the standard types with many useful methods.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Objects API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Objects"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Classes
+\end_layout
+
+\begin_layout Standard
+This straightforward-but-powerful library lets you use the object-oriented
+ programming (OOP) paradigm in JavaScript.
+ It lets you define classes with public and private members, inherit classes,
+ and even provides a mechanism for generation of constructors.
+ Generally, the Sincerity JavaScript Library does not use OOP indiscriminately:
+ classes are used only when they make sense and add elegance.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Classes API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Classes"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Iterators
+\end_layout
+
+\begin_layout Standard
+Iterators let you write coherent code that can efficiently comprehend and
+ operate on sequences of any size.
+ Its design borrows stylistically from functional programming languages.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Iterators API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Iterators"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Files
+\end_layout
+
+\begin_layout Standard
+Low-level access to the filesystem, including high-performance reading and
+ writing of files using memory-mapped files.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Files API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Files"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Templates
+\end_layout
+
+\begin_layout Standard
+Straightforward and flexible string interpolation.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+println('Hello, {user}'.cast({user: 'Sincerity'})
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Templates API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Templates"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+JSON
+\end_layout
+
+\begin_layout Standard
+High-performance JSON parsing and rendering using the 
+\begin_inset CommandInset href
+LatexCommand href
+name "JSON Rhino library"
+target "http://code.google.com/p/json-rhino/"
+
+\end_inset
+
+, which is written in Java.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.JSON API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.JSON"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+XML
+\end_layout
+
+\begin_layout Standard
+High-performance XML parsing and rendering using the standard JVM libraries.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Objects API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Objects"
+
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.XML API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.XML"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Calendar
+\end_layout
+
+\begin_layout Standard
+Enhancements to JavaScript's standard Date type.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Calendar API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Calendar"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Localization
+\end_layout
+
+\begin_layout Standard
+Easy access to the JVM's localization libraries, including formatting for
+ dates, times and currencies.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Localization API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Localization"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Cryptography
+\end_layout
+
+\begin_layout Standard
+Easy access to the JVM's cryptography libraries, including shortcuts for
+ common hashing, encryption and decryption tasks.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Cryptography API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Cryptography"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+JVM
+\end_layout
+
+\begin_layout Standard
+Easy conversions between JVM and JavaScript types, and also access to a
+ few operating system services.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Localization API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Localization"
+
+\end_inset
+
+
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.JVM API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.JVM"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Validation
+\end_layout
+
+\begin_layout Standard
+A general-purpose user input validation library for commonly used types,
+ such as numbers and email addresses.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Validation API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Validation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Mail
+\end_layout
+
+\begin_layout Standard
+Easy access to JavaMail, including sending of mixed-media plain-text/HTML
+ emails.
+ Uses the templates library to let you easily create email templates.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Mail API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Mail"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Lucene
+\end_layout
+
+\begin_layout Standard
+Easy access to the Lucene search engine.
+ Supports the iterators library, so you can easily index very large collections
+ of documents.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Lucene API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Lucene"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Rhino
+\end_layout
+
+\begin_layout Standard
+Access to features of the Rhino JavaScript engine, such as the call stack
+ and exception details.
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Rhino API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Rhino"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section

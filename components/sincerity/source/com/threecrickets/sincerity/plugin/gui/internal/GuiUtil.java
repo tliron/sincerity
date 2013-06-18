@@ -69,6 +69,8 @@ public class GuiUtil
 
 	public static final String GTK_LOOK_AND_FEEL = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
 
+	public static final String LOOK_AND_FEEL_ATTRIBUTE = "com.threecrickets.sincerity.lookAndFeel";
+
 	public static String getLookAndFeel( String name )
 	{
 		if( !"native".equals( name ) )
@@ -78,9 +80,9 @@ public class GuiUtil
 		return null;
 	}
 
-	public static void initLookAndFeel( String ui )
+	public static void initLookAndFeel( String ui ) throws SincerityException
 	{
-		String current = (String) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.lookAndFeel" );
+		String current = (String) Bootstrap.getAttributes().get( LOOK_AND_FEEL_ATTRIBUTE );
 		if( ( current == null ) || !current.equals( ui ) )
 		{
 			String lookAndFeel = getLookAndFeel( ui );
@@ -115,22 +117,22 @@ public class GuiUtil
 			}
 			catch( InstantiationException x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not set look-and-feel to: " + ui, x );
 			}
 			catch( ClassNotFoundException x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not set look-and-feel to: " + ui, x );
 			}
 			catch( UnsupportedLookAndFeelException x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not set look-and-feel to: " + ui, x );
 			}
 			catch( IllegalAccessException x )
 			{
-				x.printStackTrace();
+				throw new SincerityException( "Could not set look-and-feel to: " + ui, x );
 			}
 
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.lookAndFeel", ui );
+			Bootstrap.getAttributes().put( LOOK_AND_FEEL_ATTRIBUTE, ui );
 		}
 	}
 
