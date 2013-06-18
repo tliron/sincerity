@@ -53,12 +53,18 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 public class Console extends JFrame implements Runnable, ActionListener
 {
 	//
+	// Constants
+	//
+
+	public static final String CONSOLE_ATTRIBUTE = "com.threecrickets.sincerity.console";
+
+	//
 	// Static attributes
 	//
 
 	public static Console getCurrent()
 	{
-		return (Console) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.console" );
+		return (Console) Bootstrap.getAttributes().get( CONSOLE_ATTRIBUTE );
 	}
 
 	//
@@ -131,7 +137,7 @@ public class Console extends JFrame implements Runnable, ActionListener
 
 	public void run()
 	{
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.console", this );
+		Bootstrap.getAttributes().put( CONSOLE_ATTRIBUTE, this );
 		GuiUtil.center( this );
 		setVisible( true );
 	}
@@ -165,7 +171,7 @@ public class Console extends JFrame implements Runnable, ActionListener
 			GuiUtil.error( x );
 		}
 
-		Bootstrap.getAttributes().remove( "com.threecrickets.sincerity.console" );
+		Bootstrap.getAttributes().remove( CONSOLE_ATTRIBUTE );
 		super.dispose();
 
 		Sincerity.main( new String[]

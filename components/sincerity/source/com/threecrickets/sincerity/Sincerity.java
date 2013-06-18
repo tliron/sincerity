@@ -70,11 +70,23 @@ public class Sincerity implements Runnable
 
 	public static final String CONTAINER_ENV = "SINCERITY_CONTAINER";
 
-	public static final String CONTAINER_ATTRIBUTE = "com.threecrickets.sincerity.containerRoot";
-
 	public static final String DEBUG_PROPERTY = "sincerity.debug";
 
 	public static final String DEBUG_ENV = "SINCERITY_DEBUG";
+
+	public static final String VERSION_ATTRIBUTE = "com.threecrickets.sincerity.version";
+
+	public static final String CONTAINER_ATTRIBUTE = "com.threecrickets.sincerity.containerRoot";
+
+	public static final String STARTED_ATTRIBUTE = "com.threecrickets.sincerity.started";
+
+	public static final String VERBOSITY_ATTRIBUTE = "com.threecrickets.sincerity.verbosity";
+
+	public static final String INSTALLS_ATTRIBUTE = "com.threecrickets.sincerity.installs";
+
+	public static final String OUT_ATTRIBUTE = "com.threecrickets.sincerity.out";
+
+	public static final String ERR_ATTRIBUTE = "com.threecrickets.sincerity.err";
 
 	//
 	// Static attributes
@@ -93,7 +105,7 @@ public class Sincerity implements Runnable
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> getVersion()
 	{
-		Map<String, String> version = (Map<String, String>) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.version" );
+		Map<String, String> version = (Map<String, String>) Bootstrap.getAttributes().get( VERSION_ATTRIBUTE );
 		if( version == null )
 		{
 			Properties properties = new Properties();
@@ -121,7 +133,7 @@ public class Sincerity implements Runnable
 				Object name = e.nextElement();
 				version.put( name.toString(), properties.getProperty( name.toString() ) );
 			}
-			Map<String, String> existing = (Map<String, String>) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.version", version );
+			Map<String, String> existing = (Map<String, String>) Bootstrap.getAttributes().putIfAbsent( VERSION_ATTRIBUTE, version );
 			if( existing != null )
 				version = existing;
 		}
@@ -134,7 +146,7 @@ public class Sincerity implements Runnable
 
 	public static void main( String[] arguments )
 	{
-		boolean started = Bootstrap.getAttributes().get( "com.threecrickets.sincerity.started" ) != null;
+		boolean started = Bootstrap.getAttributes().get( STARTED_ATTRIBUTE ) != null;
 		try
 		{
 			Sincerity sincerity = new Sincerity( arguments, getCurrent() );
@@ -143,7 +155,7 @@ public class Sincerity implements Runnable
 				sincerity.commands.add( new Command( "gui", "gui", false, sincerity ) );
 
 			if( !started )
-				Bootstrap.getAttributes().put( "com.threecrickets.sincerity.started", true );
+				Bootstrap.getAttributes().put( STARTED_ATTRIBUTE, true );
 
 			sincerity.run();
 		}
@@ -198,11 +210,11 @@ public class Sincerity implements Runnable
 
 	public int getVerbosity()
 	{
-		Integer verbosity = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.verbosity" );
+		Integer verbosity = (Integer) Bootstrap.getAttributes().get( VERBOSITY_ATTRIBUTE );
 		if( verbosity == null )
 		{
 			verbosity = 1;
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
+			Bootstrap.getAttributes().put( VERBOSITY_ATTRIBUTE, verbosity );
 		}
 
 		return verbosity;
@@ -210,16 +222,16 @@ public class Sincerity implements Runnable
 
 	public void setVerbosity( int verbosity )
 	{
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.verbosity", verbosity );
+		Bootstrap.getAttributes().put( VERBOSITY_ATTRIBUTE, verbosity );
 	}
 
 	public int getInstalls()
 	{
-		Integer installs = (Integer) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.installs" );
+		Integer installs = (Integer) Bootstrap.getAttributes().get( INSTALLS_ATTRIBUTE );
 		if( installs == null )
 		{
 			installs = 0;
-			Bootstrap.getAttributes().put( "com.threecrickets.sincerity.installs", installs );
+			Bootstrap.getAttributes().put( INSTALLS_ATTRIBUTE, installs );
 		}
 
 		return installs;
@@ -227,16 +239,16 @@ public class Sincerity implements Runnable
 
 	public void setInstalls( int installs )
 	{
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.installs", installs );
+		Bootstrap.getAttributes().put( INSTALLS_ATTRIBUTE, installs );
 	}
 
 	public PrintWriter getOut()
 	{
-		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.out" );
+		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( OUT_ATTRIBUTE );
 		if( out == null )
 		{
 			out = new PrintWriter( new OutputStreamWriter( System.out ), true );
-			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.out", out );
+			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( OUT_ATTRIBUTE, out );
 			if( existing != null )
 				out = existing;
 		}
@@ -248,16 +260,16 @@ public class Sincerity implements Runnable
 	{
 		if( !( out instanceof PrintWriter ) )
 			out = new PrintWriter( out, true );
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.out", out );
+		Bootstrap.getAttributes().put( OUT_ATTRIBUTE, out );
 	}
 
 	public PrintWriter getErr()
 	{
-		PrintWriter err = (PrintWriter) Bootstrap.getAttributes().get( "com.threecrickets.sincerity.err" );
+		PrintWriter err = (PrintWriter) Bootstrap.getAttributes().get( ERR_ATTRIBUTE );
 		if( err == null )
 		{
 			err = new PrintWriter( new OutputStreamWriter( System.err ), true );
-			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( "com.threecrickets.sincerity.err", err );
+			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( ERR_ATTRIBUTE, err );
 			if( existing != null )
 				err = existing;
 		}
@@ -269,7 +281,7 @@ public class Sincerity implements Runnable
 	{
 		if( !( err instanceof PrintWriter ) )
 			err = new PrintWriter( err, true );
-		Bootstrap.getAttributes().put( "com.threecrickets.sincerity.err", err );
+		Bootstrap.getAttributes().put( ERR_ATTRIBUTE, err );
 	}
 
 	public File getContainerRoot() throws SincerityException

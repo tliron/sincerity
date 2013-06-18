@@ -282,10 +282,10 @@ public class DependenciesPlugin implements Plugin1
 					else
 						pattern = size < 2 ? TreeUtil.T : TreeUtil._T;
 				}
-				System.out.print( pattern );
+				writer.print( pattern );
 			}
 
-			System.out.print( TreeUtil.VV );
+			writer.print( TreeUtil.VV );
 			if( seal )
 				// Erase the pattern after it was sealed
 				patterns.set( size - 1, size < 2 ? "  " : "    " );

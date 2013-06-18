@@ -61,11 +61,6 @@ public class DelegatePlugin implements Plugin1
 	// Plugin
 	//
 
-	/*
-	 * static { System.out.println("load " +
-	 * DelegatePlugin.class.getClassLoader()); }
-	 */
-
 	public int getInterfaceVersion()
 	{
 		return 1;

@@ -14,12 +14,14 @@ package com.threecrickets.sincerity.plugin;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.Iterator;
 
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
 import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
@@ -74,10 +76,11 @@ public class ArtifactsPlugin implements Plugin1
 		if( "artifacts".equals( commandName ) )
 		{
 			command.setParse( true );
+			boolean packages = command.getSwitches().contains( "packages" );
 			boolean verbose = command.getSwitches().contains( "verbose" );
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printArtifacts( dependencies, command.getSincerity().getOut(), verbose );
+			printArtifacts( dependencies, command.getSincerity().getOut(), packages, verbose );
 		}
 		else if( "prune".equals( commandName ) )
 		{
@@ -98,7 +101,7 @@ public class ArtifactsPlugin implements Plugin1
 	// Operations
 	//
 
-	public void printArtifacts( Dependencies dependencies, Writer writer, boolean verbose ) throws SincerityException
+	public void printArtifacts( Dependencies dependencies, Writer writer, boolean packages, boolean verbose ) throws SincerityException
 	{
 		@SuppressWarnings("resource")
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
@@ -112,6 +115,8 @@ public class ArtifactsPlugin implements Plugin1
 				printWriter.print( i == length - 1 ? TreeUtil.LVV : TreeUtil.TVV );
 
 				String location = artifact.getId().getAttribute( "location" );
+				if( location != null )
+					location = dependencies.getContainer().getRelativePath( location );
 				boolean installed = location != null && new File( location ).exists();
 
 				if( !installed )
@@ -124,7 +129,7 @@ public class ArtifactsPlugin implements Plugin1
 					printWriter.print( ": " );
 					String size = artifact.getId().getAttribute( "size" );
 					if( location != null )
-						printWriter.print( dependencies.getContainer().getRelativePath( location ) );
+						printWriter.print( location );
 					else
 					{
 						// Could not find a location for it?
@@ -145,6 +150,21 @@ public class ArtifactsPlugin implements Plugin1
 					printWriter.print( ')' );
 
 				printWriter.println();
+
+				if( packages )
+				{
+					Package pack = location != null ? dependencies.getPackages().getByPackage( new File( location ) ) : null;
+					if( pack != null )
+					{
+						for( Iterator<Artifact> ii = pack.iterator(); ii.hasNext(); )
+						{
+							Artifact packedArtifact = ii.next();
+							printWriter.print( "    " );
+							printWriter.print( ii.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
+							printWriter.println( dependencies.getContainer().getRelativeFile( packedArtifact.getFile() ) );
+						}
+					}
+				}
 			}
 		}
 	}
