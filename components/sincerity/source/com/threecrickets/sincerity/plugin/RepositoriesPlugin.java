@@ -81,8 +81,8 @@ public class RepositoriesPlugin implements Plugin1
 		if( "repositories".equals( commandName ) )
 		{
 			Repositories repositories = command.getSincerity().getContainer().getRepositories();
-			printRepositories( command.getSincerity().getOut(), "Public", repositories.getResolvers( "public" ) );
 			printRepositories( command.getSincerity().getOut(), "Private", repositories.getResolvers( "private" ) );
+			printRepositories( command.getSincerity().getOut(), "Public", repositories.getResolvers( "public" ) );
 		}
 		else if( "attach".equals( commandName ) )
 		{

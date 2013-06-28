@@ -46,7 +46,7 @@ public class Shortcuts extends AbstractList<String>
 
 	public static final String SHORTCUT_PREFIX = "@";
 
-	public static final String SHORTCUT_TYPE_SEPARATOR = "@";
+	public static final String SHORTCUT_TYPE_SEPARATOR = "#";
 
 	public static final int SHORTCUT_PREFIX_LENGTH = SHORTCUT_PREFIX.length();
 

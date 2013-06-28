@@ -149,6 +149,9 @@ public class ContainerPlugin implements Plugin1
 					throw new SincerityException( "Could not clean cache", x );
 				}
 			}
+
+			command.getSincerity().removeCommand( command );
+			command.getSincerity().reboot();
 		}
 		else
 			throw new UnknownCommandException( command );

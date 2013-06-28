@@ -20,6 +20,7 @@ import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
 import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin1;
@@ -36,6 +37,13 @@ import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
  * <li><b>artifacts</b>: prints out a list of artifacts installed in the current
  * container, organized by jars. Use the --verbose switch for a more detailed
  * report.</li>
+ * <li><b>install</b>: downloads and installs all artifacts for dependencies in
+ * this container. This would also involve unpacking all packages and running
+ * their installation hooks.</li>
+ * <li><b>uninstall</b>: uninstalls all artifacts in this container. This would
+ * also involve calling all package uninstall hooks. Note that the dependencies
+ * are still added to the container, and can be re-installed. Also see
+ * "container:clean".</li>
  * <li><b>prune</b> : deletes any artifacts that have been previously installed
  * but are no longer necessary due to changed in the dependencies. Note that
  * changed artifacts will be ignored.</li>
@@ -66,7 +74,7 @@ public class ArtifactsPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"artifacts", "prune"
+			"artifacts", "install", "uninstall", "prune"
 		};
 	}
 
@@ -81,6 +89,29 @@ public class ArtifactsPlugin implements Plugin1
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			printArtifacts( dependencies, command.getSincerity().getOut(), packages, verbose );
+		}
+		else if( "install".equals( commandName ) )
+		{
+			command.setParse( true );
+			boolean overwrite = command.getSwitches().contains( "overwrite" );
+
+			Container container = command.getSincerity().getContainer();
+			container.getDependencies().install( overwrite );
+
+			if( container.hasFinishedInstalling() )
+			{
+				container.setInstallations( 0 );
+				command.getSincerity().removeCommand( command );
+			}
+			command.getSincerity().reboot();
+		}
+		else if( "uninstall".equals( commandName ) )
+		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			dependencies.uninstall();
+
+			command.getSincerity().removeCommand( command );
+			command.getSincerity().reboot();
 		}
 		else if( "prune".equals( commandName ) )
 		{

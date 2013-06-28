@@ -264,9 +264,10 @@ Sincerity was born of many years of experience writing complex software
 \end_layout
 
 \begin_layout Standard
-You can go ahead and just use it; it will feel quite natural and trivial.
- However, what follows is some of the more complicated impetus behind it,
- which may help you understand why a tool such as Sincerity became necessary.
+You can go ahead and skip this chapter, and dive right into the tutorial.
+ It may very well feel very natural and trivial to you.
+ Otherwise, this chapter details the problematic reality that made a tool
+ such as Sincerity necessary.
 \end_layout
 
 \begin_layout Subsection
@@ -1284,7 +1285,7 @@ of modularity, introducing no special restrictions for users that do not
 \end_layout
 
 \begin_layout Section
-Getting Started
+Tutorial
 \end_layout
 
 \begin_layout Subsection
@@ -1646,6 +1647,170 @@ sincerity
 \end_layout
 
 \end_deeper
+\begin_layout Enumerate
+If an argument begins with a 
+\begin_inset Quotes eld
+\end_inset
+
+@
+\begin_inset Quotes erd
+\end_inset
+
+ character, it will be interpreted as a shortcut, and searched for in the
+ current container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+ If found, it will be expanded to the command defined there.
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Expansion to a command chain is allowed, as well as recursive use of shortcuts.
+ For example:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use container1 : @mv : start restlet
+\end_layout
+
+\end_inset
+
+Would expand to:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity use container1 : add mongovision : install : start restlet
+\end_layout
+
+\end_inset
+
+If the following entry is in 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+mv = add mongovision : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Some commands support implicit use of shortcuts without requiring the 
+\begin_inset Quotes eld
+\end_inset
+
+@
+\begin_inset Quotes erd
+\end_inset
+
+ prefix.
+ Specifically, the 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:add
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+repositories:attach
+\begin_inset Quotes erd
+\end_inset
+
+ commands will search for shortcuts with the 
+\begin_inset Quotes eld
+\end_inset
+
+add#
+\begin_inset Quotes erd
+\end_inset
+
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+attach#
+\begin_inset Quotes erd
+\end_inset
+
+ prefixes respectively.
+ For example:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add mongovision
+\end_layout
+
+\end_inset
+
+Will expand to:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity attach three-crickets : add com.threecrickets.mongovision mongovision
+\end_layout
+
+\end_inset
+
+If the following entry is in 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+add#mongovision = attach three-crickets : add com.threecrickets.mongovision
+ mongovision
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
 \begin_layout Subsection
 Working with the Graphical User Interface (GUI)
 \end_layout
@@ -1705,7 +1870,8 @@ sincerity use container1 : gui
 
 \begin_layout Standard
 If you are designing your own Sincerity plugin, it is strongly recommend
- that you include GUI support via the optional gui() entry point.
+ that you include GUI support if appropriate via the optional gui() entry
+ point.
 \end_layout
 
 \begin_layout Subsection
@@ -1906,7 +2072,15 @@ all
 
 \begin_layout Standard
 Sincerity adds this path to the classpath, expecting to find JVM class files
- (.class).
+ (
+\begin_inset Quotes eld
+\end_inset
+
+.class
+\begin_inset Quotes erd
+\end_inset
+
+).
  The directory structure 
 \emph on
 must
@@ -1997,7 +2171,7 @@ This subdirectory is reserved for Sincerity installers.
 \begin_inset Quotes eld
 \end_inset
 
-dependencies:install
+artifacts:install
 \begin_inset Quotes erd
 \end_inset
 
@@ -2209,53 +2383,6 @@ dependencies:dependencies
 \end_layout
 
 \begin_layout Subsubsection
-Shortcut
-\end_layout
-
-\begin_layout Standard
-Dependency names can be quite long and hard to remember.
- For example, 
-\begin_inset Quotes eld
-\end_inset
-
-sincerity add com.threecrickets.sincerity.skeleton sincerity-jetty-servlet-jmx
-\begin_inset Quotes erd
-\end_inset
-
- included the full identifier (group and name) for a dependency.
- Instead, Sincerity allows for configurable shortcuts, for example, 
-\begin_inset Quotes eld
-\end_inset
-
-sincerity add jetty.servlet.jmx
-\begin_inset Quotes erd
-\end_inset
-
- instead of the full identifier above.
-\end_layout
-
-\begin_layout Standard
-Shortcuts are defined in a container's 
-\begin_inset Quotes eld
-\end_inset
-
-/configuration/sincerity/shortcuts.conf
-\begin_inset Quotes erd
-\end_inset
-
- file.
- You can list them all using the 
-\begin_inset Quotes eld
-\end_inset
-
-shortcuts:shortcuts
-\begin_inset Quotes erd
-\end_inset
-
- command.
-\end_layout
-
-\begin_layout Subsubsection
 Artifact
 \end_layout
 
@@ -2307,7 +2434,7 @@ Packages are automatically unpacked using the
 \begin_inset Quotes eld
 \end_inset
 
-dependencies:install
+artifacts:install
 \begin_inset Quotes erd
 \end_inset
 
@@ -2392,16 +2519,184 @@ Manages Sincerity containers.
 container:create
 \end_layout
 
+\begin_layout Standard
+Creates a new container using a container template and points Sincerity
+ to it, making it the new current container.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Container root directory
+\series default
+: If the directory does not exist, this command will create a new container
+ there.
+ If the directory already exists and is a container, points Sincerity at
+ it.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+[Template name]
+\series default
+: This is the name of a subdirectory under your Sincerity installation's
+ 
+\begin_inset Quotes eld
+\end_inset
+
+/templates/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory.
+ Will default to 
+\begin_inset Quotes eld
+\end_inset
+
+default
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Sincerity will recursively copy the files from the template into your new
+ container.
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+templates:templates
+\begin_inset Quotes erd
+\end_inset
+
+ command to see available templates.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--force
+\series default
+: With this switch, even if the directory already exists, the command would
+ 
+\emph on
+still
+\emph default
+ copy the template into it.
+ Note that this might overwrite existing files.
+\end_layout
+
 \begin_layout Subsubsection
 container:use
+\end_layout
+
+\begin_layout Standard
+Changes the current container to which Sincerity is pointing.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Container root directory
+\series default
+: The path must point to a valid container root, meaning that it must have
+ a 
+\begin_inset Quotes eld
+\end_inset
+
+/.sincerity/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory.
 \end_layout
 
 \begin_layout Subsubsection
 container:clone
 \end_layout
 
+\begin_layout Standard
+Creates a clone of the current container.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Target container root directory
+\series default
+: If the directory does not exist, this command will create a new container
+ there, recursively copying all files from the current container to it.
+ Note that Sincerity will 
+\emph on
+not 
+\emph default
+switch to the new container: use the 
+\begin_inset Quotes eld
+\end_inset
+
+container:use
+\begin_inset Quotes erd
+\end_inset
+
+ command if you need to do that.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--force
+\series default
+: With this switch, even if the target directory already exists, the command
+ would 
+\emph on
+still
+\emph default
+ copy the files into it.
+ Note that this might overwrite existing files.
+\end_layout
+
 \begin_layout Subsubsection
 container:clean
+\end_layout
+
+\begin_layout Standard
+This command is the same as 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:uninstall
+\begin_inset Quotes erd
+\end_inset
+
+ but also deletes the 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory.
 \end_layout
 
 \begin_layout Subsection
@@ -2426,7 +2721,7 @@ The
 \begin_inset Quotes eld
 \end_inset
 
-dependencies:install
+artifacts:install
 \begin_inset Quotes erd
 \end_inset
 
@@ -2454,7 +2749,7 @@ repositories:repositories
 \end_layout
 
 \begin_layout Standard
-List all repositories attached to the current container.
+List all repositories attached to the current container in order by section.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2462,7 +2757,203 @@ repositories:attach
 \end_layout
 
 \begin_layout Standard
-Attached (adds) a repository to the current container.
+Attaches (adds) a repository to the current container.
+ This command modifies the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/repositories.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Section
+\series default
+: Repositories are searched in the order they are added, but are first ordered
+ by 
+\emph on
+section
+\emph default
+.
+ By default Sincerity containers have two sections: 
+\begin_inset Quotes eld
+\end_inset
+
+private
+\begin_inset Quotes erd
+\end_inset
+
+ and then 
+\begin_inset Quotes eld
+\end_inset
+
+public
+\begin_inset Quotes erd
+\end_inset
+
+, in that order.
+ Thus, any repositories you attach to the 
+\begin_inset Quotes eld
+\end_inset
+
+private
+\begin_inset Quotes erd
+\end_inset
+
+ section will be searched before any repositories attached in the 
+\begin_inset Quotes eld
+\end_inset
+
+public
+\begin_inset Quotes erd
+\end_inset
+
+ section.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Name
+\series default
+: The repository name must be unique 
+\emph on
+per its section
+\emph default
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Type
+\series default
+: Sincerity currently supports two types of repositories: 
+\begin_inset Quotes eld
+\end_inset
+
+maven
+\begin_inset Quotes erd
+\end_inset
+
+ (you can also use the 
+\begin_inset Quotes eld
+\end_inset
+
+ibiblio
+\begin_inset Quotes erd
+\end_inset
+
+ alias) and 
+\begin_inset Quotes eld
+\end_inset
+
+pypi
+\begin_inset Quotes erd
+\end_inset
+
+ (you can also use the 
+\begin_inset Quotes eld
+\end_inset
+
+python
+\begin_inset Quotes erd
+\end_inset
+
+ alias).
+\end_layout
+
+\begin_layout Standard
+Arguments after the first three depend on the type of repository attached.
+ However, both currently supported types require one additional argument:
+ the repository base URL.
+\end_layout
+
+\begin_layout Standard
+Note that this command supports implicit shortcuts that begin with the 
+\begin_inset Quotes eld
+\end_inset
+
+attach#
+\begin_inset Quotes erd
+\end_inset
+
+ prefix.
+ For example:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity attach maven-central
+\end_layout
+
+\end_inset
+
+Will expand to:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity attach public maven-central maven http://repo1.maven.org/maven2/
+\end_layout
+
+\end_inset
+
+If the following entry is in 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+attach#maven-central = attach public maven-central maven http://repo1.maven.org/ma
+ven2/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To see all available 
+\begin_inset Quotes eld
+\end_inset
+
+attach#
+\begin_inset Quotes erd
+\end_inset
+
+ shortcuts in your container use the 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts:shortcuts
+\begin_inset Quotes erd
+\end_inset
+
+ command.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2471,6 +2962,51 @@ repositories:detach
 
 \begin_layout Standard
 Detaches (removes) a repository from the current container.
+ This command modifies the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/repositories.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Section
+\series default
+: See the 
+\begin_inset Quotes eld
+\end_inset
+
+repositories:attach
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Name
+\series default
+: See the 
+\begin_inset Quotes eld
+\end_inset
+
+repositories:attach
+\begin_inset Quotes erd
+\end_inset
+
+ command.
 \end_layout
 
 \begin_layout Subsection
@@ -2511,6 +3047,11 @@ not
 installed will be listed in parentheses.
 \end_layout
 
+\begin_layout Standard
+For a large dependency tree, it may be easier to use the Sincerity GUI instead
+ of this command.
+\end_layout
+
 \begin_layout Subsubsection
 dependencies:licenses
 \end_layout
@@ -2522,10 +3063,10 @@ Lists all licenses per all dependencies in the current container.
 
 \begin_layout Quote
 Please be aware that you should not treat the output of this command as
- legally binding.
- Package managers do their best to provide you with correct and useful informati
-on, but you should yourself investigate the licensing available per each
- library you use.
+ legal advice.
+ Package maintainers do their best to provide you with correct and useful
+ information, but you should yourself investigate the licensing available
+ per each library you use to avoid breaking the law.
 \end_layout
 
 \begin_layout Paragraph
@@ -2542,13 +3083,502 @@ Switches
 \end_layout
 
 \begin_layout Subsubsection
-dependencies:install
+dependencies:add
 \end_layout
 
 \begin_layout Standard
-This powerful command downloads and installs the current container's dependencie
-s and their sub-dependencies from the online repositories to which it is
- attached.
+Adds a dependency to the current container.
+ 
+\emph on
+Note that this does not download artifacts
+\emph default
+: all it does is modify the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+The reason this command doesn't install files is that installation requires
+ a resolution phase that goes over all dependencies and their sub-dependencies
+ and selected the highest possible versions of dependencies.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+ to download artifacts.
+ It will also delete artifacts no longer used in the revised dependency
+ tree.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Group
+\series default
+: The dependency group name.
+ This is sometimes also called an 
+\begin_inset Quotes eld
+\end_inset
+
+organization,
+\begin_inset Quotes erd
+\end_inset
+
+ though it may be a bit misleading, because a group can refer to a set of
+ products within an organization.
+ Group names tend to follow the Java package naming format.
+ For example, Prudence's group name is 
+\begin_inset Quotes eld
+\end_inset
+
+com.threecrickets.prudence
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Unfortunately, group names are not standardized and many projects follow
+ their own conventions.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Name
+\series default
+: This is the name of the dependency within the group.
+ It is usually a simple string, possibly with dashes, the project.
+ For example, the name for the 
+\begin_inset Quotes eld
+\end_inset
+
+Prudence Example
+\begin_inset Quotes erd
+\end_inset
+
+ application within the Prudence group is 
+\begin_inset Quotes eld
+\end_inset
+
+prudence-example
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+[Version]
+\series default
+: If you do not specify a specific version (or use the special 
+\begin_inset Quotes eld
+\end_inset
+
+latest
+\begin_inset Quotes erd
+\end_inset
+
+ string), Sincerity will resolve for the highest available version.
+ Sincerity supports range specifications for versions.
+ For example.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+[1.0,2.0[
+\begin_inset Quotes erd
+\end_inset
+
+ will match versions that are greater than or equal to 1.0 but lesser than
+ 2.0.
+\end_layout
+
+\begin_layout Quote
+
+\series bold
+Important
+\series default
+: Sincerity uses 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy's dynamic revision format"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependency.html"
+
+\end_inset
+
+ for versions, which look similar to 
+\begin_inset CommandInset href
+LatexCommand href
+name "Maven's"
+target "http://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-project-dependencies.html#pom-relationships-sect-version-ranges"
+
+\end_inset
+
+ but is in fact interpreted quite differently.
+ This is a cause for many mistakes in using version constraints in Sincerity!
+\end_layout
+
+\begin_layout Standard
+Note that this command supports implicit shortcuts that begin with the 
+\begin_inset Quotes eld
+\end_inset
+
+add#
+\begin_inset Quotes erd
+\end_inset
+
+ prefix.
+ For example:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add velocity 1.7
+\end_layout
+
+\end_inset
+
+Will expand to:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity attach three-crickets : add org.apache.velocity velocity 1.7
+\end_layout
+
+\end_inset
+
+If the following entry is in 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+:
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+add#velocity = attach three-crickets : add com.org.apache.velocity velocity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To see all available 
+\begin_inset Quotes eld
+\end_inset
+
+add#
+\begin_inset Quotes erd
+\end_inset
+
+ shortcuts in your container use the 
+\begin_inset Quotes eld
+\end_inset
+
+shortcuts:shortcuts
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:revise
+\end_layout
+
+\begin_layout Standard
+Allows you to change the version of a previously added dependency.
+ The format is identical to 
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:add
+\begin_inset Quotes erd
+\end_inset
+
+: the difference is that a new dependency is not (and cannot be) added.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add org.apache.velocity velocity 1.7
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity revise org.apache.velocity velocity latest
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:remove
+\end_layout
+
+\begin_layout Standard
+Removes a dependency from the current container.
+ 
+\emph on
+Note that this does not delete installed artifacts
+\emph default
+: all it does is modify the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+Use 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:prune
+\begin_inset Quotes erd
+\end_inset
+
+ to delete artifacts no longer used in the revised dependency tree, or 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:uninstall
+\begin_inset Quotes erd
+\end_inset
+
+ to delete all artifacts.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Group
+\series default
+: The dependency group name.
+ This is sometimes also called an 
+\begin_inset Quotes eld
+\end_inset
+
+organization,
+\begin_inset Quotes erd
+\end_inset
+
+ though it may be a bit misleading, because a group can refer to a set of
+ products within an organization.
+ Group names tend to follow the Java package naming format.
+ For example, Prudence's group name is 
+\begin_inset Quotes eld
+\end_inset
+
+com.threecrickets.prudence
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Unfortunately, group names are not standardized and many projects follow
+ their own conventions.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Name
+\series default
+: This is the name of the dependency within the group.
+ It is usually a simple string, possibly with dashes, the project.
+ For example, the name for the 
+\begin_inset Quotes eld
+\end_inset
+
+Prudence Example
+\begin_inset Quotes erd
+\end_inset
+
+ application within the Prudence group is 
+\begin_inset Quotes eld
+\end_inset
+
+prudence-example
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add org.apache.velocity velocity 1.7
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity remove org.apache.velocity velocity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:reset
+\end_layout
+
+\begin_layout Standard
+Removes 
+\emph on
+all
+\emph default
+ dependencies from the current container.
+ 
+\emph on
+Note that this does not delete installed artifacts
+\emph default
+: all it does is empty the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:uninstall
+\begin_inset Quotes erd
+\end_inset
+
+ to delete installed files.
+\end_layout
+
+\begin_layout Subsection
+Artifacts
+\end_layout
+
+\begin_layout Standard
+Manages artifacts in the current container.
+ Adds an 
+\begin_inset Quotes eld
+\end_inset
+
+Artifacts
+\begin_inset Quotes erd
+\end_inset
+
+ tab to the Sincerity GUI.
+\end_layout
+
+\begin_layout Subsubsection
+artifacts:artifacts
+\end_layout
+
+\begin_layout Standard
+Lists artifacts available for each dependency of the current container.
+ If the dependency is 
+\emph on
+not 
+\emph default
+installed, it will be listed in parentheses.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--packages
+\series default
+: Shows artifacts within packages (by default these are 
+\emph on
+not
+\emph default
+ shown).
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--verbose
+\series default
+: In non-verbose mode (the default) only the type of artifact is shown.
+ In verbose mode you'll see the complete relative path to the artifact as
+ well as its size in bytes.
+\end_layout
+
+\begin_layout Subsubsection
+artifacts:install
+\end_layout
+
+\begin_layout Standard
+This powerful command downloads and installs artifacts belonging to the
+ current container's dependencies and their sub-dependencies from the online
+ repositories to which the container is attached.
  It should thus be used after 
 \begin_inset Quotes eld
 \end_inset
@@ -2566,11 +3596,11 @@ repositories:attach
 \end_inset
 
  have been used.
- This command also handles upgrades and resolves version conflicts.
+ This command also handles upgrades and resolves dependency version conflicts.
 \end_layout
 
 \begin_layout Standard
-Installation happens in several phases:
+Installation happens in seven phases:
 \end_layout
 
 \begin_layout Enumerate
@@ -2660,7 +3690,7 @@ resolved.
 \begin_inset Quotes erd
 \end_inset
 
- This means that duplicate dependencies will be skipped, highest possible
+ This means that duplicate dependencies will be skipped and highest possible
  versions for dependencies will be selected.
  Note that upgrades are handled by this phase: if a newer version of a certain
  dependency is found, it will be selected instead of the previously installed
@@ -2716,6 +3746,7 @@ packages:unpack
 
  command, and may cause new artifacts to appear in your container, as well
  as arbitrary code to be executed via installer hooks in a package.
+ It will not by default overwrite existing files.
 \end_layout
 
 \begin_layout Enumerate
@@ -2748,15 +3779,15 @@ target "http://ant.apache.org/ivy/"
 
 \end_inset
 
- to handle phases 1 to 5, and it may be useful to refer to documentation
- there if you require specialized configuration and handling.
+ to handle phases 1 to 5, and it may be useful to refer to its documentation
+ if you require specialized configuration and handling.
 \end_layout
 
 \begin_layout Standard
 Note that remote repositories introduce consider delay for phases 1, 2 and
  5.
  Furthermore, the more repositories you attach, the longer phase 1 will
- take, as each repository is checked.
+ take, as each repository is checked in sequence.
  For these reasons, as well as saving you from network/server failure by
  3rd party providers, it is strongly recommend that you run a local proxy
  for the repositories you use.
@@ -2785,23 +3816,97 @@ packages:unpack
 \end_layout
 
 \begin_layout Subsubsection
-dependencies:uninstall
+artifacts:uninstall
+\end_layout
+
+\begin_layout Standard
+This command deletes all artifacts installed by 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+, 
+\emph on
+unless these artifacts have been changed since they've been installed
+\emph default
+.
+ This behavior ensures that you do not lose your custom work.
+ If a package has an uninstaller hook, it will be executed after its artifacts
+ are deleted.
+\end_layout
+
+\begin_layout Standard
+This command is useful for leaving your container clean of any dependencies.
+ Though the artifacts are deleted, they are still added to your container.
+ Thus, this command is entirely reversible by issuing a 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+ command.
+\end_layout
+
+\begin_layout Standard
+Also see the 
+\begin_inset Quotes eld
+\end_inset
+
+container:clean
+\begin_inset Quotes erd
+\end_inset
+
+ command.
 \end_layout
 
 \begin_layout Subsubsection
-dependencies:reset
+artifacts:prune
 \end_layout
 
-\begin_layout Subsubsection
-dependencies:add
+\begin_layout Standard
+Deletes artifacts that were previously installed by 
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+ but for which their dependencies no longer exist.
+
+\emph on
+ Artifacts that were changed since installation will not be deleted.
+ 
+\emph default
+This behavior ensures that you do not lose your custom work.
 \end_layout
 
-\begin_layout Subsubsection
-dependencies:remove
-\end_layout
+\begin_layout Standard
+You usually would not have to run this command by itself, because it is
+ part of 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Subsubsection
-dependencies:revise
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+.
+ However, it may be useful in case you are manipulating the contents of
+ 
+\begin_inset Quotes eld
+\end_inset
+
+/libraries/jars/
+\begin_inset Quotes erd
+\end_inset
+
+ manually.
 \end_layout
 
 \begin_layout Subsection
@@ -2826,7 +3931,7 @@ Unpacks all Sincerity packages in
 \end_inset
 
 .
- If the package has an installer hook, it will be executed after the artifacts
+ If a package has an installer hook, it will be executed after its artifacts
  are unpacked.
 \end_layout
 
@@ -2836,7 +3941,7 @@ You usually would not have to run this command by itself, because it is
 \begin_inset Quotes eld
 \end_inset
 
-dependencies:install
+artifacts:install
 \begin_inset Quotes erd
 \end_inset
 
@@ -2889,7 +3994,9 @@ Switches
 \series bold
 --overwrite
 \series default
-: By default the command will not overwrite existing files.
+: By default the command will not overwrite existing files, unless these
+ files were previously installed by Sincerity and have not been modified
+ since.
  This behavior ensures that you do not lose your custom work.
  However, you can override this behavior using this switch.
  
@@ -2918,103 +4025,6 @@ without
 \end_layout
 
 \begin_layout Subsection
-Artifacts
-\end_layout
-
-\begin_layout Standard
-Manages artifacts in the current container.
- Adds an 
-\begin_inset Quotes eld
-\end_inset
-
-Artifacts
-\begin_inset Quotes erd
-\end_inset
-
- tab to the Sincerity GUI.
-\end_layout
-
-\begin_layout Subsubsection
-artifacts:artifacts
-\end_layout
-
-\begin_layout Standard
-Lists artifacts available for each dependency.
- If the dependency is 
-\emph on
-not 
-\emph default
-installed, it will be listed in parentheses.
-\end_layout
-
-\begin_layout Paragraph
-Switches
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
---packages
-\series default
-: Shows artifacts within packages (by default these are 
-\emph on
-not
-\emph default
- shown).
-\end_layout
-
-\begin_layout Itemize
-
-\series bold
---verbose
-\series default
-: In non-verbose mode (the default) only the type of artifact is shown.
- In verbose mode you'll see the complete relative path to the artifact as
- well as its size in bytes.
-\end_layout
-
-\begin_layout Subsubsection
-artifacts:prune
-\end_layout
-
-\begin_layout Standard
-Deletes artifacts that were previously installed by Sincerity but for which
- their dependencies no longer exist.
-\end_layout
-
-\begin_layout Standard
-
-\emph on
-Note that artifacts that were changed since installation will not be deleted.
- 
-\emph default
-This behavior ensures that you do not lose your custom work.
-\end_layout
-
-\begin_layout Standard
-You usually would not have to run this command by itself, because it is
- part of 
-\begin_inset Quotes eld
-\end_inset
-
-dependencies:install
-\begin_inset Quotes erd
-\end_inset
-
-.
- However, it may be useful in case you are manipulating the contents of
- 
-\begin_inset Quotes eld
-\end_inset
-
-/libraries/jars/
-\begin_inset Quotes erd
-\end_inset
-
- manually.
-\end_layout
-
-\begin_layout Subsection
 Delegate
 \end_layout
 
@@ -3038,6 +4048,44 @@ delegate:main
 
 \begin_layout Standard
 Calls the main() method within a JVM class.
+ The class may exist anywhere within the current container, within the Sincerity
+ installation, or elsewhere in the JVM classpath.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Classname
+\series default
+: This is the fully qualified JVM class name.
+ For example, 
+\begin_inset Quotes eld
+\end_inset
+
+org.myapplication.Service
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Note that the class has to have a method named 
+\begin_inset Quotes eld
+\end_inset
+
+main
+\begin_inset Quotes erd
+\end_inset
+
+ with the correct signature (public, returns void, with an array of strings
+ as its only argument).
+\end_layout
+
+\begin_layout Standard
+Additional command arguments after the first will be sent as arguments to
+ the main() method.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3048,13 +4096,93 @@ delegate:start
 Executes a Scripturian document.
 \end_layout
 
+\begin_layout Standard
+Though Sincerity comes with support for JavaScript, documents can be written
+ in any installed programming language that support Scripturian.
+ The document extension will tell Scripturian which language engine to use:
+ 
+\begin_inset Quotes eld
+\end_inset
+
+.js
+\begin_inset Quotes erd
+\end_inset
+
+ for JavaScript, 
+\begin_inset Quotes eld
+\end_inset
+
+.py
+\begin_inset Quotes erd
+\end_inset
+
+ for Python, 
+\begin_inset Quotes eld
+\end_inset
+
+.rb
+\begin_inset Quotes erd
+\end_inset
+
+ for Ruby, etc.
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:languages
+\begin_inset Quotes erd
+\end_inset
+
+ command to list all supported languages.
+\end_layout
+
+\begin_layout Standard
+Your code will have full access to Sincerity's execution environment and
+ API.
+ See the chapter on Programming for more information.
+\end_layout
+
+\begin_layout Standard
+Scripturian will store compiled code in the 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory, speeding up subsequent runs.
+ For example, JavaScript classes will be stored under 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/javascript/
+\begin_inset Quotes erd
+\end_inset
+
+.
+ You can safely delete this files.
+\end_layout
+
 \begin_layout Paragraph
 Arguments
 \end_layout
 
 \begin_layout Enumerate
-Document name: The argument is a document name, either relative to the current
- container root or to the 
+
+\series bold
+Document name
+\series default
+: The argument is a document name, either beginning with a 
+\begin_inset Quotes eld
+\end_inset
+
+/
+\begin_inset Quotes erd
+\end_inset
+
+ and relative to the current container root, or a simple string specifying
+ a filename in the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3063,14 +4191,39 @@ Document name: The argument is a document name, either relative to the current
 \end_inset
 
  subdirectory.
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:programs
+\begin_inset Quotes erd
+\end_inset
+
+ command to list all files under 
+\begin_inset Quotes eld
+\end_inset
+
+/programs/
+\begin_inset Quotes erd
+\end_inset
+
+.
  As usual with Scripturian, filename extensions should not be used.
- If the name points to a directory, then the default file in that directory
+ If the name points to a directory, then a file named 
+\begin_inset Quotes eld
+\end_inset
+
+default
+\begin_inset Quotes erd
+\end_inset
+
+ (with the appropriate programming language extension) in that directory
  will be executed.
  For example, 
 \begin_inset Quotes eld
 \end_inset
 
-sincerity start component
+sincerity start /component/
 \begin_inset Quotes erd
 \end_inset
 
@@ -3082,7 +4235,37 @@ sincerity start component
 \begin_inset Quotes erd
 \end_inset
 
- from within the current container.
+ from within the current container, while 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity start component
+\begin_inset Quotes erd
+\end_inset
+
+ would execute 
+\begin_inset Quotes eld
+\end_inset
+
+/programs/component.js
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Additional command arguments after the first will be ignored by Sincerity,
+ but will be forwarded to the program and can be accessed from within its
+ code using the 
+\begin_inset CommandInset href
+LatexCommand href
+name "application.arguments API"
+target "http://threecrickets.com/api/javascript/?namespace=application"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3090,11 +4273,59 @@ delegate:execute
 \end_layout
 
 \begin_layout Standard
+This command starts a new process, which would be a child process of Sincerity.
+ Standard output and input from the child process are piped to the current
+ standard output and input.
+\end_layout
 
+\begin_layout Standard
+This command is useful not only for integrating non-JVM code into Sincerity,
+ but also for hashtag support, allowing you to incorporate dynamic language
+ scripts, for Python, Ruby, etc.
+ Since Sincerity controls the environment of the child process, it can guarantee
+ that environment variables and other properties are set according to the
+ current container.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Executable name
+\series default
+: The argument is a filename relative to the current container's 
+\begin_inset Quotes eld
+\end_inset
+
+/executables/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory.
+ The file must be executable by the underlying operating system.
+ On *nix this includes support for hashtag script files.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--background
+\series default
+: By default this command will block until the child process exits.
+ However, using this switch Sincerity will not block and continue processing
+ its command chain.
+ Note that this would 
 \emph on
-This command starts a new process
+not 
 \emph default
-, which would be a child process of Sincerity.
+stop the child process from ending when the Sincerity parent process ends.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3112,6 +4343,15 @@ Lists all available programs in the current container (documents in the
 \end_inset
 
  subdirectory).
+ Use the 
+\begin_inset Quotes eld
+\end_inset
+
+delegate:start
+\begin_inset Quotes erd
+\end_inset
+
+ command to start them.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3119,7 +4359,7 @@ delegate:languages
 \end_layout
 
 \begin_layout Standard
-Lists all languages supported by Scripturian in the current container.
+Lists all languages in the current container that support Scripturian 
 \end_layout
 
 \begin_layout Subsection
@@ -3174,8 +4414,49 @@ Turns the current container into a Sincerity template.
 \begin_inset Quotes erd
 \end_inset
 
- directory.
+ subdirectory.
  Note that you must have write permissions there in order for this to work.
+\end_layout
+
+\begin_layout Standard
+Note that you can manipulate the 
+\begin_inset Quotes eld
+\end_inset
+
+/templates/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory directly.
+ This command is merely for convenience.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Template name
+\series default
+: A new subdirectory to be created under your Sincerity installation's 
+\begin_inset Quotes eld
+\end_inset
+
+/templates/
+\begin_inset Quotes erd
+\end_inset
+
+ subdirectory.
+ Note that this command will 
+\emph on
+not 
+\emph default
+copy over an existing template! If the directory already exists, you will
+ get an error.
+ You must manually delete the directory if you want to change an existing
+ template using this command.
 \end_layout
 
 \begin_layout Subsection
@@ -3193,6 +4474,26 @@ Shortcuts
 \end_inset
 
  tab to the Sincerity GUI.
+\end_layout
+
+\begin_layout Standard
+Your shortcuts are defined in your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/shortcuts.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Subsubsection
+shortcuts:shortcuts
+\end_layout
+
+\begin_layout Standard
+Lists all available shortcuts in the current container.
 \end_layout
 
 \begin_layout Subsection
@@ -3376,8 +4677,23 @@ java:compile
 \end_layout
 
 \begin_layout Standard
-Compiles Java source files (.java) into JVM class files (.class) using the
- current container's classpath.
+Compiles Java source files (
+\begin_inset Quotes eld
+\end_inset
+
+.java
+\begin_inset Quotes erd
+\end_inset
+
+) into JVM class files (
+\begin_inset Quotes eld
+\end_inset
+
+.class
+\begin_inset Quotes erd
+\end_inset
+
+) using the current container's classpath.
 \end_layout
 
 \begin_layout Standard
@@ -3394,8 +4710,15 @@ Arguments
 \series bold
 [Source directory]
 \series default
-: Recursively compiles all .java files in this directory (relative to the
- container root).
+: Recursively compiles all 
+\begin_inset Quotes eld
+\end_inset
+
+.java
+\begin_inset Quotes erd
+\end_inset
+
+ files in this directory (relative to the container root).
  Defaults to 
 \begin_inset Quotes eld
 \end_inset
@@ -3412,7 +4735,15 @@ Arguments
 \series bold
 [Classes directory]
 \series default
-: Output .class files here.
+: Output 
+\begin_inset Quotes eld
+\end_inset
+
+.class
+\begin_inset Quotes erd
+\end_inset
+
+ files here.
  Defaults to 
 \begin_inset Quotes eld
 \end_inset
@@ -3498,11 +4829,13 @@ target "https://developer.mozilla.org/en/docs/Rhino"
  in JVM 8).
 \end_layout
 
-\begin_layout Standard
+\begin_layout Quote
 
+\series bold
+Note:
+\series default
 \emph on
-Important: You do not need this plugin to install JavaScript support for
- Sincerity.
+ You do not need this plugin to install JavaScript support for Sincerity.
 
 \emph default
  It does, however, provide you with a new command to get easy access to
@@ -3587,7 +4920,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add javascript : install : javascript -e "print('Hello, world')"
+sincerity create mycontainer : add javascript : install : javascript -e
+ "print('Hello, world')"
 \end_layout
 
 \end_inset
@@ -3698,7 +5032,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add python : install : python -c "print 'Hello, world'"
+sincerity create mycontainer : add python : install : python -c "print 'Hello,
+ world'"
 \end_layout
 
 \end_inset
@@ -3944,7 +5279,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add ruby : install : ruby -e "puts 'Hello, world'"
+sincerity create mycontainer : add ruby : install : ruby -e "puts 'Hello,
+ world'"
 \end_layout
 
 \end_inset
@@ -4271,7 +5607,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add php : install : php test.php
+sincerity create mycontainer : add php : install : php test.php
 \end_layout
 
 \end_inset
@@ -4375,7 +5711,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add groovy : install : groovy -e "println 'Hello, world'"
+sincerity create mycontainer : add groovy : install : groovy -e "println
+ 'Hello, world'"
 \end_layout
 
 \end_inset
@@ -4464,7 +5801,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add clojure : install : clojure -e '(println "Hello, World")'
+sincerity create mycontainer : add clojure : install : clojure -e '(println
+ "Hello, World")'
 \end_layout
 
 \end_inset
@@ -6423,6 +7761,24 @@ target "http://localhost:8080"
 \end_inset
 
  to see your new Nexus repository manager.
+ The default user is 
+\begin_inset Quotes eld
+\end_inset
+
+admin
+\begin_inset Quotes erd
+\end_inset
+
+ with password 
+\begin_inset Quotes eld
+\end_inset
+
+admin123
+\begin_inset Quotes erd
+\end_inset
+
+.
+ You probably want to log in and change that password.
  Nexus provides a rich web-based interface and includes excellent documentation.
 \end_layout
 
@@ -6444,29 +7800,8 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
-The default user is 
-\begin_inset Quotes eld
-\end_inset
-
-admin
-\begin_inset Quotes erd
-\end_inset
-
- with password 
-\begin_inset Quotes eld
-\end_inset
-
-admin123
-\begin_inset Quotes erd
-\end_inset
-
-.
- You probably want to log in and change that password.
-\end_layout
-
-\begin_layout Standard
-You may also want to change the default port from 8080, which you can do
- by editing 
+You may want to change the default port from 8080, which you can do by editing
+ 
 \begin_inset Quotes eld
 \end_inset
 
