@@ -12,9 +12,6 @@
 package com.threecrickets.sincerity.plugin;
 
 import com.threecrickets.sincerity.Command;
-import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.ManagedArtifacts;
-import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
@@ -69,10 +66,7 @@ public class PackagesPlugin implements Plugin1
 			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			Packages packages = dependencies.getPackages();
-			ManagedArtifacts managedArtifacts = dependencies.getManagedArtifacts();
-			packages.install( filter, managedArtifacts, overwrite );
+			command.getSincerity().getContainer().getDependencies().getPackages().unpack( filter, overwrite );
 		}
 		else
 			throw new UnknownCommandException( command );

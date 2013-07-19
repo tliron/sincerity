@@ -46,6 +46,7 @@ public class Packages extends ArrayList<Package>
 
 	public Packages( Container container ) throws SincerityException
 	{
+		this.container = container;
 		try
 		{
 			Enumeration<URL> manifestUrls = container.getBootstrap().getResources( MANIFEST );
@@ -88,11 +89,11 @@ public class Packages extends ArrayList<Package>
 	// Operations
 	//
 
-	public void install( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
+	public void unpack( String filter, boolean overwrite ) throws SincerityException
 	{
 		for( Package pack : this )
 		{
-			pack.install( filter, managedArtifacts, overwrite );
+			pack.unpack( filter, container.getDependencies().getManagedArtifacts(), overwrite );
 			pack.install();
 		}
 	}
@@ -107,4 +108,6 @@ public class Packages extends ArrayList<Package>
 	// Private
 
 	private static final long serialVersionUID = 1L;
+
+	private final Container container;
 }

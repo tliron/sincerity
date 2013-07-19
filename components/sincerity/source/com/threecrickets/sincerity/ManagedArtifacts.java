@@ -16,8 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -56,20 +55,20 @@ public class ManagedArtifacts
 	{
 		validate();
 
-		Entry entry = entries.get( artifact.getFile() );
+		Entry entry = entries.get( artifact.getPath() );
 		if( entry != null )
 			return entry.wasInstalled();
 
 		return false;
 	}
 
-	public byte[] getDigest( Artifact artifact ) throws SincerityException
+	public byte[] getOriginalDigest( Artifact artifact ) throws SincerityException
 	{
 		validate();
 
-		Entry entry = entries.get( artifact.getFile() );
+		Entry entry = entries.get( artifact.getPath() );
 		if( entry != null )
-			return entry.digest;
+			return entry.originalDigest;
 
 		return null;
 	}
@@ -78,68 +77,28 @@ public class ManagedArtifacts
 	// Operations
 	//
 
-	public void update( Iterable<Artifact> artifacts ) throws SincerityException
+	public void merge( Artifact artifact, boolean installed ) throws SincerityException
 	{
-		update( artifacts, MODE_UPDATE );
+		validate();
+
+		String key = artifact.getPath();
+		Entry entry = new Entry( artifact, installed );
+		Entry existing = entries.get( key );
+		if( ( existing != null ) && ( existing.equals( entry ) ) )
+			return;
+
+		changed = true;
+		entries.put( key, entry );
 	}
 
-	public void clean() throws SincerityException
+	public void save() throws SincerityException
 	{
-		update( null, MODE_CLEAN );
-	}
+		if( !changed )
+			return;
 
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	private final static int MODE_UPDATE = 0;
-
-	private final static int MODE_CLEAN = 1;
-
-	private final File file;
-
-	private final Container container;
-
-	private Map<File, Entry> entries;
-
-	private void validate() throws SincerityException
-	{
-		if( entries == null )
-		{
-			entries = new HashMap<File, Entry>();
-
-			Properties properties = new Properties();
-			try
-			{
-				FileInputStream stream = new FileInputStream( file );
-				try
-				{
-					try
-					{
-						properties.load( stream );
-						for( Map.Entry<Object, Object> entry : properties.entrySet() )
-							entries.put( container.getAbsoluteFile( new File( entry.getKey().toString() ) ), new Entry( entry.getValue() ) );
-					}
-					finally
-					{
-						stream.close();
-					}
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not read artifacts configuration", x );
-				}
-			}
-			catch( FileNotFoundException x )
-			{
-			}
-		}
-	}
-
-	private void save() throws SincerityException
-	{
 		Properties properties = new Properties();
-		for( Map.Entry<File, Entry> entry : entries.entrySet() )
-			properties.put( container.getRelativePath( entry.getKey() ), entry.getValue().toString() );
+		for( Map.Entry<String, Entry> entry : entries.entrySet() )
+			properties.put( entry.getKey(), entry.getValue().toString() );
 
 		try
 		{
@@ -157,110 +116,149 @@ public class ManagedArtifacts
 		{
 			throw new SincerityException( "Could not write artifacts configuration", x );
 		}
+
+		changed = false;
 	}
 
-	private void update( Iterable<Artifact> artifacts, int mode ) throws SincerityException
+	public void prune() throws SincerityException
+	{
+		prune( null );
+	}
+
+	public void prune( Iterable<Artifact> artifacts ) throws SincerityException
 	{
 		validate();
 
-		// First mark all current artifacts as unnecessary
-		for( Entry entry : entries.values() )
-			if( !entry.isUnnecessary() )
-				entry.setUnnecessary( true );
-
-		// Merge in the new set of artifacts
-		if( mode == MODE_UPDATE )
-			for( Artifact artifact : artifacts )
-				entries.put( artifact.getFile(), new Entry( artifact ) );
-
-		// Remove all unnecessary artifacts
-		if( ( mode == MODE_CLEAN ) || ( mode == MODE_UPDATE ) )
+		for( Iterator<Map.Entry<String, Entry>> i = entries.entrySet().iterator(); i.hasNext(); )
 		{
-			for( Iterator<Map.Entry<File, Entry>> i = entries.entrySet().iterator(); i.hasNext(); )
+			Map.Entry<String, Entry> e = i.next();
+			String path = e.getKey();
+			Entry entry = e.getValue();
+
+			// Is the entry still necessary?
+			boolean necessary = false;
+			if( artifacts != null )
 			{
-				Map.Entry<File, Entry> e = i.next();
-				File file = e.getKey();
-				Entry entry = e.getValue();
-
-				if( entry.isUnnecessary() )
+				for( Artifact artifact : artifacts )
 				{
-					i.remove();
-
-					file = container.getAbsoluteFile( file );
-
-					if( !file.exists() )
+					if( path.equals( artifact.getPath() ) )
 					{
-						if( container.getSincerity().getVerbosity() >= 3 )
-							container.getSincerity().getOut().println( "Artifact already deleted: " + file );
-						continue;
+						necessary = true;
+						break;
 					}
+				}
+			}
 
-					if( ( entry.url != null ) && FileUtil.isUrlValid( entry.url ) )
-					{
-						// Keep changed artifacts
-						try
-						{
-							byte[] digest = entry.digest;
-							if( digest == null )
-								digest = FileUtil.getDigest( entry.url.openStream() );
+			// Nope!
+			if( !necessary )
+			{
+				i.remove();
+				changed = true;
 
-							if( !FileUtil.isSameContent( file, digest ) )
-							{
-								if( container.getSincerity().getVerbosity() >= 3 )
-									container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
-								continue;
-							}
-						}
-						catch( IOException x )
-						{
-							throw new SincerityException( "Could not compare digest for artifact: " + file, x );
-						}
-					}
+				File file = new File( container.getRoot(), path );
 
-					// Delete artifact
+				if( !file.exists() )
+				{
 					if( container.getSincerity().getVerbosity() >= 3 )
-						container.getSincerity().getOut().println( "Deleting artifact: " + file );
-					if( !file.delete() )
-						throw new SincerityException( "Could not delete artifact: " + file );
+						container.getSincerity().getOut().println( "Artifact doesn't exist, nothing to delete: " + file );
+					continue;
+				}
+
+				// Keep changed artifacts
+				if( entry.originalDigest != null )
+				{
 					try
 					{
-						FileUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );
+						if( !FileUtil.isSameContent( file, entry.originalDigest ) )
+						{
+							if( container.getSincerity().getVerbosity() >= 2 )
+								container.getSincerity().getOut().println( "Not deleting unnecessary artifact because it has been changed: " + file );
+							continue;
+						}
 					}
 					catch( IOException x )
 					{
-						throw new SincerityException( "Could not delete parent directories for artifact: " + file, x );
+						throw new SincerityException( "Could not compare digest for unnecessary artifact: " + file, x );
 					}
+				}
+
+				// Delete artifact
+				if( container.getSincerity().getVerbosity() >= 2 )
+					container.getSincerity().getOut().println( "Deleting unnecessary artifact: " + file );
+				if( !file.delete() )
+					throw new SincerityException( "Could not delete unnecessary artifact: " + file );
+				try
+				{
+					FileUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not delete parent directories for artifact: " + file, x );
 				}
 			}
 		}
 
-		// Mark existing artifacts as installed
-		for( Map.Entry<File, Entry> entry : entries.entrySet() )
-			if( !entry.getValue().isUnnecessary() && !entry.getValue().wasInstalled() && entry.getKey().exists() )
-				entry.getValue().setInstalled( true );
-
 		save();
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private final File file;
+
+	private final Container container;
+
+	private boolean changed;
+
+	private Map<String, Entry> entries;
+
+	private void validate() throws SincerityException
+	{
+		if( entries == null )
+		{
+			entries = new HashMap<String, Entry>();
+
+			Properties properties = new Properties();
+			try
+			{
+				FileInputStream stream = new FileInputStream( file );
+				try
+				{
+					try
+					{
+						properties.load( stream );
+						for( Map.Entry<Object, Object> entry : properties.entrySet() )
+							entries.put( entry.getKey().toString(), new Entry( entry.getValue() ) );
+					}
+					finally
+					{
+						stream.close();
+					}
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not read artifacts configuration", x );
+				}
+			}
+			catch( FileNotFoundException x )
+			{
+			}
+		}
 	}
 
 	private static class Entry
 	{
-		public Entry( Artifact artifact ) throws SincerityException
+		public Entry( Artifact artifact, boolean installed ) throws SincerityException
 		{
-			flags = 0;
-			url = artifact.getUrl();
-			if( url != null )
+			flags = installed ? INSTALLED : 0;
+			try
 			{
-				try
-				{
-					digest = FileUtil.getDigest( url.openStream() );
-				}
-				catch( IOException x )
-				{
-					throw new SincerityException( "Could not create artifacts configuration entry for: " + url, x );
-				}
+				originalDigest = artifact.getOriginDigest();
 			}
-			else
-				digest = null;
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not create artifacts configuration entry for: " + artifact.getOriginUrl(), x );
+			}
 		}
 
 		public Entry( Object value ) throws SincerityException
@@ -272,71 +270,46 @@ public class ManagedArtifacts
 			flags = Byte.valueOf( parsed[0] );
 
 			if( parsed.length >= 2 )
-			{
-				try
-				{
-					url = new URL( parsed[1] );
-					if( parsed.length >= 3 )
-						digest = StringUtil.fromHex( parsed[2] );
-					else
-						digest = null;
-				}
-				catch( MalformedURLException x )
-				{
-					throw new SincerityException( "Could not parse artifacts configuration: " + value, x );
-				}
-			}
+				originalDigest = StringUtil.fromHex( parsed[1] );
 			else
-			{
-				url = null;
-				digest = null;
-			}
+				originalDigest = null;
 		}
 
-		public final URL url;
-
-		public final byte[] digest;
+		public final byte[] originalDigest;
 
 		public boolean wasInstalled()
 		{
 			return ( flags & INSTALLED ) != 0;
 		}
 
-		public void setInstalled( boolean installed )
+		@Override
+		public boolean equals( Object o )
 		{
-			if( installed )
-				flags |= INSTALLED;
-			else
-				flags ^= INSTALLED;
-		}
-
-		public boolean isUnnecessary()
-		{
-			return ( flags & UNNECESSARY ) != 0;
-		}
-
-		public void setUnnecessary( boolean unnecessary )
-		{
-			if( unnecessary )
-				flags |= UNNECESSARY;
-			else
-				flags ^= UNNECESSARY;
+			if( !( o instanceof Entry ) )
+				return false;
+			Entry entry = (Entry) o;
+			if( flags != entry.flags )
+				return false;
+			if( originalDigest == null )
+			{
+				if( entry.originalDigest != null )
+					return false;
+			}
+			else if( !Arrays.equals( originalDigest, entry.originalDigest ) )
+				return false;
+			return true;
 		}
 
 		@Override
 		public String toString()
 		{
-			if( url == null )
+			if( originalDigest == null )
 				return Byte.toString( flags );
-			else if( digest == null )
-				return Byte.toString( flags ) + "," + url;
 			else
-				return Byte.toString( flags ) + "," + url + "," + StringUtil.toHex( digest );
+				return Byte.toString( flags ) + "," + StringUtil.toHex( originalDigest );
 		}
 
-		private static final byte UNNECESSARY = 1 << 0;
-
-		private static final byte INSTALLED = 1 << 1;
+		private static final byte INSTALLED = 1;
 
 		private byte flags;
 	}

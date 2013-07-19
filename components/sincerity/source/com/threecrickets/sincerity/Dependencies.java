@@ -198,24 +198,39 @@ public class Dependencies
 	public Set<Artifact> getArtifacts( boolean install, boolean overwrite ) throws SincerityException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
-
-		for( ArtifactDownloadReport downloadReport : getDownloadReports() )
-		{
-			if( downloadReport.getLocalFile() != null )
-				artifacts.add( new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container ) );
-		}
-
 		Packages packages = getPackages();
 
-		for( Package pack : packages )
+		try
 		{
-			for( Artifact artifact : pack )
+			for( ArtifactDownloadReport downloadReport : getDownloadReports() )
 			{
-				if( install && !( artifact.isVolatile() && managedArtifacts.wasInstalled( artifact ) ) )
-					artifact.install( null, managedArtifacts.getDigest( artifact ), overwrite );
-
-				artifacts.add( artifact );
+				if( downloadReport.getLocalFile() != null )
+				{
+					Artifact artifact = new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container );
+					artifacts.add( artifact );
+					managedArtifacts.merge( artifact, true );
+				}
 			}
+
+			for( Package pack : packages )
+			{
+				for( Artifact artifact : pack )
+				{
+					if( install )
+					{
+						artifact.unpack( managedArtifacts, overwrite );
+						managedArtifacts.merge( artifact, true );
+					}
+					else
+						managedArtifacts.merge( artifact, false );
+
+					artifacts.add( artifact );
+				}
+			}
+		}
+		finally
+		{
+			managedArtifacts.save();
 		}
 
 		if( install )
@@ -423,14 +438,14 @@ public class Dependencies
 
 	public void prune() throws SincerityException
 	{
-		managedArtifacts.update( getArtifacts() );
+		managedArtifacts.prune( getArtifacts() );
 		container.updateBootstrap();
 	}
 
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
-		managedArtifacts.clean();
+		managedArtifacts.prune();
 		container.updateBootstrap();
 	}
 
@@ -488,12 +503,10 @@ public class Dependencies
 
 		if( container.hasChanged() )
 		{
-			// Make sure to handle package deletions first
-			managedArtifacts.update( getArtifacts() );
 			container.updateBootstrap();
 
-			// Now artifacts in packages will be properly deleted
-			managedArtifacts.update( getArtifacts( true, overwrite ) );
+			// Prune unnecessary artifacts
+			managedArtifacts.prune( getArtifacts( true, overwrite ) );
 
 			if( container.hasFinishedInstalling() )
 				printDisclaimer( container.getSincerity().getOut() );
@@ -502,7 +515,7 @@ public class Dependencies
 		else
 		{
 			// Just handle artifact installations
-			managedArtifacts.update( getArtifacts( true, overwrite ) );
+			getArtifacts( true, overwrite );
 
 			if( container.hasFinishedInstalling() )
 				container.getSincerity().getOut().println( "Dependencies have not changed since last install" );
