@@ -124,7 +124,17 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		
 		return copy
 	}
-	
+
+	/**
+	 * True if the value is a wrapped JVM object (as opposed to a JavaScript object).
+	 * 
+	 * @param value The value
+	 * @returns {Boolean}
+	 */
+    Public.isJVM = function(value) {
+		return Public.exists(value) ? Object.prototype.toString.call(value) == '[object JavaClass]' : false
+    }
+
 	//
 	// Numbers
 	//

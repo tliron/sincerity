@@ -190,13 +190,26 @@ public abstract class FileUtil
 		}
 	}
 
-	public static boolean isSameContent( URL url, File file ) throws IOException
+	public static boolean isSameContent( File file, URL url ) throws IOException
 	{
 		try
 		{
-			byte[] urlDigest = FileUtil.getDigest( url.openStream() );
 			byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
-			return Arrays.equals( urlDigest, fileDigest );
+			byte[] urlDigest = FileUtil.getDigest( url.openStream() );
+			return Arrays.equals( fileDigest, urlDigest );
+		}
+		catch( FileNotFoundException x )
+		{
+			return false;
+		}
+	}
+
+	public static boolean isSameContent( File file, byte[] digest ) throws IOException
+	{
+		try
+		{
+			byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
+			return Arrays.equals( fileDigest, digest );
 		}
 		catch( FileNotFoundException x )
 		{

@@ -80,8 +80,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 * @returns {String}
 	 */
 	Public.toHex = function(bytes) {
-		var i = new java.math.BigInteger(1, bytes)
-		return String(java.lang.String.format('%1$032x', i))
+		return String(com.threecrickets.sincerity.internal.StringUtil.toHex(bytes))
 	}
 	
 	/**
