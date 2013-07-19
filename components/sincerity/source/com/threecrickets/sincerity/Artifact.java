@@ -84,14 +84,18 @@ public class Artifact implements Comparable<Artifact>
 	 * Checks if the artifact exists in the filesystem and if its contents are
 	 * identical to that of the origin URL.
 	 * 
+	 * @param digest
+	 *        The known digest or null to get the current digest
 	 * @return True if file is different from its origin
 	 * @throws UnpackingException
 	 */
-	public boolean isDifferent() throws UnpackingException
+	public boolean isDifferent( byte[] digest ) throws UnpackingException
 	{
 		try
 		{
-			return !FileUtil.isSameContent( url, file );
+			if( digest == null )
+				digest = FileUtil.getDigest( url.openStream() );
+			return !FileUtil.isSameContent( file, digest );
 		}
 		catch( IOException x )
 		{
@@ -108,17 +112,21 @@ public class Artifact implements Comparable<Artifact>
 	 * filesystem.
 	 * 
 	 * @param filter
+	 * @param digest
+	 *        The known digest or null to get the current digest
 	 * @param overwrite
 	 *        Whether to overwrite the file if it already exists
 	 * @throws UnpackingException
 	 */
-	public void install( String filter, boolean overwrite ) throws UnpackingException
+	public void install( String filter, byte[] digest, boolean overwrite ) throws UnpackingException
 	{
+		// TODO: check filter!
+
 		if( file.exists() )
 		{
 			if( overwrite )
 			{
-				if( isDifferent() )
+				if( isDifferent( digest ) )
 				{
 					if( container.getSincerity().getVerbosity() >= 3 )
 						container.getSincerity().getOut().println( "Overwriting artifact: " + path );
@@ -199,6 +207,12 @@ public class Artifact implements Comparable<Artifact>
 		if( !( o instanceof Artifact ) )
 			return false;
 		return file.equals( ( (Artifact) o ).file );
+	}
+
+	@Override
+	public String toString()
+	{
+		return file.toString();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -88,11 +88,11 @@ public class Packages extends ArrayList<Package>
 	// Operations
 	//
 
-	public void install( String filter, boolean overwrite ) throws SincerityException
+	public void install( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
 	{
 		for( Package pack : this )
 		{
-			pack.install( filter, overwrite );
+			pack.install( filter, managedArtifacts, overwrite );
 			pack.install();
 		}
 	}

@@ -212,7 +212,7 @@ public class Dependencies
 			for( Artifact artifact : pack )
 			{
 				if( install && !( artifact.isVolatile() && managedArtifacts.wasInstalled( artifact ) ) )
-					artifact.install( null, overwrite );
+					artifact.install( null, managedArtifacts.getDigest( artifact ), overwrite );
 
 				artifacts.add( artifact );
 			}
@@ -223,6 +223,11 @@ public class Dependencies
 				pack.install();
 
 		return artifacts;
+	}
+
+	public ManagedArtifacts getManagedArtifacts()
+	{
+		return managedArtifacts;
 	}
 
 	public String getClasspath( boolean includeSystem ) throws SincerityException

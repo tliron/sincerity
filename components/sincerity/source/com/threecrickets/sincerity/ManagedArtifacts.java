@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.StringUtil;
 
 /**
  * This class helps a {@link Dependencies} instance keep track of installed
@@ -55,11 +56,22 @@ public class ManagedArtifacts
 	{
 		validate();
 
-		Object value = entries.get( artifact.getFile() );
-		if( value != null )
-			return new Entry( value ).wasInstalled();
+		Entry entry = entries.get( artifact.getFile() );
+		if( entry != null )
+			return entry.wasInstalled();
 
 		return false;
+	}
+
+	public byte[] getDigest( Artifact artifact ) throws SincerityException
+	{
+		validate();
+
+		Entry entry = entries.get( artifact.getFile() );
+		if( entry != null )
+			return entry.digest;
+
+		return null;
 	}
 
 	//
@@ -69,11 +81,6 @@ public class ManagedArtifacts
 	public void update( Iterable<Artifact> artifacts ) throws SincerityException
 	{
 		update( artifacts, MODE_UPDATE );
-	}
-
-	public void add( Iterable<Artifact> artifacts ) throws SincerityException
-	{
-		update( artifacts, MODE_ADD );
 	}
 
 	public void clean() throws SincerityException
@@ -86,9 +93,7 @@ public class ManagedArtifacts
 
 	private final static int MODE_UPDATE = 0;
 
-	private final static int MODE_ADD = 1;
-
-	private final static int MODE_CLEAN = 2;
+	private final static int MODE_CLEAN = 1;
 
 	private final File file;
 
@@ -163,8 +168,8 @@ public class ManagedArtifacts
 			if( !entry.isUnnecessary() )
 				entry.setUnnecessary( true );
 
-		// Add the new set of artifacts
-		if( ( mode == MODE_ADD ) || ( mode == MODE_UPDATE ) )
+		// Merge in the new set of artifacts
+		if( mode == MODE_UPDATE )
 			for( Artifact artifact : artifacts )
 				entries.put( artifact.getFile(), new Entry( artifact ) );
 
@@ -193,14 +198,26 @@ public class ManagedArtifacts
 					if( ( entry.url != null ) && FileUtil.isUrlValid( entry.url ) )
 					{
 						// Keep changed artifacts
-						if( new Artifact( file, entry.url, false, container ).isDifferent() )
+						try
 						{
-							if( container.getSincerity().getVerbosity() >= 3 )
-								container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
-							continue;
+							byte[] digest = entry.digest;
+							if( digest == null )
+								digest = FileUtil.getDigest( entry.url.openStream() );
+
+							if( !FileUtil.isSameContent( file, digest ) )
+							{
+								if( container.getSincerity().getVerbosity() >= 3 )
+									container.getSincerity().getOut().println( "Keeping changed artifact: " + file );
+								continue;
+							}
+						}
+						catch( IOException x )
+						{
+							throw new SincerityException( "Could not compare digest for artifact: " + file, x );
 						}
 					}
 
+					// Delete artifact
 					if( container.getSincerity().getVerbosity() >= 3 )
 						container.getSincerity().getOut().println( "Deleting artifact: " + file );
 					if( !file.delete() )
@@ -211,7 +228,7 @@ public class ManagedArtifacts
 					}
 					catch( IOException x )
 					{
-						throw new SincerityException( x.getMessage(), x );
+						throw new SincerityException( "Could not delete parent directories for artifact: " + file, x );
 					}
 				}
 			}
@@ -227,34 +244,58 @@ public class ManagedArtifacts
 
 	private static class Entry
 	{
-		public Entry( Artifact artifact )
+		public Entry( Artifact artifact ) throws SincerityException
 		{
+			flags = 0;
 			url = artifact.getUrl();
+			if( url != null )
+			{
+				try
+				{
+					digest = FileUtil.getDigest( url.openStream() );
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( "Could not create artifacts configuration entry for: " + url, x );
+				}
+			}
+			else
+				digest = null;
 		}
 
 		public Entry( Object value ) throws SincerityException
 		{
 			String[] parsed = value.toString().split( ",", 2 );
 			if( parsed.length < 1 )
-				throw new SincerityException( "Could not parse artifacts configuration" );
+				throw new SincerityException( "Could not parse artifacts configuration: " + value );
 
 			flags = Byte.valueOf( parsed[0] );
-			if( parsed.length == 2 )
+
+			if( parsed.length >= 2 )
 			{
 				try
 				{
 					url = new URL( parsed[1] );
+					if( parsed.length >= 3 )
+						digest = StringUtil.fromHex( parsed[2] );
+					else
+						digest = null;
 				}
 				catch( MalformedURLException x )
 				{
-					throw new SincerityException( "Could not parse artifacts configuration", x );
+					throw new SincerityException( "Could not parse artifacts configuration: " + value, x );
 				}
 			}
 			else
+			{
 				url = null;
+				digest = null;
+			}
 		}
 
 		public final URL url;
+
+		public final byte[] digest;
 
 		public boolean wasInstalled()
 		{
@@ -287,8 +328,10 @@ public class ManagedArtifacts
 		{
 			if( url == null )
 				return Byte.toString( flags );
-			else
+			else if( digest == null )
 				return Byte.toString( flags ) + "," + url;
+			else
+				return Byte.toString( flags ) + "," + url + "," + StringUtil.toHex( digest );
 		}
 
 		private static final byte UNNECESSARY = 1 << 0;
