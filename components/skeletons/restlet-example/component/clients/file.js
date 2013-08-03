@@ -1,4 +1,8 @@
 
+//
+// Adds a file-based client.
+//
+
 importClass(
 	org.restlet.data.Protocol)
 

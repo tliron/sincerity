@@ -1,4 +1,13 @@
 
+//
+// Sets up and starts a single Restlet component.
+//
+// By default, all applications under the "/applications/" subdirectory are set up,
+// however you can configure a list of applications using the RESTLET_APPLICATIONS
+// environment variable or the restlet.application JVM property. The value is a
+// comma-delimited list of application subdirectory names.
+//
+
 document.executeOnce('/sincerity/container/')
 
 importClass(java.lang.System)

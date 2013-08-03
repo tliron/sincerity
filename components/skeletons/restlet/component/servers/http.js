@@ -1,4 +1,11 @@
 
+//
+// Adds an HTTP server.
+//
+// The default port is 8080, but it can also be set using the RESTLET_PORT environment
+// variable or the restlet.port JVM property.
+//
+
 document.executeOnce('/sincerity/templates/')
 
 importClass(
