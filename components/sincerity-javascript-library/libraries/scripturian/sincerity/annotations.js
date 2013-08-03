@@ -56,8 +56,10 @@ Sincerity.Annotations = Sincerity.Annotations || function() {
 		var files = dir.listFiles()
 		for (var f in files) {
 			var file = files[f]
-			var name = Public.getNameFromFile(file)
-			annotations[name] = Public.get(file, re)
+			if (!file.directory) {
+				var name = Public.getNameFromFile(file)
+				annotations[name] = Public.get(file, re)
+			}
 		}
 		
 		return annotations
