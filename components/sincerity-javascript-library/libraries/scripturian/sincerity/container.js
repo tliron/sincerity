@@ -64,7 +64,7 @@ Sincerity.Container = Sincerity.Container || function() {
     	popHere()
 	}
 
-	Public.executeAll = function(file) {
+	Public.executeAll = function(file, exclusions) {
     	importClass(java.io.File)
     	
     	if (!(file instanceof File)) {
@@ -77,7 +77,20 @@ Sincerity.Container = Sincerity.Container || function() {
     	
 		var children = listFiles(file)
 		for (var c in children) {
-			Public.execute(children[c])
+			var child = children[c]
+			if (exclusions) {
+				var excluded = false
+				for (var e in exclusions) {
+					if (child.name == exclusions[e]) {
+						excluded = true
+						break
+					}
+				}
+				if (excluded) {
+					continue
+				}
+			}
+			Public.execute(child)
 		}
 	}
 	
