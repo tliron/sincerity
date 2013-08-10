@@ -33,7 +33,7 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.RebootException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.Frame;
@@ -417,7 +417,7 @@ public class Sincerity implements Runnable
 		{
 			try
 			{
-				FileUtil.copyRecursive( file, containerRoot );
+				IoUtil.copyRecursive( file, containerRoot );
 			}
 			catch( IOException x )
 			{

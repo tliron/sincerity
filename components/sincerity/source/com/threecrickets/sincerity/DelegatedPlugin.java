@@ -18,7 +18,7 @@ import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 
 /**
  * Allows you to delegate the {@link Plugin1} interface to non-Java languages
@@ -35,7 +35,7 @@ public class DelegatedPlugin implements Plugin1
 
 	public DelegatedPlugin( File pluginFile, ScripturianShell shell ) throws SincerityException
 	{
-		defaultName = FileUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
+		defaultName = IoUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
 		executable = shell.makeEnterable( "/" + shell.getContainer().getRelativePath( pluginFile ), ENTERING_KEY );
 	}
 

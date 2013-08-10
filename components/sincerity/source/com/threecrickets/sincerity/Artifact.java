@@ -11,17 +11,20 @@
 
 package com.threecrickets.sincerity;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 
 /**
  * @author Tal Liron
@@ -69,7 +72,7 @@ public class Artifact implements Comparable<Artifact>
 	public byte[] getFileDigest() throws IOException
 	{
 		if( fileDigest == null )
-			fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
+			fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
 		return fileDigest;
 	}
 
@@ -88,7 +91,7 @@ public class Artifact implements Comparable<Artifact>
 	public byte[] getOriginDigest() throws IOException
 	{
 		if( ( originDigest == null ) && ( originUrl != null ) )
-			originDigest = FileUtil.getDigest( originUrl.openStream() );
+			originDigest = IoUtil.getDigest( new BufferedInputStream( originUrl.openStream() ) );
 		return originDigest;
 	}
 
@@ -151,6 +154,8 @@ public class Artifact implements Comparable<Artifact>
 			{
 				if( overwrite )
 				{
+					originDigest = null;
+
 					if( container.getSincerity().getVerbosity() >= 1 )
 						container.getSincerity().getOut().println( "Unpacking over changed artifact: " + path );
 
@@ -179,14 +184,15 @@ public class Artifact implements Comparable<Artifact>
 		// Unpack
 		try
 		{
-			InputStream in = originUrl.openStream();
+			InputStream in = new BufferedInputStream( originUrl.openStream() );
 			try
 			{
 				file.getParentFile().mkdirs();
-				FileOutputStream out = new FileOutputStream( file );
+				fileDigest = null;
+				OutputStream out = new BufferedOutputStream( new FileOutputStream( file ) );
 				try
 				{
-					org.apache.ivy.util.FileUtil.copy( in, out, null );
+					IoUtil.copy( in, out );
 				}
 				finally
 				{
@@ -197,6 +203,9 @@ public class Artifact implements Comparable<Artifact>
 			{
 				in.close();
 			}
+
+			if( !Arrays.equals( getFileDigest(), getOriginDigest() ) )
+				throw new UnpackingException( "Artifact incorrectly unpacked from " + originUrl + " to " + file );
 		}
 		catch( IOException x )
 		{

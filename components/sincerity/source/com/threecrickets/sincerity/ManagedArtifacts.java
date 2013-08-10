@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 
 /**
@@ -169,7 +169,7 @@ public class ManagedArtifacts
 				{
 					try
 					{
-						if( !FileUtil.isSameContent( file, entry.originalDigest ) )
+						if( !IoUtil.isSameContent( file, entry.originalDigest ) )
 						{
 							if( container.getSincerity().getVerbosity() >= 2 )
 								container.getSincerity().getOut().println( "Not deleting unnecessary artifact because it has been changed: " + file );
@@ -189,7 +189,7 @@ public class ManagedArtifacts
 					throw new SincerityException( "Could not delete unnecessary artifact: " + file );
 				try
 				{
-					FileUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );
+					IoUtil.deleteEmptyDirectoryRecursive( file.getParentFile() );
 				}
 				catch( IOException x )
 				{

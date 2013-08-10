@@ -276,19 +276,12 @@ public class Package extends AbstractList<Artifact>
 		}
 	}
 
-	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws UnpackingException
+	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
 	{
 		for( Artifact artifact : this )
 		{
 			// TODO: check filter!
-			try
-			{
-				artifact.unpack( managedArtifacts, overwrite );
-			}
-			catch( SincerityException x )
-			{
-				throw new UnpackingException( "Could not install artifact: " + artifact, x );
-			}
+			artifact.unpack( managedArtifacts, overwrite );
 		}
 	}
 

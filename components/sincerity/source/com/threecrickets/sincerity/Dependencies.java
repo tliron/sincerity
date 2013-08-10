@@ -44,7 +44,7 @@ import org.apache.ivy.plugins.repository.url.URLResource;
 
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.internal.XmlUtil;
 
@@ -303,7 +303,7 @@ public class Dependencies
 			classpaths.add( classesDir );
 
 		// Jar directory
-		FileUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );
+		IoUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );
 
 		// Downloaded artifacts
 		for( ArtifactDownloadReport artifact : getDownloadReports() )

@@ -11,6 +11,7 @@
 
 package com.threecrickets.sincerity.internal;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -20,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -47,7 +49,7 @@ import org.apache.commons.vfs.provider.zip.ZipFileProvider;
  * 
  * @author Tal Liron
  */
-public abstract class FileUtil
+public abstract class IoUtil
 {
 	public static void unpack( File archiveFile, File destinationDir, File workdDir ) throws IOException
 	{
@@ -112,7 +114,7 @@ public abstract class FileUtil
 		}
 	}
 
-	public static final void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
+	public static void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
 	{
 		folder.createFolder();
 		FileType type = file.getType();
@@ -126,7 +128,7 @@ public abstract class FileUtil
 		}
 	}
 
-	public static final void copyRecursive( File fromDir, File toDir ) throws IOException
+	public static void copyRecursive( File fromDir, File toDir ) throws IOException
 	{
 		DefaultFileSystemManager manager = new DefaultFileSystemManager();
 		try
@@ -142,6 +144,14 @@ public abstract class FileUtil
 		{
 			manager.close();
 		}
+	}
+
+	public static void copy( InputStream in, OutputStream out ) throws IOException
+	{
+		byte[] buffer = new byte[BUFFER_SIZE];
+		int length = 0;
+		while( ( length = in.read( buffer ) ) != -1 )
+			out.write( buffer, 0, length );
 	}
 
 	public static void deleteEmptyDirectoryRecursive( File directory ) throws IOException
@@ -194,8 +204,8 @@ public abstract class FileUtil
 	{
 		try
 		{
-			byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
-			byte[] urlDigest = FileUtil.getDigest( url.openStream() );
+			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
+			byte[] urlDigest = IoUtil.getDigest( new BufferedInputStream( url.openStream() ) );
 			return Arrays.equals( fileDigest, urlDigest );
 		}
 		catch( FileNotFoundException x )
@@ -208,7 +218,7 @@ public abstract class FileUtil
 	{
 		try
 		{
-			byte[] fileDigest = FileUtil.getDigest( new FileInputStream( file ) );
+			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
 			return Arrays.equals( fileDigest, digest );
 		}
 		catch( FileNotFoundException x )
@@ -221,13 +231,13 @@ public abstract class FileUtil
 	{
 		try
 		{
-			MessageDigest md = MessageDigest.getInstance( "SHA-1" );
-			md.reset();
-			byte[] buf = new byte[BUFFER_SIZE];
-			int len = 0;
-			while( ( len = stream.read( buf ) ) != -1 )
-				md.update( buf, 0, len );
-			return md.digest();
+			MessageDigest digest = MessageDigest.getInstance( "SHA-1" );
+			digest.reset();
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int length = 0;
+			while( ( length = stream.read( buffer ) ) != -1 )
+				digest.update( buffer, 0, length );
+			return digest.digest();
 		}
 		catch( NoSuchAlgorithmException x )
 		{
@@ -330,7 +340,7 @@ public abstract class FileUtil
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private FileUtil()
+	private IoUtil()
 	{
 	}
 

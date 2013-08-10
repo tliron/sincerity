@@ -62,7 +62,7 @@ import org.apache.ivy.util.Message;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.FileUtil;
+import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.ivy.SincerityRepositoryCacheManager;
 
 /**
@@ -656,7 +656,7 @@ public class PyPiResolver extends BasicResolver
 	{
 		// Unpack only if we haven't already unpacked into the cache
 		if( ( archiveFile != null ) && !sourceDir.isDirectory() )
-			FileUtil.unpack( archiveFile, sourceDir, sourceDir );
+			IoUtil.unpack( archiveFile, sourceDir, sourceDir );
 
 		// Find setup.py
 		File setupFile = null;
@@ -803,7 +803,7 @@ public class PyPiResolver extends BasicResolver
 		ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
 		if( requiresEntry != null )
 		{
-			List<String> lines = FileUtil.readLines( zip.getInputStream( requiresEntry ) );
+			List<String> lines = IoUtil.readLines( zip.getInputStream( requiresEntry ) );
 			for( String line : lines )
 			{
 				String name = null, dependencyVersion = null;
@@ -836,11 +836,11 @@ public class PyPiResolver extends BasicResolver
 	{
 		String pth = "./" + eggFile.getName();
 		File pthFile = getPthFile();
-		List<String> pths = FileUtil.readLines( pthFile );
+		List<String> pths = IoUtil.readLines( pthFile );
 		if( !pths.contains( pths ) )
 		{
 			pths.add( pth );
-			FileUtil.writeLines( pthFile, pths );
+			IoUtil.writeLines( pthFile, pths );
 		}
 	}
 
