@@ -117,6 +117,9 @@ public class ArtifactsPlugin implements Plugin1
 		{
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.prune();
+
+			command.getSincerity().removeCommand( command );
+			command.getSincerity().reboot();
 		}
 		else
 			throw new UnknownCommandException( command );
