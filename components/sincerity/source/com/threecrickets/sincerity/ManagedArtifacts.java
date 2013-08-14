@@ -27,11 +27,10 @@ import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.internal.StringUtil;
 
 /**
- * This class helps a {@link Dependencies} instance keep track of installed
- * artifacts.
+ * This class manages a database of artifacts for a a {@link Dependencies}
+ * instance.
  * <p>
- * Information about installed artifacts is stored in
- * "/configuration/sincerity/artifacts.conf".
+ * The database is normally stored in "/configuration/sincerity/artifacts.conf".
  * 
  * @author Tal Liron
  */
@@ -41,6 +40,15 @@ public class ManagedArtifacts
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param file
+	 *        The database file (usually
+	 *        "/configuration/sincerity/artifacts.conf")
+	 * @param container
+	 *        The container
+	 */
 	public ManagedArtifacts( File file, Container container )
 	{
 		this.file = file;
@@ -51,9 +59,17 @@ public class ManagedArtifacts
 	// Attributes
 	//
 
+	/**
+	 * True if the artifact was marked as installed.
+	 * 
+	 * @param artifact
+	 *        The artifact
+	 * @return True if was installed
+	 * @throws SincerityException
+	 */
 	public boolean wasInstalled( Artifact artifact ) throws SincerityException
 	{
-		validate();
+		load();
 
 		Entry entry = entries.get( artifact.getPath() );
 		if( entry != null )
@@ -62,9 +78,17 @@ public class ManagedArtifacts
 		return false;
 	}
 
+	/**
+	 * The digest when the artifact's file was first unpacked.
+	 * 
+	 * @param artifact
+	 *        The artifact
+	 * @return The digest or null
+	 * @throws SincerityException
+	 */
 	public byte[] getOriginalDigest( Artifact artifact ) throws SincerityException
 	{
-		validate();
+		load();
 
 		Entry entry = entries.get( artifact.getPath() );
 		if( entry != null )
@@ -77,9 +101,17 @@ public class ManagedArtifacts
 	// Operations
 	//
 
-	public void merge( Artifact artifact, boolean installed ) throws SincerityException
+	/**
+	 * Adds the artifact to the database, marking the configuration file as
+	 * requiring a save if the addition caused a change.
+	 * 
+	 * @param artifact
+	 * @param installed
+	 * @throws SincerityException
+	 */
+	public void add( Artifact artifact, boolean installed ) throws SincerityException
 	{
-		validate();
+		load();
 
 		String key = artifact.getPath();
 		Entry entry = new Entry( artifact, installed );
@@ -91,6 +123,11 @@ public class ManagedArtifacts
 		entries.put( key, entry );
 	}
 
+	/**
+	 * Saves the database if there were changes.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void save() throws SincerityException
 	{
 		if( !changed )
@@ -120,14 +157,30 @@ public class ManagedArtifacts
 		changed = false;
 	}
 
+	/**
+	 * Removes all artifacts from the database, deletes all unnecessary files
+	 * that have not been modified (for which the digest has not changed), and
+	 * finally saves the changes.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void prune() throws SincerityException
 	{
 		prune( null );
 	}
 
-	public void prune( Iterable<Artifact> artifacts ) throws SincerityException
+	/**
+	 * Removes all artifacts from the database that are <i>not</i> mentioned,
+	 * deletes all unnecessary files that have not been modified (for which the
+	 * digest has not changed), and finally saves the changes.
+	 * 
+	 * @param necessaryArtifacts
+	 *        The artifacts that should stay
+	 * @throws SincerityException
+	 */
+	public void prune( Iterable<Artifact> necessaryArtifacts ) throws SincerityException
 	{
-		validate();
+		load();
 
 		for( Iterator<Map.Entry<String, Entry>> i = entries.entrySet().iterator(); i.hasNext(); )
 		{
@@ -137,11 +190,11 @@ public class ManagedArtifacts
 
 			// Is the entry still necessary?
 			boolean necessary = false;
-			if( artifacts != null )
+			if( necessaryArtifacts != null )
 			{
-				for( Artifact artifact : artifacts )
+				for( Artifact necessaryArtifact : necessaryArtifacts )
 				{
-					if( path.equals( artifact.getPath() ) )
+					if( path.equals( necessaryArtifact.getPath() ) )
 					{
 						necessary = true;
 						break;
@@ -212,7 +265,12 @@ public class ManagedArtifacts
 
 	private Map<String, Entry> entries;
 
-	private void validate() throws SincerityException
+	/**
+	 * Loads and caches the database.
+	 * 
+	 * @throws SincerityException
+	 */
+	private void load() throws SincerityException
 	{
 		if( entries == null )
 		{
@@ -246,6 +304,9 @@ public class ManagedArtifacts
 		}
 	}
 
+	/**
+	 * Managed artifact entry in the database.
+	 */
 	private static class Entry
 	{
 		public Entry( Artifact artifact, boolean installed ) throws SincerityException

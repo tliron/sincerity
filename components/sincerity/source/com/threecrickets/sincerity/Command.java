@@ -58,6 +58,18 @@ public class Command
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param plugin
+	 *        The plugin name, or null if not specified
+	 * @param name
+	 *        The command name
+	 * @param isGreedy
+	 *        True if greedy
+	 * @param sincerity
+	 *        The Sincerity instance
+	 */
 	public Command( String plugin, String name, boolean isGreedy, Sincerity sincerity )
 	{
 		this.plugin = plugin;
@@ -66,6 +78,16 @@ public class Command
 		this.sincerity = sincerity;
 	}
 
+	/**
+	 * Constructor: supports parsing of the command.
+	 * 
+	 * @param name
+	 *        The command name with an optional plugin prefix
+	 * @param isGreedy
+	 *        True if greedy
+	 * @param sincerity
+	 *        The Sincerity instance
+	 */
 	public Command( String name, boolean isGreedy, Sincerity sincerity )
 	{
 		String[] split = name.split( PLUGIN_COMMAND_SEPARATOR, 2 );
@@ -85,16 +107,36 @@ public class Command
 	// Attributes
 	//
 
+	/**
+	 * The command name.
+	 * 
+	 * @return The command name
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * The Sincerity instance.
+	 * 
+	 * @return The Sincerity instance
+	 */
 	public Sincerity getSincerity()
 	{
 		return sincerity;
 	}
 
+	/**
+	 * When {@link #setParse(boolean)} is false, returns the raw arguments of
+	 * the command.
+	 * <p>
+	 * When {@link #setParse(boolean)} is true, returns only those arguments
+	 * that are <i>not</i> switches or properties.
+	 * 
+	 * @return The arguments
+	 * @throws SincerityException
+	 */
 	public String[] getArguments() throws SincerityException
 	{
 		if( arguments == null )
@@ -107,6 +149,15 @@ public class Command
 		return arguments;
 	}
 
+	/**
+	 * Returns the command's switches: arguments prefixed with "--" that are not
+	 * properties.
+	 * <p>
+	 * You must set {@link #setParse(boolean)} to true to support this method.
+	 * 
+	 * @return The switches or an empty set
+	 * @throws SincerityException
+	 */
 	public Set<String> getSwitches() throws SincerityException
 	{
 		if( switches == null )
@@ -119,6 +170,15 @@ public class Command
 		return switches;
 	}
 
+	/**
+	 * Returns the command's switches: arguments prefixed with "--" that have a
+	 * "=" in their value.
+	 * <p>
+	 * You must set {@link #setParse(boolean)} to true to support this method.
+	 * 
+	 * @return The properties or an empty map
+	 * @throws SincerityException
+	 */
 	public Map<String, String> getProperties() throws SincerityException
 	{
 		if( properties == null )
@@ -131,16 +191,34 @@ public class Command
 		return properties;
 	}
 
+	/**
+	 * @return Whether to parse
+	 * @see #setParse(boolean)
+	 */
 	public boolean getParse()
 	{
 		return parse;
 	}
 
+	/**
+	 * When true, supports {@link #getArguments()} in parsed mode,
+	 * {@link #getSwitches()} and {@link #getProperties()}.
+	 * 
+	 * @param parse
+	 *        True to support parsing
+	 * @see #getParse()
+	 */
 	public void setParse( boolean parse )
 	{
 		this.parse = parse;
 	}
 
+	/**
+	 * Creates command line arguments that could be parsed back into this
+	 * command.
+	 * 
+	 * @return The command line arguments
+	 */
 	public String[] toArguments()
 	{
 		String[] arguments = new String[rawArguments.size() + 1];
@@ -168,8 +246,14 @@ public class Command
 	// //////////////////////////////////////////////////////////////////////////
 	// Protected
 
+	/**
+	 * The command's plugin, or null if not specified.
+	 */
 	protected String plugin;
 
+	/**
+	 * The original (raw) arguments of the command.
+	 */
 	protected final List<String> rawArguments = new ArrayList<String>();
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -189,6 +273,11 @@ public class Command
 
 	private Map<String, String> properties;
 
+	/**
+	 * Separates switches and properties from the rest of the arguments.
+	 * 
+	 * @throws SincerityException
+	 */
 	private void parse() throws SincerityException
 	{
 		ArrayList<String> arguments = new ArrayList<String>();

@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.ResolvedDependency.Caller;
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**
@@ -53,6 +54,13 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	// Construction
 	//
 
+	/**
+	 * Parses the latest Ivy resolution report.
+	 * 
+	 * @param dependencies
+	 *        The dependencies instance
+	 * @throws SincerityException
+	 */
 	public ResolvedDependencies( Dependencies dependencies ) throws SincerityException
 	{
 		super();
@@ -201,6 +209,11 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	// Attributes
 	//
 
+	/**
+	 * Cached list of all resolved dependencies, whether explicit or implicit.
+	 * 
+	 * @return The resolved dependencies
+	 */
 	public List<ResolvedDependency> getAll()
 	{
 		if( allDependencies == null )
@@ -212,6 +225,11 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		return allDependencies;
 	}
 
+	/**
+	 * Caches list of all artifacts.
+	 * 
+	 * @return The artifacts
+	 */
 	public List<Artifact> getArtifacts()
 	{
 		if( artifacts == null )
@@ -224,6 +242,11 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		return artifacts;
 	}
 
+	/**
+	 * Cached list of all licenses.
+	 * 
+	 * @return The licenses
+	 */
 	public List<License> getLicenses()
 	{
 		if( licenses == null )
@@ -250,6 +273,13 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		return licenses;
 	}
 
+	/**
+	 * List of all resolved dependencies using a license.
+	 * 
+	 * @param license
+	 *        The license
+	 * @return The resolved dependencies
+	 */
 	public List<ResolvedDependency> getByLicense( License license )
 	{
 		ArrayList<ResolvedDependency> dependencies = new ArrayList<ResolvedDependency>();
@@ -267,6 +297,16 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		return dependencies;
 	}
 
+	/**
+	 * The resolved version of a dependency.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @return The resolved version or null
+	 * @throws SincerityException
+	 */
 	public String getVersion( String group, String name ) throws SincerityException
 	{
 		for( ResolvedDependency resolvedDependency : getAll() )
@@ -295,25 +335,6 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
-	// Protected
-
-	protected static class Caller
-	{
-		private Caller( String organisation, String name, String revision )
-		{
-			this.organisation = organisation;
-			this.name = name;
-			this.revision = revision;
-		}
-
-		private final String organisation;
-
-		private final String name;
-
-		private final String revision;
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private final List<ResolvedDependency> roots = new ArrayList<ResolvedDependency>();
@@ -324,16 +345,24 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 
 	private ArrayList<License> licenses;
 
-	private static void addAllDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> installedDependencies )
+	/**
+	 * Recursively adds a resolved dependency and its children to a list.
+	 * 
+	 * @param resolvedDependency
+	 *        The resolved dependency
+	 * @param dependencies
+	 *        The list of dependencies to which we will add
+	 */
+	private static void addAllDependencies( ResolvedDependency resolvedDependency, ArrayList<ResolvedDependency> dependencies )
 	{
 		if( resolvedDependency.evicted != null )
 			return;
 
 		boolean exists = false;
 		ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
-		for( ResolvedDependency installedDependency : installedDependencies )
+		for( ResolvedDependency existingDependency : dependencies )
 		{
-			if( id.equals( installedDependency.descriptor.getModuleRevisionId() ) )
+			if( id.equals( existingDependency.descriptor.getModuleRevisionId() ) )
 			{
 				exists = true;
 				break;
@@ -341,9 +370,9 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 		}
 
 		if( !exists )
-			installedDependencies.add( resolvedDependency );
+			dependencies.add( resolvedDependency );
 
 		for( ResolvedDependency child : resolvedDependency.children )
-			addAllDependencies( child, installedDependencies );
+			addAllDependencies( child, dependencies );
 	}
 }

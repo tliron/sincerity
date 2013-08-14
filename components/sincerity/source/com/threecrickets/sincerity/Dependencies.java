@@ -55,7 +55,7 @@ import com.threecrickets.sincerity.internal.XmlUtil;
  * <p>
  * Changes to dependencies are only actually resolved when
  * {@link #install(boolean)} is called. To access the actually resolved
- * dependencies, see {@link #getResolvedDependencies()}.
+ * dependencies since the last install, see {@link #getResolvedDependencies()}.
  * <p>
  * To access the Jars, use {@link #getClasspaths(boolean)}. To access the
  * artifacts, use {@link #getArtifacts()} or {@link #getPackages()}. See also
@@ -73,6 +73,20 @@ public class Dependencies
 	// Construction
 	//
 
+	/**
+	 * Parses the Ivy module descriptor, and loads the managed artifacts
+	 * database.
+	 * 
+	 * @param ivyFile
+	 *        The Ivy module descriptor file (usually
+	 *        "/configuration/sincerity/dependencies.conf")
+	 * @param artifactsFile
+	 *        The managed artifacts database file (usually
+	 *        "/configuration/sincerity/artifacts.conf")
+	 * @param container
+	 *        The container
+	 * @throws SincerityException
+	 */
 	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws SincerityException
 	{
 		this.ivyFile = ivyFile;
@@ -136,21 +150,52 @@ public class Dependencies
 	// Attributes
 	//
 
+	/**
+	 * The container.
+	 * 
+	 * @return The container
+	 */
 	public Container getContainer()
 	{
 		return container;
 	}
 
+	/**
+	 * The packages.
+	 * 
+	 * @return The packages
+	 * @throws SincerityException
+	 */
 	public Packages getPackages() throws SincerityException
 	{
 		return new Packages( container );
 	}
 
+	/**
+	 * True if the dependency is explicit, whatever its version.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @return True if specified
+	 */
 	public boolean has( String group, String name )
 	{
 		return has( group, name, null );
 	}
 
+	/**
+	 * True if the dependency is explicit with a particular version.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @param version
+	 *        The dependency's version
+	 * @return True if specified
+	 */
 	public boolean has( String group, String name, String version )
 	{
 		for( DependencyDescriptor dependency : moduleDescriptor.getDependencies() )
@@ -162,11 +207,13 @@ public class Dependencies
 		return false;
 	}
 
-	public DependencyDescriptor[] getDescriptors()
-	{
-		return moduleDescriptor.getDependencies();
-	}
-
+	/**
+	 * The resolved dependencies (explicit and implicit) based on the explicit
+	 * dependencies, calculated in the last {@link #install(boolean)}.
+	 * 
+	 * @return The resolved dependencies
+	 * @throws SincerityException
+	 */
 	public ResolvedDependencies getResolvedDependencies() throws SincerityException
 	{
 		if( resolvedDependencies == null )
@@ -174,27 +221,28 @@ public class Dependencies
 		return resolvedDependencies;
 	}
 
-	public File getResolutionReport()
-	{
-		ivy.pushContext();
-		ResolutionCacheManager resolutionCache;
-		try
-		{
-			resolutionCache = ivy.getResolutionCacheManager();
-		}
-		finally
-		{
-			ivy.popContext();
-		}
-		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
-		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
-	}
-
+	/**
+	 * Retrieves the set of artifacts based on currently installed packages.
+	 * 
+	 * @return The artifacts
+	 * @throws SincerityException
+	 */
 	public Set<Artifact> getArtifacts() throws SincerityException
 	{
 		return getArtifacts( false, false );
 	}
 
+	/**
+	 * Retrieves or installs the set of artifacts based on currently installed
+	 * packages.
+	 * 
+	 * @param install
+	 *        True to allow installation of packages
+	 * @param overwrite
+	 *        True to force overwriting of existing files
+	 * @return The artifacts
+	 * @throws SincerityException
+	 */
 	public Set<Artifact> getArtifacts( boolean install, boolean overwrite ) throws SincerityException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
@@ -208,7 +256,7 @@ public class Dependencies
 				{
 					Artifact artifact = new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container );
 					artifacts.add( artifact );
-					managedArtifacts.merge( artifact, true );
+					managedArtifacts.add( artifact, true );
 				}
 			}
 
@@ -219,10 +267,10 @@ public class Dependencies
 					if( install )
 					{
 						artifact.unpack( managedArtifacts, overwrite );
-						managedArtifacts.merge( artifact, true );
+						managedArtifacts.add( artifact, true );
 					}
 					else
-						managedArtifacts.merge( artifact, false );
+						managedArtifacts.add( artifact, false );
 
 					artifacts.add( artifact );
 				}
@@ -240,11 +288,25 @@ public class Dependencies
 		return artifacts;
 	}
 
+	/**
+	 * The managed artifacts database.
+	 * 
+	 * @return The managed artifacts
+	 */
 	public ManagedArtifacts getManagedArtifacts()
 	{
 		return managedArtifacts;
 	}
 
+	/**
+	 * The classpath based on currently installed dependencies.
+	 * 
+	 * @param includeSystem
+	 *        True to include the system classpath
+	 * @return The classpath
+	 * @throws SincerityException
+	 * @see #getClasspaths(boolean)
+	 */
 	public String getClasspath( boolean includeSystem ) throws SincerityException
 	{
 		List<File> classpaths = getClasspaths( includeSystem );
@@ -254,6 +316,15 @@ public class Dependencies
 		return StringUtil.join( paths, File.pathSeparator );
 	}
 
+	/**
+	 * The classpath based on currently installed dependencies.
+	 * 
+	 * @param includeSystem
+	 *        True to include the system classpath
+	 * @return The classpath
+	 * @throws SincerityException
+	 * @see #getClasspath(boolean)
+	 */
 	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
 	{
 		ArrayList<File> classpaths = new ArrayList<File>();
@@ -326,10 +397,49 @@ public class Dependencies
 		return classpaths;
 	}
 
+	/**
+	 * The Ivy {@link DependencyDescriptor} instances for the explicit
+	 * dependencies.
+	 * 
+	 * @return The dependency descriptors
+	 */
+	public DependencyDescriptor[] getDescriptors()
+	{
+		return moduleDescriptor.getDependencies();
+	}
+
+	/**
+	 * The Ivy resolution report file, from the last {@link #resolve()}.
+	 * 
+	 * @return The resolution report file
+	 */
+	public File getResolutionReport()
+	{
+		ivy.pushContext();
+		ResolutionCacheManager resolutionCache;
+		try
+		{
+			resolutionCache = ivy.getResolutionCacheManager();
+		}
+		finally
+		{
+			ivy.popContext();
+		}
+		String resolveId = ResolveOptions.getDefaultResolveId( moduleDescriptor );
+		return resolutionCache.getConfigurationResolveReportInCache( resolveId, "default" );
+	}
+
 	//
 	// Operations
 	//
 
+	/**
+	 * Revokes all explicit and implicit dependencies.
+	 * <p>
+	 * Does <i>not</i> resolve; only changes the specification.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void reset() throws SincerityException
 	{
 		ivy.pushContext();
@@ -347,6 +457,20 @@ public class Dependencies
 		save();
 	}
 
+	/**
+	 * Adds an explicit dependency.
+	 * <p>
+	 * Will not add the dependency if it is already specified.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @param version
+	 *        The dependency's version
+	 * @return True if added
+	 * @throws SincerityException
+	 */
 	public boolean add( String group, String name, String version ) throws SincerityException
 	{
 		if( has( group, name, version ) )
@@ -362,7 +486,20 @@ public class Dependencies
 		return true;
 	}
 
-	public boolean revise( String group, String name, String version ) throws SincerityException
+	/**
+	 * Changes the version for an explicit dependency that has already been
+	 * specified.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @param newVersion
+	 *        The dependency's new version
+	 * @return True if changed
+	 * @throws SincerityException
+	 */
+	public boolean revise( String group, String name, String newVersion ) throws SincerityException
 	{
 		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
 		boolean changed = false;
@@ -370,10 +507,10 @@ public class Dependencies
 		{
 			DependencyDescriptor dependency = i.next();
 			ModuleRevisionId id = dependency.getDependencyRevisionId();
-			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) && !version.equals( id.getRevision() ) )
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) && !newVersion.equals( id.getRevision() ) )
 			{
 				i.remove();
-				id = ModuleRevisionId.newInstance( id, version );
+				id = ModuleRevisionId.newInstance( id, newVersion );
 				dependency = dependency.clone( id );
 				i.add( dependency );
 				changed = true;
@@ -401,6 +538,16 @@ public class Dependencies
 		return true;
 	}
 
+	/**
+	 * Revokes an explicit dependency.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @return True if removed
+	 * @throws SincerityException
+	 */
 	public boolean remove( String group, String name ) throws SincerityException
 	{
 		List<DependencyDescriptor> dependencies = new ArrayList<DependencyDescriptor>( Arrays.asList( moduleDescriptor.getDependencies() ) );
@@ -436,12 +583,22 @@ public class Dependencies
 		return true;
 	}
 
+	/**
+	 * Deletes all managed artifacts which no longer have an origin.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void prune() throws SincerityException
 	{
 		managedArtifacts.prune( getArtifacts() );
 		container.updateBootstrap();
 	}
 
+	/**
+	 * Uninstalls all packages.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void uninstall() throws SincerityException
 	{
 		getPackages().uninstall();
@@ -449,6 +606,14 @@ public class Dependencies
 		container.updateBootstrap();
 	}
 
+	/**
+	 * Ivy resolve: checks explicit dependencies' metadata, resolves implicit
+	 * dependency tree, downloads new dependencies, removes unused dependencies,
+	 * creates resolution report.
+	 * 
+	 * @return The resolve report
+	 * @throws SincerityException
+	 */
 	private ResolveReport resolve() throws SincerityException
 	{
 		ivy.pushContext();
@@ -474,6 +639,13 @@ public class Dependencies
 		}
 	}
 
+	/**
+	 * Installs/upgrades dependencies.
+	 * 
+	 * @param overwrite
+	 *        True to force overwrite of existing artifact files
+	 * @throws SincerityException
+	 */
 	public void install( boolean overwrite ) throws SincerityException
 	{
 		int installations = container.getInstallations();
@@ -545,6 +717,12 @@ public class Dependencies
 
 	private boolean printedDisclaimer;
 
+	/**
+	 * Saves the Ivy module descriptor file (usually
+	 * "/configuration/sincerity/dependencies.conf").
+	 * 
+	 * @throws SincerityException
+	 */
 	private void save() throws SincerityException
 	{
 		try
@@ -557,6 +735,13 @@ public class Dependencies
 		}
 	}
 
+	/**
+	 * Parses the Ivy resolution report from the last {@link #resolve()}.
+	 * 
+	 * @return The report parser
+	 * @throws SincerityException
+	 * @see #getResolutionReport()
+	 */
 	private XmlReportParser getParsedResolutionReport() throws SincerityException
 	{
 		File reportFile = getResolutionReport();
@@ -576,6 +761,12 @@ public class Dependencies
 		return null;
 	}
 
+	/**
+	 * The Ivy download reports from the last {@link #resolve()}.
+	 * 
+	 * @return The download reports
+	 * @throws SincerityException
+	 */
 	private Set<ArtifactDownloadReport> getDownloadReports() throws SincerityException
 	{
 		HashSet<ArtifactDownloadReport> artifacts = new HashSet<ArtifactDownloadReport>();
@@ -585,6 +776,12 @@ public class Dependencies
 		return artifacts;
 	}
 
+	/**
+	 * Prints the Sincerity installation disclaimer.
+	 * 
+	 * @param out
+	 *        The print writer
+	 */
 	private void printDisclaimer( PrintWriter out )
 	{
 		if( printedDisclaimer )

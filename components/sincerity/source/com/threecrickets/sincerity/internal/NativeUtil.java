@@ -21,11 +21,27 @@ import java.lang.reflect.Field;
  */
 public abstract class NativeUtil
 {
+	//
+	// Static operations
+	//
+
+	/**
+	 * Adds to the JVM's search path for native libraries.
+	 * 
+	 * @param nativePath
+	 *        The path
+	 */
 	public static void addNativePath( File nativePath )
 	{
 		addNativePath( nativePath.getAbsolutePath() );
 	}
 
+	/**
+	 * Adds to the JVM's search path for native libraries.
+	 * 
+	 * @param nativePath
+	 *        The path
+	 */
 	public static void addNativePath( String nativePath )
 	{
 		try

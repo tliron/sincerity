@@ -82,8 +82,6 @@ public class Sincerity implements Runnable
 
 	public static final String VERBOSITY_ATTRIBUTE = "com.threecrickets.sincerity.verbosity";
 
-	public static final String INSTALLS_ATTRIBUTE = "com.threecrickets.sincerity.installs";
-
 	public static final String OUT_ATTRIBUTE = "com.threecrickets.sincerity.out";
 
 	public static final String ERR_ATTRIBUTE = "com.threecrickets.sincerity.err";
@@ -102,6 +100,13 @@ public class Sincerity implements Runnable
 		return threadLocal.get();
 	}
 
+	/**
+	 * Sincerity version information (cached as a bootstrap attribute).
+	 * <p>
+	 * Taken from the "version.conf" resource.
+	 * 
+	 * @return Version information
+	 */
 	@SuppressWarnings("unchecked")
 	public static Map<String, String> getVersion()
 	{
@@ -144,6 +149,13 @@ public class Sincerity implements Runnable
 	// Main
 	//
 
+	/**
+	 * Executes a Sincerity command line, defaulting to the "gui:gui" command if
+	 * no commands are given.
+	 * 
+	 * @param arguments
+	 *        The command line
+	 */
 	public static void main( String[] arguments )
 	{
 		boolean started = Bootstrap.getAttributes().get( STARTED_ATTRIBUTE ) != null;
@@ -169,11 +181,27 @@ public class Sincerity implements Runnable
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param arguments
+	 *        The command line
+	 * @throws SincerityException
+	 */
 	public Sincerity( String[] arguments ) throws SincerityException
 	{
 		this( arguments, null );
 	}
 
+	/**
+	 * Cloning constructor.
+	 * 
+	 * @param arguments
+	 *        The command line
+	 * @param sincerity
+	 *        The instance to clone
+	 * @throws SincerityException
+	 */
 	public Sincerity( String[] arguments, Sincerity sincerity ) throws SincerityException
 	{
 		if( sincerity != null )
@@ -193,6 +221,12 @@ public class Sincerity implements Runnable
 	// Attributes
 	//
 
+	/**
+	 * The Sincerity home directory
+	 * 
+	 * @return The home directory
+	 * @throws SincerityException
+	 */
 	public File getHome() throws SincerityException
 	{
 		if( home == null )
@@ -200,6 +234,14 @@ public class Sincerity implements Runnable
 		return home;
 	}
 
+	/**
+	 * Constructs an absolute path from the home directory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 * @throws SincerityException
+	 */
 	public File getHomeFile( String... parts ) throws SincerityException
 	{
 		File file = getHome();
@@ -208,6 +250,10 @@ public class Sincerity implements Runnable
 		return file;
 	}
 
+	/**
+	 * @return The verbosity level
+	 * @see #setVerbosity(int)
+	 */
 	public int getVerbosity()
 	{
 		Integer verbosity = (Integer) Bootstrap.getAttributes().get( VERBOSITY_ATTRIBUTE );
@@ -220,28 +266,28 @@ public class Sincerity implements Runnable
 		return verbosity;
 	}
 
+	/**
+	 * Verbosity is only used to control messages to standard output and
+	 * standard error
+	 * <p>
+	 * It is interpreted individually by individual commands, though 0 usually
+	 * means "silent," 1 means "only important messages" and 2 means
+	 * "quite chatty." Higher values usually include more minute debugging
+	 * information.
+	 * 
+	 * @param verbosity
+	 *        The verbosity level
+	 * @see #getVerbosity()
+	 */
 	public void setVerbosity( int verbosity )
 	{
 		Bootstrap.getAttributes().put( VERBOSITY_ATTRIBUTE, verbosity );
 	}
 
-	public int getInstalls()
-	{
-		Integer installs = (Integer) Bootstrap.getAttributes().get( INSTALLS_ATTRIBUTE );
-		if( installs == null )
-		{
-			installs = 0;
-			Bootstrap.getAttributes().put( INSTALLS_ATTRIBUTE, installs );
-		}
-
-		return installs;
-	}
-
-	public void setInstalls( int installs )
-	{
-		Bootstrap.getAttributes().put( INSTALLS_ATTRIBUTE, installs );
-	}
-
+	/**
+	 * @return The print writer
+	 * @see #setOut(Writer)
+	 */
 	public PrintWriter getOut()
 	{
 		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( OUT_ATTRIBUTE );
@@ -256,6 +302,15 @@ public class Sincerity implements Runnable
 		return out;
 	}
 
+	/**
+	 * The standard output writer.
+	 * <p>
+	 * Will be wrapped in a {@link PrintWriter} if it's not already one.
+	 * 
+	 * @param out
+	 *        The writer
+	 * @see #getOut()
+	 */
 	public void setOut( Writer out )
 	{
 		if( !( out instanceof PrintWriter ) )
@@ -263,6 +318,10 @@ public class Sincerity implements Runnable
 		Bootstrap.getAttributes().put( OUT_ATTRIBUTE, out );
 	}
 
+	/**
+	 * @return The print writer
+	 * @see #setErr(Writer)
+	 */
 	public PrintWriter getErr()
 	{
 		PrintWriter err = (PrintWriter) Bootstrap.getAttributes().get( ERR_ATTRIBUTE );
@@ -277,6 +336,14 @@ public class Sincerity implements Runnable
 		return err;
 	}
 
+	/**
+	 * The standard error writer.
+	 * <p>
+	 * Will be wrapped in a {@link PrintWriter} if it's not already one.
+	 * 
+	 * @param err
+	 *        The writer
+	 */
 	public void setErr( Writer err )
 	{
 		if( !( err instanceof PrintWriter ) )
@@ -284,6 +351,13 @@ public class Sincerity implements Runnable
 		Bootstrap.getAttributes().put( ERR_ATTRIBUTE, err );
 	}
 
+	/**
+	 * The root directory of the current container.
+	 * 
+	 * @return The canonical file
+	 * @throws SincerityException
+	 * @see #setContainerRoot(File)
+	 */
 	public File getContainerRoot() throws SincerityException
 	{
 		if( containerRoot == null )
@@ -295,11 +369,29 @@ public class Sincerity implements Runnable
 		return containerRoot;
 	}
 
+	/**
+	 * Changes the current container by specifying a new root directory.
+	 * <p>
+	 * Causes a {@link #reboot()} if the current container is changed!
+	 * 
+	 * @param containerRoot
+	 *        The container root
+	 * @throws SincerityException
+	 * @see #getContainerRoot()
+	 */
 	public void setContainerRoot( File containerRoot ) throws SincerityException
 	{
 		try
 		{
 			File canonicalContainerRoot = containerRoot.getCanonicalFile();
+
+			// Make sure this is a new container root
+			if( this.containerRoot == null )
+				this.containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ATTRIBUTE );
+			if( this.containerRoot != null )
+				if( canonicalContainerRoot.equals( this.containerRoot ) )
+					return;
+
 			Bootstrap.getAttributes().put( CONTAINER_ATTRIBUTE, canonicalContainerRoot );
 			System.setProperty( CONTAINER_PROPERTY, canonicalContainerRoot.toString() );
 			this.containerRoot = canonicalContainerRoot;
@@ -315,6 +407,14 @@ public class Sincerity implements Runnable
 		}
 	}
 
+	/**
+	 * The current container.
+	 * <p>
+	 * Creates a new instance if not previously accessed.
+	 * 
+	 * @return The container
+	 * @throws SincerityException
+	 */
 	public Container getContainer() throws SincerityException
 	{
 		if( container == null )
@@ -346,6 +446,15 @@ public class Sincerity implements Runnable
 		return container;
 	}
 
+	/**
+	 * The plugins.
+	 * <p>
+	 * If there is a current container, then we will include its classpath.
+	 * Otherwise, we will only consider the Sincerity home plugins.
+	 * 
+	 * @return The plugins
+	 * @throws SincerityException
+	 */
 	public Plugins getPlugins() throws SincerityException
 	{
 		try
@@ -355,22 +464,40 @@ public class Sincerity implements Runnable
 		catch( NoContainerException x )
 		{
 			if( plugins == null )
-				plugins = new Plugins( this );
+				plugins = new Plugins();
 
 			return plugins;
 		}
 	}
 
+	/**
+	 * @return The GUI frame or null
+	 * @see #setFrame(Frame)
+	 */
 	public Frame getFrame()
 	{
 		return frame;
 	}
 
+	/**
+	 * The current open GUI frame.
+	 * 
+	 * @param frame
+	 *        The GUI frame
+	 * @see #getFrame()
+	 */
 	public void setFrame( Frame frame )
 	{
 		this.frame = frame;
 	}
 
+	/**
+	 * The available templates (names of directory in the "/templates/"
+	 * subdirectory of the Sincerity install).
+	 * 
+	 * @return The templates
+	 * @throws SincerityException
+	 */
 	public List<Template> getTemplates() throws SincerityException
 	{
 		ArrayList<Template> templates = new ArrayList<Template>();
@@ -390,6 +517,21 @@ public class Sincerity implements Runnable
 	// Operations
 	//
 
+	/**
+	 * Creates a new container based on a template and sets it as the current
+	 * container.
+	 * <p>
+	 * Unless force is true, will not copy any files if the directory already
+	 * exists.
+	 * 
+	 * @param containerRoot
+	 *        The container root directory
+	 * @param templateDir
+	 *        The template root directory
+	 * @param force
+	 *        True to force overriding of existing files
+	 * @throws SincerityException
+	 */
 	public void createContainer( File containerRoot, File templateDir, boolean force ) throws SincerityException
 	{
 		if( !force )
@@ -428,6 +570,15 @@ public class Sincerity implements Runnable
 		setContainerRoot( containerRoot );
 	}
 
+	/**
+	 * Parses a command line.
+	 * <p>
+	 * No validation is done of commands here, neither are shortcuts expanded.
+	 * 
+	 * @param arguments
+	 *        The command line
+	 * @return The commands
+	 */
 	public List<Command> parseCommands( String... arguments )
 	{
 		LinkedList<Command> commands = new LinkedList<Command>();
@@ -475,6 +626,19 @@ public class Sincerity implements Runnable
 		return commands;
 	}
 
+	/**
+	 * Runs a single command with the current set up plugins.
+	 * <p>
+	 * Shortcuts are expanded, and commands without plugin names are searched
+	 * for among all plugins. If a used name exists more than once in the
+	 * plugins, an {@link AmbiguousCommandException} is thrown.
+	 * 
+	 * @param command
+	 *        The command
+	 * @throws SincerityException
+	 * @see #getPlugins()
+	 * @see #run(String, String...)
+	 */
 	public void run( Command command ) throws SincerityException
 	{
 		if( command.getName().startsWith( Shortcuts.SHORTCUT_PREFIX ) )
@@ -520,6 +684,21 @@ public class Sincerity implements Runnable
 		}
 	}
 
+	/**
+	 * Runs a single command with the current set up plugins.
+	 * <p>
+	 * Shortcuts are expanded, and commands without plugin names are searched
+	 * for among all plugins. If a used name exists more than once in the
+	 * plugins, an {@link AmbiguousCommandException} is thrown.
+	 * 
+	 * @param name
+	 *        The command name
+	 * @param arguments
+	 *        The command arguments
+	 * @throws SincerityException
+	 * @see #getPlugins()
+	 * @see #run(Command)
+	 */
 	public void run( String name, String... arguments ) throws SincerityException
 	{
 		boolean isGreedy;
@@ -537,16 +716,36 @@ public class Sincerity implements Runnable
 		run( command );
 	}
 
+	/**
+	 * Removes a command from the queue.
+	 * 
+	 * @param command
+	 *        The command
+	 */
 	public void removeCommand( Command command )
 	{
 		commands.remove( command );
 	}
 
+	/**
+	 * Reboots Sincerity without forcing a new container bootstrap.
+	 * 
+	 * @throws SincerityException
+	 * @see #reboot(boolean)
+	 */
 	public void reboot() throws SincerityException
 	{
 		reboot( false );
 	}
 
+	/**
+	 * Reboots Sincerity, resubmitting the current command queue to the new
+	 * instance.
+	 * 
+	 * @param forceNewBootstrap
+	 *        True to force the re-creation of the container's bootstrap
+	 * @throws SincerityException
+	 */
 	public void reboot( boolean forceNewBootstrap ) throws SincerityException
 	{
 		if( commands.isEmpty() )
@@ -583,9 +782,16 @@ public class Sincerity implements Runnable
 		throw new RebootException();
 	}
 
+	/**
+	 * Dumps an exception's stack trace to standard error.
+	 * 
+	 * @param x
+	 *        The exception
+	 * @see #setErr(Writer)
+	 */
 	public void printStackTrace( Throwable x )
 	{
-		getErr().println( StringUtil.joinStackTrace( x ) );
+		getErr().println( StringUtil.createHumanReadableStackTrace( x ) );
 	}
 
 	//
@@ -623,6 +829,9 @@ public class Sincerity implements Runnable
 	// //////////////////////////////////////////////////////////////////////////
 	// Protected
 
+	/**
+	 * The command queue.
+	 */
 	protected final List<Command> commands;
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -640,15 +849,18 @@ public class Sincerity implements Runnable
 
 	private Frame frame;
 
+	/**
+	 * Look for a container in this order:
+	 * <p>
+	 * 1. 'sincerity.container.root' JVM property<br />
+	 * 2. 'SINCERITY_CONTAINER' environment variable<br />
+	 * 3. Search up filesystem tree from current path
+	 * 
+	 * @return The canonical file
+	 * @throws SincerityException
+	 */
 	private static File findContainerRoot() throws SincerityException
 	{
-		//
-		// Look for container in this order:
-		//
-		// 1. 'sincerity.container.root' JVM property
-		// 2. 'SINCERITY_CONTAINER' environment variable
-		// 3. Search up filesystem tree from current path
-		//
 
 		try
 		{

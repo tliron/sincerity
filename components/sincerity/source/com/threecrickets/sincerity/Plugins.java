@@ -40,6 +40,13 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	// Construction
 	//
 
+	/**
+	 * Finds all delegated and JVM plugins in the container's classpath.
+	 * 
+	 * @param container
+	 *        The container
+	 * @throws SincerityException
+	 */
 	public Plugins( Container container ) throws SincerityException
 	{
 		super();
@@ -73,7 +80,12 @@ public class Plugins extends AbstractMap<String, Plugin1>
 			plugins.put( plugin.getName(), plugin );
 	}
 
-	public Plugins( Sincerity sincerity ) throws SincerityException
+	/**
+	 * Finds all JVM plugins in the current classpath.
+	 * 
+	 * @throws SincerityException
+	 */
+	public Plugins() throws SincerityException
 	{
 		super();
 

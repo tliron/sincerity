@@ -87,14 +87,6 @@ document.executeOnce('/sincerity/xml/')
  */
 
 /**
- * The number of times the "sincerity:install" command has been called in the current run
- * of Sincerity.
- * 
- * @name sincerity.installs
- * @type Number
- */
-
-/**
  * The standard output for Sincerity.
  * <p>
  * Note that you can change this value.

@@ -187,7 +187,7 @@ public class ArtifactsPlugin implements Plugin1
 
 				if( packages )
 				{
-					Package pack = location != null ? dependencies.getPackages().getByPackage( new File( location ) ) : null;
+					Package pack = location != null ? dependencies.getPackages().getPackage( new File( location ) ) : null;
 					if( pack != null )
 					{
 						for( Iterator<Artifact> ii = pack.iterator(); ii.hasNext(); )

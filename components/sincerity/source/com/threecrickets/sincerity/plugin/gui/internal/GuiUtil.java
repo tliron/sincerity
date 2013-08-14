@@ -290,7 +290,7 @@ public class GuiUtil
 			s.append( "</i>" );
 		s.append( "</html>" );
 
-		Package pack = location != null ? dependencies.getPackages().getByPackage( new File( location ) ) : null;
+		Package pack = location != null ? dependencies.getPackages().getPackage( new File( location ) ) : null;
 		EnhancedNode node = new EnhancedNode( artifact, s.toString(), pack != null ? PACKAGE_ICON : FILE_ICON );
 
 		if( includePackageContents && pack != null )

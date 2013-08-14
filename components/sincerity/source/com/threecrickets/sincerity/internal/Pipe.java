@@ -28,6 +28,14 @@ public class Pipe implements Runnable
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param reader
+	 *        The reader
+	 * @param writer
+	 *        The writer
+	 */
 	public Pipe( Reader reader, Writer writer )
 	{
 		this.reader = reader;

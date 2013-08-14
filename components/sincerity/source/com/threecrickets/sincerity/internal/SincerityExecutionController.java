@@ -27,6 +27,12 @@ public class SincerityExecutionController implements ExecutionController
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param sincerity
+	 *        The Sincerity instance
+	 */
 	public SincerityExecutionController( Sincerity sincerity )
 	{
 		this.sincerity = sincerity;

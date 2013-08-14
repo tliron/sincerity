@@ -35,10 +35,22 @@ public class Artifact implements Comparable<Artifact>
 	// Construction
 	//
 
-	public Artifact( File file, URL url, boolean isVolatile, Container container )
+	/**
+	 * Constructor.
+	 * 
+	 * @param file
+	 *        The intended absolute destination in the filesystem
+	 * @param originUrl
+	 *        The origin URL
+	 * @param isVolatile
+	 *        True if volatile
+	 * @param container
+	 *        The container
+	 */
+	public Artifact( File file, URL originUrl, boolean isVolatile, Container container )
 	{
 		this.file = file;
-		this.originUrl = url;
+		this.originUrl = originUrl;
 		this.isVolatile = isVolatile;
 		this.container = container;
 		path = container.getRelativePath( file );
@@ -69,6 +81,12 @@ public class Artifact implements Comparable<Artifact>
 		return path;
 	}
 
+	/**
+	 * The cached digest for the file.
+	 * 
+	 * @return The digest
+	 * @throws IOException
+	 */
 	public byte[] getFileDigest() throws IOException
 	{
 		if( fileDigest == null )
@@ -88,6 +106,12 @@ public class Artifact implements Comparable<Artifact>
 		return originUrl;
 	}
 
+	/**
+	 * The cached digest for the origin.
+	 * 
+	 * @return The digest
+	 * @throws IOException
+	 */
 	public byte[] getOriginDigest() throws IOException
 	{
 		if( ( originDigest == null ) && ( originUrl != null ) )
@@ -95,6 +119,11 @@ public class Artifact implements Comparable<Artifact>
 		return originDigest;
 	}
 
+	/**
+	 * True if volatile.
+	 * 
+	 * @return True if volatile
+	 */
 	public boolean isVolatile()
 	{
 		return isVolatile;
@@ -146,7 +175,11 @@ public class Artifact implements Comparable<Artifact>
 	{
 		// Don't reinstall volatile artifacts that were already installed
 		if( isVolatile && managedArtifacts.wasInstalled( this ) )
+		{
+			if( container.getSincerity().getVerbosity() >= 2 )
+				container.getSincerity().getOut().println( "Volatile artifact already unpacked once, so not overwriting: " + path );
 			return;
+		}
 
 		if( file.exists() )
 		{
@@ -264,5 +297,4 @@ public class Artifact implements Comparable<Artifact>
 	private byte[] fileDigest;
 
 	private byte[] originDigest;
-
 }

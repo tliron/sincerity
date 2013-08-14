@@ -109,6 +109,16 @@ public class Package extends AbstractList<Artifact>
 	// Construction
 	//
 
+	/**
+	 * Creates a package instance by interpreting its manifest.
+	 * 
+	 * @param manifestUrl
+	 *        The manifest URL
+	 * @param container
+	 *        The container
+	 * @return The package or null if not a package manifest
+	 * @throws SincerityException
+	 */
 	public static Package parsePackage( URL manifestUrl, Container container ) throws SincerityException
 	{
 		String installer = null;
@@ -125,16 +135,19 @@ public class Package extends AbstractList<Artifact>
 			{
 				Attributes manifest = new Manifest( stream ).getMainAttributes();
 
+				// Package installer
 				Object packageInstallerAttribute = manifest.getValue( PACKAGE_INSTALLER );
 				if( packageInstallerAttribute != null )
 					installer = packageInstallerAttribute.toString();
 
+				// Package uninstaller
 				Object packageUninstallerAttribute = manifest.getValue( PACKAGE_UNINSTALLER );
 				if( packageUninstallerAttribute != null )
 					uninstaller = packageUninstallerAttribute.toString();
 
 				Volatiles volatiles = null;
 
+				// Package folders
 				Object packageFoldersAttribute = manifest.getValue( PACKAGE_FOLDERS );
 				if( packageFoldersAttribute != null )
 				{
@@ -163,6 +176,7 @@ public class Package extends AbstractList<Artifact>
 					}
 				}
 
+				// Package files
 				Object packageFilesAttribute = manifest.getValue( PACKAGE_FILES );
 				if( packageFilesAttribute != null )
 				{
@@ -189,6 +203,7 @@ public class Package extends AbstractList<Artifact>
 					}
 				}
 
+				// Package resources
 				Object packageResourcesAttribute = manifest.getValue( PACKAGE_RESOURCES );
 				if( packageResourcesAttribute != null )
 				{
@@ -232,16 +247,31 @@ public class Package extends AbstractList<Artifact>
 	// Attributes
 	//
 
+	/**
+	 * The installer class name.
+	 * 
+	 * @return The installer class name or null
+	 */
 	public String getInstaller()
 	{
 		return installer;
 	}
 
+	/**
+	 * The uninstaller class name.
+	 * 
+	 * @return The uninstaller class name or null
+	 */
 	public String getUninstaller()
 	{
 		return uninstaller;
 	}
 
+	/**
+	 * The package file (a Jar).
+	 * 
+	 * @return The file
+	 */
 	public File getFile()
 	{
 		return file;
@@ -251,6 +281,11 @@ public class Package extends AbstractList<Artifact>
 	// Operations
 	//
 
+	/**
+	 * Executes the installer class's main() method, if it exists.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void install() throws SincerityException
 	{
 		if( installer != null )
@@ -267,6 +302,11 @@ public class Package extends AbstractList<Artifact>
 		}
 	}
 
+	/**
+	 * Executes the uninstaller class's main() method, if it exists.
+	 * 
+	 * @throws SincerityException
+	 */
 	public void uninstall() throws SincerityException
 	{
 		if( uninstaller != null )
@@ -276,6 +316,19 @@ public class Package extends AbstractList<Artifact>
 		}
 	}
 
+	/**
+	 * Unpacks all artifacts, while consulting and updating the managed
+	 * artifacts database.
+	 * 
+	 * @param filter
+	 *        Filter artifacts (currently unused)
+	 * @param managedArtifacts
+	 *        The managed artifacts database
+	 * @param overwrite
+	 *        True to force overwriting of modified artifacts
+	 * @throws SincerityException
+	 * @see Artifact#unpack(ManagedArtifacts, boolean)
+	 */
 	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
 	{
 		for( Artifact artifact : this )
@@ -319,6 +372,18 @@ public class Package extends AbstractList<Artifact>
 
 	public boolean sorted;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param installer
+	 *        Installer class name or null
+	 * @param uninstaller
+	 *        Uninstaller class name or null
+	 * @param file
+	 *        The package file
+	 * @param artifacts
+	 *        The artifacts
+	 */
 	private Package( String installer, String uninstaller, File file, List<Artifact> artifacts )
 	{
 		super();
@@ -328,20 +393,25 @@ public class Package extends AbstractList<Artifact>
 		this.artifacts = artifacts;
 	}
 
+	/**
+	 * Manages volatile entries within a package.
+	 */
 	private static class Volatiles
 	{
 		public Volatiles( Attributes manifest )
 		{
+			// Volatile folders
 			Object packageVolatileFoldersAttribute = manifest.getValue( PACKAGE_VOLATILE_FOLDERS );
 			folders = packageVolatileFoldersAttribute != null ? packageVolatileFoldersAttribute.toString().split( "," ) : null;
-
-			Object packageVolatileFilesAttribute = manifest.getValue( PACKAGE_VOLATILE_FILES );
-			files = packageVolatileFilesAttribute != null ? packageVolatileFilesAttribute.toString().split( "," ) : null;
 
 			if( folders != null )
 				for( int i = folders.length - 1; i >= 0; i-- )
 					if( !folders[i].endsWith( "/" ) )
 						folders[i] += "/";
+
+			// Volatile files
+			Object packageVolatileFilesAttribute = manifest.getValue( PACKAGE_VOLATILE_FILES );
+			files = packageVolatileFilesAttribute != null ? packageVolatileFilesAttribute.toString().split( "," ) : null;
 		}
 
 		public boolean contains( String name )
@@ -362,6 +432,9 @@ public class Package extends AbstractList<Artifact>
 		private final String[] files;
 	}
 
+	/**
+	 * Utility class for working with Jars.
+	 */
 	private static class Jar
 	{
 		public Jar( URL manifestUrl, Container container, String errorMessage ) throws UnpackingException

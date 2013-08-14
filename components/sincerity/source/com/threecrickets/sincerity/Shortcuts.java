@@ -54,16 +54,32 @@ public class Shortcuts extends AbstractList<String>
 	// Construction
 	//
 
+	/**
+	 * Loads the shortcuts.
+	 * 
+	 * @param file
+	 *        The database file (usually
+	 *        "/configuration/sincerity/shortcuts.conf")
+	 * @throws SincerityException
+	 */
 	public Shortcuts( File file ) throws SincerityException
 	{
 		this.file = file;
-		validate();
+		load();
 	}
 
 	//
 	// Attributes
 	//
 
+	/**
+	 * Retrieves a shortcut if it exists.
+	 * 
+	 * @param shortcut
+	 *        The shortcut identifier
+	 * @return The shortcut values
+	 * @throws SincerityException
+	 */
 	public String[] get( String shortcut ) throws SincerityException
 	{
 		Object value = properties.get( shortcut );
@@ -77,6 +93,13 @@ public class Shortcuts extends AbstractList<String>
 		return items.toArray( new String[items.size()] );
 	}
 
+	/**
+	 * All shortcut identifiers by type.
+	 * 
+	 * @param type
+	 *        The type
+	 * @return The shortcut identifiers
+	 */
 	public List<String> getByType( String type )
 	{
 		type += SHORTCUT_TYPE_SEPARATOR;
@@ -87,6 +110,16 @@ public class Shortcuts extends AbstractList<String>
 		return shortcuts;
 	}
 
+	/**
+	 * Utility to add an arguments to a list of arguments while supporting
+	 * recursive expansion of shortcuts.
+	 * 
+	 * @param argument
+	 *        The argument to add
+	 * @param arguments
+	 *        The list to which we should add arguments
+	 * @throws SincerityException
+	 */
 	public void addArgument( String argument, List<String> arguments ) throws SincerityException
 	{
 		if( argument.startsWith( SHORTCUT_PREFIX ) )
@@ -129,7 +162,12 @@ public class Shortcuts extends AbstractList<String>
 
 	private Properties properties;
 
-	private void validate() throws SincerityException
+	/**
+	 * Loads and caches the database.
+	 * 
+	 * @throws SincerityException
+	 */
+	private void load() throws SincerityException
 	{
 		if( properties == null )
 		{

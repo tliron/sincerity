@@ -28,6 +28,16 @@ public abstract class ClassUtil
 	// Static operations
 	//
 
+	/**
+	 * Executes the main() method of the class named by the first argument using
+	 * the current bootstrap.
+	 * 
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @param arguments
+	 *        The class name followed by the arguments for main()
+	 * @throws SincerityException
+	 */
 	public static void main( Sincerity sincerity, String[] arguments ) throws SincerityException
 	{
 		String mainClassName = arguments[0];
@@ -36,6 +46,17 @@ public abstract class ClassUtil
 		main( sincerity, mainClassName, mainArguments );
 	}
 
+	/**
+	 * Executes the main() method of a class using the current bootstrap.
+	 * 
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @param className
+	 *        The class name
+	 * @param arguments
+	 *        The arguments for main()
+	 * @throws SincerityException
+	 */
 	public static void main( Sincerity sincerity, String className, String[] arguments ) throws SincerityException
 	{
 		if( sincerity == null )

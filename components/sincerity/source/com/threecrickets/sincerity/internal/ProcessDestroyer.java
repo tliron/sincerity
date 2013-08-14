@@ -22,6 +22,12 @@ public class ProcessDestroyer extends Thread
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param process
+	 *        The process
+	 */
 	public ProcessDestroyer( Process process )
 	{
 		super();

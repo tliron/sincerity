@@ -258,6 +258,13 @@ public class Bootstrap extends URLClassLoader
 		super( getUrls(), Bootstrap.class.getClassLoader() );
 	}
 
+	/**
+	 * Combines a collection of URLs with the master bootstrap's URLs.
+	 * 
+	 * @param urls
+	 *        The URLs to combine with those of the master bootstrap.
+	 * @return An array of URLs
+	 */
 	private static URL[] inheritUrls( Collection<URL> urls )
 	{
 		ArrayList<URL> combined = new ArrayList<URL>( urls );
@@ -267,6 +274,13 @@ public class Bootstrap extends URLClassLoader
 		return combined.toArray( new URL[combined.size()] );
 	}
 
+	/**
+	 * The URLs of all Jar files recursively under the "/libraries/jars/"
+	 * subdirectory of the home directory, and also "/libraries/classes/" if it
+	 * exists.
+	 * 
+	 * @return An array of URLs
+	 */
 	private static URL[] getUrls()
 	{
 		File homeDir = getHome();
@@ -304,16 +318,24 @@ public class Bootstrap extends URLClassLoader
 		return urls.toArray( new URL[urls.size()] );
 	}
 
-	private static void listJars( File file, ArrayList<URL> urls )
+	/**
+	 * Recursively adds URLs for Jar files in a directory.
+	 * 
+	 * @param dir
+	 *        The directory
+	 * @param urls
+	 *        The list of URLs
+	 */
+	private static void listJars( File dir, Collection<URL> urls )
 	{
-		if( file.isDirectory() )
-			for( File child : file.listFiles() )
+		if( dir.isDirectory() )
+			for( File child : dir.listFiles() )
 				listJars( child, urls );
-		else if( file.getName().endsWith( ".jar" ) )
+		else if( dir.getName().endsWith( ".jar" ) )
 		{
 			try
 			{
-				urls.add( file.toURI().toURL() );
+				urls.add( dir.toURI().toURL() );
 			}
 			catch( MalformedURLException x )
 			{
@@ -321,6 +343,14 @@ public class Bootstrap extends URLClassLoader
 		}
 	}
 
+	/**
+	 * Finds the home directory from either a JVM property or environment
+	 * variable.
+	 * <p>
+	 * If not found, exits the JVM.
+	 * 
+	 * @return The home directory
+	 */
 	private static File findHome()
 	{
 		String path = System.getProperty( HOME_PROPERTY );
@@ -351,6 +381,7 @@ public class Bootstrap extends URLClassLoader
 
 	static
 	{
+		// Load configuration from "bootstrap.conf"
 		Properties properties = new Properties();
 		InputStream stream = Bootstrap.class.getResourceAsStream( "bootstrap.conf" );
 		try
@@ -373,12 +404,15 @@ public class Bootstrap extends URLClassLoader
 			}
 		}
 
+		// Configure
 		MAIN_CLASS = (String) properties.get( "main.class" );
 		HOME_PROPERTY = (String) properties.get( "home.property" );
 		HOME_VARIABLE = (String) properties.get( "home.variable" );
 
 		attributes = new ConcurrentHashMap<Object, Object>();
 		bootstraps = new ConcurrentHashMap<Object, Bootstrap>();
+
+		// Master bootstrap
 		master = new Bootstrap();
 	}
 }

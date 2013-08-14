@@ -26,6 +26,12 @@ public class Template
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param root
+	 *        The root directory
+	 */
 	public Template( File root )
 	{
 		this.root = root;
@@ -35,8 +41,16 @@ public class Template
 	// Attributes
 	//
 
+	/**
+	 * The root directory.
+	 */
 	public final File root;
 
+	/**
+	 * The name (identical the filename of the root directory).
+	 * 
+	 * @return The name
+	 */
 	public String getName()
 	{
 		return root.getName();

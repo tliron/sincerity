@@ -22,6 +22,19 @@ import java.util.Iterator;
  */
 public abstract class StringUtil
 {
+	//
+	// Static operations
+	//
+
+	/**
+	 * Joins a list strings into a single string.
+	 * 
+	 * @param strings
+	 *        The list of strings
+	 * @param delimiter
+	 *        The delimiter between strings
+	 * @return The joined string
+	 */
 	public static String join( String[] strings, String delimiter )
 	{
 		StringBuilder r = new StringBuilder();
@@ -34,6 +47,15 @@ public abstract class StringUtil
 		return r.toString();
 	}
 
+	/**
+	 * Joins a list strings into a single string.
+	 * 
+	 * @param strings
+	 *        The list of strings
+	 * @param delimiter
+	 *        The delimiter between strings
+	 * @return The joined string
+	 */
 	public static String join( Iterable<String> strings, String delimiter )
 	{
 		StringBuilder r = new StringBuilder();
@@ -46,14 +68,30 @@ public abstract class StringUtil
 		return r.toString();
 	}
 
-	public static String joinStackTrace( Throwable x )
+	/**
+	 * Creates a human-readable stack trace.
+	 * 
+	 * @param x
+	 *        The exception
+	 * @return The stack trace
+	 */
+	public static String createHumanReadableStackTrace( Throwable x )
 	{
 		StringWriter writer = null;
 		writer = new StringWriter();
-		joinStackTrace( x, writer );
+		createHumanReadableStackTrace( x, writer );
 		return writer.toString();
 	}
 
+	/**
+	 * Creates a hexadecimal representation for an array of bytes.
+	 * <p>
+	 * The letters A-F are in uppercase.
+	 * 
+	 * @param bytes
+	 *        The bytes
+	 * @return The hexadecimal representation
+	 */
 	public static String toHex( byte[] bytes )
 	{
 		// BigInteger i = new BigInteger( 1, bytes );
@@ -72,21 +110,39 @@ public abstract class StringUtil
 		return new String( hexChars );
 	}
 
+	/**
+	 * Creates an array of bytes from its hexadecimal representation.
+	 * 
+	 * @param hex
+	 *        The hexadecimal representation
+	 * @return The bytes
+	 */
 	public static byte[] fromHex( String hex )
 	{
 		int length = hex.length();
 		byte[] data = new byte[length / 2];
 		for( int i = 0; i < length; i += 2 )
-		{
 			data[i / 2] = (byte) ( ( Character.digit( hex.charAt( i ), 16 ) << 4 ) + Character.digit( hex.charAt( i + 1 ), 16 ) );
-		}
 		return data;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static void joinStackTrace( Throwable x, StringWriter writer )
+	private StringUtil()
+	{
+	}
+
+	/**
+	 * Creates a human-readable stack trace.
+	 * 
+	 * @param x
+	 *        The exception
+	 * @param writer
+	 *        The string writer
+	 * @return The stack trace
+	 */
+	private static void createHumanReadableStackTrace( Throwable x, StringWriter writer )
 	{
 		PrintWriter printer = new PrintWriter( writer );
 		while( x != null )
@@ -102,15 +158,8 @@ public abstract class StringUtil
 		}
 	}
 
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	final protected static char[] HEX =
+	private static final char[] HEX =
 	{
 		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
 	};
-
-	private StringUtil()
-	{
-	}
 }

@@ -75,6 +75,18 @@ public class Container implements IvyListener, TransferListener
 	// Construction
 	//
 
+	/**
+	 * Creates an Ivy instance using the "ivy.conf" resource.
+	 * 
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @param root
+	 *        The container root directory
+	 * @param debugLevel
+	 *        The Ivy debug level
+	 * @throws SincerityException
+	 * @see DefaultMessageLogger
+	 */
 	public Container( Sincerity sincerity, File root, int debugLevel ) throws SincerityException
 	{
 		this.sincerity = sincerity;
@@ -128,31 +140,62 @@ public class Container implements IvyListener, TransferListener
 	// Attributes
 	//
 
+	/**
+	 * The Ivy instance.
+	 * 
+	 * @return The Ivy instance
+	 */
 	public Ivy getIvy()
 	{
 		return ivy;
 	}
 
+	/**
+	 * The Sincerity instance.
+	 * 
+	 * @return The Sincerity instance
+	 */
 	public Sincerity getSincerity()
 	{
 		return sincerity;
 	}
 
+	/**
+	 * The specified repositories.
+	 * 
+	 * @return The repositories
+	 */
 	public Repositories getRepositories()
 	{
 		return repositories;
 	}
 
+	/**
+	 * The specified and resolved dependencies.
+	 * 
+	 * @return The dependencies
+	 */
 	public Dependencies getDependencies()
 	{
 		return dependencies;
 	}
 
+	/**
+	 * The shortcuts.
+	 * 
+	 * @return The shortcuts
+	 */
 	public Shortcuts getShortcuts()
 	{
 		return shortcuts;
 	}
 
+	/**
+	 * The cached plugins, based on the current bootstrap.
+	 * 
+	 * @return The plugins
+	 * @throws SincerityException
+	 */
 	public Plugins getPlugins() throws SincerityException
 	{
 		if( plugins == null )
@@ -160,11 +203,26 @@ public class Container implements IvyListener, TransferListener
 		return plugins;
 	}
 
+	/**
+	 * The cached bootstrap.
+	 * 
+	 * @return The bootstrap
+	 * @throws SincerityException
+	 */
 	public Bootstrap getBootstrap() throws SincerityException
 	{
 		return getBootstrap( false );
 	}
 
+	/**
+	 * The bootstrap, whether cached or explicitly (re)created.
+	 * 
+	 * @param forceCreate
+	 *        True to ignore cached value and force creation
+	 * @return The bootstrap
+	 * @throws SincerityException
+	 * @see #createBootstrap()
+	 */
 	public Bootstrap getBootstrap( boolean forceCreate ) throws SincerityException
 	{
 		Bootstrap bootstrap = forceCreate ? null : Bootstrap.getBootstrap( root );
@@ -180,6 +238,14 @@ public class Container implements IvyListener, TransferListener
 		return bootstrap;
 	}
 
+	/**
+	 * The cached Scripturian language manager, based on the current bootstrap.
+	 * <p>
+	 * Contains explicit support for Python and Velocity.
+	 * 
+	 * @return The language manager
+	 * @throws SincerityException
+	 */
 	public LanguageManager getLanguageManager() throws SincerityException
 	{
 		if( languageManager == null )
@@ -210,11 +276,23 @@ public class Container implements IvyListener, TransferListener
 		return languageManager;
 	}
 
+	/**
+	 * The absolute path of the root directory.
+	 * 
+	 * @return The absolute file
+	 */
 	public File getRoot()
 	{
 		return root;
 	}
 
+	/**
+	 * Constructs an absolute path from the root directory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getFile( String... parts )
 	{
 		File file = root;
@@ -223,6 +301,13 @@ public class Container implements IvyListener, TransferListener
 		return file;
 	}
 
+	/**
+	 * Constructs an absolute path from the Sincerity root directory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getSincerityFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -231,6 +316,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "configuration" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getConfigurationFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -239,6 +331,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "logs" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getLogsFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -247,6 +346,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "cache" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getCacheFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -255,6 +361,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "libraries" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getLibrariesFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -263,6 +376,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "programs" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getProgramsFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -271,6 +391,13 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Constructs an absolute path from the "executables" subdirectory.
+	 * 
+	 * @param parts
+	 *        The path parts
+	 * @return The absolute file
+	 */
 	public File getExecutablesFile( String... parts )
 	{
 		String[] newParts = new String[parts.length + 1];
@@ -279,6 +406,15 @@ public class Container implements IvyListener, TransferListener
 		return getFile( newParts );
 	}
 
+	/**
+	 * Makes sure that we have an absolute file path, using the root directory
+	 * as the start if the supplied path is relative.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The absolute file
+	 * @see #getRelativeFile(File)
+	 */
 	public File getAbsoluteFile( File file )
 	{
 		if( !file.isAbsolute() )
@@ -287,16 +423,42 @@ public class Container implements IvyListener, TransferListener
 			return file;
 	}
 
+	/**
+	 * If the file is under to the root directory, returns a relative path.
+	 * 
+	 * @param file
+	 *        The absolute file
+	 * @return The relative file
+	 * @see #getAbsoluteFile(File)
+	 * @see #getRelativePath(String)
+	 */
 	public File getRelativeFile( File file )
 	{
 		return new File( getRelativePath( file.getPath() ) );
 	}
 
+	/**
+	 * If the file is under to the root directory, returns a relative path.
+	 * 
+	 * @param file
+	 *        The absolute file
+	 * @return The relative path
+	 * @see #getRelativeFile(File)
+	 * @see #getRelativePath(File)
+	 */
 	public String getRelativePath( File file )
 	{
 		return getRelativePath( file.getAbsolutePath() );
 	}
 
+	/**
+	 * If the path is under to the root directory, returns a relative path.
+	 * 
+	 * @param path
+	 *        The absolute path
+	 * @return The relative path
+	 * @see #getRelativePath(File)
+	 */
 	public String getRelativePath( String path )
 	{
 		String root = this.root.getPath();
@@ -305,6 +467,13 @@ public class Container implements IvyListener, TransferListener
 		return path;
 	}
 
+	/**
+	 * The names of all files under the "programs" subdirectory without their
+	 * extensions.
+	 * 
+	 * @return The programs
+	 * @throws SincerityException
+	 */
 	public List<String> getPrograms() throws SincerityException
 	{
 		ArrayList<String> programs = new ArrayList<String>();
@@ -323,26 +492,50 @@ public class Container implements IvyListener, TransferListener
 		return programs;
 	}
 
+	/**
+	 * @return True if changed
+	 * @see #setChanged(boolean)
+	 */
 	public boolean hasChanged()
 	{
 		return hasChanged;
 	}
 
+	/**
+	 * True if the dependencies have been changed, requiring a new bootstrap.
+	 * 
+	 * @param hasChanged
+	 *        True if changed
+	 */
 	public void setChanged( boolean hasChanged )
 	{
 		this.hasChanged = hasChanged;
 	}
 
+	/**
+	 * @return True if finished installing
+	 * @see #setHasFinishedInstalling(boolean)
+	 */
 	public boolean hasFinishedInstalling()
 	{
 		return hasFinishedInstalling;
 	}
 
+	/**
+	 * True if dependencies have finished installing.
+	 * 
+	 * @param hasFinishedInstalling
+	 *        True if finished installing
+	 */
 	public void setHasFinishedInstalling( boolean hasFinishedInstalling )
 	{
 		this.hasFinishedInstalling = hasFinishedInstalling;
 	}
 
+	/**
+	 * @return The number of installations
+	 * @see #setInstallations(int)
+	 */
 	public int getInstallations()
 	{
 		String installationsName = getInstallationsName();
@@ -356,6 +549,15 @@ public class Container implements IvyListener, TransferListener
 		return installations;
 	}
 
+	/**
+	 * The number of installation attempts for this root directory.
+	 * <p>
+	 * Note that this value will persist even if this class is re-instantiated.
+	 * 
+	 * @param installations
+	 *        The number of installations
+	 * @see #addInstallation()
+	 */
 	public void setInstallations( int installations )
 	{
 		Bootstrap.getAttributes().put( getInstallationsName(), installations );
@@ -365,17 +567,32 @@ public class Container implements IvyListener, TransferListener
 	// Operations
 	//
 
+	/**
+	 * Increase the number of installations by one.
+	 * 
+	 * @see #setInstallations(int)
+	 */
 	public void addInstallation()
 	{
 		setInstallations( getInstallations() + 1 );
 	}
 
+	/**
+	 * Sets {@link #setChanged(boolean)} to false and
+	 * {@link #setHasFinishedInstalling(boolean)} to true.
+	 */
 	public void initializeProgress()
 	{
 		hasChanged = false;
 		hasFinishedInstalling = true;
 	}
 
+	/**
+	 * Creates a new bootstrap based on the classpath.
+	 * 
+	 * @return A bootstrap
+	 * @throws SincerityException
+	 */
 	public Bootstrap createBootstrap() throws SincerityException
 	{
 		List<File> classpaths = getDependencies().getClasspaths( false );
@@ -393,12 +610,15 @@ public class Container implements IvyListener, TransferListener
 		return new Bootstrap( urls );
 	}
 
+	/**
+	 * Recreates and caches the bootstrap.
+	 * 
+	 * @throws SincerityException
+	 * @see {@link #getBootstrap(boolean)}
+	 */
 	public void updateBootstrap() throws SincerityException
 	{
 		getBootstrap( true );
-		/*
-		 * for( File file : getClasspaths( false ) ) bootstrap.addFile( file );
-		 */
 	}
 
 	//

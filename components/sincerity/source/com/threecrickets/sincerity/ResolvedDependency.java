@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
-import com.threecrickets.sincerity.ResolvedDependencies.Caller;
-
 /**
  * A descriptor for a single node in the resolved dependency tree. See
  * {@link ResolvedDependencies}.
@@ -30,10 +28,19 @@ public class ResolvedDependency
 	// Attributes
 	//
 
+	/**
+	 * The Ivy module descriptor.
+	 */
 	public final ModuleDescriptor descriptor;
 
+	/**
+	 * The Ivy eviction information.
+	 */
 	public final String evicted;
 
+	/**
+	 * Our children.
+	 */
 	public final ArrayList<ResolvedDependency> children = new ArrayList<ResolvedDependency>();
 
 	//
@@ -69,13 +76,46 @@ public class ResolvedDependency
 	// //////////////////////////////////////////////////////////////////////////
 	// Protected
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param descriptor
+	 *        The Ivy module descriptor
+	 * @param evicted
+	 *        The Ivy eviction information
+	 */
 	protected ResolvedDependency( ModuleDescriptor descriptor, String evicted )
 	{
 		this.descriptor = descriptor;
 		this.evicted = ( evicted != null && evicted.length() == 0 ) ? null : evicted;
 	}
 
+	/**
+	 * True if we have no parents.
+	 */
 	protected boolean isRoot = true;
 
+	/**
+	 * The callers.
+	 */
 	protected final ArrayList<Caller> callers = new ArrayList<Caller>();
+
+	/**
+	 * Caller information record.
+	 */
+	protected static class Caller
+	{
+		public Caller( String organisation, String name, String revision )
+		{
+			this.organisation = organisation;
+			this.name = name;
+			this.revision = revision;
+		}
+
+		public final String organisation;
+
+		public final String name;
+
+		public final String revision;
+	}
 }

@@ -65,6 +65,17 @@ public class Repositories
 	// Construction
 	//
 
+	/**
+	 * Parses the Ivy settings file. Note that only the "resolvers" section will
+	 * be taken into account.
+	 * 
+	 * @param ivyFile
+	 *        The Ivy settings file (usually
+	 *        "/configuration/sincerity/repositories.conf")
+	 * @param ivy
+	 *        The Ivy instance
+	 * @throws SincerityException
+	 */
 	public Repositories( File ivyFile, Ivy ivy ) throws SincerityException
 	{
 		this.ivyFile = ivyFile;
@@ -105,6 +116,13 @@ public class Repositories
 	// Attributes
 	//
 
+	/**
+	 * The resolvers in a section.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @return The resolvers or null
+	 */
 	@SuppressWarnings("unchecked")
 	public Collection<DependencyResolver> getResolvers( String section )
 	{
@@ -118,6 +136,18 @@ public class Repositories
 	// Operations
 	//
 
+	/**
+	 * Adds a Maven resolver.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @param name
+	 *        The resolver name within the section
+	 * @param url
+	 *        The Maven root URL
+	 * @return True if added
+	 * @throws SincerityException
+	 */
 	public boolean addMaven( String section, String name, String url ) throws SincerityException
 	{
 		name = section + REPOSITORY_SECTION_SEPARATOR + name;
@@ -157,6 +187,18 @@ public class Repositories
 		return added;
 	}
 
+	/**
+	 * Adds a PyPI resolver.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @param name
+	 *        The resolver name within the section
+	 * @param url
+	 *        The PyPI root URL
+	 * @return True if added
+	 * @throws SincerityException
+	 */
 	public boolean addPyPi( String section, String name, String url ) throws SincerityException
 	{
 		name = section + REPOSITORY_SECTION_SEPARATOR + name;
@@ -194,6 +236,17 @@ public class Repositories
 		return added;
 	}
 
+	/**
+	 * Removes a resolver.
+	 * <p>
+	 * TODO
+	 * 
+	 * @param section
+	 *        The section name
+	 * @param name
+	 *        The resolver name within the section
+	 * @return True if removed
+	 */
 	public boolean remove( String section, String name )
 	{
 		name = section + REPOSITORY_SECTION_SEPARATOR + name;
@@ -212,6 +265,17 @@ public class Repositories
 
 	private final Ivy ivy;
 
+	/**
+	 * Adds a resolver.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @param resolver
+	 *        The resolver
+	 * @param root
+	 *        True to add a root resolver as well as the section resolver
+	 * @return
+	 */
 	private boolean addResolver( String section, DependencyResolver resolver, boolean root )
 	{
 		DependencyResolver chain = ivy.getSettings().getResolver( section );
@@ -226,6 +290,10 @@ public class Repositories
 		return false;
 	}
 
+	/**
+	 * Utility class to append a resolver to the Ivy settings file and save it
+	 * as human-readable XML.
+	 */
 	private class Appender
 	{
 		public Appender( String type ) throws ParserConfigurationException, SAXException, IOException

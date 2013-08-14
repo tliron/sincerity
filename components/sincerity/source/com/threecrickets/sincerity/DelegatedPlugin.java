@@ -33,6 +33,16 @@ public class DelegatedPlugin implements Plugin1
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param pluginFile
+	 *        The Scripturian library file (also determines the plugin's default
+	 *        name)
+	 * @param shell
+	 *        The shell
+	 * @throws SincerityException
+	 */
 	public DelegatedPlugin( File pluginFile, ScripturianShell shell ) throws SincerityException
 	{
 		defaultName = IoUtil.separateExtensionFromFilename( pluginFile.getName() )[0];

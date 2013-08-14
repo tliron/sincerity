@@ -17,11 +17,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,7 +52,24 @@ import org.apache.commons.vfs.provider.zip.ZipFileProvider;
  */
 public abstract class IoUtil
 {
-	public static void unpack( File archiveFile, File destinationDir, File workdDir ) throws IOException
+	//
+	// Static operations
+	//
+
+	/**
+	 * Unpacks all files in an archive using Apache Commons VFS.
+	 * <p>
+	 * Supported formats: zip, tar.gz/tgz, tar.bz2.
+	 * 
+	 * @param archiveFile
+	 *        The archive file
+	 * @param destinationDir
+	 *        The destination directory
+	 * @param workDir
+	 *        The work directory
+	 * @throws IOException
+	 */
+	public static void unpack( File archiveFile, File destinationDir, File workDir ) throws IOException
 	{
 		String scheme = null;
 		String name = archiveFile.getName();
@@ -83,7 +101,7 @@ public abstract class IoUtil
 
 			if( scheme != null )
 			{
-				DefaultFileReplicator replicator = new DefaultFileReplicator( workdDir );
+				DefaultFileReplicator replicator = new DefaultFileReplicator( workDir );
 				replicator.init();
 				manager.setReplicator( replicator );
 				manager.setTemporaryFileStore( replicator );
@@ -98,7 +116,7 @@ public abstract class IoUtil
 				FileObject[] children = fileObject.getChildren();
 				if( untar && children.length > 0 )
 				{
-					FileObject tar = manager.resolveFile( new File( workdDir, children[0].getName().getBaseName() ).toURI().toString() );
+					FileObject tar = manager.resolveFile( new File( workDir, children[0].getName().getBaseName() ).toURI().toString() );
 					org.apache.commons.vfs.FileUtil.copyContent( children[0], tar );
 					tar = manager.resolveFile( "tar:" + tar.getName() );
 					children = tar.getChildren();
@@ -114,6 +132,17 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Copies a file or a complete subdirectory tree using Apache Commons VFS.
+	 * 
+	 * @param manager
+	 *        The file system manager
+	 * @param file
+	 *        The source file or directory
+	 * @param folder
+	 *        The target folder
+	 * @throws IOException
+	 */
 	public static void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
 	{
 		folder.createFolder();
@@ -128,6 +157,15 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Copies a complete subdirectory tree using Apache Commons VFS.
+	 * 
+	 * @param fromDir
+	 *        The source directory
+	 * @param toDir
+	 *        The target directory
+	 * @throws IOException
+	 */
 	public static void copyRecursive( File fromDir, File toDir ) throws IOException
 	{
 		DefaultFileSystemManager manager = new DefaultFileSystemManager();
@@ -146,6 +184,15 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Copies streams.
+	 * 
+	 * @param in
+	 *        The input stream
+	 * @param out
+	 *        The output stream
+	 * @throws IOException
+	 */
 	public static void copy( InputStream in, OutputStream out ) throws IOException
 	{
 		byte[] buffer = new byte[BUFFER_SIZE];
@@ -154,6 +201,14 @@ public abstract class IoUtil
 			out.write( buffer, 0, length );
 	}
 
+	/**
+	 * Deletes an empty directory, including all parent directories that are
+	 * also empty, stopping at the first non-empty parent.
+	 * 
+	 * @param directory
+	 *        The start directory
+	 * @throws IOException
+	 */
 	public static void deleteEmptyDirectoryRecursive( File directory ) throws IOException
 	{
 		if( ( directory != null ) && directory.isDirectory() )
@@ -168,6 +223,13 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Deletes a file or a subdirectory tree.
+	 * 
+	 * @param file
+	 *        The file or directory
+	 * @throws IOException
+	 */
 	public static void deleteRecursive( File file ) throws IOException
 	{
 		if( file.isDirectory() )
@@ -177,6 +239,16 @@ public abstract class IoUtil
 			throw new IOException( "Could not delete file: " + file );
 	}
 
+	/**
+	 * Recursively gathers all files with filenames ending with a postfix.
+	 * 
+	 * @param file
+	 *        The file or directory
+	 * @param postfix
+	 *        The required postfix
+	 * @param files
+	 *        The collection to which we will add files
+	 */
 	public static void listRecursiveEndsWith( File file, String postfix, Collection<File> files )
 	{
 		if( file.isDirectory() )
@@ -187,6 +259,13 @@ public abstract class IoUtil
 				files.add( file );
 	}
 
+	/**
+	 * True if the URL points to a reachable resource.
+	 * 
+	 * @param url
+	 *        The URL
+	 * @return True if valid
+	 */
 	public static boolean isUrlValid( URL url )
 	{
 		try
@@ -200,6 +279,17 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * True if the streams have the same digest.
+	 * 
+	 * @param file
+	 *        The file
+	 * @param url
+	 *        The URL
+	 * @return True if the digests are equal
+	 * @throws IOException
+	 * @see #getDigest(InputStream)
+	 */
 	public static boolean isSameContent( File file, URL url ) throws IOException
 	{
 		try
@@ -214,6 +304,17 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * True if the file has a specific digest.
+	 * 
+	 * @param file
+	 *        The file
+	 * @param digest
+	 *        The digest
+	 * @return True if the digests are equal
+	 * @throws IOException
+	 * @see #getDigest(InputStream)
+	 */
 	public static boolean isSameContent( File file, byte[] digest ) throws IOException
 	{
 		try
@@ -227,6 +328,16 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Calculates a SHA-1 digest for a stream.
+	 * <p>
+	 * Note that the stream is closed by this method!
+	 * 
+	 * @param stream
+	 *        The stream
+	 * @return The digest
+	 * @throws IOException
+	 */
 	public static byte[] getDigest( InputStream stream ) throws IOException
 	{
 		try
@@ -251,11 +362,29 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Returns an array of 2 strings, the first being the filename without its
+	 * extension, the second being its extension.
+	 * 
+	 * @param filename
+	 *        The filename
+	 * @return The two elements of the filename
+	 */
 	public static String[] separateExtensionFromFilename( String filename )
 	{
 		return filename.split( "\\.(?=[^\\.]+$)", 2 );
 	}
 
+	/**
+	 * Reads all lines in a file using UTF-8.
+	 * <p>
+	 * Note that this method returns an empty list if the file doesn't exist.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The lines
+	 * @throws IOException
+	 */
 	public static List<String> readLines( File file ) throws IOException
 	{
 		try
@@ -268,10 +397,18 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Reads all lines in a stream using UTF-8.
+	 * 
+	 * @param stream
+	 *        The stream
+	 * @return The lines
+	 * @throws IOException
+	 */
 	public static List<String> readLines( InputStream stream ) throws IOException
 	{
 		ArrayList<String> lines = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+		BufferedReader reader = new BufferedReader( new InputStreamReader( stream, "UTF-8" ) );
 		try
 		{
 			String line;
@@ -295,9 +432,21 @@ public abstract class IoUtil
 		return lines;
 	}
 
+	/**
+	 * Writes lines to a file using UTF-8, overwriting its current contents if
+	 * it has any.
+	 * <p>
+	 * Lines end in a newline character.
+	 * 
+	 * @param file
+	 *        The file
+	 * @param lines
+	 *        The lines
+	 * @throws IOException
+	 */
 	public static void writeLines( File file, Iterable<String> lines ) throws IOException
 	{
-		BufferedWriter writer = new BufferedWriter( new FileWriter( file ) );
+		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
 		try
 		{
 			for( String line : lines )
@@ -322,6 +471,16 @@ public abstract class IoUtil
 		}
 	}
 
+	/**
+	 * Updates a file's last-modified timestamp.
+	 * <p>
+	 * If the file doesn't exist, it is created as an empty file, including
+	 * necessary parent directories.
+	 * 
+	 * @param file
+	 *        The file
+	 * @throws IOException
+	 */
 	public static void touch( File file ) throws IOException
 	{
 		if( file.exists() )
@@ -335,13 +494,12 @@ public abstract class IoUtil
 		}
 	}
 
-	public static final int BUFFER_SIZE = 2048;
-
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private static final int BUFFER_SIZE = 2048;
 
 	private IoUtil()
 	{
 	}
-
 }

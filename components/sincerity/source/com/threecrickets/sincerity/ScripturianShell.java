@@ -20,6 +20,7 @@ import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.ExecutionContext;
 import com.threecrickets.scripturian.ExecutionController;
 import com.threecrickets.scripturian.LanguageManager;
+import com.threecrickets.scripturian.Main;
 import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
 import com.threecrickets.scripturian.document.DocumentFileSource;
@@ -48,6 +49,19 @@ public class ScripturianShell implements Shell
 	// Construction
 	//
 
+	/**
+	 * Initializes the parsing context for the shell.
+	 * 
+	 * @param container
+	 *        The container
+	 * @param sourceDir
+	 *        The document source directory
+	 * @param prepare
+	 *        True to prepare documents
+	 * @param arguments
+	 *        The arguments sent to {@link Main#main(String[])}
+	 * @throws SincerityException
+	 */
 	public ScripturianShell( Container container, File sourceDir, boolean prepare, String... arguments ) throws SincerityException
 	{
 		if( sourceDir == null )
@@ -71,6 +85,11 @@ public class ScripturianShell implements Shell
 	// Operations
 	//
 
+	/**
+	 * Creates a new execution context.
+	 * 
+	 * @return An execution context
+	 */
 	public ExecutionContext createExecutionContext()
 	{
 		ExecutionContext executionContext = new ExecutionContext( container.getSincerity().getOut(), container.getSincerity().getErr() );
@@ -82,6 +101,13 @@ public class ScripturianShell implements Shell
 		return executionContext;
 	}
 
+	/**
+	 * Executes a document in a new execution context.
+	 * 
+	 * @param documentName
+	 *        The document name
+	 * @throws SincerityException
+	 */
 	public void execute( String documentName ) throws SincerityException
 	{
 		ExecutionContext executionContext = createExecutionContext();
@@ -115,6 +141,17 @@ public class ScripturianShell implements Shell
 		}
 	}
 
+	/**
+	 * Makes the executable for the document enterable with a new execution
+	 * context.
+	 * 
+	 * @param documentName
+	 *        The document name
+	 * @param enteringKey
+	 *        The entering key
+	 * @return
+	 * @throws SincerityException
+	 */
 	public Executable makeEnterable( String documentName, String enteringKey ) throws SincerityException
 	{
 		boolean enterable = false;
@@ -156,6 +193,11 @@ public class ScripturianShell implements Shell
 	// Attributes
 	//
 
+	/**
+	 * The container.
+	 * 
+	 * @return The container
+	 */
 	public Container getContainer()
 	{
 		return container;
