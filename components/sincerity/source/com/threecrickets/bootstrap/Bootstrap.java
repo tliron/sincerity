@@ -44,6 +44,15 @@ import java.util.concurrent.ConcurrentMap;
  * <p>
  * One important use case for this is to let you "reboot" your application with
  * a new classpath, via a fresh bootstrap, without ever exiting the JVM.
+ * <p>
+ * When this class is loaded, it will initialize itself using a property sheet
+ * at the "com/threecrickets/boostrap/bootstrap.conf" resource. An example:
+ * 
+ * <pre>
+ * main.class = com.threecrickets.sincerity.Sincerity
+ * home.property = sincerity.home
+ * home.variable = SINCERITY_HOME
+ * </pre>
  * 
  * @author Tal Liron
  */

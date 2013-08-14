@@ -446,6 +446,10 @@ public abstract class IoUtil
 	 */
 	public static void writeLines( File file, Iterable<String> lines ) throws IOException
 	{
+		// Possible bug?
+		// See:
+		// http://tripoverit.blogspot.com/2007/04/javas-utf-8-and-unicode-writing-is.html
+
 		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
 		try
 		{

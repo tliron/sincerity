@@ -49,6 +49,8 @@ public abstract class XmlUtil
 
 	/**
 	 * Saves a DOM to a human-readable XML file (4-space indentation, UTF-8).
+	 * <p>
+	 * Contains workaround for various JVM bugs.
 	 * 
 	 * @param document
 	 *        The DOM

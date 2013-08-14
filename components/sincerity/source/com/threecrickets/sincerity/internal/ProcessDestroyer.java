@@ -13,6 +13,8 @@ package com.threecrickets.sincerity.internal;
 
 /**
  * Destroys a {@link Process}.
+ * <p>
+ * Useful in conjunction with {@link Runtime#addShutdownHook(Thread)}.
  * 
  * @author Tal Liron
  */

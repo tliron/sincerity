@@ -57,12 +57,16 @@ public class PyPi
 	//
 
 	/**
+	 * Creates a regular expression to match PyPI artifact filenames and extract
+	 * the following unnamed groups:
+	 * <p>
 	 * Group 1: version<br/>
 	 * Group 2: python version<br/>
 	 * Group 3: file extension<br/>
 	 * 
 	 * @param moduleName
-	 * @return pattern
+	 *        The module name
+	 * @return The regular expression
 	 */
 	public static Pattern getArtifactPattern( String moduleName )
 	{
@@ -73,6 +77,14 @@ public class PyPi
 	// Construction
 	//
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param root
+	 *        The PyPI root URI
+	 * @param repository
+	 *        The Ivy repository
+	 */
 	public PyPi( String root, Repository repository )
 	{
 		this.root = root;
@@ -83,6 +95,12 @@ public class PyPi
 	// Operations
 	//
 
+	/**
+	 * Retrieves and caches all available module names by parsing the HTML of
+	 * the index page.
+	 * 
+	 * @return The module names
+	 */
 	public List<String> listModuleNames()
 	{
 		ArrayList<String> moduleNames = new ArrayList<String>();
@@ -96,6 +114,14 @@ public class PyPi
 		return moduleNames;
 	}
 
+	/**
+	 * Retrieves and caches the URI of a module's page by parsing the HTML of
+	 * the index page.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @return The URI
+	 */
 	public String getModuleUri( String moduleName )
 	{
 		String moduleUri = moduleUris.get( moduleName );
@@ -116,10 +142,18 @@ public class PyPi
 		return moduleUri;
 	}
 
+	/**
+	 * Gets the last modification date for a module.
+	 * <p>
+	 * Note: PyPI does not keep modification dates for module pages, but we can
+	 * give it a try anyway.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @return The modification date or the current time if not found
+	 */
 	public long getModuleLastModified( String moduleName )
 	{
-		// Note: PyPI does not keep modification dates for module pages, but
-		// we'll give it a try anyway
 		long lastModified = 0;
 		Resource moduleResource = getModuleResource( moduleName );
 		if( moduleResource != null )
@@ -129,6 +163,17 @@ public class PyPi
 		return lastModified;
 	}
 
+	/**
+	 * Retrieves the list of artifacts for a module by parsing the HTML of its
+	 * page.
+	 * <p>
+	 * Each artifact node is an array of 2 strings, where the first string is
+	 * the artifact's name and the second string is the artifact's download UI.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @return The artifact names
+	 */
 	public List<String[]> listArtifacts( String moduleName )
 	{
 		ArrayList<String[]> artifactNames = new ArrayList<String[]>();
@@ -150,6 +195,16 @@ public class PyPi
 		return artifactNames;
 	}
 
+	/**
+	 * Retrieves the URI for downloading an artifact by parsing the HTML of the
+	 * module's page.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @param artifactName
+	 *        The artifact name
+	 * @return The artifact download URI
+	 */
 	public String getArtifactUri( String moduleName, String artifactName )
 	{
 		Document moduleDocument = getModuleDocument( moduleName );
@@ -168,16 +223,23 @@ public class PyPi
 	}
 
 	/**
+	 * Finds all artifacts matching the conditions.
+	 * <p>
+	 * Each artifact node is an array of 5 strings:
+	 * <p>
 	 * 0: name<br/>
-	 * 1: uri<br/>
+	 * 1: download URI<br/>
 	 * 2: version<br/>
-	 * 3: python version<br/>
-	 * 4: file extension<br/>
+	 * 3: Python version<br/>
+	 * 4: file extension
 	 * 
 	 * @param id
+	 *        The Ivy module revision ID
 	 * @param versionMatcher
+	 *        The Ivy version matcher
 	 * @param pythonVersion
-	 * @return artifacts
+	 *        The Python version
+	 * @return artifacts The found artifacts
 	 */
 	public List<String[]> findArtifacts( ModuleRevisionId id, VersionMatcher versionMatcher, String pythonVersion )
 	{
@@ -234,6 +296,11 @@ public class PyPi
 
 	private Map<String, String> moduleUris = new HashMap<String, String>();
 
+	/**
+	 * Retrieves the index page, parses its HTML, and caches the parsed result.
+	 * 
+	 * @return The parsed index page
+	 */
 	private Document getIndexDocument()
 	{
 		if( indexDocument == null )
@@ -260,6 +327,13 @@ public class PyPi
 		return indexDocument;
 	}
 
+	/**
+	 * The cached Ivy resource for the module.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @return The Ivy resource
+	 */
 	private Resource getModuleResource( String moduleName )
 	{
 		Resource moduleResource = moduleResources.get( moduleName );
@@ -283,6 +357,13 @@ public class PyPi
 		return moduleResource;
 	}
 
+	/**
+	 * The cached parsed HTML of the module's page.
+	 * 
+	 * @param moduleName
+	 *        The module name
+	 * @return The parsed page
+	 */
 	private Document getModuleDocument( String moduleName )
 	{
 		Document moduleDocument = moduleDocuments.get( moduleName );

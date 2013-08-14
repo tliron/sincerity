@@ -19,6 +19,8 @@ import com.threecrickets.sincerity.Sincerity;
 
 /**
  * Sincerity Ant task.
+ * <p>
+ * Experimental! Would not properly support rebooting.
  * 
  * @author Tal Liron
  */
