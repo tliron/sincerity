@@ -256,7 +256,7 @@ public class Dependencies
 				{
 					Artifact artifact = new Artifact( downloadReport.getLocalFile().getAbsoluteFile(), null, false, container );
 					artifacts.add( artifact );
-					managedArtifacts.add( artifact, true );
+					managedArtifacts.add( artifact, true, null );
 				}
 			}
 
@@ -265,12 +265,9 @@ public class Dependencies
 				for( Artifact artifact : pack )
 				{
 					if( install )
-					{
-						artifact.unpack( managedArtifacts, overwrite );
-						managedArtifacts.add( artifact, true );
-					}
+						managedArtifacts.add( artifact, true, artifact.unpack( managedArtifacts, overwrite ) );
 					else
-						managedArtifacts.add( artifact, false );
+						managedArtifacts.add( artifact, false, null );
 
 					artifacts.add( artifact );
 				}

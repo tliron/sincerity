@@ -12,6 +12,7 @@
 package com.threecrickets.sincerity.internal;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -185,7 +186,7 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Copies streams.
+	 * Copies a stream.
 	 * 
 	 * @param in
 	 *        The input stream
@@ -199,6 +200,38 @@ public abstract class IoUtil
 		int length = 0;
 		while( ( length = in.read( buffer ) ) != -1 )
 			out.write( buffer, 0, length );
+	}
+
+	/**
+	 * Copies a stream from a URL to a file, creating necessary parent
+	 * directories.
+	 * 
+	 * @param url
+	 *        The origin URL
+	 * @param file
+	 *        The target file
+	 * @throws IOException
+	 */
+	public static void copy( URL url, File file ) throws IOException
+	{
+		InputStream in = new BufferedInputStream( url.openStream() );
+		try
+		{
+			file.getParentFile().mkdirs();
+			OutputStream out = new BufferedOutputStream( new FileOutputStream( file ) );
+			try
+			{
+				copy( in, out );
+			}
+			finally
+			{
+				out.close();
+			}
+		}
+		finally
+		{
+			in.close();
+		}
 	}
 
 	/**
@@ -280,31 +313,6 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * True if the streams have the same digest.
-	 * 
-	 * @param file
-	 *        The file
-	 * @param url
-	 *        The URL
-	 * @return True if the digests are equal
-	 * @throws IOException
-	 * @see #getDigest(InputStream)
-	 */
-	public static boolean isSameContent( File file, URL url ) throws IOException
-	{
-		try
-		{
-			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
-			byte[] urlDigest = IoUtil.getDigest( new BufferedInputStream( url.openStream() ) );
-			return Arrays.equals( fileDigest, urlDigest );
-		}
-		catch( FileNotFoundException x )
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * True if the file has a specific digest.
 	 * 
 	 * @param file
@@ -360,6 +368,32 @@ public abstract class IoUtil
 		{
 			stream.close();
 		}
+	}
+
+	/**
+	 * Calculates a SHA-1 digest for a file.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The digest
+	 * @throws IOException
+	 */
+	public static byte[] getDigest( File file ) throws IOException
+	{
+		return getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
+	}
+
+	/**
+	 * Calculates a SHA-1 digest for a URL.
+	 * 
+	 * @param url
+	 *        The URL
+	 * @return The digest
+	 * @throws IOException
+	 */
+	public static byte[] getDigest( URL url ) throws IOException
+	{
+		return getDigest( new BufferedInputStream( url.openStream() ) );
 	}
 
 	/**

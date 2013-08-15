@@ -274,7 +274,7 @@ public class Repositories
 	 *        The resolver
 	 * @param root
 	 *        True to add a root resolver as well as the section resolver
-	 * @return
+	 * @return True if added
 	 */
 	private boolean addResolver( String section, DependencyResolver resolver, boolean root )
 	{

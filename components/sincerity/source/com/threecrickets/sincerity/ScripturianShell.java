@@ -149,7 +149,7 @@ public class ScripturianShell implements Shell
 	 *        The document name
 	 * @param enteringKey
 	 *        The entering key
-	 * @return
+	 * @return The enterable executable
 	 * @throws SincerityException
 	 */
 	public Executable makeEnterable( String documentName, String enteringKey ) throws SincerityException

@@ -11,14 +11,8 @@
 
 package com.threecrickets.sincerity;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -85,13 +79,20 @@ public class Artifact implements Comparable<Artifact>
 	 * The cached digest for the file.
 	 * 
 	 * @return The digest
-	 * @throws IOException
+	 * @throws SincerityException
 	 */
-	public byte[] getFileDigest() throws IOException
+	public byte[] getFileDigest() throws SincerityException
 	{
-		if( fileDigest == null )
-			fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
-		return fileDigest;
+		try
+		{
+			if( ( fileDigest == null ) && file.exists() )
+				fileDigest = IoUtil.getDigest( file );
+			return fileDigest;
+		}
+		catch( IOException x )
+		{
+			throw new UnpackingException( "Could not calculate file digest for " + file + ": " + x.getMessage(), x );
+		}
 	}
 
 	/**
@@ -110,13 +111,20 @@ public class Artifact implements Comparable<Artifact>
 	 * The cached digest for the origin.
 	 * 
 	 * @return The digest
-	 * @throws IOException
+	 * @throws SincerityException
 	 */
-	public byte[] getOriginDigest() throws IOException
+	public byte[] getOriginDigest() throws SincerityException
 	{
-		if( ( originDigest == null ) && ( originUrl != null ) )
-			originDigest = IoUtil.getDigest( new BufferedInputStream( originUrl.openStream() ) );
-		return originDigest;
+		try
+		{
+			if( ( originDigest == null ) && ( originUrl != null ) )
+				originDigest = IoUtil.getDigest( originUrl );
+			return originDigest;
+		}
+		catch( IOException x )
+		{
+			throw new UnpackingException( "Could not calculate origin digest for " + originUrl + ": " + x.getMessage(), x );
+		}
 	}
 
 	/**
@@ -127,34 +135,6 @@ public class Artifact implements Comparable<Artifact>
 	public boolean isVolatile()
 	{
 		return isVolatile;
-	}
-
-	/**
-	 * Checks if the artifact's unpacked contents are identical to that of the
-	 * original.
-	 * 
-	 * @param managedArtifacts
-	 *        The managed artifacts
-	 * @return True if file is different from its original
-	 * @throws UnpackingException
-	 */
-	public boolean isDifferent( ManagedArtifacts managedArtifacts ) throws UnpackingException
-	{
-		try
-		{
-			byte[] originalDigest = managedArtifacts.getOriginalDigest( this );
-			if( originalDigest == null )
-				return true;
-			return !Arrays.equals( getFileDigest(), originalDigest );
-		}
-		catch( SincerityException x )
-		{
-			throw new UnpackingException( "Could not compare artifact digest: " + file, x );
-		}
-		catch( IOException x )
-		{
-			throw new UnpackingException( "Could not compare artifact digest: " + file, x );
-		}
 	}
 
 	//
@@ -169,43 +149,60 @@ public class Artifact implements Comparable<Artifact>
 	 *        The managed artifacts
 	 * @param overwrite
 	 *        Whether to overwrite the file if it already exists
+	 * @return The digest
 	 * @throws SincerityException
 	 */
-	public void unpack( ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
+	public byte[] unpack( ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
 	{
 		// Don't reinstall volatile artifacts that were already installed
 		if( isVolatile && managedArtifacts.wasInstalled( this ) )
 		{
 			if( container.getSincerity().getVerbosity() >= 2 )
 				container.getSincerity().getOut().println( "Volatile artifact already unpacked once, so not overwriting: " + path );
-			return;
+			return managedArtifacts.getOriginalDigest( this );
 		}
 
-		if( file.exists() )
+		byte[] currentDigest = getFileDigest();
+		byte[] newDigest = getOriginDigest();
+
+		if( currentDigest != null )
 		{
-			if( isDifferent( managedArtifacts ) )
+			// The file already exists
+			boolean hasNewVersion = !Arrays.equals( currentDigest, newDigest );
+			if( hasNewVersion )
 			{
-				if( overwrite )
+				// There is a new version of the artifact
+				byte[] originalDigest = managedArtifacts.getOriginalDigest( this );
+				boolean changedByUser = !Arrays.equals( currentDigest, originalDigest );
+				if( changedByUser )
 				{
-					originDigest = null;
+					// The current version of the artifact has been changed by
+					// the user
+					if( overwrite )
+					{
+						if( container.getSincerity().getVerbosity() >= 1 )
+							container.getSincerity().getOut().println( "Unpacking over changed artifact: " + path );
 
-					if( container.getSincerity().getVerbosity() >= 1 )
-						container.getSincerity().getOut().println( "Unpacking over changed artifact: " + path );
-
-					// TODO: backup changed artifacts in cache!
+						// TODO: backup changed-by-user artifacts in cache!
+					}
+					else
+					{
+						if( container.getSincerity().getVerbosity() >= 1 )
+							container.getSincerity().getOut().println( "Artifact has been changed, so not overwriting: " + path );
+						return originalDigest;
+					}
 				}
 				else
 				{
 					if( container.getSincerity().getVerbosity() >= 1 )
-						container.getSincerity().getOut().println( "Artifact has been changed, so not overwriting: " + path );
-					return;
+						container.getSincerity().getOut().println( "Unpacking new version of artifact: " + path );
 				}
 			}
 			else
 			{
 				if( container.getSincerity().getVerbosity() >= 2 )
-					container.getSincerity().getOut().println( "Artifact unchanged, so no need to unpack: " + path );
-				return;
+					container.getSincerity().getOut().println( "Artifact already unpacked: " + path );
+				return currentDigest;
 			}
 		}
 		else
@@ -217,33 +214,19 @@ public class Artifact implements Comparable<Artifact>
 		// Unpack
 		try
 		{
-			InputStream in = new BufferedInputStream( originUrl.openStream() );
-			try
-			{
-				file.getParentFile().mkdirs();
-				fileDigest = null;
-				OutputStream out = new BufferedOutputStream( new FileOutputStream( file ) );
-				try
-				{
-					IoUtil.copy( in, out );
-				}
-				finally
-				{
-					out.close();
-				}
-			}
-			finally
-			{
-				in.close();
-			}
-
-			if( !Arrays.equals( getFileDigest(), getOriginDigest() ) )
-				throw new UnpackingException( "Artifact incorrectly unpacked from " + originUrl + " to " + file );
+			IoUtil.copy( originUrl, file );
 		}
 		catch( IOException x )
 		{
 			throw new UnpackingException( "Could not copy artifact from " + originUrl + " to " + file + ": " + x.getMessage(), x );
 		}
+		fileDigest = null;
+
+		// Verify
+		if( !Arrays.equals( getFileDigest(), getOriginDigest() ) )
+			throw new UnpackingException( "Artifact incorrectly unpacked from " + originUrl + " to " + file );
+
+		return getFileDigest();
 	}
 
 	//

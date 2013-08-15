@@ -106,15 +106,19 @@ public class ManagedArtifacts
 	 * requiring a save if the addition caused a change.
 	 * 
 	 * @param artifact
+	 *        The artifact
 	 * @param installed
+	 *        True if the artifact is installed
+	 * @param digest
+	 *        The artifact's digest or null
 	 * @throws SincerityException
 	 */
-	public void add( Artifact artifact, boolean installed ) throws SincerityException
+	public void add( Artifact artifact, boolean installed, byte[] digest ) throws SincerityException
 	{
 		load();
 
+		Entry entry = new Entry( artifact, installed, digest );
 		String key = artifact.getPath();
-		Entry entry = new Entry( artifact, installed );
 		Entry existing = entries.get( key );
 		if( ( existing != null ) && ( existing.equals( entry ) ) )
 			return;
@@ -309,17 +313,10 @@ public class ManagedArtifacts
 	 */
 	private static class Entry
 	{
-		public Entry( Artifact artifact, boolean installed ) throws SincerityException
+		public Entry( Artifact artifact, boolean installed, byte[] digest ) throws SincerityException
 		{
 			flags = installed ? INSTALLED : 0;
-			try
-			{
-				originalDigest = artifact.getOriginDigest();
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not create artifacts configuration entry for: " + artifact.getOriginUrl(), x );
-			}
+			originalDigest = digest;
 		}
 
 		public Entry( Object value ) throws SincerityException
@@ -349,16 +346,7 @@ public class ManagedArtifacts
 			if( !( o instanceof Entry ) )
 				return false;
 			Entry entry = (Entry) o;
-			if( flags != entry.flags )
-				return false;
-			if( originalDigest == null )
-			{
-				if( entry.originalDigest != null )
-					return false;
-			}
-			else if( !Arrays.equals( originalDigest, entry.originalDigest ) )
-				return false;
-			return true;
+			return ( flags == entry.flags ) && Arrays.equals( originalDigest, entry.originalDigest );
 		}
 
 		@Override

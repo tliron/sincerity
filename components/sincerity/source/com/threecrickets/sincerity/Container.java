@@ -614,7 +614,7 @@ public class Container implements IvyListener, TransferListener
 	 * Recreates and caches the bootstrap.
 	 * 
 	 * @throws SincerityException
-	 * @see {@link #getBootstrap(boolean)}
+	 * @see #getBootstrap(boolean)
 	 */
 	public void updateBootstrap() throws SincerityException
 	{
