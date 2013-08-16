@@ -90,7 +90,7 @@
 		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" />
 		<path id="dependencies">
 			<path refid="dependencies-ivy" />
-			<fileset dir="${dependencies}" />
+			<fileset dir="${dependencies}" includes="**/*.jar" />
 		</path>
 	</target>
 
@@ -108,7 +108,7 @@
 		
 	<target name="classes" depends="dependencies" description="Compile Java code">
 		<mkdir dir="${cache.classes}" />
-		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${compile.version}" target="${compile.version}" includeAntRuntime="yes" debug="${compile.debug}">
+		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}">
 			<classpath refid="dependencies" />
 		</javac>
 		<copy todir="${cache.classes}">
