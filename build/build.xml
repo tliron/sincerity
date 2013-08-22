@@ -135,7 +135,7 @@
 	</target>
 
 	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
-		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${jvm.version}" windowtitle="${documentation.title} ${component.version}${component.version.postfix}" doctitle="${documentation.title} ${component.version}${component.version.postfix}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
+		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${compile.version}" windowtitle="${documentation.title} ${component.version}${component.version.postfix}" doctitle="${documentation.title} ${component.version}${component.version.postfix}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
 			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
