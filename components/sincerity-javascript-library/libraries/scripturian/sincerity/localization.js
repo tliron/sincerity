@@ -14,6 +14,7 @@
 document.executeOnce('/sincerity/classes/')
 document.executeOnce('/sincerity/jvm/')
 document.executeOnce('/sincerity/templates/')
+document.executeOnce('/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
 
@@ -31,11 +32,24 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/** @exports Public as Sincerity.Localization */
     var Public = {}
 
+    /**
+     * Rounds a number to the certain number of decimal digits.
+     * 
+     * @param {Number} number The number
+     * @param {Number} [decimals=0] The number of decimal digits after the dot
+     * @returns {Number}
+     */
 	Public.round = function(number, decimals) {
 		decimals = Math.pow(10, decimals)
 		return Math.round(number * decimals) / decimals
 	}
 
+    /**
+     * Formats a number for human readability, using commas for every three digits.
+     * 
+     * @param {Number} number The number
+     * @returns {String}
+     */
 	Public.formatNumber = function(number) {
 		var d = String(number).split('.')
 		var before = d[0]
@@ -46,19 +60,60 @@ Sincerity.Localization = Sincerity.Localization || function() {
 		return before + after;
 	}
 
+	/**
+	 * Formats a duration for human readability, using 'milliseconds', 'seconds', 'minutes' or 'hours'
+	 * for the long format, or 'ms', 's', 'm' or 'h' for the short format.
+	 * 
+	 * @param {Number} duration The duration
+	 * @param {Boolean} [longFormat=false]
+	 * @returns {String}
+	 */
 	Public.formatDuration = function(duration, longFormat) {
 		if (duration < 1000) {
 			return Public.formatNumber(Public.round(duration, 0)) + (longFormat ? ' milliseconds' : 'ms')
 		}
-		if (duration < 60000) {
+		else if (duration < 60000) {
 			return Public.formatNumber(Public.round(duration / 1000, 0)) + (longFormat ? ' seconds' : 's')
 		}
-		if (duration < 60000 * 60) {
+		else if (duration < 3600000) {
 			return Public.formatNumber(Public.round(duration / 60000, 2)) + (longFormat ? ' minutes' : 'm')
 		}
-		return Public.formatNumber(Public.round(duration / (60000 * 60), 2)) + (longFormat ? ' hours' : 'h')
+		else if (duration < 86400000) {
+			return Public.formatNumber(Public.round(duration / 3600000, 2)) + (longFormat ? ' hours' : 'h')
+		}
+		else {
+			return Public.formatNumber(Public.round(duration / 86400000, 2)) + (longFormat ? ' days' : 'd')
+		}
 	}
-		
+	
+	/**
+	 * Converts a string to milliseconds, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
+	 * 
+	 * @param {String} string The number
+	 * @returns {Number} 
+	 */
+	Public.toMilliseconds = function(string) {
+		string = String(string)
+		if (string.endsWith('s')) {
+			return parseInt(string.substring(0, string.length - 1)) * 1000
+		}
+		else if (string.endsWith('m')) {
+			return parseInt(string.substring(0, string.length - 1)) * 60000
+		}
+		else if (string.endsWith('h')) {
+			return parseInt(string.substring(0, string.length - 1)) * 3600000
+		}
+		else if (string.endsWith('d')) {
+			return parseInt(string.substring(0, string.length - 1)) * 86400000
+		}
+		else if (string.endsWith('ms')) {
+			return parseInt(string.substring(0, string.length - 2))
+		}
+		else {
+			return parseInt(string)
+		}
+	}
+	
 	/**
 	 * Parses a string into a date.
 	 * 
