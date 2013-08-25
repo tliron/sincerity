@@ -336,6 +336,17 @@ Sincerity.Localization = Sincerity.Localization || function() {
 }()
 
 /**
+ * Converts a string to milliseconds, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
+ * 
+ * @methodOf String#
+ * @see Sincerity.Localization#toMilliseconds
+ * @returns {Number} 
+ */
+String.prototype.toMilliseconds = String.prototype.toMilliseconds || function() {
+	return Sincerity.Localization.toMilliseconds(this)
+}
+
+/**
  * Formats a date as a string.
  * 
  * @methodOf Date#
