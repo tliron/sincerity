@@ -87,32 +87,69 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	}
 	
 	/**
-	 * Converts a string to milliseconds, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
+	 * Converts a string to a milliseconds integer, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
+	 * Numbers are simply rounded to an integer.
 	 * 
-	 * @param {String} string The number
+	 * @param {String|Number} value The number
 	 * @returns {Number} 
 	 */
-	Public.toMilliseconds = function(string) {
-		string = String(string)
-		if (string.endsWith('s')) {
-			return parseInt(string.substring(0, string.length - 1)) * 1000
+	Public.toMilliseconds = function(value) {
+		if (Sincerity.Objects.isNumber(value)) {
+			return Math.round(value)
 		}
-		else if (string.endsWith('m')) {
-			return parseInt(string.substring(0, string.length - 1)) * 60000
+		value = String(value)
+		if (value.endsWith('ms')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 2)))
 		}
-		else if (string.endsWith('h')) {
-			return parseInt(string.substring(0, string.length - 1)) * 3600000
+		else if (value.endsWith('s')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)) * 1000)
 		}
-		else if (string.endsWith('d')) {
-			return parseInt(string.substring(0, string.length - 1)) * 86400000
+		else if (value.endsWith('m')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)) * 60000)
 		}
-		else if (string.endsWith('ms')) {
-			return parseInt(string.substring(0, string.length - 2))
+		else if (value.endsWith('h')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)) * 3600000)
+		}
+		else if (value.endsWith('d')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)) * 86400000)
 		}
 		else {
-			return parseInt(string)
+			return Math.round(parseFloat(value))
 		}
 	}
+	
+	/**
+	 * Converts a string to a bytes integer, interpreting 'b', 'kb', 'mb', 'gb' and 'tb' suffixes.
+	 * Numbers are simply rounded to an integer.
+	 * 
+	 * @param {String|Number} value The number
+	 * @returns {Number} 
+	 */
+	Public.toBytes = function(value) {
+		if (Sincerity.Objects.isNumber(value)) {
+			return Math.round(value)
+		}
+		value = String(value)
+		if (value.endsWith('b')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)))
+		}
+		else if (value.endsWith('kb')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1024)
+		}
+		else if (value.endsWith('mb')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1048576)
+		}
+		else if (value.endsWith('gb')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1073741824)
+		}
+		else if (value.endsWith('tb')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1099511627776)
+		}
+		else {
+			return Math.round(parseFloat(value))
+		}
+	}
+
 	
 	/**
 	 * Parses a string into a date.
@@ -336,7 +373,7 @@ Sincerity.Localization = Sincerity.Localization || function() {
 }()
 
 /**
- * Converts a string to milliseconds, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
+ * Converts a string to a milliseconds integer, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
  * 
  * @methodOf String#
  * @see Sincerity.Localization#toMilliseconds
@@ -344,6 +381,17 @@ Sincerity.Localization = Sincerity.Localization || function() {
  */
 String.prototype.toMilliseconds = String.prototype.toMilliseconds || function() {
 	return Sincerity.Localization.toMilliseconds(this)
+}
+
+/**
+ * Converts a string to a bytes integer, interpreting 'b', 'kb', 'mb', 'gb' and 'tb' suffixes.
+ * 
+ * @methodOf String#
+ * @see Sincerity.Localization#toBytes
+ * @returns {Number} 
+ */
+String.prototype.toBytes = String.prototype.toBytes || function() {
+	return Sincerity.Localization.toBytes(this)
 }
 
 /**
