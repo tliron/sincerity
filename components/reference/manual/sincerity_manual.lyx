@@ -11399,15 +11399,15 @@ target "https://www.djangoproject.com/"
  is a popular web development framework for the Python programming language.
  It relies on a traditional MVC approach backed by relational database stores
  (MySQL, Postgres).
- Django enjoys a strong ecosystem of drop-in features and snippets, but
- also provides a lot of features right in the box.
+ Django enjoys a large ecosystem of drop-in features and snippets, but already
+ provides many features right out of the box.
  Much the appeal of Django is the Python programming language: elegant,
  clean and supported by what must be the friendliest and most welcoming
  community of any programming language.
 \end_layout
 
 \begin_layout Standard
-There are many advantages in running Django on the JVM instead of on the
+There are many advantages for running Django on the JVM instead of on the
  CPython reference platform: great performance, much improved scalability
  (there is no GIL in Jython), as well as access to any JVM library 
 \emph on

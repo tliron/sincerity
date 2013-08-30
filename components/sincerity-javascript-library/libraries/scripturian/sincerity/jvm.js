@@ -279,7 +279,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
 	 * @see #getCharset
 	 */
-	Public.toBytes = function(string, charset) {
+	Public.toByteArray = function(string, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
 		return null !== charset ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
 	}
@@ -316,7 +316,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Loads a JVM Properties sheet from a file.
 	 * 
-	 * @param {String|{<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>}
 	 */
 	Public.loadProperties = function(file) {
@@ -522,8 +522,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
  * @methodOf String#
  * @param {String|java.nio.charset.Charset} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
  * @see Sincerity.JVM#getCharset
- * @see Sincerity.JVM#toBytes
+ * @see Sincerity.JVM#toByteArray
  */ 
-String.prototype.toBytes = String.prototype.toBytes || function(charset) {
-	return Sincerity.JVM.toBytes(this, charset)
+String.prototype.toByteArray = String.prototype.toBytes || function(charset) {
+	return Sincerity.JVM.toByteArray(this, charset)
 }

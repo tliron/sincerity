@@ -38,8 +38,8 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 * @param {byte[]} [saltBytes] The salt
 	 * @returns {byte[]}
 	 */    	
-	Public.toBytes = function(string, saltBytes) {
-		var bytes = String(string).toBytes()
+	Public.toByteArray = function(string, saltBytes) {
+		var bytes = Sincerity.JVM.toByteArray(string)
 		
 		if (Sincerity.Objects.exists(saltBytes)) {
 			// Add salt before the bytes
@@ -58,7 +58,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 * @param {String} string The base64-encoded string
 	 * @returns {byte[]}
 	 */
-	Public.toBytesFromBase64 = function(string) {
+	Public.toByteArrayFromBase64 = function(string) {
 		return org.apache.commons.codec.binary.Base64.decodeBase64(string)
 	}
 
