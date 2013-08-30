@@ -164,7 +164,7 @@ repository
 \end_layout
 
 \begin_layout Subsection
-What Sincerity Stands For
+Why Sincerity?
 \end_layout
 
 \begin_layout Standard
@@ -1923,7 +1923,30 @@ Below are some a few standard container subdirectories used by the core
 \begin_layout Standard
 Reserved for Sincerity's internal use.
  It's most essential use is to mark a directory as a container root.
- If you are using a VCS, make sure to commit this hidden directory.
+\end_layout
+
+\begin_layout Standard
+If you are using a VCS, make sure to commit this hidden directory.
+ See 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+Working with a VCS
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "vcs"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Paragraph
@@ -1931,8 +1954,7 @@ Reserved for Sincerity's internal use.
 \end_layout
 
 \begin_layout Standard
-Files put here should be considered deletable without any negative effects,
- and you likely do not want to commit them to a VCS.
+Files put here should be considered deletable without any negative effects.
 \end_layout
 
 \begin_layout Standard
@@ -1956,14 +1978,61 @@ Two subdirectories are most common:
  is where Scripturian will store its compiled JavaScript code.
 \end_layout
 
+\begin_layout Standard
+You likely do not want to commit this directory to a VCS.
+ See 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+Working with a VCS
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "vcs"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
 \begin_layout Paragraph
 /logs/
 \end_layout
 
 \begin_layout Standard
-Files put here should be considered deletable without any negative effects,
- and you likely do not want to commit them to a VCS.
+Files put here should be considered deletable without any negative effects.
  This is used by the Logging plugin.
+\end_layout
+
+\begin_layout Standard
+You likely do not want to commit this directory to a VCS.
+ See 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+Working with a VCS
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "vcs"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Paragraph
@@ -2140,11 +2209,22 @@ These subdirectories are for libraries for specific programming languages
 Sincerity, as well as other products that use Scripturian, will look for
  executable documents here (and possibly in other places).
  Most libraries and frameworks will create their own subdirectory underneath.
- For example, Prudence libraries are under 
+ For example, 
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
+\end_inset
+
+)
+\bar default
+ libraries are under 
 \begin_inset Quotes eld
 \end_inset
 
-/libraries/scripturian/prudence/
+/libraries/scripturian/prudence-scriptlet-resources/
 \begin_inset Quotes erd
 \end_inset
 
@@ -2464,6 +2544,486 @@ A store for dependencies and their artifacts.
 Sincerity supports several repository technologies, and can also help you
  deploy your own dependencies to them.
  
+\end_layout
+
+\begin_layout Subsection
+Working with a VCS
+\begin_inset CommandInset label
+LatexCommand label
+name "vcs"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Because Sincerity containers are all in a single directory tree, it's very
+ easy to use them with Version Control Systems (VCSes), such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "git"
+target "http://git-scm.com/"
+
+\end_inset
+
+, 
+\begin_inset CommandInset href
+LatexCommand href
+name "Mercurial"
+target "http://mercurial.selenic.com/"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset href
+LatexCommand href
+name "Subversion"
+target "http://subversion.apache.org/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+One quick issue to note is that your 
+\begin_inset Quotes eld
+\end_inset
+
+/.sincerity/
+\begin_inset Quotes erd
+\end_inset
+
+ directory will often be empty, and many VCSes, such as git, tend to ignore
+ empty directories.
+ To force git to commit it, simply add a 
+\begin_inset Quotes eld
+\end_inset
+
+.gitignore
+\begin_inset Quotes erd
+\end_inset
+
+ file in that directory:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+touch .sincerity/.gitignore
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Otherwise, there are two recommended strategies for working with a VCS:
+\end_layout
+
+\begin_layout Subsubsection
+Strategy #1: Commit (Almost) Everything
+\end_layout
+
+\begin_layout Standard
+This strategy is safest in terms of testing and debugging, because it guarantees
+ that all developers and deployments are sharing the exact same files.
+\end_layout
+
+\begin_layout Standard
+You might just want to make sure that you don't commit the deployment-specific
+ directories.
+ Here's an example of a 
+\begin_inset Quotes eld
+\end_inset
+
+.gitignore
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+/cache
+\end_layout
+
+\begin_layout Plain Layout
+
+/logs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The problem with this strategy---and it can be serious---is that distributed
+ VCSes often require you to clone the repository with its entire history.
+ Every time you change a large binary, it will increase the size of the
+ repository.
+ If this happens a lot, the repository can become quite unwieldy.
+\end_layout
+
+\begin_layout Standard
+Some VCS have workarounds for this problem, though they would only work
+ in environments where developers have access to these files via a shared
+ directory.
+ Consider, for example, 
+\begin_inset CommandInset href
+LatexCommand href
+name "git-annex"
+target "http://git-annex.branchable.com/"
+
+\end_inset
+
+ for git.
+\end_layout
+
+\begin_layout Subsubsection
+Strategy #2: Commit Only Your Work
+\end_layout
+
+\begin_layout Standard
+This strategy makes good use of Sincerity and allows for compact repositories.
+ The idea is that users of the repository will just have to run 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity install
+\begin_inset Quotes erd
+\end_inset
+
+ to fill in all the missing files.
+\end_layout
+
+\begin_layout Standard
+In order for this to work well, you will need some discipline.
+ You will need to have your VCS explicitly ignore all files that are managed
+ by Sincerity.
+ A good way to do this a blanket ignore on all standard container and skeleton
+ directories, and then add exceptions for files you add or change.
+ Care must be taken during the commit phase to make sure that your changes
+ have indeed been committed, and that you have not forgotten to add an exception.
+ If you forget, your changes will not be committed and can be lost.
+\end_layout
+
+\begin_layout Standard
+One small but important issue is that you want to make sure that 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/artifacts.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file is ignored.
+ This file is managed by Sincerity specifically in order to keep track of
+ files changed during 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity install
+\begin_inset Quotes erd
+\end_inset
+
+ (and 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity unpack
+\begin_inset Quotes erd
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+Here's an example .gitignore for a container based around a 
+\bar under
+Prudence skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
+\end_inset
+
+)
+\bar default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# Ignore everything by default, allowing Sincerity to manage it
+\end_layout
+
+\begin_layout Plain Layout
+
+/cache
+\end_layout
+
+\begin_layout Plain Layout
+
+/component
+\end_layout
+
+\begin_layout Plain Layout
+
+/configuration
+\end_layout
+
+\begin_layout Plain Layout
+
+/executables
+\end_layout
+
+\begin_layout Plain Layout
+
+/libraries
+\end_layout
+
+\begin_layout Plain Layout
+
+/logs
+\end_layout
+
+\begin_layout Plain Layout
+
+/programs
+\end_layout
+
+\begin_layout Plain Layout
+
+/reference
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Our applications
+\end_layout
+
+\begin_layout Plain Layout
+
+!/component/applications/myapp1
+\end_layout
+
+\begin_layout Plain Layout
+
+!/component/applications/myapp2
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Installed applications
+\end_layout
+
+\begin_layout Plain Layout
+
+!/component/applications/prudence-admin/routing.js
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Shared libraries
+\end_layout
+
+\begin_layout Plain Layout
+
+!/libraries/scripturian/minjson.py
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Component
+\end_layout
+
+\begin_layout Plain Layout
+
+!/component/servers
+\end_layout
+
+\begin_layout Plain Layout
+
+!/component/services/database
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Logging configuration
+\end_layout
+
+\begin_layout Plain Layout
+
+!/configuration/logging/appenders/common-file.js
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Sincerity configuration
+\end_layout
+
+\begin_layout Plain Layout
+
+!/configuration/sincerity/repositories.conf
+\end_layout
+
+\begin_layout Plain Layout
+
+!/configuration/sincerity/dependencies.conf
+\end_layout
+
+\begin_layout Plain Layout
+
+!/configuration/sincerity/shortcuts.conf 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note how we added exceptions for both new directories added to the container
+ as well as changes to specific files.
+ Also note that the 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/artifacts.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file is ignored because of the blanket ignore on 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+There are two possible disadvantages for this strategy:
+\end_layout
+
+\begin_layout Standard
+First, unless you specify dependency versions precisely for 
+\emph on
+all 
+\emph default
+dependencies, there is a chance that at different times different versions
+ of dependencies will be pulled in by 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity install
+\begin_inset Quotes erd
+\end_inset
+
+, for example if a newer version is available.
+ For some testing strategies, this is a disadvantage.
+ However, for more 
+\begin_inset Quotes eld
+\end_inset
+
+agile
+\begin_inset Quotes erd
+\end_inset
+
+ continuous build strategies, this can actually be seen as an advantage,
+ as it makes sure that you are always at the cutting edge.
+ As long as your tests are run 
+\emph on
+before
+\emph default
+ deployment, then this should not be a problem.
+ However, it could still be a problem for coordinating debugging if multiple
+ developers are working on the same VCS repository but are using different
+ versions of dependencies.
+ For the particular problem of debugging, you can make sure to copy over
+ files from the deployment in which the bug has been discovered, or possibly
+ include a full 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity dependencies
+\begin_inset Quotes erd
+\end_inset
+
+ dump with the bug report, allowing developers to precisely replicate its
+ environment.
+\end_layout
+
+\begin_layout Standard
+The second problem is that because you need to run 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity install
+\begin_inset Quotes erd
+\end_inset
+
+, you would potentially be dependent on third-party repositories (Three
+ Crickets, Maven Central, PyPI) to turn your VCS repository into a runnable
+ system.
+ A good solution is to use a repository proxy, such as 
+\bar under
+Nexus (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "nexus"
+
+\end_inset
+
+)
+\bar default
+, that would guarantee that you control access to all binaries within your
+ organization.
 \end_layout
 
 \begin_layout Section
@@ -3573,6 +4133,13 @@ not
 
 \begin_layout Subsubsection
 artifacts:install
+\begin_inset CommandInset label
+LatexCommand label
+name "artifacts:install"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -4895,7 +5462,7 @@ delegate:start
  command.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -5007,7 +5574,7 @@ delegate:start
  command.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -5254,7 +5821,7 @@ delegate:start
  command.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -5543,7 +6110,7 @@ delegate:start
  command.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -5686,7 +6253,7 @@ sincerity groovy
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -5775,7 +6342,7 @@ sincerity groovy
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -6084,7 +6651,7 @@ Note for Restlet users:
  access to SLF4J.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -6238,7 +6805,7 @@ sincerity log "Hello, log!"
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -6732,7 +7299,7 @@ target "http://wrapper.tanukisoftware.com/doc/english/licenseOverview.html"
  for more information.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -7047,7 +7614,7 @@ insserv
  internally.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -7263,7 +7830,7 @@ uninstaller.jar
 .
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -7411,7 +7978,7 @@ admin
 .
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Markup Plugin
 \end_layout
 
@@ -7502,7 +8069,7 @@ sincerity render markdown README.md readme.html
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsection
 Batik SVG Plugin
 \end_layout
 
@@ -7616,76 +8183,200 @@ You've most likely come to Sincerity for the skeletons: they provide the
  languages as your project grows.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Web Platforms
 \end_layout
 
 \begin_layout Itemize
-Prudence
+
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Restlet
+
+\bar under
+Restlet (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Jetty (static web)
+
+\bar under
+Jetty: static web (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jetty-web"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Jetty (servlet/JSP container)
+
+\bar under
+Jetty: servlet/JSP container (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jetty-servlet"
+
+\end_inset
+
+)
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Web Frameworks
 \end_layout
 
 \begin_layout Itemize
-Savory
+
+\bar under
+Diligence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "diligence"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Django
+
+\bar under
+Rails (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "rails"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Rails
+
+\bar under
+Django (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "django"
+
+\end_inset
+
+)
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Databases
 \end_layout
 
 \begin_layout Itemize
-OrientDB
+
+\bar under
+OrientDB (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "orientdb"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-H2
+
+\bar under
+H2 (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "h2"
+
+\end_inset
+
+)
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Paragraph
 Middleware
 \end_layout
 
 \begin_layout Itemize
-Hadoop
+
+\bar under
+Hadoop (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "hadoop"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Solr
+
+\bar under
+Solr (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "solr"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Felix
+
+\bar under
+Felix (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "felix"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Itemize
-Nexus
+
+\bar under
+Nexus (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "nexus"
+
+\end_inset
+
+)
 \end_layout
 
 \begin_layout Subsection
 Nexus Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "nexus"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7696,7 +8387,7 @@ target "http://www.sonatype.org/nexus/"
 
 \end_inset
 
-is a recommended companion for Sincerity.
+ is a recommended companion for Sincerity.
  At its most basic, it provides you with a proxy for accessing remote repositori
 es, such as the Three Crickets repository in which many Sincerity packages
  are stored.
@@ -7795,7 +8486,7 @@ contexts
  (web applications).
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -7830,7 +8521,7 @@ Otherwise, the default configuration should be quite sensible.
  can configure Nexus logging right in the user interface.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -7904,6 +8595,13 @@ sincerity use mycontainer : service jetty stop
 
 \begin_layout Subsection
 Solr Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "solr"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7979,7 +8677,7 @@ target "http://localhost:8080/solr/admin/"
  to see the main Solr administration page.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -8013,7 +8711,7 @@ Solr is very configurable, both in terms of performance fine-tuning and
  See the official site for more information on fleshing out your skeleton.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -8085,6 +8783,13 @@ sincerity use mycontainer : service jetty stop
 
 \begin_layout Subsection
 Hadoop Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "hadoop"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -8275,7 +8980,7 @@ sincerity hadoop status
 Note that Hadoop uses the service plugin to manage the node services.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -8361,6 +9066,13 @@ target "http://hadoop.apache.org/common/docs/current/single_node_setup.html#Pseu
 
 \begin_layout Subsection
 OrientDB Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "orientdb"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -8510,7 +9222,7 @@ orientdb> gremlin g.V[1]
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -8596,7 +9308,7 @@ Databases will be stored in the
  directory in your Sincerity container.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -8663,6 +9375,13 @@ sincerity use mycontainer : service orientdb stop
 
 \begin_layout Subsection
 H2 Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "h2"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -8744,7 +9463,7 @@ target "http://localhost:8082/"
  in your Sincerity container.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -8869,7 +9588,7 @@ By default, databases will be stored in the
  server in a locked-down operating system user.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -8936,6 +9655,13 @@ sincerity use mycontainer : service h2 stop
 
 \begin_layout Subsection
 Jetty Web Server Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "jetty-web"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9037,7 +9763,7 @@ restlet.jetty
 .
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -9086,7 +9812,7 @@ You can configure the server by editing
  and configure new MIME types.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -9153,6 +9879,13 @@ sincerity use mycontainer : service jetty stop
 
 \begin_layout Subsection
 Jetty Servlet/JSP Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "jetty-servlet"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9265,7 +9998,7 @@ prudence
  choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -9295,7 +10028,7 @@ official
  Jetty, then you're in for a treat, as well as a sigh of relief.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -9438,6 +10171,13 @@ sincerity use mycontainer : service jetty stop
 
 \begin_layout Subsection
 Restlet Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "restlet"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9542,7 +10282,7 @@ prudence
  with your choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -9926,7 +10666,7 @@ RESTLET_APPLICATIONS=restlet-example sincerity start restlet
 
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -10109,14 +10849,32 @@ sincerity use mycontainer : service restlet stop
 
 \begin_layout Subsection
 Felix Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "felix"
+
+\end_inset
+
+
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Standard
+TODO
+\end_layout
+
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
 \begin_layout Subsection
 Prudence Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "prudence"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10162,6 +10920,13 @@ target "http://threecrickets.com/diligence/"
 
 \begin_layout Subsection
 Diligence Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "diligence"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10237,6 +11002,13 @@ The Diligence skeleton is an extension of the Prudence and Restlet skeletons,
 
 \begin_layout Subsection
 Rails Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "rails"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10348,7 +11120,7 @@ prudence
  skeleton).
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -10524,7 +11296,7 @@ If you need to access the Rails source code, you'll find it under
 , which is where all Ruby gems will be installed in your container.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -10607,6 +11379,13 @@ Note that Sincerity's logging plugin won't do you much good out of the box,
 
 \begin_layout Subsection
 Django Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "django"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10706,7 +11485,7 @@ target "http://localhost:8000"
 .
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
@@ -10878,7 +11657,7 @@ If you need to access the Django source code, you'll find it under
 , which is where all Python libraries will be installed in your container.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Extras
 \end_layout
 
@@ -10952,6 +11731,13 @@ Note that Sincerity's logging plugin won't do you much good out of the box,
 
 \begin_layout Subsection
 LWJGL Skeleton
+\begin_inset CommandInset label
+LatexCommand label
+name "lwjgl"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -11052,7 +11838,7 @@ lwjgl.example
  It includes a simple Space Invaders clone.
 \end_layout
 
-\begin_layout Subsubsection
+\begin_layout Subsubsection*
 Fleshing Out
 \end_layout
 
