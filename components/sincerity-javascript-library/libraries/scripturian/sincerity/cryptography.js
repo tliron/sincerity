@@ -138,7 +138,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	Public.digest = function(payload, saltBytes, iterations, algorithm, encoding) {
 		var messageDigest = java.security.MessageDigest.getInstance(algorithm)
 		if (messageDigest) {
-			var digest = Public.toBytes(payload, saltBytes)
+			var digest = Public.toByteArray(payload, saltBytes)
 			
 			for (var i = 0; i < iterations; i++) {
 				messageDigest.reset()
