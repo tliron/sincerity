@@ -154,7 +154,29 @@ reference "container"
 \bar default
  which are nothing more than straightforward file directories.
  According to your preferences and constraints, you can use either Sincerity's
- pretty GUI or the powerful CLI.
+ 
+\bar under
+pretty GUI (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "gui"
+
+\end_inset
+
+)
+\bar default
+ or the 
+\bar under
+powerful CLI (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "cli"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Standard
@@ -174,8 +196,27 @@ repository
  daemons with surprisingly minimal fuss.
 \end_layout
 
+\begin_layout Standard
+Sincerity was born of many years of experience writing complex software
+ for the JVM.
+ The rest of this chapter summarizes this experience and the problematic
+ reality that made a tool such as Sincerity necessary.
+ If this sounds dreary to you, feel free to skip to the 
+\bar under
+tutorial (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "tutorial"
+
+\end_inset
+
+)
+\bar default
+ for now, and come back here later!
+\end_layout
+
 \begin_layout Subsection
-Why Sincerity?
+Principles
 \end_layout
 
 \begin_layout Standard
@@ -273,23 +314,7 @@ ecosystem
  quality plugins that do all the above, and the list keeps growing.
  Developing plugins is a piece of cake and you're strongly encouraged to
  develop your own using the straightforward API.
- The Sincerity Manual contains everything you need to know to get started.
-\end_layout
-
-\begin_layout Section
-Background
-\end_layout
-
-\begin_layout Standard
-Sincerity was born of many years of experience writing complex software
- for the JVM.
-\end_layout
-
-\begin_layout Standard
-You can go ahead and skip this chapter, and dive right into the tutorial.
- It may very well feel very natural and trivial to you.
- Otherwise, this chapter details the problematic reality that made a tool
- such as Sincerity necessary.
+ This Sincerity Manual contains everything you need to know to get started.
 \end_layout
 
 \begin_layout Subsection
@@ -1394,6 +1419,13 @@ of modularity, introducing no special restrictions for users that do not
 
 \begin_layout Section
 Tutorial
+\begin_inset CommandInset label
+LatexCommand label
+name "tutorial"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
@@ -1507,6 +1539,13 @@ PATH=$PATH:/opt/sincerity
 
 \begin_layout Subsection
 Working with the Command Line
+\begin_inset CommandInset label
+LatexCommand label
+name "cli"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -9655,7 +9694,29 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Two plugins are strongly recommended: logging and service.
+Two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -10495,7 +10556,29 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Two plugins are strongly recommended: logging and service.
+Two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -10775,7 +10858,29 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Two plugins are strongly recommended: logging and service.
+Two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -10999,7 +11104,29 @@ Extras
 \end_layout
 
 \begin_layout Standard
-Two plugins are strongly recommended: logging and service.
+Two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -11291,7 +11418,29 @@ The example
 \end_layout
 
 \begin_layout Standard
-Additionally, two plugins are strongly recommended: logging and service.
+Additionally, two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -11445,23 +11594,18 @@ target "http://localhost:8080"
 
 \begin_layout Standard
 Restlet, on its own, requires you to code in Java, but 
-\begin_inset CommandInset href
-LatexCommand href
-name "Prudence"
-target "http://threecrickets.com/prudence/"
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
 
 \end_inset
 
- (the 
-\begin_inset Quotes eld
-\end_inset
-
-prudence
-\begin_inset Quotes erd
-\end_inset
-
- skeleton in Sincerity) builds on Restlet, letting you do all of the above
- with your choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+)
+\bar default
+ builds on Restlet, letting you do all of the above with your choice of
+ JavaScript, Python, Ruby, PHP, Groovy or Clojure.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -11469,29 +11613,36 @@ Fleshing Out
 \end_layout
 
 \begin_layout Standard
-While Restlet requires you to write your resources in Java (see Prudence
- for an alternative that supports other languages), there is no reason for
- your bootstrapping code---the code that assembles your component, servers,
- clients, hosts and routes---to be so rigid.
+While Restlet requires you to write your resources in Java, there is no
+ reason for your bootstrapping code---the code that assembles your component,
+ servers, clients, hosts and routes---to be so rigid.
  The API for boostrapping your component is simple and elegant enough, but
  without Sincerity you would have to likely have to write it in Java, or
- implement your own bootstrapping mechanism.
+ implement your own bootstrapping mechanism or use 
+\begin_inset CommandInset href
+LatexCommand href
+name "a DSL"
+target "http://code.google.com/p/groovy-restlet/"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
-JavaScript, Sincerity's natural language, provides a much more lightweight
- solution, and one that does not require you to recompile anything when
- all you want to change is your configuration.
+JavaScript, Sincerity's natural language, provides a lightweight solution,
+ and one that does not require you to recompile anything when all you want
+ to change is your configuration.
  Of course, once your component is up and running, JavaScript plays no more
  role.
  We mention that in case you're worried about performance, though you shouldn't
  be: the language engine is likely not the source of any bottlenecks in
- your application's performance
+ your application's live performance.
 \end_layout
 
 \begin_layout Standard
-The skeleton follows the structure of Restlet, which in turn closely adheres
- to Roy Fielding's original terminology for 
+The skeleton follows the network structure of Restlet, which in turn closely
+ adheres to Roy Fielding's original terminology for 
 \begin_inset CommandInset href
 LatexCommand href
 name "Representational State Transfer (REST)"
@@ -11499,7 +11650,7 @@ target "http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm"
 
 \end_inset
 
-.
+:
 \end_layout
 
 \begin_layout Standard
@@ -11549,6 +11700,8 @@ connector,
  By default, the Sincerity skeleton for Restlet relies on Restlet's internal
  connector, but it is not recommended for production applications.
  See 
+\bar under
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -11556,7 +11709,16 @@ Extras
 \begin_inset Quotes erd
 \end_inset
 
- below on how to install other connectors.
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet-extras"
+
+\end_inset
+
+)
+\bar default
+ on how to install other connectors.
 \end_layout
 
 \begin_layout Standard
@@ -11684,15 +11846,18 @@ file:
 .
  The skeleton defines no clients by default, but you can create files here
  for each client you need.
- See the Restlet example (in 
-\begin_inset Quotes eld
+ Install the 
+\bar under
+Restlet example (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet-extras"
+
 \end_inset
 
-Extras
-\begin_inset Quotes erd
-\end_inset
-
- below) for the usage of a 
+)
+\bar default
+ to see usage of a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -11735,7 +11900,18 @@ https:
 \begin_inset Quotes erd
 \end_inset
 
-, you can install the Apache HttpClient connector.
+, you can install the 
+\bar under
+Apache HttpClient connector (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet-extras"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Standard
@@ -11755,7 +11931,8 @@ target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/
 
 \end_inset
 
-, such as ConnegService, TunnelService, EncoderService, etc.
+, such as ConnegService, TunnelService, EncoderService, etc., but can be
+ used for any additional work to be done before applications are configured.
  By default only the LogService is configured.
 \end_layout
 
@@ -11795,16 +11972,19 @@ target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/
  through host, through application, through router, and finally to your
  RESTful resources.
  Please refer to the Restlet documentation for full details.
- Note that the skeleton does not include any application by default: see
+ Note that the skeleton does not include any application by default, but
  
-\begin_inset Quotes eld
+\bar under
+one is available for you to install (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet-extras"
+
 \end_inset
 
-Extras
-\begin_inset Quotes erd
-\end_inset
-
- below for a full example.
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Standard
@@ -11954,7 +12134,29 @@ sincerity add restlet.httpclient : install
 \end_layout
 
 \begin_layout Standard
-Additionally, two plugins are strongly recommended: logging and service.
+Additionally, two plugins are strongly recommended: 
+\bar under
+logging (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "logging"
+
+\end_inset
+
+)
+\bar default
+ and 
+\bar under
+service (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "service"
+
+\end_inset
+
+)
+\bar default
+.
  To install them:
 \end_layout
 
@@ -11991,8 +12193,8 @@ logging
 \end_inset
 
  plugin.
- The former relies on the latter, but adds a Restlet library that provides
- a direct chute to SLF4J, whici is more efficient than bridging.)
+ The former depends on the latter, but adds a Restlet library that provides
+ a direct chute to SLF4J, which is more efficient than bridging.)
 \end_layout
 
 \begin_layout Standard
@@ -12055,7 +12257,7 @@ target "http://felix.apache.org/"
 
 \end_inset
 
-is flexible, straightforward 
+ is flexible, straightforward 
 \begin_inset CommandInset href
 LatexCommand href
 name "OSGi (R4)"
@@ -12126,6 +12328,10 @@ admin
 Fleshing Out
 \end_layout
 
+\begin_layout Standard
+TODO
+\end_layout
+
 \begin_layout Subsection
 Prudence Skeleton
 \begin_inset CommandInset label
@@ -12138,7 +12344,6 @@ name "prudence"
 \end_layout
 
 \begin_layout Standard
-Since version 2.0, 
 \begin_inset CommandInset href
 LatexCommand href
 name "Prudence"
@@ -12146,13 +12351,29 @@ target "http://threecrickets.com/prudence/"
 
 \end_inset
 
- is designed from the ground-up around Sincerity.
- It's distributed exclusively as a Sincerity skeleton with a large collection
- of tightly integrated add-ons.
+ is a platform on which you can build scalable web frontends and network
+ services.
+ It lets you write your server-side code in JavaScript, Python, Ruby, Clojure,
+ PHP or Groovy.
+ Though minimalistic, Prudence addresses real-world, practical web development
+ needs, from virtual hosting and URI rewriting to state-of-the-art server-
+ and client-side caching.
+ Your applications can support rich clients (AJAX), thin clients (pure HTML),
+ and happy mixes between the two.
+ 
 \end_layout
 
 \begin_layout Standard
-The Prudence skeleton is an extension of the 
+Prudence is distributed exclusively as a Sincerity skeleton with a 
+\begin_inset CommandInset href
+LatexCommand href
+name "large collection of tightly integrated add-ons"
+target "http://threecrickets.com/prudence/download/#sincerity"
+
+\end_inset
+
+.
+ It is an extension of the 
 \bar under
 Restlet skeleton (page 
 \begin_inset CommandInset ref
@@ -12164,28 +12385,32 @@ reference "restlet"
 )
 \bar default
 , so the documentation there applies here.
-\end_layout
-
-\begin_layout Standard
-Prudence is underlying platform for 
-\begin_inset CommandInset href
-LatexCommand href
-name "Diligence"
-target "http://threecrickets.com/diligence/"
+ It is, in turn, the underlying platform for 
+\bar under
+Diligence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "diligence"
 
 \end_inset
 
+)
+\bar default
 .
 \end_layout
 
 \begin_layout Standard
-(Historically, it was actually the other way around.
+Since version 2.0, Prudence is designed from the ground-up around Sincerity.
+\end_layout
+
+\begin_layout Quote
+Historically, it was actually the other way around.
  Sincerity was designed by Three Crickets precisely in order to make Prudence
  2.0 sanely modular, building on many lessons learned while deploying Prudence
  1.0 and 1.1.
  It was clear during development that there was nothing in the proposed
  solution that was specific to Prudence.
- And so Sincerity was born as a generic tool useful for many JVM projects.)
+ And so Sincerity was born as a generic tool useful for many JVM projects.
 \end_layout
 
 \begin_layout Subsection
@@ -12208,7 +12433,7 @@ target "http://threecrickets.com/diligence/"
 \end_inset
 
  lets you develop scalable data-driven web applications in server-side JavaScrip
-t, centering on 
+t, using 
 \begin_inset CommandInset href
 LatexCommand href
 name "MongoDB"
@@ -12217,13 +12442,16 @@ target "http://www.mongodb.org/"
 \end_inset
 
  as its data provider and 
-\begin_inset CommandInset href
-LatexCommand href
-name "Prudence"
-target "http://threecrickets.com/prudence/"
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
 
 \end_inset
 
+)
+\bar default
  as its RESTful base.
  It features strong integration with client-side 
 \begin_inset Quotes eld
@@ -12260,14 +12488,44 @@ large sites), authentication and authorization, and support for several
 \end_layout
 
 \begin_layout Standard
-The Diligence skeleton is an extension of the Prudence and Restlet skeletons,
- so the documentation there applies here.
+Diligence is distributed exclusively as a 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity skeleton"
+target "http://threecrickets.com/diligence/download/#sincerity"
+
+\end_inset
+
+.
+ It is an extension of the 
+\bar under
+Prudence skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
+\end_inset
+
+)
+\bar default
+ and the 
+\bar under
+Restlet skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet"
+
+\end_inset
+
+)
+\bar default
+, so the documentation there applies here.
 \end_layout
 
-\begin_layout Standard
-(Like Sincerity and Prudence, Diligence is developed by Three Crickets.
+\begin_layout Quote
+Like Sincerity and Prudence, Diligence is developed by Three Crickets.
  The three products together form a powerful web application stack on top
- of the JVM.)
+ of the JVM.
 \end_layout
 
 \begin_layout Subsection
@@ -12372,22 +12630,17 @@ target "http://localhost:3000"
 \begin_layout Standard
 If you're looking for a more strictly RESTful, minimalist alternative to
  Rails, while sticking to Ruby, take a look at 
-\begin_inset CommandInset href
-LatexCommand href
-name "Prudence"
-target "http://threecrickets.com/prudence/"
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
 
 \end_inset
 
- (the 
-\begin_inset Quotes eld
-\end_inset
-
-prudence
-\begin_inset Quotes erd
-\end_inset
-
- skeleton).
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -12537,8 +12790,15 @@ rails
 
 \begin_layout Standard
 And that's it: from here on, it's all standard Rails goodness.
- You can go ahead with the tutorial at http://guides.rubyonrails.org/getting_start
-ed.html, skipping step 3.2 (
+ You can go ahead with the 
+\begin_inset CommandInset href
+LatexCommand href
+name "tutorial"
+target "http://guides.rubyonrails.org/getting_started.html"
+
+\end_inset
+
+, skipping step 3.2 (
 \begin_inset Quotes eld
 \end_inset
 
@@ -12711,15 +12971,18 @@ to Python libraries.
 
 \begin_layout Standard
 If you're looking for RESTful, minimalist alternative to Django, while sticking
- to Python, take a look at Prudence (the 
-\begin_inset Quotes eld
+ to Python, take a look at 
+\bar under
+Prudence (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
 \end_inset
 
-prudence
-\begin_inset Quotes erd
-\end_inset
-
- skeleton).
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Standard
@@ -12955,10 +13218,10 @@ Extras
 \begin_layout Standard
 Adding the 
 \bar under
-logging plugin (page 
+service plugin (page 
 \begin_inset CommandInset ref
 LatexCommand pageref
-reference "logging"
+reference "service"
 
 \end_inset
 
@@ -13423,7 +13686,16 @@ Templates
 
 \begin_layout Standard
 Straightforward and flexible string interpolation.
- For example:
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Sincerity.Templates API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Templates"
+
+\end_inset
+
+.
+ Example:
 \end_layout
 
 \begin_layout Standard
@@ -13439,18 +13711,6 @@ println('Hello, {user}'.cast({user: 'Sincerity'})
 \end_inset
 
 
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Sincerity.Templates API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Templates"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Paragraph
@@ -14176,8 +14436,18 @@ You can add as many dependencies as you like.
 \end_layout
 
 \begin_layout Itemize
-Under <manifestEntries> you can add anything that adheres to the packaging
- specification.
+Under <manifestEntries> you can add anything that adheres to the 
+\bar under
+packaging specification (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "sincerity-packages"
+
+\end_inset
+
+)
+\bar default
+.
  For example, you may want to call a package installation script, like so:
 \begin_inset listings
 inline false
@@ -14519,6 +14789,13 @@ Specifications
 
 \begin_layout Subsection
 Sincerity Packages
+\begin_inset CommandInset label
+LatexCommand label
+name "sincerity-packages"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -14637,6 +14914,271 @@ Package-Uninstaller
 : specifies a class name which has a main() entry point.
  Simple string arguments can be optionally appended, separated by spaces.
  The uninstaller will be called when the package is to be uninstalled.
+\end_layout
+
+\begin_layout Section
+FAQ
+\end_layout
+
+\begin_layout Subsubsection
+How do I avoid pulling in a dependency's implicit dependencies?
+\end_layout
+
+\begin_layout Standard
+There is currently no way to do this with Sincerity commands, but you can
+ do this by editing your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+To avoid pulling 
+\emph on
+any
+\emph default
+ implicit dependencies, change the 
+\begin_inset Quotes eld
+\end_inset
+
+transitive
+\begin_inset Quotes erd
+\end_inset
+
+ attribute, which is 
+\begin_inset Quotes eld
+\end_inset
+
+true
+\begin_inset Quotes erd
+\end_inset
+
+ by default:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*" transitive="false"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for dependencies"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Otherwise, you can exclude specific implicit dependencies using 
+\begin_inset Quotes eld
+\end_inset
+
+exclude
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+<exclude org="com.tanukisoftware" module="wrapper-base"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for excludes"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/exclude.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+A dependency is being installed at the wrong version.
+ Why, and how do I fix it?
+\end_layout
+
+\begin_layout Standard
+If this is an 
+\emph on
+explicit 
+\emph default
+dependency that you added, it could be that it is also being included as
+ an 
+\emph on
+implicit 
+\emph default
+dependency with different version restrictions, and Ivy has done its best
+ to resolve the conflict within the restrictions.
+ You can observe this in the dependency tree using the 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:dependencies
+\begin_inset Quotes erd
+\end_inset
+
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:dependencies"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Standard
+There is currently no way to fix this with Sincerity commands, but you can
+ do this by editing your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file, and adding a 
+\begin_inset Quotes eld
+\end_inset
+
+force
+\begin_inset Quotes erd
+\end_inset
+
+ attribute, which will cause Ivy to avoid resolving the dependency's version:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*" force="true"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for dependencies"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If the problem is with an 
+\emph on
+implicit
+\emph default
+ dependency, you can make it explicit and use the above method.
+ However, Ivy also supports an alternative method, using 
+\begin_inset Quotes eld
+\end_inset
+
+override
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+<override org="com.tanukisoftware" module="wrapper-base" rev="3.5.20"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An 
+\begin_inset Quotes eld
+\end_inset
+
+override
+\begin_inset Quotes erd
+\end_inset
+
+ is not an actual dependency, and does not affect your dependency tree.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for overrides"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/override.html"
+
+\end_inset
+
+.
 \end_layout
 
 \end_body

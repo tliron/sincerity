@@ -98,7 +98,7 @@ function service(command) {
 			if (isSupported(os)) {
 				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('com.tanukisoftware', 'wrapper-base')
 				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, version])
-				command.sincerity.run('dependencies:install')
+				command.sincerity.run('artifacts:install')
 			}
 			if (!binary.exists()) {
 				throw new CommandException(command, 'The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
