@@ -26,10 +26,14 @@ function run(command) {
 }
 
 function ruby(command, preArguments, postArguments) {
-	System.setProperty('jruby.home', command.sincerity.container.getLibrariesFile('ruby'))
+	//System.setProperty('jruby.home', command.sincerity.container.getLibrariesFile('ruby'))
 
-	// The Ruby standard library is here
+	// The Ruby standard library
 	System.setProperty('jruby.lib', command.sincerity.container.getLibrariesFile('ruby', 'lib'))
+
+	// Ruby binaries
+	System.setProperty('jruby.bindir', command.sincerity.container.getExecutablesFile())
+	System.setProperty('jruby.script', 'ruby')
 
 	// JFFI
 	System.setProperty('jffi.boot.library.path', command.sincerity.container.getLibrariesFile('ruby', 'native'))
@@ -49,7 +53,6 @@ function ruby(command, preArguments, postArguments) {
 			runArguments.push(postArguments[i])
 		}
 	}
-	
 	command.sincerity.run(runArguments)
 }
 

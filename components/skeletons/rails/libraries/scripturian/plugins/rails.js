@@ -16,11 +16,10 @@ function run(command) {
 }
 
 function rails(command) {
-	var runArguments = ['ruby:ruby', '-C' + command.sincerity.container.getFile('app'), command.sincerity.container.getExecutablesFile('rails')]
+	var runArguments = ['ruby:ruby', '-C' + command.sincerity.container.getFile('app'), 'bin/rails']
 	var arguments = command.arguments
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	
 	command.sincerity.run(runArguments)
 }

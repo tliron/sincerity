@@ -1,5 +1,5 @@
 
-document.executeOnce('/sincerity/files/')
+document.execute('/sincerity/files/')
 
 Sincerity.Files.makeExecutable(sincerity.container.getExecutablesFile('ast'))
 Sincerity.Files.makeExecutable(sincerity.container.getExecutablesFile('gem'))
