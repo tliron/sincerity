@@ -26,13 +26,13 @@ function run(command) {
 }
 
 function orientdb(command, className, isServer) {
-	var arguments = [className]
+	var runArguments = ['delegate:main', className]
 	
 	for (var i in command.arguments) {
-		arguments.push(command.arguments[i])
+		runArguments.push(command.arguments[i])
 	}
 	try {
-		command.sincerity.run('logging:logging')
+		command.sincerity.run(['logging:logging'])
 	} catch(x) {}
 	
 	System.setProperty('ORIENTDB_HOME', sincerity.container.root)
@@ -51,5 +51,5 @@ function orientdb(command, className, isServer) {
 		}
 	}
 
-	command.sincerity.run('delegate:main', arguments)
+	command.sincerity.run(runArguments)
 }

@@ -13,4 +13,4 @@ if(arguments > 1) {
 	java.lang.System.setProperty('restlet.applications', applications)
 }
 
-sincerity.run('delegate:start', ['/component/'])
+sincerity.run(['delegate:start', '/component/'])

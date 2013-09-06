@@ -1,2 +1,2 @@
 
-sincerity.run('logging:server')
+sincerity.run(['logging:server'])

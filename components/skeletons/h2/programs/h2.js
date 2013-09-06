@@ -1,2 +1,2 @@
 
-sincerity.run('h2:server')
+sincerity.run(['h2:server'])

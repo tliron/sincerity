@@ -100,9 +100,13 @@ Sincerity.Container = Sincerity.Container || function() {
 			var length = arguments.length
 			if (length > 1) {
 				for (var d = 1; d < length; d++) {
-					sincerity.run('dependencies:add', arguments[d])
+					var runArguments = ['dependencies:add']
+					for (var a in arguments[d]) {
+						runArguments.push(arguments[d][a])
+					}
+					sincerity.run(runArguments)
 				}
-				sincerity.run('dependencies:install')
+				sincerity.run(['artifacts:install'])
 				theClass = Sincerity.JVM.getClass(className)
 			}
 		}

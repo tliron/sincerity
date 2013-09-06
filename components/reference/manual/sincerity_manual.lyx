@@ -2009,6 +2009,56 @@ reference "core-plugins"
  to learn about all the essential commands.
 \end_layout
 
+\begin_layout Subsubsection
+Environment Variables
+\begin_inset CommandInset label
+LatexCommand label
+name "environment-variables"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity
+\begin_inset Quotes erd
+\end_inset
+
+ script will try to find your operating system's default JVM and your Sincerity
+ installation.
+ You can modify its behavior using the following environment variables:
+\end_layout
+
+\begin_layout Itemize
+SINCERITY_HOME: The root of the Sincerity installation to use.
+ If not provided, will automatically discover it according to actual (not
+ symlinked) location of the script file.
+\end_layout
+
+\begin_layout Itemize
+JAVA_HOME: The root of the JVM installation.
+ If not provided, will use a platform-specific heuristic to discover it.
+\end_layout
+
+\begin_layout Itemize
+JAVA_VERSION: Used only in Darwin (Mac OS X).
+ Defaults to "CurrentJDK".
+\end_layout
+
+\begin_layout Itemize
+JVM_LIBRARIES: Extra libraries to add to the classpath.
+\end_layout
+
+\begin_layout Itemize
+JVM_SWITCHES: Extra switches to add to the JVM invocation.
+ 
+\end_layout
+
 \begin_layout Subsection
 Working with the Graphical User Interface (GUI)
 \begin_inset CommandInset label
@@ -6362,6 +6412,13 @@ reference "delegate:languages"
 
 \begin_layout Subsection
 JavaScript Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "javascript"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -6500,6 +6557,13 @@ sincerity create mycontainer : add javascript : install : javascript -e
 
 \begin_layout Subsection
 Python Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "python"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -6777,6 +6841,13 @@ reference "delegate:execute"
 
 \begin_layout Subsection
 Ruby Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "ruby"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7094,6 +7165,13 @@ reference "delegate:execute"
 
 \begin_layout Subsection
 PHP Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "php"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7275,6 +7353,13 @@ target "http://pear.php.net/"
 
 \begin_layout Subsection
 Groovy Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "groovy"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -7408,6 +7493,13 @@ reference "delegate:start"
 
 \begin_layout Subsection
 Clojure Plugin
+\begin_inset CommandInset label
+LatexCommand label
+name "clojure"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -10221,7 +10313,7 @@ The skeleton comes with a plugin that supports the
 \begin_inset CommandInset href
 LatexCommand href
 name "full list of Hadoop commands"
-target "http://hadoop.apache.org/common/docs/current/commands_manual.html"
+target "http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/CommandsManual.html"
 
 \end_inset
 
@@ -10282,12 +10374,11 @@ To configure your instance, see
 \end_inset
 
 .
- The default configuration is based on that of the official Hadoop distribution,
- for 
+ The default configuration is based on that of the 
 \begin_inset CommandInset href
 LatexCommand href
-name "pseudo-distributed operation"
-target "http://hadoop.apache.org/common/docs/current/single_node_setup.html#PseudoDistributed"
+name "official Hadoop distribution"
+target "http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/SingleCluster.html"
 
 \end_inset
 
@@ -11283,28 +11374,35 @@ jetty.web
 
 \begin_layout Standard
 As useful as servlets are, we recommend you take a look at the 
-\begin_inset Quotes eld
+\bar under
+Restlet skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet"
+
 \end_inset
 
-restlet
-\begin_inset Quotes erd
-\end_inset
-
- skeleton if you want to build a dynamic web application in Java.
+)
+\bar default
+ if you want to build a dynamic web application in Java.
  And Restlet can use Jetty as its underlying connector.
 \end_layout
 
 \begin_layout Standard
-And why stop there? Prudence (the 
-\begin_inset Quotes eld
+And why stop there? Prudence 
+\bar under
+(page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "prudence"
+
 \end_inset
 
-prudence
-\begin_inset Quotes erd
-\end_inset
-
- skeleton) builds on Restlet, letting you do all of that and more with your
- choice of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+)
+\bar default
+ builds on Restlet, letting you do all of that and more with your choice
+ of JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ (Disclosure: Prudence has also been created by Three Crickets.)
 \end_layout
 
 \begin_layout Subsubsection*
@@ -11606,6 +11704,7 @@ reference "prudence"
 \bar default
  builds on Restlet, letting you do all of the above with your choice of
  JavaScript, Python, Ruby, PHP, Groovy or Clojure.
+ (Disclosure: Prudence has also been created by Three Crickets.)
 \end_layout
 
 \begin_layout Subsubsection*
@@ -12400,7 +12499,9 @@ reference "diligence"
 \end_layout
 
 \begin_layout Standard
-Since version 2.0, Prudence is designed from the ground-up around Sincerity.
+Since version 2.0, Prudence is designed from the ground-up around Sincerity,
+ and such provides the primary example for how Sincerity can reform product
+ distribution.
 \end_layout
 
 \begin_layout Quote
@@ -12522,10 +12623,11 @@ reference "restlet"
 , so the documentation there applies here.
 \end_layout
 
-\begin_layout Quote
-Like Sincerity and Prudence, Diligence is developed by Three Crickets.
+\begin_layout Standard
+(Disclosure: Like Sincerity and Prudence, Diligence is developed by Three
+ Crickets.
  The three products together form a powerful web application stack on top
- of the JVM.
+ of the JVM.)
 \end_layout
 
 \begin_layout Subsection
@@ -12641,6 +12743,7 @@ reference "prudence"
 )
 \bar default
 .
+ (Disclosure: Prudence has also been created by Three Crickets.)
 \end_layout
 
 \begin_layout Subsubsection*
@@ -12983,6 +13086,7 @@ reference "prudence"
 )
 \bar default
 .
+ (Disclosure: Prudence has also been created by Three Crickets.)
 \end_layout
 
 \begin_layout Standard
@@ -13305,6 +13409,28 @@ reference "logging"
  to standard JVM logging if that seems exciting to you.
 \end_layout
 
+\begin_layout Quote
+
+\series bold
+OutOfMemoryError?
+\series default
+ Installing and starting Django in the same Sincerity command may exhaust
+ your JVM's PermGen space.
+ Try installing and starting via separate commands.
+ For more tips, see the 
+\bar under
+FAQ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "permgen-space"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
 \begin_layout Subsection
 LWJGL Skeleton
 \begin_inset CommandInset label
@@ -13332,7 +13458,7 @@ target "http://www.lwjgl.org/"
  and 3D sound, and to accept input from gaming controllers.
  LWJGL relies on native extensions to the JVM, and supports Linux, Windows,
  Mac OS X and Solaris.
- The author's favorite game, 
+ (This author's favorite game, 
 \begin_inset CommandInset href
 LatexCommand href
 name "Minecraft"
@@ -13340,7 +13466,7 @@ target "http://www.minecraft.net/"
 
 \end_inset
 
-, is based on it!
+, is based on it!)
 \end_layout
 
 \begin_layout Standard
@@ -13401,17 +13527,18 @@ game
 \end_inset
 
  program\SpecialChar \ldots{}
- except that with this barebones skeleton, there is no game to start.
- For something to play with, see the 
-\begin_inset Quotes eld
+ except that with this barebones skeleton, 
+\bar under
+there is no game to start (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jwjgl-extras"
+
 \end_inset
 
-lwjgl.example
-\begin_inset Quotes erd
-\end_inset
-
- skeleton.
- It includes a simple Space Invaders clone.
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -13478,6 +13605,45 @@ reference "scripturian"
 )
 \bar default
  to allow high-performance, muli-threaded integration of the language engines.
+\end_layout
+
+\begin_layout Subsubsection*
+Extras
+\begin_inset CommandInset label
+LatexCommand label
+name "jwjgl-extras"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For something to play with, see the 
+\begin_inset Quotes eld
+\end_inset
+
+lwjgl.example
+\begin_inset Quotes erd
+\end_inset
+
+ add-on.
+ It includes a simple Space Invaders clone:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add lwjgl.example : install : start lwjgl
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -15035,7 +15201,7 @@ target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/exclude.html"
 \end_layout
 
 \begin_layout Subsubsection
-A dependency is being installed at the wrong version.
+A dependency is being installed at a wrong version.
  Why, and how do I fix it?
 \end_layout
 
@@ -15179,6 +15345,115 @@ target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/override.html
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsubsection
+I'm getting 
+\begin_inset Quotes erd
+\end_inset
+
+java.lang.OutOfMemoryError: PermGen space
+\begin_inset Quotes erd
+\end_inset
+
+ exceptions!
+\begin_inset CommandInset label
+LatexCommand label
+name "permgen-space"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is likely because you are chaining several of Sincerity commands together
+ while also using the 
+\begin_inset Quotes eld
+\end_inset
+
+heavier
+\begin_inset Quotes erd
+\end_inset
+
+ language engines (Jython, JRuby).
+ The easy solution in most cases is simply separating your commands.
+ For example, instead of this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add rails : install : add django : install : start django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Run this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add rails : install
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity add django : install
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity start django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If you're using the Oracle JVM, you can also increase the PermGen space
+ by setting the 
+\bar under
+JVM_SWITCHES environment variable (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "environment-variables"
+
+\end_inset
+
+)
+\bar default
+ before running Sincerity:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+JVM_SWITCHES=-XX:MaxPermSize=128m sincerity ...
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body

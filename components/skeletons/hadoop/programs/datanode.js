@@ -1,6 +1,6 @@
 
 try {
-sincerity.run('logging:logging')
+sincerity.run(['logging:logging'])
 } catch(x) {}
 
-sincerity.run('hadoop:hadoop', ['datanode'])
+sincerity.run(['hadoop:hadoop', 'datanode'])

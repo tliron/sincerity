@@ -97,8 +97,8 @@ function service(command) {
 		if (!binary.exists()) {
 			if (isSupported(os)) {
 				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('com.tanukisoftware', 'wrapper-base')
-				command.sincerity.run('dependencies:add', ['com.tanukisoftware', 'wrapper-' + os.name, version])
-				command.sincerity.run('artifacts:install')
+				command.sincerity.run(['dependencies:add', 'com.tanukisoftware', 'wrapper-' + os.name, version])
+				command.sincerity.run(['artifacts:install'])
 			}
 			if (!binary.exists()) {
 				throw new CommandException(command, 'The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
@@ -192,17 +192,17 @@ function service(command) {
 		}
 
 		// Assemble arguments
-		var arguments = [binary, command.sincerity.container.getConfigurationFile('service', 'service.conf')]
+		var runArguments = ['delegate:execute', binary, command.sincerity.container.getConfigurationFile('service', 'service.conf')]
 		configuration = Sincerity.Objects.flatten(configuration)
 		for (var c in configuration) {
-			arguments.push(c + '=' + configuration[c])
+			runArguments.push(c + '=' + configuration[c])
 		}
 		command.sincerity.container.getLogsFile().mkdirs()
 
 		if (verbose) {
 			command.sincerity.out.println('Arguments:')
-			for (c in arguments) {
-				command.sincerity.out.println(' ' + c + ' = ' + arguments[c])
+			for (c in runArguments) {
+				command.sincerity.out.println(' ' + c + ' = ' + runArguments[c])
 			}
 		}
 
@@ -210,7 +210,7 @@ function service(command) {
 		if (verb == 'console') {
 			command.sincerity.out.println('Running ' + displayName + '...')
 		}
-		command.sincerity.run('delegate:execute', arguments)
+		command.sincerity.run(runArguments)
 		if ((verb == 'start') || (verb == 'restart')) {
 			command.sincerity.out.println('Started ' + displayName)
 		}

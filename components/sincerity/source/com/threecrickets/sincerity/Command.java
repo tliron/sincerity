@@ -54,6 +54,8 @@ public class Command
 
 	public static final String PLUGIN_COMMAND_SEPARATOR = ":";
 
+	public static final Command UNTIL = new Command( null, null, false, null );
+
 	//
 	// Construction
 	//

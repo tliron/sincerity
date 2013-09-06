@@ -4,7 +4,7 @@
 //
 
 try {
-sincerity.run('logging:logging')
+sincerity.run(['logging:logging'])
 } catch(x) {}
 
 //

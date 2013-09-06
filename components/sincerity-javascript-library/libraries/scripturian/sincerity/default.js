@@ -144,13 +144,14 @@ document.executeOnce('/sincerity/xml/')
 /**
  * Runs arbitrary Sincerity commands.
  * <p>
- * The arguments are strings, identical to the Sincerity command line. For example:
+ * The argument is an arrayof strings, identical to the Sincerity command line. For example:
  * <code>
- * sincerity.run("add", "javascript", ":", "install", ":", "javascript")
+ * sincerity.run(['add', 'javascript', ':', 'install', ':', 'javascript'])
  * </code>
  * 
  * @name sincerity.run
  * @function
+ * @param {String[]} arguments
  */
 
 /**

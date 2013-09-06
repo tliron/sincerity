@@ -1,2 +1,2 @@
 
-sincerity.run('rails:rails', ['server'])
+sincerity.run(['rails:rails', 'server'])

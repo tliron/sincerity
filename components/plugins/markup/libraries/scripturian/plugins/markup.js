@@ -74,8 +74,8 @@ function renderWikiText(command, sourceFile, renderedFile, name, complete) {
 
 	if (!Sincerity.Objects.exists(language)) {
 		// Install the relevant dependency and try again
-		command.sincerity.run('dependencies:add', ['org.eclipse.mylyn', 'wikitext-' + name, wikiTextVersion])
-		command.sincerity.run('dependencies:install')
+		command.sincerity.run(['dependencies:add', 'org.eclipse.mylyn', 'wikitext-' + name, wikiTextVersion])
+		command.sincerity.run(['artifacts:install'])
 		language = getLanguage(fullName)
 	}
 

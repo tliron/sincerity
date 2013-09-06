@@ -260,7 +260,7 @@ public class PyPiResolver extends BasicResolver
 		}
 		catch( Exception x )
 		{
-			x.printStackTrace();
+			Sincerity.getCurrent().printStackTrace( x );
 			return null;
 		}
 
@@ -430,7 +430,7 @@ public class PyPiResolver extends BasicResolver
 					if( ( eggFile != null ) && !installed )
 					{
 						// Let's crack open the egg to examine its dependencies
-						System.out.println( "Finding dependencies in Python egg: " + artifactName + " " + eggFile );
+						Sincerity.getCurrent().getOut().println( "Finding dependencies in Python egg: " + artifactName + " " + eggFile );
 						dependencyIds.addAll( getDependenciesFromEgg( eggFile ) );
 
 						// TODO: licenses?
@@ -445,7 +445,7 @@ public class PyPiResolver extends BasicResolver
 			}
 			catch( Exception x )
 			{
-				x.printStackTrace();
+				Sincerity.getCurrent().printStackTrace( x );
 			}
 		}
 
@@ -616,10 +616,10 @@ public class PyPiResolver extends BasicResolver
 					int installations = sincerity.getContainer().getInstallations();
 
 					if( installations > 0 )
-						System.out.println( "Cannot install Python dependencies without Python!" );
+						sincerity.getOut().println( "Cannot install Python dependencies without Python!" );
 					else
 					{
-						System.out.println( "A second installation phase has been triggered in order to install Python dependencies" );
+						sincerity.getOut().println( "A second installation phase has been triggered in order to install Python dependencies" );
 						sincerity.getContainer().setHasFinishedInstalling( false );
 					}
 				}
@@ -627,7 +627,7 @@ public class PyPiResolver extends BasicResolver
 		}
 		catch( SincerityException x )
 		{
-			x.printStackTrace();
+			sincerity.printStackTrace( x );
 		}
 
 		return null;
@@ -645,7 +645,7 @@ public class PyPiResolver extends BasicResolver
 			}
 			catch( SincerityException x )
 			{
-				x.printStackTrace();
+				sincerity.printStackTrace( x );
 			}
 		}
 
@@ -700,12 +700,12 @@ public class PyPiResolver extends BasicResolver
 
 					if( eggsDir != null )
 					{
-						System.out.println( "Building egg in Python: " + setupFile.getPath() );
+						sincerity.getOut().println( "Building egg in Python: " + setupFile.getPath() );
 						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "bdist_egg", "--dist-dir=" + eggsDir.getPath() );
 					}
 					else
 					{
-						System.out.println( "Installing in Python: " + setupFile.getPath() );
+						sincerity.getOut().println( "Installing in Python: " + setupFile.getPath() );
 						sincerity.run( "python" + Command.PLUGIN_COMMAND_SEPARATOR + "python", setupFile.getPath(), "install", "--install-scripts=" + sincerity.getContainer().getExecutablesFile() );
 					}
 
@@ -713,7 +713,7 @@ public class PyPiResolver extends BasicResolver
 				}
 				catch( SincerityException x )
 				{
-					x.printStackTrace();
+					sincerity.printStackTrace( x );
 				}
 			}
 		}

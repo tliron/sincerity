@@ -24,14 +24,14 @@ function validate() {
 	var module = 'lwjgl-' + os
 	if (!sincerity.container.dependencies.has('org.lwjgl', module)) {
 		var version = sincerity.container.dependencies.resolvedDependencies.getVersion('org.lwjgl', 'lwjgl')
-		sincerity.run('dependencies:add', ['org.lwjgl', module, version])
-		sincerity.run('dependencies:install')
+		sincerity.run(['dependencies:add', 'org.lwjgl', module, version])
+		sincerity.run(['artifacts:install'])
 	}
 }
 
 validate()
-var arguments = ['game']
+var runArguments = ['delegate:start', 'game']
 for (var i = 1, length = application.arguments.length; i < length; i++) {
-	arguments.push(application.arguments[i])
+	runArguments.push(application.arguments[i])
 }
-sincerity.run('delegate:start', arguments)
+sincerity.run(runArguments)

@@ -1,2 +1,2 @@
 
-sincerity.run('django:manage', ['runserver'])
+sincerity.run(['django:manage', 'runserver'])

@@ -74,7 +74,7 @@ function run(command) {
 }
 
 function h2(command, className, confName) {
-	var arguments = [className]
+	var runArguments = ['delegate:main', className]
 
 	var file = command.sincerity.container.getConfigurationFile('h2', confName + '.conf')
 	if (file.exists()) {
@@ -84,7 +84,7 @@ function h2(command, className, confName) {
 				if ((line.length() == 0) || line.startsWith('#')) {
 					continue
 				}
-				arguments.push(line)
+				runArguments.push(line)
 			}
 		}
 		finally {
@@ -93,17 +93,17 @@ function h2(command, className, confName) {
 	}
 
 	if ((confName == 'server') || (confName == 'console')) {
-		arguments.push('-baseDir')
-		arguments.push(command.sincerity.container.getFile('databases'))
+		runArguments.push('-baseDir')
+		runArguments.push(command.sincerity.container.getFile('databases'))
 	}
 
 	for (var i in command.arguments) {
-		arguments.push(command.arguments[i])
+		runArguments.push(command.arguments[i])
 	}
 	
 	try {
-		command.sincerity.run('logging:logging')
+		command.sincerity.run(['logging:logging'])
 	} catch(x) {}
 	
-	command.sincerity.run('delegate:main', arguments)
+	command.sincerity.run(runArguments)
 }

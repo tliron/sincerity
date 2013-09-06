@@ -17,7 +17,7 @@ importClass(java.lang.System)
 //
 
 try {
-	sincerity.run('logging:logging')
+	sincerity.run(['logging:logging'])
 	
 	// Have Restlet use the SLF4J facade (we'd get here only if the logging plugin is installed)
 	var restletVersion = sincerity.container.dependencies.resolvedDependencies.getVersion('org.restlet.jse', 'restlet')

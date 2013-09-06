@@ -22,7 +22,7 @@ function run(command) {
 }
 
 function izpack(command) {
-	var mainArguments = [MAIN_CLASS]
+	var runArguments = ['delegate:main', MAIN_CLASS]
 	
 	command.parse = true
 	if (command.arguments.length < 1) {
@@ -35,12 +35,12 @@ function izpack(command) {
 	System.setProperty('distribution.title', title)
 	System.setProperty('distribution.version', version)
 
-	mainArguments.push(
+	runArguments.push(
 		command.sincerity.container.getConfigurationFile('izpack', 'installer.xml'),
 		'-b', command.sincerity.container.root,
 		'-o', command.sincerity.container.getFile('installer.jar'),
 		'-k', 'standard'
 	)
 	
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 }

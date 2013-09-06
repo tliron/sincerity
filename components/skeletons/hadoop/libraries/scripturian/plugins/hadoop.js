@@ -64,30 +64,30 @@ function hadoop(command) {
 			if ((architecture.indexOf('86') != -1) || (architecture.indexOf('amd') != -1)) {
 				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('org.apache.hadoop', 'hadoop-standalone')
 				if (bits == '64') {
-					command.sincerity.run('dependencies:add', ['org.apache.hadoop', 'hadoop-linux-amd64', version])
+					command.sincerity.run(['dependencies:add', 'org.apache.hadoop', 'hadoop-linux-amd64', version])
 				}
 				else {
-					command.sincerity.run('dependencies:add', ['org.apache.hadoop', 'hadoop-linux-i386', version])
+					command.sincerity.run(['dependencies:add', 'org.apache.hadoop', 'hadoop-linux-i386', version])
 				}
-				command.sincerity.run('dependencies:install')
+				command.sincerity.run('artifacts:install')
 			}
 		}
 	}
 	
 	var commandName = command.arguments[0].toLowerCase()
 	if (commandName == 'start') {
-		command.sincerity.run('service:service', ['namenode', 'start'])
-		command.sincerity.run('service:service', ['datanode', 'start'])
+		command.sincerity.run(['service:service', 'namenode', 'start'])
+		command.sincerity.run(['service:service', 'datanode', 'start'])
 		return
 	}
 	else if (commandName == 'stop') {
-		command.sincerity.run('service:service', ['datanode', 'stop'])
-		command.sincerity.run('service:service', ['namenode', 'stop'])
+		command.sincerity.run(['service:service', 'datanode', 'stop'])
+		command.sincerity.run(['service:service', 'namenode', 'stop'])
 		return
 	}
 	else if (commandName == 'status') {
-		command.sincerity.run('service:service', ['namenode', 'status'])
-		command.sincerity.run('service:service', ['datanode', 'status'])
+		command.sincerity.run(['service:service', 'namenode', 'status'])
+		command.sincerity.run(['service:service', 'datanode', 'status'])
 		return
 	}
 	
@@ -96,9 +96,9 @@ function hadoop(command) {
 		throw new CommandException(command, 'Unsupported Hadoop command: ' + commandName)		
 	}
 
-	var mainArguments = [className]
+	var runArguments = ['delegate:main', className]
 	for (var i = 1, l = command.arguments.length; i < l; i++) {
-		mainArguments.push(command.arguments[i])
+		runArguments.push(command.arguments[i])
 	}
 
 	System.setProperty('hadoop.home.dir', command.sincerity.container.root)
@@ -109,7 +109,7 @@ function hadoop(command) {
 	
 	command.sincerity.container.bootstrap.addFile(command.sincerity.container.getConfigurationFile('hadoop'))
 	
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 }
 
 function getPlatform() {

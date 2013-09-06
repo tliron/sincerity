@@ -42,8 +42,8 @@ var reader = new BufferedReader(new InputStreamReader(System['in']))
 var example = reader.readLine()
 example = EXAMPLES[parseInt(example)]
 
-var arguments = ['org.lwjgl.' + example]
+var runArguments = ['delegate:main', 'org.lwjgl.' + example]
 for (var i = 1, length = application.arguments.length; i < length; i++) {
-	arguments.push(application.arguments[i])
+	runArguments.push(application.arguments[i])
 }
-sincerity.run('delegate:main', arguments)
+sincerity.run(runArguments)

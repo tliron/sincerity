@@ -17,10 +17,10 @@ function run(command) {
 
 function manage(command) {
 	var manageFile = sincerity.container.getFile('project', 'manage.py')
-	var pythonArguments = [manageFile]
+	var runArguments = ['python:python', manageFile]
 	var arguments = command.arguments
 	for (var i in arguments) {
-		pythonArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 	}
-	sincerity.run('python:python', pythonArguments)
+	sincerity.run(runArguments)
 }

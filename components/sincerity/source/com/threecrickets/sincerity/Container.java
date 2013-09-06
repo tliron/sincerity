@@ -583,8 +583,8 @@ public class Container implements IvyListener, TransferListener
 	 */
 	public void initializeProgress()
 	{
-		hasChanged = false;
-		hasFinishedInstalling = true;
+		setChanged( false );
+		setHasFinishedInstalling( true );
 	}
 
 	/**

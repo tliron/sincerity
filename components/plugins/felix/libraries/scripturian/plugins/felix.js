@@ -27,10 +27,10 @@ function gogo(command) {
 	
 	System.setProperty('felix.config.properties', command.sincerity.container.getConfigurationFile('felix.conf').toURL())
 	
-	var mainArguments = [MAIN_CLASS]
+	var runArguments = ['delegate:main', MAIN_CLASS]
 	var arguments = command.arguments
 	for (var i in arguments) {
-		mainArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 	}
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 }

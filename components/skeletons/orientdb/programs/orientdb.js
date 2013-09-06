@@ -1,2 +1,2 @@
 
-sincerity.run('orientdb:server')
+sincerity.run(['orientdb:server'])

@@ -20,16 +20,16 @@ function run(command) {
 }
 
 function scala(command) {
-	var mainArguments = [MAIN_CLASS]
+	var runArguments = ['delegate:main', MAIN_CLASS]
 	
 	// Scala uses its own classpath, so we'll just make sure to duplicate it from the container
-	mainArguments.push('-classpath', command.sincerity.container.dependencies.classpath)
+	runArguments.push('-classpath', command.sincerity.container.dependencies.classpath)
 	
 	var arguments = command.arguments
 	for (var i in arguments) {
-		mainArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 	}
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 	
 	// The Scala REPL (which uses JLine) does not restore terminal echo, so we will do it manually
 	// (See: http://scala-forum.org/read.php?5,411,411)

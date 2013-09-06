@@ -1,5 +1,5 @@
 
-//sincerity.run('delegate:execute', ['easy_install', 'Django==1.2.7', 'django-jython==1.2.0'])
+//sincerity.run(['delegate:execute', 'easy_install', 'Django==1.2.7', 'django-jython==1.2.0'])
 
 println()
 println('To start your Django server, run: "sincerity delegate:start django"')

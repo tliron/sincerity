@@ -34,34 +34,34 @@ function ruby(command, preArguments, postArguments) {
 	// JFFI
 	System.setProperty('jffi.boot.library.path', command.sincerity.container.getLibrariesFile('ruby', 'native'))
 	
-	var mainArguments = [MAIN_CLASS]
+	var runArguments = ['delegate:main', MAIN_CLASS]
 	if (preArguments) {
 		for (var i in preArguments) {
-			mainArguments.push(preArguments[i])
+			runArguments.push(preArguments[i])
 		}
 	}
 	var arguments = command.arguments
 	for (var i in arguments) {
-		mainArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 	}
 	if (postArguments) {
 		for (var i in postArguments) {
-			mainArguments.push(postArguments[i])
+			runArguments.push(postArguments[i])
 		}
 	}
 	
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 }
 
 function gem(command) {
 	// We are executing gem in a separate process, because otherwise it will exit our process when done :(
-	var executeArguments = ['gem']
+	var runArguments = ['delegate:execute', 'gem']
 	var arguments = command.arguments
 	for (var i in arguments) {
-		executeArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 		if ((i == 0) && (arguments[i] == 'install')) {
-			executeArguments.push('--bindir', sincerity.container.getExecutablesFile())
+			runArguments.push('--bindir', sincerity.container.getExecutablesFile())
 		}
 	}
-	sincerity.run('delegate:execute', executeArguments)
+	sincerity.run(runArguments)
 }

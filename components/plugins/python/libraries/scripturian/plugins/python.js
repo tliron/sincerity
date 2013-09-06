@@ -58,22 +58,22 @@ function python(command) {
 	// so we must explicitly set sys.argv if we want to run it more than once with different arguments
 	sys.argv.clear()
 
-	var mainArguments = [MAIN_CLASS]
+	var runArguments = ['delegate:main', MAIN_CLASS]
 	var arguments = command.arguments
 	for (var i in arguments) {
-		mainArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 		sys.argv.add(new PyString(arguments[i]))
 	}
 
-	command.sincerity.run('delegate:main', mainArguments)
+	command.sincerity.run(runArguments)
 }
 
 function easy_install(command) {
 	// We are executing easy_install in a separate process, because otherwise it will exit our process when done :(
-	var executeArguments = ['easy_install']
+	var runArguments = ['delegate:execute', 'easy_install']
 	var arguments = command.arguments
 	for (var i in arguments) {
-		executeArguments.push(arguments[i])
+		runArguments.push(arguments[i])
 	}
-	sincerity.run('delegate:execute', executeArguments)
+	sincerity.run(runArguments)
 }

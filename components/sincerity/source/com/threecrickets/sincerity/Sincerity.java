@@ -579,7 +579,7 @@ public class Sincerity implements Runnable
 	 *        The command line
 	 * @return The commands
 	 */
-	public List<Command> parseCommands( String... arguments )
+	public LinkedList<Command> parseCommands( String... arguments )
 	{
 		LinkedList<Command> commands = new LinkedList<Command>();
 
@@ -627,97 +627,25 @@ public class Sincerity implements Runnable
 	}
 
 	/**
-	 * Runs a single command with the current set up plugins.
-	 * <p>
-	 * Shortcuts are expanded, and commands without plugin names are searched
-	 * for among all plugins. If a used name exists more than once in the
-	 * plugins, an {@link AmbiguousCommandException} is thrown.
+	 * Runs a command line with the current set of plugs. Supported expanding
+	 * shortcuts.
 	 * 
-	 * @param command
-	 *        The command
-	 * @throws SincerityException
-	 * @see #getPlugins()
-	 * @see #run(String, String...)
-	 */
-	public void run( Command command ) throws SincerityException
-	{
-		if( command.getName().startsWith( Shortcuts.SHORTCUT_PREFIX ) )
-		{
-			String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( Shortcuts.SHORTCUT_PREFIX_LENGTH ) );
-			if( shortcut != null )
-			{
-				List<Command> commands = parseCommands( shortcut );
-				for( Command c : commands )
-					run( c );
-			}
-			return;
-		}
-
-		if( command.plugin != null )
-		{
-			Plugin1 plugin = getPlugins().get( command.plugin );
-			if( plugin == null )
-				throw new UnknownCommandException( command );
-			plugin.run( command );
-		}
-		else
-		{
-			ArrayList<Plugin1> plugins = new ArrayList<Plugin1>();
-			for( Plugin1 plugin : getPlugins().values() )
-			{
-				if( Arrays.asList( plugin.getCommands() ).contains( command.getName() ) )
-					plugins.add( plugin );
-			}
-
-			int size = plugins.size();
-			if( size == 1 )
-			{
-				Plugin1 plugin = plugins.get( 0 );
-				command.plugin = plugin.getName();
-				plugin.run( command );
-				return;
-			}
-			else if( size > 1 )
-				throw new AmbiguousCommandException( command, plugins );
-			else
-				throw new UnknownCommandException( command );
-		}
-	}
-
-	/**
-	 * Runs a single command with the current set up plugins.
-	 * <p>
-	 * Shortcuts are expanded, and commands without plugin names are searched
-	 * for among all plugins. If a used name exists more than once in the
-	 * plugins, an {@link AmbiguousCommandException} is thrown.
-	 * 
-	 * @param name
-	 *        The command name
 	 * @param arguments
 	 *        The command arguments
 	 * @throws SincerityException
 	 * @see #getPlugins()
-	 * @see #run(Command)
 	 */
-	public void run( String name, String... arguments ) throws SincerityException
+	public void run( String... arguments ) throws SincerityException
 	{
-		boolean isGreedy;
-		if( name.endsWith( Command.GREEDY_POSTFIX ) )
-		{
-			name = name.substring( 0, name.length() - Command.GREEDY_POSTFIX_LENGTH );
-			isGreedy = true;
-		}
-		else
-			isGreedy = false;
-
-		Command command = new Command( name, isGreedy, this );
-		for( String argument : arguments )
-			command.rawArguments.add( argument );
-		run( command );
+		// Insert at beginning of current command line queue with an "until" tag
+		LinkedList<Command> newCommands = parseCommands( arguments );
+		newCommands.add( Command.UNTIL );
+		commands.addAll( 0, newCommands );
+		run( true );
 	}
 
 	/**
-	 * Removes a command from the queue.
+	 * Removes a command from the current command queue.
 	 * 
 	 * @param command
 	 *        The command
@@ -756,6 +684,8 @@ public class Sincerity implements Runnable
 		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
 		{
 			Command c = i.next();
+			if( c == Command.UNTIL )
+				continue;
 			for( String argument : c.toArguments() )
 				arguments.add( argument );
 			if( i.hasNext() )
@@ -783,6 +713,29 @@ public class Sincerity implements Runnable
 	}
 
 	/**
+	 * Prints the current command queue to standard out.
+	 */
+	public void printCommands()
+	{
+		ArrayList<String> arguments = new ArrayList<String>();
+		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
+		{
+			Command c = i.next();
+			if( c == Command.UNTIL )
+				arguments.add( "UNTIL" );
+			else
+			{
+				for( String argument : c.toArguments() )
+					arguments.add( argument );
+			}
+			if( i.hasNext() )
+				arguments.add( Command.COMMANDS_SEPARATOR );
+		}
+		String commandLine = StringUtil.join( arguments, " " );
+		getOut().println( commandLine );
+	}
+
+	/**
 	 * Dumps an exception's stack trace to standard error.
 	 * 
 	 * @param x
@@ -802,42 +755,23 @@ public class Sincerity implements Runnable
 	{
 		try
 		{
-			while( !commands.isEmpty() )
-			{
-				Command command = commands.get( 0 );
-				run( command );
-				commands.remove( command );
-			}
-		}
-		catch( RebootException x )
-		{
-			// This means that the run has continued in a different bootstrap
+			run( false );
 		}
 		catch( SincerityException x )
 		{
-			if( getVerbosity() >= 2 )
-				printStackTrace( x );
-			else
-				getErr().println( x.getMessage() );
-		}
-		catch( Throwable x )
-		{
-			printStackTrace( x );
+			// Should never happen
 		}
 	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	// Protected
-
-	/**
-	 * The command queue.
-	 */
-	protected final List<Command> commands;
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final ThreadLocal<Sincerity> threadLocal = new ThreadLocal<Sincerity>();
+
+	/**
+	 * The command queue.
+	 */
+	private final LinkedList<Command> commands;
 
 	private File home;
 
@@ -905,6 +839,124 @@ public class Sincerity implements Runnable
 		catch( IOException x )
 		{
 			throw new SincerityException( "I/O error searching for Sincerity container" );
+		}
+	}
+
+	/**
+	 * Runs the current command line queue with the current set of plugs.
+	 * Supported expanding shortcuts.
+	 * <p>
+	 * When isManual is true (see {@link #run(String...)}, exceptions are thrown
+	 * and the special {@link Command#UNTIL} tag is used to stop execution.
+	 * <p>
+	 * Otherwise, exceptions are never thrown, despite the checked exception
+	 * declaration.
+	 * 
+	 * @param isManual
+	 *        Whether we are running in manual mode
+	 * @throws SincerityException
+	 */
+	private void run( boolean isManual ) throws SincerityException
+	{
+		Command command = null;
+		try
+		{
+			while( !commands.isEmpty() )
+			{
+				command = commands.peek();
+
+				// Check for special "until" tag
+				if( command == Command.UNTIL )
+				{
+					commands.remove( command );
+					if( isManual )
+						// Stop!
+						break;
+					else
+					{
+						command = commands.peek();
+						if( command == null )
+							break;
+					}
+				}
+
+				if( command.getName().startsWith( Shortcuts.SHORTCUT_PREFIX ) )
+				{
+					// Expands shortcuts into current command queue
+					String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( Shortcuts.SHORTCUT_PREFIX_LENGTH ) );
+					LinkedList<Command> shortcutCommands = parseCommands( shortcut );
+					commands.remove( command );
+					commands.addAll( 0, shortcutCommands );
+					command = commands.peek();
+					if( command == null )
+						break;
+				}
+
+				if( command.plugin != null )
+				{
+					// Plugin was provided
+					Plugin1 plugin = getPlugins().get( command.plugin );
+					if( plugin == null )
+						throw new UnknownCommandException( command );
+
+					plugin.run( command );
+				}
+				else
+				{
+					// Plugin was not provided, so try all plugins
+					ArrayList<Plugin1> plugins = new ArrayList<Plugin1>();
+					for( Plugin1 plugin : getPlugins().values() )
+					{
+						if( Arrays.asList( plugin.getCommands() ).contains( command.getName() ) )
+							plugins.add( plugin );
+					}
+
+					int size = plugins.size();
+					if( size == 1 )
+					{
+						// Found unambiguous plugin
+						Plugin1 plugin = plugins.get( 0 );
+						command.plugin = plugin.getName();
+
+						plugin.run( command );
+					}
+					else if( size > 1 )
+					{
+						throw new AmbiguousCommandException( command, plugins );
+					}
+					else
+					{
+						throw new UnknownCommandException( command );
+					}
+				}
+
+				commands.remove( command );
+			}
+		}
+		catch( RebootException x )
+		{
+			// This means that the run has continued in a different bootstrap
+		}
+		catch( SincerityException x )
+		{
+			commands.remove( command );
+			if( isManual )
+				throw x;
+			else
+			{
+				if( getVerbosity() >= 2 )
+					printStackTrace( x );
+				else
+					getErr().println( x.getMessage() );
+			}
+		}
+		catch( Throwable x )
+		{
+			commands.remove( command );
+			if( isManual )
+				throw new SincerityException( "Something very bad happened!", x );
+			else
+				printStackTrace( x );
 		}
 	}
 }
