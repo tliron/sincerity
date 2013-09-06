@@ -12696,7 +12696,7 @@ sincerity add rails : install
 \end_layout
 
 \begin_layout Standard
-This may take a minute or two: Rails is quite massive.
+This may take a few minutes: Rails is quite massive.
 \end_layout
 
 \begin_layout Standard
@@ -13110,7 +13110,7 @@ sincerity add django : install
 \end_layout
 
 \begin_layout Standard
-This may take a minute or two: Django is quite massive!
+This may take a few minutes: Django is quite massive!
 \end_layout
 
 \begin_layout Standard
