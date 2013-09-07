@@ -103,7 +103,7 @@ public class JavaPlugin implements Plugin1
 			}
 			catch( ClassNotFoundException x )
 			{
-				throw new SincerityException( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not pointing to a JDK?", x );
+				throw new SincerityException( "Could not find Java compiler in classpath. Perhaps JAVA_HOME is not pointing to a full JDK?", x );
 			}
 			catch( SecurityException x )
 			{

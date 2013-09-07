@@ -99,7 +99,7 @@ public class ContainerPlugin implements Plugin1
 			// first (likely ~/.sincerity/templates
 			// same for 'templatize'
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().createContainer( containerRoot, templateDir, force );
 		}
 		else if( "use".equals( commandName ) )
@@ -115,7 +115,7 @@ public class ContainerPlugin implements Plugin1
 			if( !new File( containerRoot, Container.SINCERITY_DIR ).isDirectory() )
 				throw new NoContainerException( "The folder is not a valid container: " + containerRoot );
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().setContainerRoot( containerRoot );
 		}
 		else if( "clone".equals( commandName ) )
@@ -128,7 +128,7 @@ public class ContainerPlugin implements Plugin1
 
 			File containerRoot = new File( arguments[0] );
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot(), force );
 		}
 		else if( "clean".equals( commandName ) )
@@ -150,7 +150,7 @@ public class ContainerPlugin implements Plugin1
 				}
 			}
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().reboot();
 		}
 		else

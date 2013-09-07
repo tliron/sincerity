@@ -13,7 +13,6 @@ package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 
 import com.threecrickets.scripturian.LanguageAdapter;
@@ -25,7 +24,6 @@ import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.ClassUtil;
-import com.threecrickets.sincerity.internal.Pipe;
 import com.threecrickets.sincerity.internal.ProcessDestroyer;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.ProgramsPane;
@@ -134,10 +132,9 @@ public class DelegatePlugin implements Plugin1
 				Process process = processBuilder.start();
 
 				if( !background )
-					Runtime.getRuntime().addShutdownHook( new ProcessDestroyer( process ) );
+					ProcessDestroyer.addShutdownHook( process );
 
-				new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), command.getSincerity().getOut() ) ).start();
-				new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), command.getSincerity().getErr() ) ).start();
+				command.getSincerity().captureOutput( process );
 
 				if( !background )
 				{
@@ -147,14 +144,14 @@ public class DelegatePlugin implements Plugin1
 					}
 					catch( InterruptedException x )
 					{
-						throw new SincerityException( "System command execution was interrupted: " + StringUtil.join( arguments, " " ), x );
+						throw new SincerityException( "System process execution was interrupted: " + StringUtil.join( arguments, " " ), x );
 					}
 				}
 			}
 			catch( IOException x )
 			{
-				command.getSincerity().printStackTrace( x );
-				throw new SincerityException( "Error executing system command: " + StringUtil.join( arguments, " " ), x );
+				command.getSincerity().dumpStackTrace( x );
+				throw new SincerityException( "Error executing system process: " + StringUtil.join( arguments, " " ), x );
 			}
 		}
 		else if( "programs".equals( commandName ) )
@@ -166,7 +163,7 @@ public class DelegatePlugin implements Plugin1
 		{
 			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
-				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( "language.name" ) );
+				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( LanguageAdapter.LANGUAGE_NAME ) );
 		}
 		else
 			throw new UnknownCommandException( command );

@@ -2,6 +2,7 @@
 document.executeOnce('/sincerity/files/')
 document.executeOnce('/sincerity/jvm/')
 document.executeOnce('/sincerity/objects/')
+document.executeOnce('/sincerity/templates/')
 
 importClass(
 	com.threecrickets.sincerity.exception.CommandException,
@@ -47,32 +48,43 @@ function service(command) {
 	
 	var pidFile = new File(cacheDir, name + '.pid')
 	var statusFile = new File(cacheDir, name + '.status')
+	var pid, status
 	
 	if (verb == 'status') {
-		var pid = getPid(pidFile, statusFile)
-		var status = getStatus(statusFile)
+		pid = getPid(pidFile, statusFile)
+		status = getStatus(statusFile)
 		if (null === status) {
-			command.sincerity.out.println(displayName + ' is not running')
+			command.sincerity.out.println('{0} is not running'.cast(displayName))
 		}
 		else {
-			command.sincerity.out.println(displayName + ': ' + status + (null === pid ? '' : ' (pid: ' + pid + ')'))
+			if (null === pid) {
+				command.sincerity.out.println('{0}: {1}'.cast(displayName, status))
+			}
+			else {
+				command.sincerity.out.println('{0}: {1} (pid: {2})'.cast(displayName, status, pid))
+			}
 		}
 		return
 	}
 	
 	if ((verb == 'stop' ) || (verb == 'restart')) {
-		var pid = getPid(pidFile, statusFile)
-		var status = getStatus(statusFile)
+		pid = getPid(pidFile, statusFile)
+		status = getStatus(statusFile)
 		if (isStopped(status) || (null === pid)) {
-			command.sincerity.out.println(displayName + ' is not running' + (null === status ? '' : ' (' + status + ')'))
+			if (null === status) {
+				command.sincerity.out.println('{0} is not running'.cast(displayName))
+			}
+			else {
+				command.sincerity.out.println('{0} is not running {1})'.cast(displayName, status))
+			}
 			return
 		}
 		
-		command.sincerity.out.println('Stopping ' + displayName + ' (pid: ' + pid + ')...')
+		command.sincerity.out.println('Stopping {0} (pid: {1})...'.cast(displayName, pid))
 		Sincerity.JVM.kill(pid)
 		pid = getPid(pidFile, statusFile)
 		if (null !== pid) {
-			command.sincerity.out.println('Waiting for ' + displayName + ' to stop...')
+			command.sincerity.out.println('Waiting for {0} to stop...'.cast(displayName))
 			while (null !== pid) {
 				java.lang.Thread.sleep(1000)
 				pid = getPid(pidFile, statusFile)
@@ -85,23 +97,24 @@ function service(command) {
 	}
 	
 	if ((verb == 'start') || (verb == 'restart') || (verb == 'console')) {
-		var pid = getPid(pidFile, statusFile)
-		var status = getStatus(statusFile)
+		pid = getPid(pidFile, statusFile)
+		status = getStatus(statusFile)
 		if (isRunning(status)) {
-			command.sincerity.out.println(displayName + ' is already running (' + status + ')')
+			command.sincerity.out.println('{0} is already running ({1})'.cast(displayName, status))
 			return
 		}
 
-		var binary = 'wrapper-' + os.name + '-' + os.architecture + '-' + os.bits
+		var binary = 'wrapper-{name}-{architecture}-{bits}'.cast(os)
 		binary = command.sincerity.container.getLibrariesFile('native', binary)
 		if (!binary.exists()) {
 			if (isSupported(os)) {
 				var version = command.sincerity.container.dependencies.resolvedDependencies.getVersion('com.tanukisoftware', 'wrapper-base')
 				command.sincerity.run(['dependencies:add', 'com.tanukisoftware', 'wrapper-' + os.name, version])
 				command.sincerity.run(['artifacts:install'])
+				return
 			}
 			if (!binary.exists()) {
-				throw new CommandException(command, 'The service plugin in this container does not support your operating system: ' + os.name + ', ' + os.architecture + ', ' + os.bits)
+				throw new CommandException(command, 'The service plugin in this container does not support your operating system: {name}, {architecture}, {bits}'.cast(os))
 			}
 		}
 		
@@ -117,7 +130,7 @@ function service(command) {
 			}
 		}
 	
-		// This configuration will override anything in service.conf
+		// Entries in this configuration will override those in service.conf
 		// See: http://wrapper.tanukisoftware.com/doc/english/properties.html
 		var configuration = {
 			wrapper: {
@@ -125,7 +138,7 @@ function service(command) {
 				displayname: displayName,
 				pidfile: pidFile,
 				'pidfile.strict': true,
-				logfile: command.sincerity.container.getLogsFile('service-' + name + '.log'),
+				logfile: command.sincerity.container.getLogsFile('service-{0}.log'.cast(name)),
 				working: {
 					dir: command.sincerity.container.root
 				},
@@ -202,17 +215,17 @@ function service(command) {
 		if (verbose) {
 			command.sincerity.out.println('Arguments:')
 			for (c in runArguments) {
-				command.sincerity.out.println(' ' + c + ' = ' + runArguments[c])
+				command.sincerity.out.println(' {0}={1}'.cast(c, runArguments[c]))
 			}
 		}
 
 		// Launch native wrapper binary
 		if (verb == 'console') {
-			command.sincerity.out.println('Running ' + displayName + '...')
+			command.sincerity.out.println('Running {0}...'.cast(displayName))
 		}
 		command.sincerity.run(runArguments)
 		if ((verb == 'start') || (verb == 'restart')) {
-			command.sincerity.out.println('Started ' + displayName)
+			command.sincerity.out.println('Started {0}'.cast(displayName))
 		}
 		return
 	}

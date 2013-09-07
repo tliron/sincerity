@@ -112,7 +112,7 @@ public class DependenciesPlugin implements Plugin1
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.reset();
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().reboot();
 		}
 		else if( "add".equals( commandName ) )
@@ -125,7 +125,7 @@ public class DependenciesPlugin implements Plugin1
 			if( arguments.length == 1 )
 			{
 				String shortcut = arguments[0];
-				command.getSincerity().removeCommand( command );
+				command.remove();
 				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "add" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
 				return;
 			}

@@ -50,7 +50,9 @@ function render(command) {
 			break
 			
 		case 'pdf':
-			Sincerity.Container.ensureClass('org.apache.fop.svg.PDFTranscoder', ['org.apache.xmlgraphics', 'fop', fopVersion])
+			if (null === Sincerity.Container.ensureClass('org.apache.fop.svg.PDFTranscoder', ['org.apache.xmlgraphics', 'fop', fopVersion])) {
+				return
+			}
 			transcoder = new org.apache.fop.svg.PDFTranscoder()
 			break
 			

@@ -70,6 +70,7 @@ function hadoop(command) {
 					command.sincerity.run(['dependencies:add', 'org.apache.hadoop', 'hadoop-linux-i386', version])
 				}
 				command.sincerity.run('artifacts:install')
+				return
 			}
 		}
 	}

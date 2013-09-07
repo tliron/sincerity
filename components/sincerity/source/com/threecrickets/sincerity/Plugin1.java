@@ -42,16 +42,18 @@ public interface Plugin1
 	 * The version of the Sincerity plugin interface supported by this plugin.
 	 * 
 	 * @return The interface version number
+	 * @throws SincerityException
 	 */
-	public int getInterfaceVersion();
+	public int getInterfaceVersion() throws SincerityException;
 
 	/**
 	 * The name of this plugin. Plugin names are expected to be unique per
 	 * container.
 	 * 
 	 * @return The plugin name
+	 * @throws SincerityException
 	 */
-	public String getName();
+	public String getName() throws SincerityException;
 
 	/**
 	 * The command names supported by this plugin. Command names do not have to

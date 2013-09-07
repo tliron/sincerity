@@ -26,6 +26,7 @@ function validate() {
 		var version = sincerity.container.dependencies.resolvedDependencies.getVersion('org.lwjgl', 'lwjgl')
 		sincerity.run(['dependencies:add', 'org.lwjgl', module, version])
 		sincerity.run(['artifacts:install'])
+		return
 	}
 }
 

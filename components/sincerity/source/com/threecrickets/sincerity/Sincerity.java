@@ -14,6 +14,7 @@ package com.threecrickets.sincerity;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -21,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -35,6 +36,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.internal.NativeUtil;
+import com.threecrickets.sincerity.internal.Pipe;
 import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 
@@ -571,63 +573,7 @@ public class Sincerity implements Runnable
 	}
 
 	/**
-	 * Parses a command line.
-	 * <p>
-	 * No validation is done of commands here, neither are shortcuts expanded.
-	 * 
-	 * @param arguments
-	 *        The command line
-	 * @return The commands
-	 */
-	public LinkedList<Command> parseCommands( String... arguments )
-	{
-		LinkedList<Command> commands = new LinkedList<Command>();
-
-		Command command = null;
-		boolean isGreedy = false;
-
-		for( String argument : arguments )
-		{
-			if( argument.length() == 0 )
-				continue;
-
-			if( !isGreedy && Command.COMMANDS_SEPARATOR.equals( argument ) )
-			{
-				if( command != null )
-				{
-					commands.add( command );
-					command = null;
-				}
-			}
-			else
-			{
-				if( command == null )
-				{
-					if( argument.endsWith( Command.GREEDY_POSTFIX ) )
-					{
-						isGreedy = true;
-						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
-					}
-
-					// Special handling for --help
-					if( argument.equals( "--help" ) || argument.equals( "-h" ) )
-						argument = "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help";
-
-					command = new Command( argument, isGreedy, this );
-				}
-				else
-					command.rawArguments.add( argument );
-			}
-		}
-
-		if( command != null )
-			commands.add( command );
-
-		return commands;
-	}
-
-	/**
-	 * Runs a command line with the current set of plugs. Supported expanding
+	 * Runs a command line with the current set of plugs. Supports expanding
 	 * shortcuts.
 	 * 
 	 * @param arguments
@@ -641,18 +587,9 @@ public class Sincerity implements Runnable
 		LinkedList<Command> newCommands = parseCommands( arguments );
 		newCommands.add( Command.UNTIL );
 		commands.addAll( 0, newCommands );
+		if( getVerbosity() >= 3 )
+			getOut().println( "Sincerity running: " + StringUtil.join( arguments, " " ) + "..." );
 		run( true );
-	}
-
-	/**
-	 * Removes a command from the current command queue.
-	 * 
-	 * @param command
-	 *        The command
-	 */
-	public void removeCommand( Command command )
-	{
-		commands.remove( command );
 	}
 
 	/**
@@ -679,19 +616,6 @@ public class Sincerity implements Runnable
 		if( commands.isEmpty() )
 			return;
 
-		// Convert commands into arguments to be re-parsed
-		ArrayList<String> arguments = new ArrayList<String>();
-		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
-		{
-			Command c = i.next();
-			if( c == Command.UNTIL )
-				continue;
-			for( String argument : c.toArguments() )
-				arguments.add( argument );
-			if( i.hasNext() )
-				arguments.add( Command.COMMANDS_SEPARATOR );
-		}
-
 		try
 		{
 			// Go native!
@@ -699,10 +623,18 @@ public class Sincerity implements Runnable
 			NativeUtil.addNativePath( nativeDir );
 
 			if( getVerbosity() >= 3 )
-				getOut().println( "Rebooting..." );
+			{
+				ArrayList<String> arguments = unparseCommands( true );
+				getOut().println( "Sincerity rebooting with command line: " + StringUtil.join( arguments, " " ) + "..." );
+			}
 
 			// Bootstrap into container
+			ArrayList<String> arguments = unparseCommands( false );
 			getContainer().getBootstrap( forceNewBootstrap ).bootstrap( arguments.toArray( new String[arguments.size()] ) );
+		}
+		catch( SincerityException x )
+		{
+			throw x;
 		}
 		catch( Exception x )
 		{
@@ -713,26 +645,17 @@ public class Sincerity implements Runnable
 	}
 
 	/**
-	 * Prints the current command queue to standard out.
+	 * Captures the standard output and standard error of a process.
+	 * 
+	 * @param process
+	 *        The process
+	 * @see #setOut(Writer)
+	 * @see #setErr(Writer)
 	 */
-	public void printCommands()
+	public void captureOutput( Process process )
 	{
-		ArrayList<String> arguments = new ArrayList<String>();
-		for( Iterator<Command> i = commands.iterator(); i.hasNext(); )
-		{
-			Command c = i.next();
-			if( c == Command.UNTIL )
-				arguments.add( "UNTIL" );
-			else
-			{
-				for( String argument : c.toArguments() )
-					arguments.add( argument );
-			}
-			if( i.hasNext() )
-				arguments.add( Command.COMMANDS_SEPARATOR );
-		}
-		String commandLine = StringUtil.join( arguments, " " );
-		getOut().println( commandLine );
+		new Thread( new Pipe( new InputStreamReader( process.getInputStream() ), getOut() ) ).start();
+		new Thread( new Pipe( new InputStreamReader( process.getErrorStream() ), getErr() ) ).start();
 	}
 
 	/**
@@ -742,7 +665,7 @@ public class Sincerity implements Runnable
 	 *        The exception
 	 * @see #setErr(Writer)
 	 */
-	public void printStackTrace( Throwable x )
+	public void dumpStackTrace( Throwable x )
 	{
 		getErr().println( StringUtil.createHumanReadableStackTrace( x ) );
 	}
@@ -761,6 +684,20 @@ public class Sincerity implements Runnable
 		{
 			// Should never happen
 		}
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	/**
+	 * Removes a command from the current command queue.
+	 * 
+	 * @param command
+	 *        The command
+	 */
+	protected void removeCommand( Command command )
+	{
+		commands.remove( command );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -840,6 +777,103 @@ public class Sincerity implements Runnable
 		{
 			throw new SincerityException( "I/O error searching for Sincerity container" );
 		}
+	}
+
+	/**
+	 * Parses a command line.
+	 * <p>
+	 * No validation is done of commands here, neither are shortcuts expanded.
+	 * 
+	 * @param arguments
+	 *        The command line
+	 * @return The commands
+	 * @see #unparseCommands(boolean)
+	 */
+	private LinkedList<Command> parseCommands( String... arguments )
+	{
+		LinkedList<Command> commands = new LinkedList<Command>();
+
+		Command command = null;
+		boolean isGreedy = false;
+
+		for( String argument : arguments )
+		{
+			if( argument.length() == 0 )
+				continue;
+
+			if( !isGreedy && Command.COMMANDS_SEPARATOR.equals( argument ) )
+			{
+				if( command != null )
+				{
+					commands.add( command );
+					command = null;
+				}
+			}
+			else
+			{
+				if( command == null )
+				{
+					if( argument.endsWith( Command.GREEDY_POSTFIX ) )
+					{
+						isGreedy = true;
+						argument = argument.substring( 0, argument.length() - Command.GREEDY_POSTFIX_LENGTH );
+					}
+
+					// Special handling for --help
+					if( argument.equals( "--help" ) || argument.equals( "-h" ) )
+						argument = "help" + Command.PLUGIN_COMMAND_SEPARATOR + "help";
+
+					command = new Command( argument, isGreedy, this );
+				}
+				else
+					command.rawArguments.add( argument );
+			}
+		}
+
+		if( command != null )
+			commands.add( command );
+
+		return commands;
+	}
+
+	/**
+	 * Turns the current command line queue into raw arguments.
+	 * 
+	 * @param includeUntil
+	 *        Whether to include {@link Command#UNTIL} instances
+	 * @return The command line arguments
+	 */
+	private ArrayList<String> unparseCommands( boolean includeUntil )
+	{
+		ListIterator<Command> i;
+		if( includeUntil )
+			i = commands.listIterator();
+		else
+		{
+			// Start after last "until" tag
+			i = commands.listIterator( commands.size() );
+			while( i.hasPrevious() )
+			{
+				Command c = i.previous();
+				if( c == Command.UNTIL )
+				{
+					i.next();
+					break;
+				}
+			}
+		}
+
+		ArrayList<String> arguments = new ArrayList<String>();
+		while( i.hasNext() )
+		{
+			Command c = i.next();
+			for( String argument : c.toArguments() )
+				arguments.add( argument );
+			if( i.hasNext() )
+				arguments.add( Command.COMMANDS_SEPARATOR );
+		}
+
+		return arguments;
 	}
 
 	/**
@@ -945,9 +979,9 @@ public class Sincerity implements Runnable
 			else
 			{
 				if( getVerbosity() >= 2 )
-					printStackTrace( x );
+					dumpStackTrace( x );
 				else
-					getErr().println( x.getMessage() );
+					getErr().println( "Error: " + x.getMessage() );
 			}
 		}
 		catch( Throwable x )
@@ -956,7 +990,7 @@ public class Sincerity implements Runnable
 			if( isManual )
 				throw new SincerityException( "Something very bad happened!", x );
 			else
-				printStackTrace( x );
+				dumpStackTrace( x );
 		}
 	}
 }

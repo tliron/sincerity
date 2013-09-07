@@ -53,7 +53,7 @@ public class DelegatedPlugin implements Plugin1
 	// Plugin
 	//
 
-	public int getInterfaceVersion()
+	public int getInterfaceVersion() throws SincerityException
 	{
 		try
 		{
@@ -68,17 +68,23 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ParsingException x )
 		{
+			throw new SincerityException( "Could not parse source code for delegated plugin: " + defaultName, x );
 		}
 		catch( ExecutionException x )
 		{
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
+			// Optional method
 		}
 		return DEFAULT_VERSION;
 	}
 
-	public String getName()
+	public String getName() throws SincerityException
 	{
 		try
 		{
@@ -88,12 +94,18 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ParsingException x )
 		{
+			throw new SincerityException( "Could not parse source code for delegated plugin: " + defaultName, x );
 		}
 		catch( ExecutionException x )
 		{
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
+			// Optional method
 		}
 		return defaultName;
 	}
@@ -119,7 +131,10 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( x.getMessage(), x.getCause() );
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -139,7 +154,10 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( x.getMessage(), x.getCause() );
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -159,10 +177,14 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( x.getMessage(), x.getCause() );
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
+			// Optional method
 		}
 	}
 

@@ -70,7 +70,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 				}
 				catch( Exception x )
 				{
-					container.getSincerity().printStackTrace( x );
+					container.getSincerity().dumpStackTrace( x );
 				}
 			}
 		}

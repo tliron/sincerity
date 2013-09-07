@@ -56,7 +56,9 @@ function render(command) {
 }
 
 function renderMarkdown(command, sourceFile, renderedFile) {
-	Sincerity.Container.ensureClass('org.pegdown.PegDownProcessor', ['org.pegdown', 'pegdown', pegdownVersion])
+	if (null == Sincerity.Container.ensureClass('org.pegdown.PegDownProcessor', ['org.pegdown', 'pegdown', pegdownVersion])) {
+		return
+	}
 	
 	var parser = new org.pegdown.PegDownProcessor()
 	var source = Sincerity.Files.loadText(sourceFile).array()
@@ -76,7 +78,7 @@ function renderWikiText(command, sourceFile, renderedFile, name, complete) {
 		// Install the relevant dependency and try again
 		command.sincerity.run(['dependencies:add', 'org.eclipse.mylyn', 'wikitext-' + name, wikiTextVersion])
 		command.sincerity.run(['artifacts:install'])
-		language = getLanguage(fullName)
+		return
 	}
 
 	if (!Sincerity.Objects.exists(language)) {

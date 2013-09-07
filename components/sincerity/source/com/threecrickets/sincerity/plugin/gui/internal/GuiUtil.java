@@ -138,7 +138,7 @@ public class GuiUtil
 
 	public static void error( Throwable x )
 	{
-		Sincerity.getCurrent().printStackTrace( x );
+		Sincerity.getCurrent().dumpStackTrace( x );
 	}
 
 	public static void center( Window window, double ratio )

@@ -260,7 +260,7 @@ public class PyPiResolver extends BasicResolver
 		}
 		catch( Exception x )
 		{
-			Sincerity.getCurrent().printStackTrace( x );
+			Sincerity.getCurrent().dumpStackTrace( x );
 			return null;
 		}
 
@@ -445,7 +445,7 @@ public class PyPiResolver extends BasicResolver
 			}
 			catch( Exception x )
 			{
-				Sincerity.getCurrent().printStackTrace( x );
+				Sincerity.getCurrent().dumpStackTrace( x );
 			}
 		}
 
@@ -627,7 +627,7 @@ public class PyPiResolver extends BasicResolver
 		}
 		catch( SincerityException x )
 		{
-			sincerity.printStackTrace( x );
+			sincerity.dumpStackTrace( x );
 		}
 
 		return null;
@@ -645,7 +645,7 @@ public class PyPiResolver extends BasicResolver
 			}
 			catch( SincerityException x )
 			{
-				sincerity.printStackTrace( x );
+				sincerity.dumpStackTrace( x );
 			}
 		}
 
@@ -713,7 +713,7 @@ public class PyPiResolver extends BasicResolver
 				}
 				catch( SincerityException x )
 				{
-					sincerity.printStackTrace( x );
+					sincerity.dumpStackTrace( x );
 				}
 			}
 		}

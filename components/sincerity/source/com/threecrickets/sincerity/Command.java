@@ -54,7 +54,7 @@ public class Command
 
 	public static final String PLUGIN_COMMAND_SEPARATOR = ":";
 
-	public static final Command UNTIL = new Command( null, null, false, null );
+	public static final Command UNTIL = new Command( null, "UNTIL", false, null );
 
 	//
 	// Construction
@@ -231,6 +231,19 @@ public class Command
 		for( String argument : rawArguments )
 			arguments[i++] = argument;
 		return arguments;
+	}
+
+	//
+	// Operations
+	//
+
+	/**
+	 * Removes this command from the {@link Sincerity} instance's current
+	 * command queue.
+	 */
+	public void remove()
+	{
+		sincerity.removeCommand( this );
 	}
 
 	//

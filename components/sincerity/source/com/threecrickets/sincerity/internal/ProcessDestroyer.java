@@ -21,6 +21,21 @@ package com.threecrickets.sincerity.internal;
 public class ProcessDestroyer extends Thread
 {
 	//
+	// Static operations
+	//
+
+	/**
+	 * Add a JVM shutdown hook to destroy the process.
+	 * 
+	 * @param process
+	 *        The process
+	 */
+	public static void addShutdownHook( Process process )
+	{
+		Runtime.getRuntime().addShutdownHook( new ProcessDestroyer( process ) );
+	}
+
+	//
 	// Construction
 	//
 

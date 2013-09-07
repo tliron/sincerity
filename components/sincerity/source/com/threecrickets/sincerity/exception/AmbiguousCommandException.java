@@ -47,8 +47,14 @@ public class AmbiguousCommandException extends CommandException
 		for( Iterator<Plugin1> i = plugins.iterator(); i.hasNext(); )
 		{
 			Plugin1 plugin = i.next();
-			s.append( plugin.getName() );
-			s.append( Command.PLUGIN_COMMAND_SEPARATOR );
+			try
+			{
+				s.append( plugin.getName() );
+				s.append( Command.PLUGIN_COMMAND_SEPARATOR );
+			}
+			catch( SincerityException x )
+			{
+			}
 			s.append( command.getName() );
 			if( i.hasNext() )
 				s.append( ", " );

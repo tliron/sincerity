@@ -101,7 +101,7 @@ public class ArtifactsPlugin implements Plugin1
 			if( container.hasFinishedInstalling() )
 			{
 				container.setInstallations( 0 );
-				command.getSincerity().removeCommand( command );
+				command.remove();
 			}
 			command.getSincerity().reboot();
 		}
@@ -110,7 +110,7 @@ public class ArtifactsPlugin implements Plugin1
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.uninstall();
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().reboot();
 		}
 		else if( "prune".equals( commandName ) )
@@ -118,7 +118,7 @@ public class ArtifactsPlugin implements Plugin1
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			dependencies.prune();
 
-			command.getSincerity().removeCommand( command );
+			command.remove();
 			command.getSincerity().reboot();
 		}
 		else

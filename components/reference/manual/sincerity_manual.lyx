@@ -12088,7 +12088,35 @@ reference "restlet-extras"
 
 \begin_layout Standard
 It may be useful during development to start only a few select applications.
- This can be done by setting the 
+ This can be done by providing the application directory names you wish
+ to start as arguments to the 
+\begin_inset Quotes eld
+\end_inset
+
+start restlet
+\begin_inset Quotes erd
+\end_inset
+
+ command:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity start restlet restlet-example myapp
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Alternatively, you can set the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12104,12 +12132,7 @@ restlet.applications
 \begin_inset Quotes erd
 \end_inset
 
- JVM property) to a comma-separated list of application directory names.
- For example, a command line to run 
-\emph on
-only
-\emph default
- the Restlet example application:
+ JVM property) to a comma-separated list of application directory names:
 \end_layout
 
 \begin_layout Standard
@@ -12119,7 +12142,7 @@ status open
 
 \begin_layout Plain Layout
 
-RESTLET_APPLICATIONS=restlet-example sincerity start restlet
+RESTLET_APPLICATIONS=restlet-example,myapp sincerity start restlet
 \end_layout
 
 \end_inset

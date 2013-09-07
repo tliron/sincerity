@@ -106,15 +106,8 @@ public class Console extends JFrame implements Runnable, ActionListener
 		getContentPane().add( buttonPane, BorderLayout.PAGE_END );
 		getRootPane().setDefaultButton( okButton );
 
-		try
-		{
-			new Thread( new Pipe( new PipedReader( out ) ) ).start();
-			new Thread( new Pipe( new PipedReader( err ) ) ).start();
-		}
-		catch( IOException x )
-		{
-			throw new SincerityException( "Could not initialize GUI console", x );
-		}
+		capture( out );
+		capture( err );
 
 		oldOut = sincerity.getOut();
 		oldErr = sincerity.getErr();
@@ -192,6 +185,18 @@ public class Console extends JFrame implements Runnable, ActionListener
 	private final PrintWriter oldErr;
 
 	private final JTextArea textArea;
+
+	public void capture( PipedWriter out ) throws SincerityException
+	{
+		try
+		{
+			new Thread( new Pipe( new PipedReader( out ) ) ).start();
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "Could not initialize GUI console", x );
+		}
+	}
 
 	private class Add implements Runnable
 	{

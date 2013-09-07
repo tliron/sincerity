@@ -30,6 +30,13 @@ Sincerity.Container = Sincerity.Container || function() {
 
     Public.here = null
     
+    /**
+     * Builds an absolute file relative to the current path.
+     * <p>
+     * The arguments are path segments.
+     * 
+     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     */
     Public.getFileFromHere = function(/* arguments */) {
     	importClass(java.io.File)
 
@@ -48,9 +55,9 @@ Sincerity.Container = Sincerity.Container || function() {
     }
 
 	/**
-	 * Executes all documents represented by the file, while keeping track of the current TODO
+	 * Executes the document represented by the file, while keeping track of the current path.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} The path to execute, relative to the 'here' location.
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
 	 */
 	Public.execute = function(file) {
     	importClass(java.io.File)
@@ -64,6 +71,12 @@ Sincerity.Container = Sincerity.Container || function() {
     	popHere()
 	}
 
+	/**
+	 * Recursively executes all documents in a directory, while keeping track of the current path.
+	 * 
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
+	 * @param {String[]} [exclusions] Paths to avoid
+	 */
 	Public.executeAll = function(file, exclusions) {
     	importClass(java.io.File)
     	
@@ -94,6 +107,15 @@ Sincerity.Container = Sincerity.Container || function() {
 		}
 	}
 	
+	/**
+	 * If the JVM class does not exist, adds and installed dependencies.
+	 * <p>
+	 * The arguments after the first are each an array of values to send to a
+	 * "dependencies:add" command.
+	 * 
+	 * @param {String} className The JVM class name
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The class or null if not found
+	 */
 	Public.ensureClass = function(className/*, dependencies*/) {
 		var theClass = Sincerity.JVM.getClass(className)
 		if (!Sincerity.Objects.exists(theClass)) {
@@ -107,7 +129,7 @@ Sincerity.Container = Sincerity.Container || function() {
 					sincerity.run(runArguments)
 				}
 				sincerity.run(['artifacts:install'])
-				theClass = Sincerity.JVM.getClass(className)
+				return null
 			}
 		}
 		return theClass

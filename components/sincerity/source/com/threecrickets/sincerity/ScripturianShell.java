@@ -128,7 +128,10 @@ public class ScripturianShell implements Shell
 			}
 			catch( ExecutionException x )
 			{
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				if( x.getCause() instanceof SincerityException )
+					throw (SincerityException) x.getCause();
+				else
+					throw new SincerityException( x.getMessage(), x.getCause() );
 			}
 			catch( IOException x )
 			{
@@ -176,7 +179,10 @@ public class ScripturianShell implements Shell
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( x.getMessage(), x.getCause() );
+			if( x.getCause() instanceof SincerityException )
+				throw (SincerityException) x.getCause();
+			else
+				throw new SincerityException( x.getMessage(), x.getCause() );
 		}
 		catch( IOException x )
 		{
