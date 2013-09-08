@@ -2009,56 +2009,6 @@ reference "core-plugins"
  to learn about all the essential commands.
 \end_layout
 
-\begin_layout Subsubsection
-Environment Variables
-\begin_inset CommandInset label
-LatexCommand label
-name "environment-variables"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 
-\begin_inset Quotes eld
-\end_inset
-
-sincerity
-\begin_inset Quotes erd
-\end_inset
-
- script will try to find your operating system's default JVM and your Sincerity
- installation.
- You can modify its behavior using the following environment variables:
-\end_layout
-
-\begin_layout Itemize
-SINCERITY_HOME: The root of the Sincerity installation to use.
- If not provided, will automatically discover it according to actual (not
- symlinked) location of the script file.
-\end_layout
-
-\begin_layout Itemize
-JAVA_HOME: The root of the JVM installation.
- If not provided, will use a platform-specific heuristic to discover it.
-\end_layout
-
-\begin_layout Itemize
-JAVA_VERSION: Used only in Darwin (Mac OS X).
- Defaults to "CurrentJDK".
-\end_layout
-
-\begin_layout Itemize
-JVM_LIBRARIES: Extra libraries to add to the classpath.
-\end_layout
-
-\begin_layout Itemize
-JVM_SWITCHES: Extra switches to add to the JVM invocation.
- 
-\end_layout
-
 \begin_layout Subsection
 Working with the Graphical User Interface (GUI)
 \begin_inset CommandInset label
@@ -2138,6 +2088,56 @@ sincerity use container1 : gui
 If you are designing your own Sincerity plugin, it is strongly recommend
  that you include GUI support if appropriate via the optional gui() entry
  point.
+\end_layout
+
+\begin_layout Subsection
+Environment Variables
+\begin_inset CommandInset label
+LatexCommand label
+name "environment-variables"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity
+\begin_inset Quotes erd
+\end_inset
+
+ script will try to find your operating system's default JVM and your Sincerity
+ installation.
+ You can modify its behavior using the following environment variables:
+\end_layout
+
+\begin_layout Itemize
+SINCERITY_HOME: The root of the Sincerity installation to use.
+ If not provided, will automatically discover it according to actual (not
+ symlinked) location of the script file.
+\end_layout
+
+\begin_layout Itemize
+JAVA_HOME: The root of the JVM installation.
+ If not provided, will use a platform-specific heuristic to discover it.
+\end_layout
+
+\begin_layout Itemize
+JAVA_VERSION: Used only in Darwin (Mac OS X).
+ Defaults to "CurrentJDK".
+\end_layout
+
+\begin_layout Itemize
+JVM_LIBRARIES: Extra libraries to add to the classpath.
+\end_layout
+
+\begin_layout Itemize
+JVM_SWITCHES: Extra switches to add to the JVM invocation.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -12391,7 +12391,53 @@ target "http://www.osgi.org/Specifications/HomePage"
 \end_layout
 
 \begin_layout Standard
-As an example, let's install the web console.
+To install:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add felix : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To start the Gogo console:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity felix
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(You can also use 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity gogo
+\begin_inset Quotes erd
+\end_inset
+
+ instead.) As an example, let's install the web console via Gogo:
 \end_layout
 
 \begin_layout Standard
@@ -12406,7 +12452,17 @@ install http://archive.apache.org/dist/felix/org.apache.felix.http.jetty-2.2.0.j
 
 \begin_layout Plain Layout
 
+start 5
+\end_layout
+
+\begin_layout Plain Layout
+
 install http://archive.apache.org/dist/felix/org.apache.felix.webconsole-3.1.8.jar
+\end_layout
+
+\begin_layout Plain Layout
+
+start 6
 \end_layout
 
 \end_inset
@@ -12415,11 +12471,16 @@ install http://archive.apache.org/dist/felix/org.apache.felix.webconsole-3.1.8.j
 \end_layout
 
 \begin_layout Standard
-You'll then need to start both bundles.
-\end_layout
+In this example you may need to change the IDs in the 
+\begin_inset Quotes eld
+\end_inset
 
-\begin_layout Standard
-Point your browser to 
+start
+\begin_inset Quotes erd
+\end_inset
+
+ command to match the bundle IDs that Gogo reports.
+ Then, point your browser to 
 \begin_inset CommandInset href
 LatexCommand href
 target "http://localhost:8080/system/console/"
@@ -12444,14 +12505,6 @@ admin
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Subsubsection*
-Fleshing Out
-\end_layout
-
-\begin_layout Standard
-TODO
 \end_layout
 
 \begin_layout Subsection
