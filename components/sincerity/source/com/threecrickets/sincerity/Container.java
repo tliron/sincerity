@@ -262,6 +262,10 @@ public class Container implements IvyListener, TransferListener
 
 			languageManager = new LanguageManager( getBootstrap() );
 
+			// Adapter preferences
+			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY + "Jython", 1 );
+			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY + "Rhino", 1 );
+
 			try
 			{
 				// Prefer log4j chute for Velocity if log4j exists
