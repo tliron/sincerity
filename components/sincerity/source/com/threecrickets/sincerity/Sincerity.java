@@ -175,7 +175,7 @@ public class Sincerity implements Runnable
 		}
 		catch( SincerityException x )
 		{
-			System.err.println( x.getMessage() );
+			System.err.println( "Error: " + x.getMessage() );
 		}
 	}
 

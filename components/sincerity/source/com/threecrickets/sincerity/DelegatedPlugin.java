@@ -75,7 +75,7 @@ public class DelegatedPlugin implements Plugin1
 			if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				throw new SincerityException( x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -101,7 +101,7 @@ public class DelegatedPlugin implements Plugin1
 			if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				throw new SincerityException( x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -134,7 +134,7 @@ public class DelegatedPlugin implements Plugin1
 			if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				throw new SincerityException( x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -157,7 +157,7 @@ public class DelegatedPlugin implements Plugin1
 			if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				throw new SincerityException( x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -180,7 +180,7 @@ public class DelegatedPlugin implements Plugin1
 			if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getMessage(), x.getCause() );
+				throw new SincerityException( x.getCause() );
 		}
 		catch( NoSuchMethodException x )
 		{

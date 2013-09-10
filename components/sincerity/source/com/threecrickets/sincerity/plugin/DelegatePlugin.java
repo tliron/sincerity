@@ -163,7 +163,10 @@ public class DelegatePlugin implements Plugin1
 		{
 			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
-				command.getSincerity().getOut().println( languageAdapter.getAttributes().get( LanguageAdapter.LANGUAGE_NAME ) );
+			{
+				Map<String, Object> attributes = languageAdapter.getAttributes();
+				command.getSincerity().getOut().println( attributes.get( LanguageAdapter.LANGUAGE_NAME ) + " (" + attributes.get( LanguageAdapter.NAME ) + ")" );
+			}
 		}
 		else
 			throw new UnknownCommandException( command );

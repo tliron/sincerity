@@ -32,6 +32,11 @@ public class SincerityException extends Exception
 		super( message, cause );
 	}
 
+	public SincerityException( Throwable cause )
+	{
+		super( cause );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

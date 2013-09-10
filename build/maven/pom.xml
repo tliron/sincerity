@@ -59,6 +59,7 @@
 		<module>plugins/groovy</module>
 		<module>plugins/javascript</module>
 		<module>plugins/lua</module>
+		<module>plugins/nashorn</module>
 		<module>plugins/php</module>
 		<module>plugins/python</module>
 		<module>plugins/ruby</module>
