@@ -6,12 +6,12 @@ function getInterfaceVersion() {
 }
 
 function getCommands() {
-	return ['nashorn']
+	return ['javascript-nashorn']
 }
 
 function run(command) {
 	switch (String(command.name)) {
-		case 'nashorn':
+		case 'javascript-nashorn':
 			javascript(command)
 			break
 	}

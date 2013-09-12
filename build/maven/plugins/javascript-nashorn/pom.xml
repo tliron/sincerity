@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.threecrickets.sincerity.plugin</groupId>
-	<artifactId>sincerity-nashorn</artifactId>
+	<artifactId>sincerity-javascript-nashorn</artifactId>
 	<version>@VERSION@</version>
 	<packaging>pom</packaging>
 
@@ -46,14 +46,6 @@
 			<archive>https://groups.google.com/forum/#!forum/sincerity-community</archive>
 		</mailingList>
 	</mailingLists>
-
-	<dependencies>
-		<dependency>
-			<groupId>jdk.nashorn</groupId>
-			<artifactId>nashorn-backport</artifactId>
-			<version>0.0-7a639347ecf0</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<directory>@CACHE@</directory>

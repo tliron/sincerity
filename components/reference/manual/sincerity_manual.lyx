@@ -8856,7 +8856,18 @@ system init script.
 \begin_inset Quotes erd
 \end_inset
 
- Below is a script template you may use.
+ Below is a script template you may use, meant for the 
+\bar under
+Restlet skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "restlet"
+
+\end_inset
+
+)
+\bar default
+.
  In our case, we are naming it 
 \begin_inset Quotes eld
 \end_inset
@@ -12790,6 +12801,37 @@ Historically, it was actually the other way around.
  And so Sincerity was born as a generic tool useful for many JVM projects.
 \end_layout
 
+\begin_layout Standard
+Quick start to see the Prudence example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add prudence.example : install : start prudence
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And then browse to 
+\begin_inset CommandInset href
+LatexCommand href
+name "http://localhost:8080/"
+target "http://localhost:8080/"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 Diligence Skeleton
 \begin_inset CommandInset label
@@ -12904,6 +12946,39 @@ reference "restlet"
  Crickets.
  The three products together form a powerful web application stack on top
  of the JVM.)
+\end_layout
+
+\begin_layout Standard
+Quick start to see the Diligence example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add diligence.example : install : start prudence
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+And then browse to 
+\begin_inset CommandInset href
+LatexCommand href
+name "http://localhost:8080/diligence-example/"
+target "http://localhost:8080/diligence-example/"
+
+\end_inset
+
+.
+ Note that the example expects an unprotected MongoDB instance running at
+ localhost.
 \end_layout
 
 \begin_layout Subsection
@@ -15730,6 +15805,18 @@ JVM_SWITCHES=-XX:MaxPermSize=128m sincerity ...
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+This problem should completely disappear in JVM 8, which 
+\begin_inset CommandInset href
+LatexCommand href
+name "removes the PermGen feature entirely"
+target "http://openjdk.java.net/jeps/122"
+
+\end_inset
+
+.
 \end_layout
 
 \end_body
