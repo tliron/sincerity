@@ -9116,11 +9116,18 @@ Extras
 \end_layout
 
 \begin_layout Standard
-To add 
-\emph on
-remote
-\emph default
- JMX support:
+\begin_inset CommandInset href
+LatexCommand href
+name "JMX"
+target "http://docs.oracle.com/javase/tutorial/jmx/"
+
+\end_inset
+
+ is a powerful technology for remote monitoring and management of your JVM
+ and applications.
+ Local JMX (using pipes) is automatically supported, however you may also
+ need remote JMX over the network.
+ To add it:
 \end_layout
 
 \begin_layout Standard
@@ -9139,56 +9146,144 @@ sincerity add service.remote-jmx : install
 \end_layout
 
 \begin_layout Standard
-Note that this add-on is only required for 
-\emph on
-remote
-\emph default
- JMX: 
-\emph on
-local
-\emph default
- JMX is automatically supported by JSW.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "official documentation"
-target "http://docs.oracle.com/javase/1.5.0/docs/guide/management/agent.html"
-
-\end_inset
-
- for more information.
- Note also that the pitfalls of remote JMX (connectivity, security) can
- be elegantly circumvented via ssh tunneling.
-\end_layout
-
-\begin_layout Standard
-Remote JMX introduces several challenges, especially when working behind
- firewalls.
- We've specially engineered this add-on by including a custom JVM agent,
- which allows the RMI Registry to run on a specific port, 1651, while the
- JMX port is at 1650.
- This is necessary because the default agent allocates the RMI Registry
- port randomly, making it impossible to configure firewalls.
- Note that you would then need to specify the RMI Registry port in the connectio
-n URI, for example: 
+The default configuration is adequate for accessing JMX via SSH tunneling,
+ which is very secure.
+ To create the tunnel, use the 
 \begin_inset Quotes eld
 \end_inset
 
-service:jmx:rmi://mysite.org:1650/jndi/rmi://mysite.org:1651/jmxrmi
+-L
+\begin_inset Quotes erd
+\end_inset
+
+ switch of SSH when connecting to your remote server:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+ssh -L 1650:localhost:1650 -L 1651:localhost:1651 mysite.org
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that we actually create 
+\emph on
+two
+\emph default
+ tunnels, one for JMX on port 1650 and one for the RMI registry on port
+ 1651.
+ With the tunnel in place, start 
+\begin_inset CommandInset href
+LatexCommand href
+name "VisualVM"
+target "http://visualvm.java.net/"
+
+\end_inset
+
+ (it's included with the JDK), choose 
+\begin_inset Quotes eld
+\end_inset
+
+Add JMX Connection,
+\begin_inset Quotes erd
+\end_inset
+
+ and use 
+\begin_inset Quotes eld
+\end_inset
+
+localhost:1650
+\begin_inset Quotes erd
+\end_inset
+
+ for the connection string.
+ Note that you do 
+\emph on
+not 
+\emph default
+want to use 
+\begin_inset Quotes eld
+\end_inset
+
+Add Remote Host
+\begin_inset Quotes erd
+\end_inset
+
+: tunneling makes the remote host appear local.
+ Of course, you will need to keep the tunnel open for as long as you're
+ connected with VisualVM.
+\end_layout
+
+\begin_layout Standard
+If this is your first time using VisualVM, it is recommended that you install
+ its 
+\begin_inset Quotes eld
+\end_inset
+
+VisualVM-MBean
+\begin_inset Quotes erd
+\end_inset
+
+ plugin, which will, among other things, allows you to access JSW's bean
+ (
+\begin_inset Quotes eld
+\end_inset
+
+org.tanukisoftware.wrapper
+\begin_inset Quotes erd
+\end_inset
+
+) for remotely restarting your service.
+\end_layout
+
+\begin_layout Standard
+You can configure remote JMX by editing 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/service/jvm/remote-jmx.conf
 \begin_inset Quotes erd
 \end_inset
 
 .
+ For example, you may change the port numbers, enable authentication, and
+ also SSL if you prefer it to SSH tunneling.
 \end_layout
 
-\begin_layout Standard
-For public servers, you most likely would also want to encrypt your JMX
- connections via SSL, as well as add password authentication.
- We've included the necessary options as comments in the configuration.
-\end_layout
+\begin_layout Quote
 
-\begin_layout Standard
-To configure, edit: 
+\series bold
+Important note if you are using a version of the JVM prior to 7u4:
+\series default
+ Unfortunately, old versions of the JVM do not support the 
+\begin_inset Quotes eld
+\end_inset
+
+com.sun.management.jmxremote.rmi.port
+\begin_inset Quotes erd
+\end_inset
+
+ property, without which the RMI registry port is assigned randomly, thus
+ making it difficult to use SSH tunneling.
+ To solve this problem, this Sincerity add-on comes with a special 
+\begin_inset Quotes eld
+\end_inset
+
+firewall-friendly-agent
+\begin_inset Quotes erd
+\end_inset
+
+ library that allows for this functionality.
+ You must specifically enable it in 
 \begin_inset Quotes eld
 \end_inset
 
