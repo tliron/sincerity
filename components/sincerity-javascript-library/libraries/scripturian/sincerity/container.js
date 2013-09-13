@@ -27,6 +27,13 @@ var Sincerity = Sincerity || {}
 Sincerity.Container = Sincerity.Container || function() {
 	/** @exports Public as Sincerity.Container */
     var Public = {}
+    
+    /**
+     * The container root path.
+     * 
+     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     */
+    Public.root = com.threecrickets.bootstrap.Bootstrap.attributes.get('com.threecrickets.sincerity.containerRoot')
 
     Public.here = null
     

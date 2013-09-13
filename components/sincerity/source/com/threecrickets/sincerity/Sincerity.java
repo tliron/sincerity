@@ -78,7 +78,7 @@ public class Sincerity implements Runnable
 
 	public static final String VERSION_ATTRIBUTE = "com.threecrickets.sincerity.version";
 
-	public static final String CONTAINER_ATTRIBUTE = "com.threecrickets.sincerity.containerRoot";
+	public static final String CONTAINER_ROOT_ATTRIBUTE = "com.threecrickets.sincerity.containerRoot";
 
 	public static final String STARTED_ATTRIBUTE = "com.threecrickets.sincerity.started";
 
@@ -364,7 +364,7 @@ public class Sincerity implements Runnable
 	{
 		if( containerRoot == null )
 		{
-			containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ATTRIBUTE );
+			containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ROOT_ATTRIBUTE );
 			if( containerRoot == null )
 				setContainerRoot( findContainerRoot() );
 		}
@@ -389,12 +389,12 @@ public class Sincerity implements Runnable
 
 			// Make sure this is a new container root
 			if( this.containerRoot == null )
-				this.containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ATTRIBUTE );
+				this.containerRoot = (File) Bootstrap.getAttributes().get( CONTAINER_ROOT_ATTRIBUTE );
 			if( this.containerRoot != null )
 				if( canonicalContainerRoot.equals( this.containerRoot ) )
 					return;
 
-			Bootstrap.getAttributes().put( CONTAINER_ATTRIBUTE, canonicalContainerRoot );
+			Bootstrap.getAttributes().put( CONTAINER_ROOT_ATTRIBUTE, canonicalContainerRoot );
 			System.setProperty( CONTAINER_PROPERTY, canonicalContainerRoot.toString() );
 			this.containerRoot = canonicalContainerRoot;
 
