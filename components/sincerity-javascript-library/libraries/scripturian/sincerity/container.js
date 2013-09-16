@@ -68,7 +68,7 @@ Sincerity.Container = Sincerity.Container || function() {
     	}
 
 		pushHere(file.directory ? file : file.parentFile)
-    	document.execute('/' + sincerity.container.getRelativePath(file))
+    	document.execute('/' + sincerity.container.getRelativePath(file) + '/')
     	popHere()
 	}
 

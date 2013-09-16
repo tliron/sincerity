@@ -48,7 +48,7 @@ Sincerity.Files = Sincerity.Files || function() {
     	}
     	
     	file = arguments[0]
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
 		for (var a = 1; a < length; a++) {
 			file = add(file, arguments[a])
 		}
@@ -71,7 +71,7 @@ Sincerity.Files = Sincerity.Files || function() {
 			return file
     	}
 		
-    	return file    	
+    	return file.absoluteFile
     }
 
 	/**
