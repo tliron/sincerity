@@ -12,6 +12,7 @@
 //
 
 document.executeOnce('/sincerity/jvm/')
+document.executeOnce('/sincerity/files/')
 document.executeOnce('/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
@@ -35,6 +36,11 @@ Sincerity.Container = Sincerity.Container || function() {
      */
     Public.root = com.threecrickets.bootstrap.Bootstrap.attributes.get('com.threecrickets.sincerity.containerRoot')
 
+    /**
+     * The current path for nested execution.
+     * 
+     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     */
     Public.here = null
     
     /**
@@ -43,22 +49,10 @@ Sincerity.Container = Sincerity.Container || function() {
      * The arguments are path segments.
      * 
      * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     * @see Sincerity.Files#build
      */
     Public.getFileFromHere = function(/* arguments */) {
-    	importClass(java.io.File)
-
-    	var file = Public.here
-    	for (var i in arguments) {
-    		var part = arguments[i]
-    		if ('..' == part) {
-    			file = file.parentFile
-    		}
-    		else if ('.' != part) {
-    			file = new File(file, part).absoluteFile
-    		}
-    	}
-    	
-    	return file
+    	return Sincerity.Files.build(Public.here, Sincerity.Objects.slice(arguments))
     }
 
 	/**

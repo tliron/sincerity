@@ -27,6 +27,52 @@ var Sincerity = Sincerity || {}
 Sincerity.Files = Sincerity.Files || function() {
 	/** @exports Public as Sincerity.Files */
     var Public = {}
+    
+    /**
+     * Builds a JVM File object, where the first argument is treated as the path
+     * root, and the rest of the arguments are treated as path segments. Arguments may
+     * also be themselves arrays, in which case they are unpacked and their elements
+     * treated as path segments (this effect is recursive).
+     * <p>
+     * The ".." and "." strings are treated specially: the first is used to move back
+     * in the path, the second is ignored.
+     * <p>
+     * The first argument can be a File object or a string.
+     * 
+	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     */
+    Public.build = function(/* arguments */) {
+    	var length = arguments.length 
+    	if (length == 0) {
+    		return null
+    	}
+    	
+    	file = arguments[0]
+		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		for (var a = 1; a < length; a++) {
+			file = add(file, arguments[a])
+		}
+		
+		function add(file, argument) {
+			if (Sincerity.Objects.isArray(argument)) {
+				for (var a in argument) {
+					file = add(file, argument[a])
+				}
+			}
+			else {
+				argument = String(argument)
+				if (argument == '..') {
+					file = file.parentFile
+				}
+				else if (argument != '.') {
+					file = new java.io.File(file, argument)
+				}
+			}
+			return file
+    	}
+		
+    	return file    	
+    }
 
 	/**
 	 * Deletes a file or a directory.

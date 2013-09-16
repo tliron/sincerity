@@ -8580,19 +8580,11 @@ target "http://wrapper.tanukisoftware.com/"
 
 \end_inset
 
- (or 
-\begin_inset Quotes eld
-\end_inset
-
-JSW
-\begin_inset Quotes erd
-\end_inset
-
-).
+ (JSW).
  JSW deploys a native process to monitor your daemon's health, is able to
  detect failures and hangs, and restarts in such cases.
  It supports many configuration options to control the JVM process, as well
- as support for JMX-based management for the wrapper.
+ as JMX-based management for the wrapper.
  While you can start any program using the 
 \begin_inset Quotes eld
 \end_inset
@@ -8603,13 +8595,13 @@ sincerity start
 
  command, it is strongly recommended that you use this plugin instead for
  production environments.
- It's so good, we wish it were included in the JVM!
+ It's so well-designed, we wish it were included in the JVM!
 \end_layout
 
 \begin_layout Standard
 JSW runs on an impressive array of JVM-capable operating systems: Linux,
  Mac OS X, Windows, Solaris, AIX, FreeBSD, HPUX, z/OS and z/Linux, supporting
- several 32bit and 64bit machine architectures for each.
+ several 32-bit and 64-bit machine architectures for each.
  Of course, you do not want to install support for 
 \emph on
 all 
@@ -8673,7 +8665,7 @@ The above assumes that you have a
 \begin_inset Quotes eld
 \end_inset
 
-/logs/service.log
+/logs/service-myprogram.log
 \begin_inset Quotes erd
 \end_inset
 
@@ -8802,7 +8794,7 @@ This plugin generates some parts of the JSW configuration on the fly, but
 
 .
  In particular, you might want to control the memory profile of your JVM,
- or configure the wrapper's logging.
+ or configure the wrapper's logging (which works independently of JVM logging).
  See the JSW 
 \begin_inset CommandInset href
 LatexCommand href
@@ -8811,7 +8803,7 @@ target "http://wrapper.tanukisoftware.com/doc/english/properties.html"
 
 \end_inset
 
- for more details.
+ for a complete guide.
 \end_layout
 
 \begin_layout Standard
@@ -8835,7 +8827,7 @@ Additionally, this plugin provides a flexible way for you to send arguments
 
  extension will be merged and added.
  The plugin comes installed with a few sensible defaults, and additionally
- other plugs may add their own 
+ other plugins may add their own 
 \begin_inset Quotes eld
 \end_inset
 
@@ -8847,7 +8839,8 @@ Additionally, this plugin provides a flexible way for you to send arguments
 \end_layout
 
 \begin_layout Standard
-It may be useful to run your Sincerity service as an operating system service.
+It may furthermore be useful to run your Sincerity service as an operating
+ system service.
  On Unix-like systems, you can use a 
 \begin_inset Quotes eld
 \end_inset
@@ -8991,8 +8984,8 @@ exit 0
 \end_layout
 
 \begin_layout Standard
-You can start/stop your service by running this script directly, for example:
- 
+You can start/stop this service by running the above script directly, for
+ example: 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9030,8 +9023,12 @@ OWNER
 \begin_inset Quotes erd
 \end_inset
 
- user will be used to run your service, and for security reasons you are
- strongly advised not to use 
+ user will be used to run your service, and that for security reasons you
+ are strongly advised 
+\emph on
+not
+\emph default
+ to use 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9039,9 +9036,8 @@ root
 \begin_inset Quotes erd
 \end_inset
 
-.
- It is best to create a special user for your service, and to set its permission
-s according to only what it needs: read access to Sincerity and the container,
+: it is best to create a special user for your service, and to set its permissio
+ns according to only what it needs: read access to Sincerity and the container,
  and write access to the container's 
 \begin_inset Quotes eld
 \end_inset
@@ -9058,7 +9054,7 @@ s according to only what it needs: read access to Sincerity and the container,
 \begin_inset Quotes erd
 \end_inset
 
-, and other relevant directories.
+ and other relevant directories.
 \end_layout
 
 \begin_layout Standard
@@ -9092,7 +9088,8 @@ Provides:
 \end_inset
 
  entry to match the name of the file.
- To process this file and the block, run 
+ To process this file and the block, effectively installing the service
+ into the operating system, run 
 \begin_inset Quotes eld
 \end_inset
 
