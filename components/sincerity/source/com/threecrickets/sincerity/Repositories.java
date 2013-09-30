@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -238,24 +239,68 @@ public class Repositories
 
 	/**
 	 * Removes a resolver.
-	 * <p>
-	 * TODO
 	 * 
 	 * @param section
 	 *        The section name
 	 * @param name
 	 *        The resolver name within the section
 	 * @return True if removed
+	 * @throws SincerityException
 	 */
-	public boolean remove( String section, String name )
+	public boolean remove( String section, String name ) throws SincerityException
 	{
 		name = section + REPOSITORY_SECTION_SEPARATOR + name;
 		if( ivy.getSettings().getResolver( name ) == null )
 			return false;
 
-		// TODO
+		boolean removed = removeResolver( section, name );
 
-		return true;
+		if( removed )
+		{
+			if( ivyFile.exists() )
+			{
+				try
+				{
+					DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+					Document document = documentBuilder.parse( ivyFile );
+					Element root = document.getDocumentElement();
+					if( "ivysettings".equals( root.getTagName() ) )
+					{
+						NodeList resolversList = root.getElementsByTagName( "resolvers" );
+						if( resolversList.getLength() > 0 )
+						{
+							Element resolvers = (Element) resolversList.item( 0 );
+							if( resolvers != null )
+							{
+								resolversList = resolvers.getChildNodes();
+								for( int i = 0, length = resolversList.getLength(); i < length; i++ )
+								{
+									Node child = resolversList.item( i );
+									if( child.getNodeType() == Node.ELEMENT_NODE )
+									{
+										Element resolver = (Element) child;
+										if( name.equals( resolver.getAttribute( "name" ) ) )
+										{
+											resolvers.removeChild( resolver );
+											XmlUtil.removeTextNodes( root );
+											XmlUtil.saveHumanReadable( document, ivyFile );
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				catch( Exception x )
+				{
+					throw new SincerityException( "Could not remove from repositories configuration", x );
+				}
+			}
+		}
+
+		return removed;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -285,6 +330,36 @@ public class Repositories
 			if( root )
 				ivy.getSettings().addResolver( resolver );
 			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Removes a resolver.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @param name
+	 *        The resolver name
+	 * @return True if removed
+	 */
+	private boolean removeResolver( String section, String name )
+	{
+		DependencyResolver chain = ivy.getSettings().getResolver( section );
+		if( chain instanceof ChainResolver )
+		{
+			@SuppressWarnings("unchecked")
+			List<DependencyResolver> resolvers = ( (ChainResolver) chain ).getResolvers();
+			for( DependencyResolver existingResolver : resolvers )
+			{
+				if( name.equals( existingResolver.getName() ) )
+				{
+					resolvers.remove( existingResolver );
+					ivy.getSettings().getResolvers().remove( existingResolver );
+					return true;
+				}
+			}
 		}
 
 		return false;
