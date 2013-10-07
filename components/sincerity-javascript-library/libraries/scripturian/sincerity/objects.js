@@ -92,38 +92,122 @@ Sincerity.Objects = Sincerity.Objects || function() {
 			return copy
 		}
 		
-		if (typeof value == 'function') {
+		if (typeof value === 'function') {
 			return value
 		}
 		
-		/*
-		if (!deep) {
-			function copy() {}
-			copy.prototype = value
-			copy = new copy()
-			return copy
-		}
-		*/
-		
 		// See A. Levy in http://stackoverflow.com/questions/728360/copying-an-valueect-in-javascript
 		var copy = {}
+		copy.prototype = value.prototype
 		if (deep) {
 			for (var k in value) {
-				//if (value.hasOwnProperty(k)) {
+				if (value.hasOwnProperty(k)) {
 					copy[k] = Public.clone(value[k], true)
-				//}
+				}
 			}
 		}
 		else {
 			for (var k in value) {
-				//if (value.hasOwnProperty(k)) {
+				if (value.hasOwnProperty(k)) {
 					copy[k] = value[k]
-				//}
+				}
 			}
 		}
 		
 		return copy
 	}
+
+	/**
+	 * Checks equality for all object types. For arrays and dicts it would
+	 * be a deep equality check.
+	 * 
+	 * @param x
+	 * @param y
+	 * @returns {Boolean} True if the values are deeply equal
+	 */
+    Public.areEqual = function(x, y) {
+		if (!Public.isObject(x)) {
+			if (!Public.isObject(y)) {
+				if (Public.isNumber(x) && Public.isNumber(y) && isNaN(x) && isNaN(y)) {
+					// Because NaN === NaN is normally false
+					return true
+				}
+				return x === y
+			}
+			else {
+				return false
+			}
+		}
+	
+		if (Public.isDate(x)) {
+			if (Public.isDate(y)) {
+				return x.getTime() === y.getTime()
+			}
+			else {
+				return false
+			}
+		}
+		
+		if (x instanceof RegExp) {
+			if (y instanceof RegExp) {
+				return (x.source === y.source) && (x.global === y.global) && (x.ignoreCase === y.ignoreCase) && (x.multiline === y.multiline)
+			}
+			else {
+				return false
+			}
+		}
+	
+		if (Public.isArray(x)) {
+			if (Public.isArray(y)) {
+				if (x.length !== y.length) {
+					return false
+				}
+				for (var i in x) {
+					if (!Public.areEqual(x[i], y[i])) {
+						return false
+					}
+				}
+				return true
+			}
+			else {
+				return false
+			}
+		}
+		
+		if (typeof x === 'function') {
+			if (typeof y === 'function') {
+				return x.toString() === y.toString()
+			}
+			else {
+				return false
+			}
+		}
+		
+		if (x.prototype !== y.prototype) {
+			return false
+		}
+		
+		var keys = []
+		for (var key in x) {
+			if (x.hasOwnProperty(key)) {
+				Public.pushUnique(keys, key)
+			}
+		}
+		for (var key in y) {
+			if (y.hasOwnProperty(key)) {
+				Public.pushUnique(keys, key)
+			}
+		}
+		
+		for (var k in keys) {
+			var key = keys[k]
+			if (!Public.areEqual(x[key], y[key])) {
+				return false
+			}
+		}
+		
+		return true
+    }
 
 	/**
 	 * True if the value is a wrapped JVM object (as opposed to a JavaScript object).
@@ -132,9 +216,9 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {Boolean}
 	 */
     Public.isJVM = function(value) {
-		return Public.exists(value) ? Object.prototype.toString.call(value) == '[object JavaClass]' : false
+		return Public.exists(value) ? Object.prototype.toString.call(value) === '[object JavaClass]' : false
     }
-
+    
 	//
 	// Numbers
 	//
@@ -149,7 +233,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		if (!Public.exists(value)) {
 			return false
 		}
-		if (typeof value == 'number') {
+		if (typeof value === 'number') {
 			return true
 		}
 		return !isNaN(value - 0)
@@ -170,7 +254,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		if (!Public.exists(value)) {
 			return false
 		}
-		return value % 1 == 0
+		return value % 1 === 0
 	}
 	
 	//
@@ -224,7 +308,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {Boolean}
 	 */
 	Public.isString = function(value) {
-		return (value instanceof java.lang.String) || (typeof value == 'string')
+		return (value instanceof java.lang.String) || (typeof value === 'string')
 	}
 	
 	/**
@@ -307,7 +391,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		if (string.length < prefixLength) {
 			return false
 		}
-		return string.substring(0, prefixLength) == prefix
+		return string.substring(0, prefixLength) === prefix
 	}
 
 	/**
@@ -327,7 +411,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		if (stringLength < postfixLength) {
 			return false
 		}
-		return string.substring(stringLength - postfixLength) == postfix 
+		return string.substring(stringLength - postfixLength) === postfix 
 	}
 	
 	/**
@@ -390,7 +474,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 			return false
 		}
 		
-		return (type == 'object') || (type == 'function')
+		return (type === 'object') || (type === 'function')
 	}
 	
 	//
@@ -404,7 +488,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {Boolean}
 	 */
 	Public.isDate = function(value) {
-		return Public.exists(value) ? Object.prototype.toString.call(value) == '[object Date]' : false
+		return Public.exists(value) ? Object.prototype.toString.call(value) === '[object Date]' : false
 	}
 	
 	//
@@ -421,7 +505,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 */
 	Public.isDict = function(value, strict) {
 		if (strict) {
-			return Public.isObject(value) && !Public.isArray(value) && (typeof value != 'function') && !(value instanceof Date) && !(value instanceof RegExp)
+			return Public.isObject(value) && !Public.isArray(value) && (typeof value !== 'function') && !(value instanceof Date) && !(value instanceof RegExp)
 		}
 		else {
 			return Public.isObject(value) && !Public.isArray(value)
@@ -555,7 +639,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {Boolean}
 	 */
 	Public.isArray = function(value) {
-		return Public.exists(value) ? Object.prototype.toString.call(value) == '[object Array]' : false
+		return Public.exists(value) ? Object.prototype.toString.call(value) === '[object Array]' : false
 	}
 	
 	/**
@@ -619,7 +703,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 					break
 				}
 			}
-			else if (array[a] === item) {
+			else if (Public.areEqual(array[a], item)) {
 				exists = true
 				break
 			}
@@ -656,7 +740,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 						break
 					}
 				}
-				else if (array1[a1] === item2) {
+				else if (Public.areEqual(array1[a1], item2)) {
 					exists = true
 					break
 				}
@@ -690,7 +774,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 					remove = testFn(array[a], item)
 				}
 				else {
-					remove = (array[a] === item)
+					remove = Public.areEqual(array[a], item)
 				}
 				if (remove) {
 					array.splice(a, 1)
