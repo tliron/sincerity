@@ -96,9 +96,8 @@ Sincerity.Objects = Sincerity.Objects || function() {
 			return value
 		}
 		
-		// See A. Levy in http://stackoverflow.com/questions/728360/copying-an-valueect-in-javascript
+		// See http://stackoverflow.com/a/728694/849021
 		var copy = {}
-		copy.prototype = value.prototype
 		if (deep) {
 			for (var k in value) {
 				if (value.hasOwnProperty(k)) {
