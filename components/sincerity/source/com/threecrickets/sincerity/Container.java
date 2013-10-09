@@ -250,7 +250,7 @@ public class Container implements IvyListener, TransferListener
 	{
 		if( languageManager == null )
 		{
-			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH, getCacheFile().getPath() );
+			System.setProperty( LanguageManager.SCRIPTURIAN_CACHE_PATH_PROPERTY, getCacheFile().getPath() );
 
 			// The Python standard library is here (Jython expects a "Lib"
 			// subdirectory underneath)
@@ -269,8 +269,8 @@ public class Container implements IvyListener, TransferListener
 				javaScriptEngine = "Rhino";
 
 			// Adapter preferences
-			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY + "Jython", 1 );
-			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY + javaScriptEngine, 1 );
+			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + "Jython", 1 );
+			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + javaScriptEngine, 1 );
 
 			try
 			{

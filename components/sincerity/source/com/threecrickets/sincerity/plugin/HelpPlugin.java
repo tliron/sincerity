@@ -62,7 +62,7 @@ public class HelpPlugin implements Plugin1
 		String commandName = command.getName();
 		if( "version".equals( commandName ) )
 		{
-			Map<String, String> version = Sincerity.getVersion();
+			Map<String, String> version = command.getSincerity().getVersion();
 			for( Map.Entry<String, String> entry : version.entrySet() )
 				command.getSincerity().getOut().println( entry.getKey() + "=" + entry.getValue() );
 		}

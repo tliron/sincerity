@@ -61,9 +61,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
 	 */
 	Public.execute = function(file) {
-    	importClass(java.io.File)
-    	
-    	if (!(file instanceof File)) {
+    	if (!(file instanceof java.io.File)) {
     		file = Public.getFileFromHere(file)
     	}
 
@@ -79,9 +77,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	 * @param {String[]} [exclusions] Paths to avoid
 	 */
 	Public.executeAll = function(file, exclusions) {
-    	importClass(java.io.File)
-    	
-    	if (!(file instanceof File)) {
+    	if (!(file instanceof java.io.File)) {
     		file = Public.getFileFromHere(file)
     	}
 

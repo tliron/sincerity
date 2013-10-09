@@ -47,7 +47,7 @@ Sincerity.Files = Sincerity.Files || function() {
     		return null
     	}
     	
-    	file = arguments[0]
+    	var file = arguments[0]
 		file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
 		for (var a = 1; a < length; a++) {
 			file = add(file, arguments[a])

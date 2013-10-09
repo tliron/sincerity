@@ -102,51 +102,6 @@ public class Sincerity implements Runnable
 		return threadLocal.get();
 	}
 
-	/**
-	 * Sincerity version information (cached as a bootstrap attribute).
-	 * <p>
-	 * Taken from the "version.conf" resource.
-	 * 
-	 * @return Version information
-	 */
-	@SuppressWarnings("unchecked")
-	public static Map<String, String> getVersion()
-	{
-		Map<String, String> version = (Map<String, String>) Bootstrap.getAttributes().get( VERSION_ATTRIBUTE );
-		if( version == null )
-		{
-			Properties properties = new Properties();
-			InputStream stream = Sincerity.class.getResourceAsStream( "version.conf" );
-			try
-			{
-				properties.load( stream );
-			}
-			catch( IOException x )
-			{
-			}
-			finally
-			{
-				try
-				{
-					stream.close();
-				}
-				catch( IOException x )
-				{
-				}
-			}
-			version = new HashMap<String, String>();
-			for( Enumeration<?> e = properties.propertyNames(); e.hasMoreElements(); )
-			{
-				Object name = e.nextElement();
-				version.put( name.toString(), properties.getProperty( name.toString() ) );
-			}
-			Map<String, String> existing = (Map<String, String>) Bootstrap.getAttributes().putIfAbsent( VERSION_ATTRIBUTE, version );
-			if( existing != null )
-				version = existing;
-		}
-		return version;
-	}
-
 	//
 	// Main
 	//
@@ -222,6 +177,51 @@ public class Sincerity implements Runnable
 	//
 	// Attributes
 	//
+
+	/**
+	 * Sincerity version information (cached as a bootstrap attribute).
+	 * <p>
+	 * Taken from the "version.conf" resource.
+	 * 
+	 * @return Version information
+	 */
+	@SuppressWarnings("unchecked")
+	public Map<String, String> getVersion()
+	{
+		Map<String, String> version = (Map<String, String>) Bootstrap.getAttributes().get( VERSION_ATTRIBUTE );
+		if( version == null )
+		{
+			Properties properties = new Properties();
+			InputStream stream = Sincerity.class.getResourceAsStream( "version.conf" );
+			try
+			{
+				properties.load( stream );
+			}
+			catch( IOException x )
+			{
+			}
+			finally
+			{
+				try
+				{
+					stream.close();
+				}
+				catch( IOException x )
+				{
+				}
+			}
+			version = new HashMap<String, String>();
+			for( Enumeration<?> e = properties.propertyNames(); e.hasMoreElements(); )
+			{
+				Object name = e.nextElement();
+				version.put( name.toString(), properties.getProperty( name.toString() ) );
+			}
+			Map<String, String> existing = (Map<String, String>) Bootstrap.getAttributes().putIfAbsent( VERSION_ATTRIBUTE, version );
+			if( existing != null )
+				version = existing;
+		}
+		return version;
+	}
 
 	/**
 	 * The Sincerity home directory
@@ -583,6 +583,10 @@ public class Sincerity implements Runnable
 	 */
 	public void run( String... arguments ) throws SincerityException
 	{
+		// Hack for Nashorn
+		if( arguments.length == 1 )
+			arguments = arguments[0].split( "," );
+
 		// Insert at beginning of current command line queue with an "until" tag
 		LinkedList<Command> newCommands = parseCommands( arguments );
 		newCommands.add( Command.UNTIL );
@@ -941,7 +945,8 @@ public class Sincerity implements Runnable
 					ArrayList<Plugin1> plugins = new ArrayList<Plugin1>();
 					for( Plugin1 plugin : getPlugins().values() )
 					{
-						if( Arrays.asList( plugin.getCommands() ).contains( command.getName() ) )
+						String[] commands = plugin.getCommands();
+						if( ( commands != null ) && Arrays.asList( commands ).contains( command.getName() ) )
 							plugins.add( plugin );
 					}
 
