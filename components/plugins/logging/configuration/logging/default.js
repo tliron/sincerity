@@ -1,5 +1,5 @@
 
-document.execute('/sincerity/container/')
+document.require('/sincerity/container/')
 
 importClass(
 	org.apache.log4j.PatternLayout,

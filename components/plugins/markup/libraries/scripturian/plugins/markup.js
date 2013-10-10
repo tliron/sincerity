@@ -1,8 +1,9 @@
 
-document.execute('/sincerity/objects/')
-document.execute('/sincerity/files/')
-document.execute('/sincerity/jvm/')
-document.execute('/sincerity/container/')
+document.require(
+	'/sincerity/objects/',
+	'/sincerity/files/',
+	'/sincerity/jvm/',
+	'/sincerity/container/')
 
 importClass(
 	com.threecrickets.sincerity.exception.CommandException,

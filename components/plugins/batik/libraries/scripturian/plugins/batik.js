@@ -1,5 +1,5 @@
 
-document.execute('/sincerity/container/')
+document.require('/sincerity/container/')
 
 importClass(com.threecrickets.sincerity.exception.BadArgumentsCommandException)
 

@@ -11,8 +11,9 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/objects/')
+document.require(
+	'/sincerity/jvm/',
+	'/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
 
@@ -212,7 +213,7 @@ Sincerity.Files = Sincerity.Files || function() {
 			}
 			else {
 				// TODO: can we be more non-portable? :(
-				Sincerity.JVM.exec('chmod', ['+x', file])
+				Sincerity.JVM.exec('chmod', ['+x', String(file)])
 			}
 		}
 	}

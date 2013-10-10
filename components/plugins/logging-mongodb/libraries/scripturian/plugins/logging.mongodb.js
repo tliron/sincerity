@@ -19,10 +19,11 @@ host.ip
 host.name
 */
 
-document.executeOnce('/mongo-db/')
-document.executeOnce('/sincerity/templates/')
-document.executeOnce('/sincerity/objects/')
-document.executeOnce('/sincerity/localization/')
+document.require(
+	'/mongo-db/',
+	'/sincerity/templates/',
+	'/sincerity/objects/',
+	'/sincerity/localization/')
 
 function getInterfaceVersion() {
 	return 1

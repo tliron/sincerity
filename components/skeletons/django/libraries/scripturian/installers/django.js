@@ -6,7 +6,7 @@ println('To start your Django server, run: "sincerity delegate:start django"')
 println('To manage your Django project, run: "sincerity django:manage"')
 println()
 
-document.execute('/sincerity/files/')
+document.require('/sincerity/files/')
 
 // Let's clear out this file so that we don't get the message again
 Sincerity.Files.erase(sincerity.container.getLibrariesFile('scripturian', 'installers', 'django.js'))

@@ -1,6 +1,7 @@
 
-document.execute('/sincerity/files/')
-document.execute('/sincerity/objects/')
+document.require(
+	'/sincerity/files/',
+	'/sincerity/objects/')
 
 importClass(
 	java.lang.System,

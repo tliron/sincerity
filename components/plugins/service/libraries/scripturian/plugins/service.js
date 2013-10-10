@@ -1,8 +1,9 @@
 
-document.executeOnce('/sincerity/files/')
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/objects/')
-document.executeOnce('/sincerity/templates/')
+document.require(
+	'/sincerity/files/',
+	'/sincerity/jvm/',
+	'/sincerity/objects/',
+	'/sincerity/templates/')
 
 importClass(
 	com.threecrickets.sincerity.exception.CommandException,
@@ -185,6 +186,10 @@ function service(command) {
 							}
 							configuration.wrapper.java['additional.' + index++] = line
 						}
+					}
+					catch (x) {
+						// Nashorn hack:
+						// java.io.IOException: stream closed
 					}
 					finally {
 						reader.close()

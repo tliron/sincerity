@@ -1,5 +1,5 @@
 
-document.execute('/sincerity/objects/')
+document.require('/sincerity/objects/')
 
 //var logger = repository.getLogger('org.restlet.Component.LogService')
 

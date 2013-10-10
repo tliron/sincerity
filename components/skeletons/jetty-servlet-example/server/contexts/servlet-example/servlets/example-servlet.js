@@ -1,5 +1,5 @@
 
-document.executeOnce('/sincerity/jvm/')
+document.require('/sincerity/jvm/')
 
 importClass(
 	org.eclipse.jetty.servlet.ServletHolder)

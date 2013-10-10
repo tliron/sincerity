@@ -8,7 +8,7 @@
 // comma-delimited list of application subdirectory names.
 //
 
-document.executeOnce('/sincerity/container/')
+document.require('/sincerity/container/')
 
 importClass(java.lang.System)
 

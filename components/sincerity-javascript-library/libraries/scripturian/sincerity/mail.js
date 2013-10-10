@@ -11,10 +11,11 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/classes/')
-document.executeOnce('/sincerity/templates/')
-document.executeOnce('/sincerity/objects/')
-document.executeOnce('/sincerity/jvm/')
+document.require(
+	'/sincerity/classes/',
+	'/sincerity/templates/',
+	'/sincerity/objects/',
+	'/sincerity/jvm/')
 
 var Sincerity = Sincerity || {}
 

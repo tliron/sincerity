@@ -12,7 +12,7 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/objects/')
+document.require('/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
 

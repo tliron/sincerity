@@ -11,8 +11,9 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/json/')
+document.require(
+	'/sincerity/jvm/',
+	'/sincerity/json/')
 
 var Sincerity = Sincerity || {}
 

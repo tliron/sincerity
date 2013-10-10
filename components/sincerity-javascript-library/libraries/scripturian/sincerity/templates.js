@@ -31,7 +31,7 @@
 // Version 1.0
 //
 
-document.executeOnce('/sincerity/objects/')
+document.require('/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
 

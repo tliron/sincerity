@@ -1,5 +1,5 @@
 
-document.executeOnce('/sincerity/jvm/')
+document.require('/sincerity/jvm/')
 
 sincerity.run(['java:compile', Sincerity.Container.getFileFromHere('..', 'java')])
 

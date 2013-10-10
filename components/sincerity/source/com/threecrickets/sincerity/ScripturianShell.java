@@ -163,7 +163,8 @@ public class ScripturianShell implements Shell
 		{
 			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( documentName, false, parsingContext );
 			Executable executable = documentDescriptor.getDocument();
-			enterable = executable.makeEnterable( enteringKey, executionContext );
+			DocumentService documentService = (DocumentService) executionContext.getServices().get( "document" );
+			enterable = executable.makeEnterable( enteringKey, executionContext, documentService, null );
 			if( enterable )
 				return executable;
 			else

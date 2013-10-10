@@ -1,5 +1,5 @@
 
-document.executeOnce('/sincerity/container/')
+document.require('/sincerity/container/')
 
 importClass(
 	org.eclipse.jetty.server.Server,

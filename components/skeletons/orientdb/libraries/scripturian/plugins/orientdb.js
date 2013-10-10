@@ -1,5 +1,5 @@
 
-document.executeOnce('/sincerity/jvm/')
+document.require('/sincerity/jvm/')
 
 importClass(java.lang.System)
 

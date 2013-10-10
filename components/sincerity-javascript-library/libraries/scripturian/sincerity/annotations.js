@@ -11,8 +11,9 @@
 // at http://threecrickets.com/
 //
 
-document.executeOnce('/sincerity/files/')
-document.executeOnce('/sincerity/objects/')
+document.require(
+	'/sincerity/files/',
+	'/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
 

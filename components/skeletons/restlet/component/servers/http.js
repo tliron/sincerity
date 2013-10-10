@@ -6,7 +6,7 @@
 // variable or the restlet.port JVM property.
 //
 
-document.executeOnce('/sincerity/templates/')
+document.require('/sincerity/templates/')
 
 importClass(
 	org.restlet.Server,

@@ -1,5 +1,5 @@
 
-document.execute('/sincerity/files/')
+document.require('/sincerity/files/')
 
 // See: http://blog.rubyrockers.com/2011/03/rails3-application-jruby/
 

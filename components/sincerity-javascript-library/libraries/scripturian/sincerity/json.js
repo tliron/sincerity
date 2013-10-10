@@ -27,10 +27,11 @@ Sincerity.JSON = Sincerity.JSON || com.threecrickets.rhino.JSON
 
 if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 	
-	document.executeOnce('/sincerity/classes/')
-	document.executeOnce('/sincerity/iterators/')
-	document.executeOnce('/sincerity/objects/')
-	document.executeOnce('/sincerity/files/')
+	document.require(
+		'/sincerity/classes/',
+		'/sincerity/iterators/',
+		'/sincerity/objects/',
+		'/sincerity/files/')
 
 	/**
 	 * Streaming JSON array parser.
@@ -116,7 +117,7 @@ if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 else {
 	// Fallback to JSON JavaScript library if the JSON Rhino library isn't found
 	
-	document.executeOnce('/sincerity/internal/json2/')
+	document.require('/sincerity/internal/json2/')
 	
 	Sincerity.JSON = {}
 	

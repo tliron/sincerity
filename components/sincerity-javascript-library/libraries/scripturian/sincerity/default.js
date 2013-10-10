@@ -19,21 +19,22 @@
  */
 var Sincerity = {}
 
-document.executeOnce('/sincerity/annotations/')
-document.executeOnce('/sincerity/calendar/')
-document.executeOnce('/sincerity/classes/')
-document.executeOnce('/sincerity/cryptography/')
-document.executeOnce('/sincerity/files/')
-document.executeOnce('/sincerity/iterators/')
-document.executeOnce('/sincerity/json/')
-document.executeOnce('/sincerity/jvm/')
-document.executeOnce('/sincerity/localization/')
-document.executeOnce('/sincerity/lucene/')
-document.executeOnce('/sincerity/mail/')
-document.executeOnce('/sincerity/objects/')
-document.executeOnce('/sincerity/rhino/')
-document.executeOnce('/sincerity/templates/')
-document.executeOnce('/sincerity/xml/')
+document.require(
+	'/sincerity/annotations/',
+	'/sincerity/calendar/',
+	'/sincerity/classes/',
+	'/sincerity/cryptography/',
+	'/sincerity/files/',
+	'/sincerity/iterators/',
+	'/sincerity/json/',
+	'/sincerity/jvm/',
+	'/sincerity/localization/',
+	'/sincerity/lucene/',
+	'/sincerity/mail/',
+	'/sincerity/objects/',
+	'/sincerity/rhino/',
+	'/sincerity/templates/',
+	'/sincerity/xml/')
 
 /**
  * Provides access to the current Sincerity installation as well as the current container and its plugins.
