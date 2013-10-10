@@ -785,7 +785,7 @@ public class Dependencies
 			return;
 
 		out.println();
-		out.println( "Sincerity has has downloaded software from a repository and installed in your container." );
+		out.println( "Sincerity has downloaded software from a repository and installed in your container." );
 		out.println( "However, it is up to you to ensure that it is legal for you to use the installed software." );
 		out.println( "Neither the developers of Sincerity nor the maintainers of the repositories can be held" );
 		out.println( "legally responsible for your usage. In particular, note that most free and open source " );
