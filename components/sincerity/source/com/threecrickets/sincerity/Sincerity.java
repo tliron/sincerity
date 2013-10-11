@@ -584,8 +584,8 @@ public class Sincerity implements Runnable
 	public void run( String... arguments ) throws SincerityException
 	{
 		// Hack for Nashorn
-		if( arguments.length == 1 )
-			arguments = arguments[0].split( "," );
+		//if( arguments.length == 1 )
+			//arguments = arguments[0].split( "," );
 
 		// Insert at beginning of current command line queue with an "until" tag
 		LinkedList<Command> newCommands = parseCommands( arguments );

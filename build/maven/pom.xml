@@ -58,7 +58,6 @@
 		<module>plugins/clojure</module>
 		<module>plugins/groovy</module>
 		<module>plugins/javascript</module>
-		<module>plugins/javascript-nashorn</module>
 		<module>plugins/lua</module>
 		<module>plugins/php</module>
 		<module>plugins/python</module>

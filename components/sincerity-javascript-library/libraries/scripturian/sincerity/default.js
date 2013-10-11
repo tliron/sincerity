@@ -32,7 +32,7 @@ document.require(
 	'/sincerity/lucene/',
 	'/sincerity/mail/',
 	'/sincerity/objects/',
-	'/sincerity/rhino/',
+	'/sincerity/platform/',
 	'/sincerity/templates/',
 	'/sincerity/xml/')
 

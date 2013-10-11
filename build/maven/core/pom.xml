@@ -78,6 +78,12 @@
 			<artifactId>rhino</artifactId>
 			<version>[1.7R4,1.8)</version>
 		</dependency>
+		<!--
+		<dependency>
+			<groupId>jdk.nashorn</groupId>
+			<artifactId>nashorn-backport</artifactId>
+		</dependency>
+		-->
 	</dependencies>
 
 	<build>

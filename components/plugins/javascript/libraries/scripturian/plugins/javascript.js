@@ -1,5 +1,7 @@
 
-var MAIN_CLASS = 'org.mozilla.javascript.tools.shell.Main'
+document.require('/sincerity/platform/')
+
+var MAIN_CLASS = Sincerity.Platform.isRhino ? 'org.mozilla.javascript.tools.shell.Main' : 'jdk.nashorn.tools.Shell'
 
 function getInterfaceVersion() {
 	return 1

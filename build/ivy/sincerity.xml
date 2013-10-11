@@ -17,6 +17,7 @@
 		<dependency org="org.jsoup" name="jsoup" rev="1.7+" />
 		<dependency org="com.threecrickets.scripturian" name="scripturian" rev="1.0+" />
 		<dependency org="org.mozilla" name="rhino" rev="1.7R4" />
+		<!-- <dependency org="jdk.nashorn" name="nashorn-backport" rev="latest.integration" /> -->
 		<dependency org="com.threecrickets.rhino" name="json-rhino" rev="1.0+" />
 		<!-- Note: When invoking Ant through the Maven Ant plugin, we cannot use the includeAntRuntime attributes in the javac task -->
 		<dependency org="org.apache.ant" name="ant" rev="1.8+" />

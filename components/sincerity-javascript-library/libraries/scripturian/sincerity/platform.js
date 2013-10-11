@@ -18,19 +18,40 @@ document.require(
 var Sincerity = Sincerity || {}
 
 /**
- * Useful shortcuts to Rhino-specific services and utilities.
+ * Useful shortcuts to platform-specific services and utilities.
  * 
  * @namespace
  * 
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.Rhino = Sincerity.Rhino || function() {
-	/** @exports Public as Sincerity.Rhino */
+Sincerity.Platform = Sincerity.Platform || function() {
+	/** @exports Public as Sincerity.Platform */
     var Public = {}
+    
+    /**
+     * The plaform name.
+     * 
+     * @returns {String}
+     */
+    Public.name = String(executable.context.adapter.attributes.get('name'))
+    
+    /**
+     * True if Nashorn.
+     * 
+     * @returns {Boolean}
+     */
+    Public.isNashorn = Public.name === 'Nashorn'
+
+    /**
+     * True if Mozilla Rhino.
+     * 
+     * @returns {Boolean}
+     */
+    Public.isRhino = Public.name === 'Rhino'
 
 	/**
-	 * The Rhino stack trace for an exception.
+	 * The platform stack trace for an exception.
 	 * 
 	 * @param {Number} [skip=0] How many stack trace entries to skip
 	 * @returns {String}
@@ -45,13 +66,17 @@ Sincerity.Rhino = Sincerity.Rhino || function() {
 	}
 
 	/**
-	 * The current Rhino stack trace.
+	 * The current platform stack trace.
 	 * 
 	 * @param {Number} [skip=0] How many stack trace entries to skip
 	 * @returns {String}
 	 */
 	Public.getCurrentStackTrace = function(skip) {
-		// We'll remove at least the first line (it's this very location)
+    	if (Public.isNashorn) {
+    		return ''
+    	}
+
+    	// We'll remove at least the first line (it's this very location)
 		skip = skip || 0
 		skip = skip + 1
 		var stackTrace = new org.mozilla.javascript.JavaScriptException(null, null, 0).scriptStackTrace
@@ -59,14 +84,14 @@ Sincerity.Rhino = Sincerity.Rhino || function() {
 	}
 	
 	/**
-	 * An exception stack trace. Supports both Rhino and JVM exceptions.
+	 * An exception stack trace. Supports both platform and JVM exceptions.
 	 * 
 	 * @param {Exception} exception The exception
 	 * @param {Number} [skip=0] How many stack trace entries to skip
 	 * @returns An object with .message and .stackTrace properties, both strings
 	 */
 	Public.getExceptionDetails = function(exception, skip) {
-		if (Sincerity.Objects.exists(exception.javaException)) {
+    	if (Sincerity.Objects.exists(exception.javaException)) {
 			return {
 				message: String(exception.javaException),
 				stackTrace: Sincerity.JVM.getStackTrace(exception.javaException)
@@ -93,6 +118,18 @@ Sincerity.Rhino = Sincerity.Rhino || function() {
 	 * @returns {Function} The synchronized function
 	 */
 	Public.synchronize = function(fn) {
+    	if (Public.isNashorn) {
+    		var lock = new java.util.concurrent.locks.ReentrantLock()
+    		return function() {
+    			lock.lock()
+    			try {
+    				return fn.apply(this, arguments)
+    			}
+    			finally {
+    				lock.unlock()
+    			}
+    		}
+    	}
 		return new org.mozilla.javascript.Synchronizer(fn)
 	}
 	

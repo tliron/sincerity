@@ -452,10 +452,6 @@ Sincerity.JVM = Sincerity.JVM || function() {
 		}
 		
 		command = [command].concat(args)
-		if (executable.context.adapter.attributes.get('name') == 'Nashorn') {
-			command = Java.to(command, 'java.lang.String[]')
-		}
-		
 		var runtime = java.lang.Runtime.runtime
 		var process = runtime.exec(command, environment || null, directory || null)
 		

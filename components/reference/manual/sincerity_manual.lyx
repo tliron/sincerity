@@ -2122,6 +2122,26 @@ SINCERITY_HOME: The root of the Sincerity installation to use.
 \end_layout
 
 \begin_layout Itemize
+SINCERITY_JAVASCRIPT: To force the JavaScript engine to either 
+\begin_inset Quotes eld
+\end_inset
+
+Nashorn
+\begin_inset Quotes erd
+\end_inset
+
+ or 
+\begin_inset Quotes eld
+\end_inset
+
+Rhino
+\begin_inset Quotes erd
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Itemize
 JAVA_HOME: The root of the JVM installation.
  If not provided, will use a platform-specific heuristic to discover it.
 \end_layout
