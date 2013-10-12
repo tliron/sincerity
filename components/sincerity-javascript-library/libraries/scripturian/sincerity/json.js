@@ -11,6 +11,12 @@
 // at http://threecrickets.com/
 //
 
+document.require(
+		'/sincerity/objects/',
+		'/sincerity/classes/',
+		'/sincerity/iterators/',
+		'/sincerity/files/')
+
 var Sincerity = Sincerity || {}
 
 /**
@@ -23,16 +29,11 @@ var Sincerity = Sincerity || {}
  * @author Tal Liron
  * @version 1.0
  */
-Sincerity.JSON = Sincerity.JSON || com.threecrickets.rhino.JSON
 
-if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
+Sincerity.JSON = Sincerity.JSON || com.threecrickets.jvm.json.JSON
+
+if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
 	
-	document.require(
-		'/sincerity/classes/',
-		'/sincerity/iterators/',
-		'/sincerity/objects/',
-		'/sincerity/files/')
-
 	/**
 	 * Streaming JSON array parser.
 	 * <p>
@@ -61,7 +62,7 @@ if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 				this.reader = Sincerity.Files.openForTextReading(params.file, params.gzip)
 			}
 			
-			this.tokener = new com.threecrickets.rhino.internal.JsonTokener(this.reader)
+			this.tokener = new com.threecrickets.jvm.json.rhino.util.JsonTokener(this.reader)
 
 			// Make sure it's an array
 			var c = nextClean.call(this)
@@ -115,7 +116,7 @@ if (Object.prototype.toString.call(Sincerity.JSON) == '[object JavaClass]') {
 	}())
 }
 else {
-	// Fallback to JSON JavaScript library if the JSON Rhino library isn't found
+	// Fallback to JSON JavaScript library if the com.threecrickets.json library isn't found
 	
 	document.require('/sincerity/internal/json2/')
 	
