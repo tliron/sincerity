@@ -215,7 +215,11 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {Boolean}
 	 */
     Public.isJVM = function(value) {
-		return Public.exists(value) ? Object.prototype.toString.call(value) === '[object JavaClass]' : false
+    	if (!Public.exists(value)) {
+    		return false
+    	}
+    	var type = Object.prototype.toString.call(value)
+    	return (type === '[object jdk.internal.dynalink.beans.StaticClass]') || (type === '[object JavaClass]')
     }
     
 	//

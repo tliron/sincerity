@@ -33,7 +33,6 @@ var Sincerity = Sincerity || {}
 Sincerity.JSON = Sincerity.JSON || com.threecrickets.jvm.json.JSON
 
 if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
-	
 	/**
 	 * Streaming JSON array parser.
 	 * <p>
@@ -62,7 +61,7 @@ if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
 				this.reader = Sincerity.Files.openForTextReading(params.file, params.gzip)
 			}
 			
-			this.tokener = new com.threecrickets.jvm.json.rhino.util.JsonTokener(this.reader)
+			this.tokener = Sincerity.JSON.createTokener(this.reader)
 
 			// Make sure it's an array
 			var c = nextClean.call(this)

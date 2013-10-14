@@ -281,6 +281,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 */
 	Public.toByteArray = function(string, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
+		string = String(string) // workaround to avoid ConsString in Nashorn
 		return null !== charset ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
 	}
 	
