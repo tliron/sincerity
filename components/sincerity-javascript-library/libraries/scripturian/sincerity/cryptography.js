@@ -23,7 +23,7 @@ var Sincerity = Sincerity || {}
  * Apache Commons Codec.
  * 
  * @namespace
- * @see <a href="http://commons.apache.org/codec/">Apache Commons Code</a>
+ * @see <a href="http://commons.apache.org/codec/">Apache Commons Codec</a>
  * 
  * @author Tal Liron
  * @version 1.0
@@ -114,7 +114,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	Public.hmac = function(payloadBytes, secretBytes, algorithm, secretAlgorithm, encoding) {
 		var mac = javax.crypto.Mac.getInstance(algorithm)
 
-		if (mac) {
+		if (Sincerity.Objects.exists(mac)) {
 			var key = new javax.crypto.spec.SecretKeySpec(secretBytes, secretAlgorithm || algorithm)
 			mac.init(key)
 			var digest = mac.doFinal(payloadBytes)
@@ -138,7 +138,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 */
 	Public.digest = function(payload, saltBytes, iterations, algorithm, encoding) {
 		var messageDigest = java.security.MessageDigest.getInstance(algorithm)
-		if (messageDigest) {
+		if (Sincerity.Objects.exists(messageDigest)) {
 			var digest = Public.toByteArray(payload, saltBytes)
 			
 			for (var i = 0; i < iterations; i++) {
@@ -147,6 +147,35 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 				digest = messageDigest.digest()
 			}
 
+			return Public.toString(digest, encoding)
+		}
+		
+		return null
+	}
+	
+	/**
+	 * Calculates a digest for file contents. See {@link #digest}.
+	 * 
+	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 * @param {String} algorithm The digest algorithm ('SHA-1', 'SHA-256', 'MD5', etc.)
+	 * @param {Boolean} [encoding='base64'] The encoding to use for the result
+	 * @returns {String} An encoded digest or null if failed
+	 */
+	Public.fileDigest = function(file, algorithm, encoding) {
+		var messageDigest = java.security.MessageDigest.getInstance(algorithm)
+		if (Sincerity.Objects.exists(messageDigest)) {
+			file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
+			var stream = new java.io.FileInputStream(file)
+			try {
+				stream = new java.security.DigestInputStream(stream, messageDigest)
+				var buffer = Sincerity.JVM.newArray(2048, 'byte')
+				while (stream.read(buffer) != -1) {}
+			}
+			finally {
+				stream.close()
+			}
+			
+			var digest = messageDigest.digest()
 			return Public.toString(digest, encoding)
 		}
 		
@@ -178,7 +207,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	Public.decode = function(payloadBytes, ivLength, secretBytes, algorithm, secretAlgorithm) {
 		var cipher = javax.crypto.Cipher.getInstance(algorithm)
 
-		if (cipher) {
+		if (Sincerity.Objects.exists(cipher)) {
 			secretAlgorithm = secretAlgorithm || algorithm.split('/')[0]
 			var key = new javax.crypto.spec.SecretKeySpec(secretBytes, secretAlgorithm)
 
