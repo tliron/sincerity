@@ -36,7 +36,7 @@ component.servers.add(server)
 // Add support for the X-FORWARDED-FOR header used by proxies, such as Apache's
 // mod_proxy. This guarantees that request.clientInfo.upstreamAddress returns
 // the upstream address behind the proxy.
-server.context.parameters.add('useForwardedForHeader', 'true')
+server.context.parameters.set('useForwardedForHeader', 'true')
 
 if (sincerity.verbosity >= 1) {
 	println('Server: "{0}" {1} on port {2}'.cast(server.name, server.protocols.get(0), server.port))

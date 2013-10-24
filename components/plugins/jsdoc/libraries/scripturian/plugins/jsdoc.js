@@ -1,4 +1,6 @@
 
+document.require('/sincerity/platform/')
+
 function getInterfaceVersion() {
 	return 1
 }
@@ -16,13 +18,15 @@ function run(command) {
 }
 
 function jsdoc(command) {
-	var run = command.sincerity.container.getLibrariesFile('javascript', 'jsdoc-toolkit', 'app', 'run.js')
+	var run = String(command.sincerity.container.getLibrariesFile('javascript', 'jsdoc-toolkit', 'app', 'run.js'))
 
 	var runArguments = ['javascript:javascript', run]
 	var arguments = command.arguments
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	runArguments.push('-j=' + run)
+	if (Sincerity.Platform.isRhino) {
+		runArguments.push('-j=' + run)
+	}
 	command.sincerity.run(runArguments)
 }

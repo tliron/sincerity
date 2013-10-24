@@ -75,7 +75,7 @@ Sincerity.Templates = Sincerity.Templates || function() {
 	 * @returns {String}
 	 */
 	Public.cast = function(template, filling/*, arguments */) {
-		template = template || ''
+		template = String(template || '') // workaround to avoid ConsString in Nashorn
 
 		if (!Sincerity.Objects.exists(filling)) {
 			return template

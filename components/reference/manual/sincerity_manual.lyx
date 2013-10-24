@@ -8334,8 +8334,11 @@ Note that we're creating the log4j server in a separate container, and starting
 \end_layout
 
 \begin_layout Standard
-On this log4j server, you want to configure all the appenders as on the
- client processes.
+On this log4j server, you want to configure your 
+\emph on
+actual 
+\emph default
+appenders.
  Then, on all your client processes, you want to disable all the appenders
  except the socket appender (
 \begin_inset Quotes eld
@@ -8352,16 +8355,16 @@ On this log4j server, you want to configure all the appenders as on the
 
 \begin_layout Standard
 The result is that all logging messages will be sent from the clients to
- the server, where they will logged normally.
+ the server, where they will be actually logged.
 \end_layout
 
 \begin_layout Standard
-Additionally, it's recommend to run the log4j server with Sincerity's 
+It's recommend to run the log4j server with Sincerity's 
 \bar under
-logging plugin (page 
+service plugin (page 
 \begin_inset CommandInset ref
 LatexCommand pageref
-reference "logging"
+reference "service"
 
 \end_inset
 
@@ -15547,6 +15550,18 @@ Package-Uninstaller
 
 \begin_layout Section
 FAQ
+\end_layout
+
+\begin_layout Standard
+Please also refer to the FAQ for 
+\begin_inset CommandInset href
+LatexCommand href
+name "Scripturian"
+target "http://threecrickets.com/scripturian/manual/faq/"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection

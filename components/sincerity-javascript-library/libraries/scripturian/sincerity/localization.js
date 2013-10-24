@@ -131,10 +131,7 @@ Sincerity.Localization = Sincerity.Localization || function() {
 			return Math.round(value)
 		}
 		value = String(value)
-		if (value.endsWith('b')) {
-			return Math.round(parseFloat(value.substring(0, value.length - 1)))
-		}
-		else if (value.endsWith('kb')) {
+		if (value.endsWith('kb')) {
 			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1024)
 		}
 		else if (value.endsWith('mb')) {
@@ -145,6 +142,9 @@ Sincerity.Localization = Sincerity.Localization || function() {
 		}
 		else if (value.endsWith('tb')) {
 			return Math.round(parseFloat(value.substring(0, value.length - 2)) * 1099511627776)
+		}
+		else if (value.endsWith('b')) {
+			return Math.round(parseFloat(value.substring(0, value.length - 1)))
 		}
 		else {
 			return Math.round(parseFloat(value))
