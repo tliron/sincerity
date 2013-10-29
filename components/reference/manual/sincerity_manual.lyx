@@ -120,6 +120,10 @@ LatexCommand tableofcontents
 
 \end_layout
 
+\begin_layout Part
+Basic Manual
+\end_layout
+
 \begin_layout Section
 Introduction
 \end_layout
@@ -3534,6 +3538,408 @@ reference "nexus"
 \bar default
 , that would guarantee that you control access to all binaries within your
  organization, even if the third party repositories fail.
+\end_layout
+
+\begin_layout Section
+FAQ
+\end_layout
+
+\begin_layout Standard
+Please also refer to the FAQ for 
+\begin_inset CommandInset href
+LatexCommand href
+name "Scripturian"
+target "http://threecrickets.com/scripturian/manual/faq/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+How do I avoid pulling in a dependency's implicit dependencies?
+\end_layout
+
+\begin_layout Standard
+There is currently no way to do this with Sincerity commands, but you can
+ do this by editing your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+To avoid pulling 
+\emph on
+any
+\emph default
+ implicit dependencies, change the 
+\begin_inset Quotes eld
+\end_inset
+
+transitive
+\begin_inset Quotes erd
+\end_inset
+
+ attribute, which is 
+\begin_inset Quotes eld
+\end_inset
+
+true
+\begin_inset Quotes erd
+\end_inset
+
+ by default:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*" transitive="false"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for dependencies"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Otherwise, you can exclude specific implicit dependencies using 
+\begin_inset Quotes eld
+\end_inset
+
+exclude
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+<exclude org="com.tanukisoftware" module="wrapper-base"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for excludes"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/exclude.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+A dependency is being installed at a wrong version.
+ Why, and how do I fix it?
+\end_layout
+
+\begin_layout Standard
+If this is an 
+\emph on
+explicit 
+\emph default
+dependency that you added, it could be that it is also being included as
+ an 
+\emph on
+implicit 
+\emph default
+dependency with different version restrictions, and Ivy has done its best
+ to resolve the conflict within the restrictions.
+ You can observe this in the dependency tree using the 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:dependencies
+\begin_inset Quotes erd
+\end_inset
+
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:dependencies"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Standard
+There is currently no way to fix this with Sincerity commands, but you can
+ do this by editing your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ file, and adding a 
+\begin_inset Quotes eld
+\end_inset
+
+force
+\begin_inset Quotes erd
+\end_inset
+
+ attribute, which will cause Ivy to avoid resolving the dependency's version:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*" force="true"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for dependencies"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+If the problem is with an 
+\emph on
+implicit
+\emph default
+ dependency, you can make it explicit and use the above method.
+ However, Ivy also supports an alternative method, using 
+\begin_inset Quotes eld
+\end_inset
+
+override
+\begin_inset Quotes erd
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
+t->*"/>
+\end_layout
+
+\begin_layout Plain Layout
+
+<override org="com.tanukisoftware" module="wrapper-base" rev="3.5.20"/>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An 
+\begin_inset Quotes eld
+\end_inset
+
+override
+\begin_inset Quotes erd
+\end_inset
+
+ is not an actual dependency, and does not affect your dependency tree.
+ See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Ivy documentation for overrides"
+target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/override.html"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection
+I'm getting 
+\begin_inset Quotes erd
+\end_inset
+
+java.lang.OutOfMemoryError: PermGen space
+\begin_inset Quotes erd
+\end_inset
+
+ exceptions!
+\begin_inset CommandInset label
+LatexCommand label
+name "permgen-space"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is likely because you are chaining several of Sincerity commands together
+ while also using the 
+\begin_inset Quotes eld
+\end_inset
+
+heavier
+\begin_inset Quotes erd
+\end_inset
+
+ language engines (Jython, JRuby).
+ The easy solution in most cases is simply separating your commands.
+ For example, instead of this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add rails : install : add django : install : start django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Run this:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add rails : install
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity add django : install
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity start django
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If you're using the Oracle JVM, you can also increase the PermGen space
+ by setting the 
+\bar under
+JVM_SWITCHES environment variable (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "environment-variables"
+
+\end_inset
+
+)
+\bar default
+ before running Sincerity:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+JVM_SWITCHES=-XX:MaxPermSize=128m sincerity ...
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This problem should completely disappear in JVM 8, which 
+\begin_inset CommandInset href
+LatexCommand href
+name "removes the PermGen feature entirely"
+target "http://openjdk.java.net/jeps/122"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Part
+Ecosystem
 \end_layout
 
 \begin_layout Section
@@ -14151,6 +14557,10 @@ reference "jsdoc"
 .
 \end_layout
 
+\begin_layout Part
+Advanced Manual
+\end_layout
+
 \begin_layout Section
 Programming
 \begin_inset CommandInset label
@@ -15546,404 +15956,6 @@ Package-Uninstaller
 : specifies a class name which has a main() entry point.
  Simple string arguments can be optionally appended, separated by spaces.
  The uninstaller will be called when the package is to be uninstalled.
-\end_layout
-
-\begin_layout Section
-FAQ
-\end_layout
-
-\begin_layout Standard
-Please also refer to the FAQ for 
-\begin_inset CommandInset href
-LatexCommand href
-name "Scripturian"
-target "http://threecrickets.com/scripturian/manual/faq/"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-How do I avoid pulling in a dependency's implicit dependencies?
-\end_layout
-
-\begin_layout Standard
-There is currently no way to do this with Sincerity commands, but you can
- do this by editing your container's 
-\begin_inset Quotes eld
-\end_inset
-
-/configuration/sincerity/dependencies.conf
-\begin_inset Quotes erd
-\end_inset
-
- file.
-\end_layout
-
-\begin_layout Standard
-To avoid pulling 
-\emph on
-any
-\emph default
- implicit dependencies, change the 
-\begin_inset Quotes eld
-\end_inset
-
-transitive
-\begin_inset Quotes erd
-\end_inset
-
- attribute, which is 
-\begin_inset Quotes eld
-\end_inset
-
-true
-\begin_inset Quotes erd
-\end_inset
-
- by default:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*" transitive="false"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for dependencies"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Otherwise, you can exclude specific implicit dependencies using 
-\begin_inset Quotes eld
-\end_inset
-
-exclude
-\begin_inset Quotes erd
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*"/>
-\end_layout
-
-\begin_layout Plain Layout
-
-<exclude org="com.tanukisoftware" module="wrapper-base"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for excludes"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/exclude.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-A dependency is being installed at a wrong version.
- Why, and how do I fix it?
-\end_layout
-
-\begin_layout Standard
-If this is an 
-\emph on
-explicit 
-\emph default
-dependency that you added, it could be that it is also being included as
- an 
-\emph on
-implicit 
-\emph default
-dependency with different version restrictions, and Ivy has done its best
- to resolve the conflict within the restrictions.
- You can observe this in the dependency tree using the 
-\bar under
-
-\begin_inset Quotes eld
-\end_inset
-
-dependencies:dependencies
-\begin_inset Quotes erd
-\end_inset
-
- command (page 
-\begin_inset CommandInset ref
-LatexCommand pageref
-reference "dependencies:dependencies"
-
-\end_inset
-
-)
-\bar default
-.
-\end_layout
-
-\begin_layout Standard
-There is currently no way to fix this with Sincerity commands, but you can
- do this by editing your container's 
-\begin_inset Quotes eld
-\end_inset
-
-/configuration/sincerity/dependencies.conf
-\begin_inset Quotes erd
-\end_inset
-
- file, and adding a 
-\begin_inset Quotes eld
-\end_inset
-
-force
-\begin_inset Quotes erd
-\end_inset
-
- attribute, which will cause Ivy to avoid resolving the dependency's version:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*" force="true"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for dependencies"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-If the problem is with an 
-\emph on
-implicit
-\emph default
- dependency, you can make it explicit and use the above method.
- However, Ivy also supports an alternative method, using 
-\begin_inset Quotes eld
-\end_inset
-
-override
-\begin_inset Quotes erd
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*"/>
-\end_layout
-
-\begin_layout Plain Layout
-
-<override org="com.tanukisoftware" module="wrapper-base" rev="3.5.20"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-An 
-\begin_inset Quotes eld
-\end_inset
-
-override
-\begin_inset Quotes erd
-\end_inset
-
- is not an actual dependency, and does not affect your dependency tree.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for overrides"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/override.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
-I'm getting 
-\begin_inset Quotes erd
-\end_inset
-
-java.lang.OutOfMemoryError: PermGen space
-\begin_inset Quotes erd
-\end_inset
-
- exceptions!
-\begin_inset CommandInset label
-LatexCommand label
-name "permgen-space"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This is likely because you are chaining several of Sincerity commands together
- while also using the 
-\begin_inset Quotes eld
-\end_inset
-
-heavier
-\begin_inset Quotes erd
-\end_inset
-
- language engines (Jython, JRuby).
- The easy solution in most cases is simply separating your commands.
- For example, instead of this:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-sincerity add rails : install : add django : install : start django
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Run this:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-sincerity add rails : install
-\end_layout
-
-\begin_layout Plain Layout
-
-sincerity add django : install
-\end_layout
-
-\begin_layout Plain Layout
-
-sincerity start django
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If you're using the Oracle JVM, you can also increase the PermGen space
- by setting the 
-\bar under
-JVM_SWITCHES environment variable (page 
-\begin_inset CommandInset ref
-LatexCommand pageref
-reference "environment-variables"
-
-\end_inset
-
-)
-\bar default
- before running Sincerity:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-JVM_SWITCHES=-XX:MaxPermSize=128m sincerity ...
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This problem should completely disappear in JVM 8, which 
-\begin_inset CommandInset href
-LatexCommand href
-name "removes the PermGen feature entirely"
-target "http://openjdk.java.net/jeps/122"
-
-\end_inset
-
-.
 \end_layout
 
 \end_body

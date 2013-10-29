@@ -155,7 +155,7 @@ Ext.onReady(function() {
 		listeners: {
 			load: function() {
 				if (args.namespace) {
-					openNamespace(args.namespace);
+					openNamespace(args.namespace, args.item);
 				}
 			}			
 		}

@@ -130,7 +130,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 * with salt (before calculating the digest).
 	 * 
 	 * @param {byte[]} payload The textual payload
-	 * @param {byte[]} [saltBytes] The salt
+	 * @param {byte[]} saltBytes The salt or null
 	 * @param {Number} iterations The number of digest iterations to run
 	 * @param {String} algorithm The digest algorithm ('SHA-1', 'SHA-256', 'MD5', etc.)
 	 * @param {Boolean} [encoding='base64'] The encoding to use for the result

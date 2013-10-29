@@ -227,7 +227,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	//
 	
 	/**
-	 * True if the value is a number or <i>can be converted to</a> a number.
+	 * True if the value is a number or <i>can be converted to</i> a number.
 	 * 
 	 * @param value The value
 	 * @returns {Boolean}
@@ -243,7 +243,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	}
 	
 	/**
-	 * True if the value is an integer or <i>can be converted to</a> an integer.
+	 * True if the value is an integer or <i>can be converted to</i> an integer.
 	 * <p>
 	 * (Note that strings that would normally be converted to floats might be able
 	 * to convert successfully to integers, too, because the decimal point would tell
