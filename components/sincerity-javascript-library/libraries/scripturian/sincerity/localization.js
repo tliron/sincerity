@@ -90,6 +90,8 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/**
 	 * Converts a string to a milliseconds integer, interpreting 'ms', 's', 'm', 'h' and 'd' suffixes.
 	 * Numbers are simply rounded to an integer.
+	 * <p>
+	 * Fractions can be used, and are rounded to the nearest millisecond, for example: "1.5d".
 	 * 
 	 * @param {String|Number} value The number
 	 * @returns {Number} 
@@ -122,6 +124,8 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	/**
 	 * Converts a string to a bytes integer, interpreting 'b', 'kb', 'mb', 'gb' and 'tb' suffixes.
 	 * Numbers are simply rounded to an integer.
+	 * <p>
+	 * Fractions can be used, and are rounded to the nearest byte, for example: "1.5mb".
 	 * 
 	 * @param {String|Number} value The number
 	 * @returns {Number} 
