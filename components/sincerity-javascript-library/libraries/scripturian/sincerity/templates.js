@@ -70,12 +70,12 @@ Sincerity.Templates = Sincerity.Templates || function() {
 	 *    })
 	 * </pre>
 	 * 
-	 * @param {String} pattern The pattern to cast
-	 * @param {Object|java.util.Map|Function} [filling] If a function, accepts arguments (original, key)
+	 * @param {String} template The template to cast
+	 * @param {Object|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Map.html">java.util.Map</a>|Function} [filling] If a function, accepts arguments (original, key)
 	 * @returns {String}
 	 */
 	Public.cast = function(template, filling/*, arguments */) {
-		template = String(template || '') // workaround to avoid ConsString in Nashorn
+		template = Sincerity.Objects.exists(template) ? String(template) : ''
 
 		if (!Sincerity.Objects.exists(filling)) {
 			return template

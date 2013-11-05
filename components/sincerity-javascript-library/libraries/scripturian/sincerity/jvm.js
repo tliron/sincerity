@@ -79,6 +79,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Creates an instance of a JVM class.
 	 * 
 	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The JVM class or its name
+	 * @returns An instance
 	 */
 	Public.newInstance = function(theClass) {
 		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
@@ -87,6 +88,10 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	
 	/**
 	 * Creates a JVM array.
+	 * 
+	 * @param {Number} length The array length
+	 * @param {String} [type='object'] The array element type: can be a primitive ('int', 'byte', etc.) or a full class name
+	 * @returns A JVM array
 	 */
 	Public.newArray = function(length, type) {
 		type = type || 'object'
@@ -147,7 +152,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 			return threadSafe ? new java.util.concurrent.CopyOnWriteArraySet() : new java.util.HashSet(initialCapacity)
 		}
 		else {
-			// CopyOnWriteArraySet does not support initial capacity
+			// Weird: CopyOnWriteArraySet does not support initial capacity
 			return threadSafe ? new java.util.concurrent.CopyOnWriteArraySet() : new java.util.HashSet()
 		}
 	}
@@ -281,7 +286,6 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 */
 	Public.toByteArray = function(string, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
-		string = String(string) // workaround to avoid ConsString in Nashorn
 		return null !== charset ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
 	}
 	
