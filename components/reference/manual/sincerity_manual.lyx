@@ -11873,6 +11873,11 @@ restlet.jetty
 .
 \end_layout
 
+\begin_layout Quote
+The Jetty skeletons use Jetty 9, which requires a JVM of at least version
+ 7.
+\end_layout
+
 \begin_layout Subsubsection*
 Fleshing Out
 \end_layout
@@ -12135,6 +12140,11 @@ reference "prudence"
  builds on Restlet, letting you do all of that and more with your choice
  of JavaScript, Python, Ruby, PHP, Lua, Groovy or Clojure.
  (Disclosure: Prudence has also been created by Three Crickets.)
+\end_layout
+
+\begin_layout Quote
+The Jetty skeletons use Jetty 9, which requires a JVM of at least version
+ 7.
 \end_layout
 
 \begin_layout Subsubsection*
