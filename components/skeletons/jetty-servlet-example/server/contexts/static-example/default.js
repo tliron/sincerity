@@ -4,7 +4,7 @@ importClass(
 	org.eclipse.jetty.server.handler.HandlerList)
 
 // The context
-var context = new ContextHandler(server.handler, '/')
+var context = new ContextHandler(contexts, '/')
 context.displayName = 'The static example context for the servlet skeleton'
 
 // Assemble context

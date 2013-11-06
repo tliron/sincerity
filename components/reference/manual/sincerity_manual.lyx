@@ -12163,9 +12163,9 @@ Official
 \begin_inset Quotes erd
 \end_inset
 
- Jetty is a morass of XML files that effectively duplicate what a lightweight
- scripting language, like JavaScript does far more comprehensibly and with
- far greater power.
+ Jetty configuration is a morass of XML files that effectively duplicate
+ what a lightweight scripting language, like JavaScript does far more comprehens
+ibly and with far greater power.
  If you're switching from 
 \begin_inset Quotes eld
 \end_inset
@@ -12175,6 +12175,19 @@ official
 \end_inset
 
  Jetty, then you're in for a treat, as well as a sigh of relief.
+\end_layout
+
+\begin_layout Standard
+Note that Jetty's NCSA-style web log does not use the logging plugin and
+ must be configured independently under 
+\begin_inset Quotes eld
+\end_inset
+
+/server/services/web-log.js
+\begin_inset Quotes erd
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -12200,7 +12213,7 @@ jetty.servlet.jmx
 
  adds JMX support to your Jetty server, allowing you to manage it via VisualVM
  or JConsole.
- To install both:
+ To install both add-ons:
 \end_layout
 
 \begin_layout Standard

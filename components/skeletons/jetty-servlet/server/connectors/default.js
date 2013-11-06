@@ -1,9 +1,11 @@
 
 // Jetty 9
 
-importClass(org.eclipse.jetty.server.ServerConnector)
+importClass(
+	org.eclipse.jetty.server.ServerConnector,
+	org.eclipse.jetty.server.HttpConnectionFactory)
 
-var connector = new ServerConnector(server)
+var connector = new ServerConnector(server, new HttpConnectionFactory())
 connector.port = 8080
 server.addConnector(connector)
 

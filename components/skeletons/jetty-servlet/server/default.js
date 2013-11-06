@@ -3,12 +3,17 @@ document.require('/sincerity/container/')
 
 importClass(
 	org.eclipse.jetty.server.Server,
+	org.eclipse.jetty.server.handler.HandlerCollection,
 	org.eclipse.jetty.server.handler.ContextHandlerCollection,
 	org.eclipse.jetty.webapp.WebAppContext,
 	org.eclipse.jetty.security.HashLoginService,
 	java.io.File)
 
 var server = new Server()
+var handlers = new HandlerCollection()
+server.handler = handlers
+var contexts = new ContextHandlerCollection()
+handlers.addHandler(contexts)
 
 // JMX (if available)
 try {
@@ -19,16 +24,16 @@ try {
 
 	var mBeanServer = ManagementFactory.platformMBeanServer
 	var mBeanContainer = new MBeanContainer(mBeanServer)
-	mBeanContainer.addBean(Log.log)
 	server.addBean(mBeanContainer)
-	server.container.addEventListener(mBeanContainer)
+	server.addBean(Log.log)
+	server.addEventListener(mBeanContainer)
 }
 catch (x) {}
 
 // Assemble server
 Sincerity.Container.here = sincerity.container.getFile('server')
 Sincerity.Container.executeAll('connectors')
-server.handler = new ContextHandlerCollection()
+Sincerity.Container.executeAll('services')
 Sincerity.Container.executeAll('contexts')
 
 // Add wars
