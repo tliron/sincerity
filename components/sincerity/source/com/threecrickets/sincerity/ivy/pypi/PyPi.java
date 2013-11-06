@@ -60,9 +60,9 @@ public class PyPi
 	 * Creates a regular expression to match PyPI artifact filenames and extract
 	 * the following unnamed groups:
 	 * <p>
-	 * Group 1: version<br/>
-	 * Group 2: python version<br/>
-	 * Group 3: file extension<br/>
+	 * Group 1: version<br>
+	 * Group 2: python version<br>
+	 * Group 3: file extension<br>
 	 * 
 	 * @param moduleName
 	 *        The module name
@@ -227,10 +227,10 @@ public class PyPi
 	 * <p>
 	 * Each artifact node is an array of 5 strings:
 	 * <p>
-	 * 0: name<br/>
-	 * 1: download URI<br/>
-	 * 2: version<br/>
-	 * 3: Python version<br/>
+	 * 0: name<br>
+	 * 1: download URI<br>
+	 * 2: version<br>
+	 * 3: Python version<br>
 	 * 4: file extension
 	 * 
 	 * @param id

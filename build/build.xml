@@ -96,7 +96,7 @@
 
 	<target name="classes-eclipse" if="eclipse.home" description="Compile Eclipse Plugin Java code">
 		<mkdir dir="${cache.eclipsePlugin}" />
-		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}">
+		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" bootclasspath="${compile.boot}">
 			<classpath>
 				<fileset dir="${eclipse.home}/plugins" includes="**/*.jar" />
 			</classpath>
@@ -108,7 +108,7 @@
 		
 	<target name="classes" depends="dependencies" description="Compile Java code">
 		<mkdir dir="${cache.classes}" />
-		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}">
+		<javac srcdir="${component.source}" destdir="${cache.classes}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" bootclasspath="${compile.boot}">
 			<classpath refid="dependencies" />
 		</javac>
 		<copy todir="${cache.classes}">
@@ -116,7 +116,7 @@
 		</copy>
 
 		<mkdir dir="${cache.agent}" />
-		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" />
+		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}"  bootclasspath="${compile.boot}"/>
 
 		<antcall target="classes-eclipse" />
 	</target>
@@ -135,7 +135,12 @@
 	</target>
 
 	<target name="javadocs-overwrite" depends="dependencies" description="Create API documentation" unless="javadocs-present">
-		<javadoc destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*" access="protected" source="${compile.version}" windowtitle="${documentation.title} ${component.version}${component.version.postfix}" doctitle="${documentation.title} ${component.version}${component.version.postfix}" author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
+		<javadoc
+			destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*"
+			access="protected" source="${compile.version}"
+			windowtitle="${documentation.title} ${component.version}${component.version.postfix}" doctitle="${documentation.title} ${component.version}${component.version.postfix}"
+			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
+			bootclasspath="${compile.boot}">
 
 			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
