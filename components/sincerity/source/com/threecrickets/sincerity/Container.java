@@ -266,7 +266,7 @@ public class Container implements IvyListener, TransferListener
 			if( javaScriptEngine == null )
 				javaScriptEngine = System.getenv( "SINCERITY_JAVASCRIPT" );
 			if( javaScriptEngine == null )
-				javaScriptEngine = "Rhino";
+				javaScriptEngine = "Nashorn";
 
 			// Adapter preferences
 			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + "Jython", 1 );
