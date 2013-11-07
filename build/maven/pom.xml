@@ -81,6 +81,7 @@
 		<module>skeletons/restlet-example</module>
 		<module>skeletons/restlet-httpclient</module>
 		<module>skeletons/restlet-jetty</module>
+		<module>skeletons/restlet-jetty9</module>
 		<module>skeletons/restlet-logging</module>
 		<module>skeletons/jetty-servlet</module>
 		<module>skeletons/jetty-servlet-example</module>

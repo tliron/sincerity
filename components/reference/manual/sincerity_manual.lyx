@@ -3557,120 +3557,6 @@ target "http://threecrickets.com/scripturian/manual/faq/"
 \end_layout
 
 \begin_layout Subsubsection
-How do I avoid pulling in a dependency's implicit dependencies?
-\end_layout
-
-\begin_layout Standard
-There is currently no way to do this with Sincerity commands, but you can
- do this by editing your container's 
-\begin_inset Quotes eld
-\end_inset
-
-/configuration/sincerity/dependencies.conf
-\begin_inset Quotes erd
-\end_inset
-
- file.
-\end_layout
-
-\begin_layout Standard
-To avoid pulling 
-\emph on
-any
-\emph default
- implicit dependencies, change the 
-\begin_inset Quotes eld
-\end_inset
-
-transitive
-\begin_inset Quotes erd
-\end_inset
-
- attribute, which is 
-\begin_inset Quotes eld
-\end_inset
-
-true
-\begin_inset Quotes erd
-\end_inset
-
- by default:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*" transitive="false"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for dependencies"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-Otherwise, you can exclude specific implicit dependencies using 
-\begin_inset Quotes eld
-\end_inset
-
-exclude
-\begin_inset Quotes erd
-\end_inset
-
-:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*"/>
-\end_layout
-
-\begin_layout Plain Layout
-
-<exclude org="com.tanukisoftware" module="wrapper-base"/>
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for excludes"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/exclude.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection
 A dependency is being installed at a wrong version.
  Why, and how do I fix it?
 \end_layout
@@ -4951,6 +4837,8 @@ name "dependencies:revise"
 \begin_layout Standard
 Allows you to change the version of a previously added dependency.
  The format is identical to 
+\bar under
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -4958,7 +4846,17 @@ dependencies:add
 \begin_inset Quotes erd
 \end_inset
 
-: the difference is that a new dependency is not (and cannot be) added.
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:add"
+
+\end_inset
+
+)
+\bar default
+: the difference is that a new dependency cannot be added with this command,
+ only revised.
  For example:
 \end_layout
 
@@ -5148,6 +5046,57 @@ sincerity add org.apache.velocity velocity 1.7
 \begin_layout Plain Layout
 
 sincerity remove org.apache.velocity velocity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:exclude
+\begin_inset CommandInset label
+LatexCommand label
+name "dependencies:exclude"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Forcibly excludes an implicit dependency from being downloaded.
+ The format is identical to 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:remove
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:remove"
+
+\end_inset
+
+)
+\bar default
+.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity exclude org.apache.velocity velocity
 \end_layout
 
 \end_inset
@@ -12985,6 +12934,26 @@ status open
 \begin_layout Plain Layout
 
 sincerity add restlet.jetty : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The above installs Jetty 8, which required JVM 6.
+ If you have JVM 7 or above, then you can use Jetty 9:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add restlet.jetty9 : install
 \end_layout
 
 \end_inset

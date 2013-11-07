@@ -87,7 +87,7 @@ public class DependenciesPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"dependencies", "licenses", "reset", "add", "revise", "remove"
+			"dependencies", "licenses", "reset", "add", "revise", "remove", "exclude"
 		};
 	}
 
@@ -179,6 +179,21 @@ public class DependenciesPlugin implements Plugin1
 			if( !dependencies.remove( group, name ) )
 				if( command.getSincerity().getVerbosity() >= 2 )
 					command.getSincerity().getErr().println( "Dependency was not in container: " + group + ":" + name );
+		}
+		else if( "exclude".equals( commandName ) )
+		{
+			command.setParse( true );
+			String[] arguments = command.getArguments();
+			if( arguments.length < 2 )
+				throw new BadArgumentsCommandException( command, "group", "name" );
+
+			String group = arguments[0];
+			String name = arguments[1];
+
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( !dependencies.exclude( group, name ) )
+				if( command.getSincerity().getVerbosity() >= 2 )
+					command.getSincerity().getErr().println( "Exclusion already in container: " + group + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

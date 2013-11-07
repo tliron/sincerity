@@ -30,12 +30,18 @@ import org.apache.ivy.Ivy;
 import org.apache.ivy.core.LogOptions;
 import org.apache.ivy.core.cache.ResolutionCacheManager;
 import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.DefaultExcludeRule;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.ExcludeRule;
+import org.apache.ivy.core.module.id.ArtifactId;
+import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
+import org.apache.ivy.plugins.matcher.ExactPatternMatcher;
+import org.apache.ivy.plugins.matcher.PatternMatcher;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
 import org.apache.ivy.plugins.parser.xml.XmlModuleDescriptorWriter;
@@ -138,10 +144,7 @@ public class Dependencies
 		// Default resolve options
 		defaultResolveOptions = new ResolveOptions();
 		defaultResolveOptions.setResolveMode( ResolveOptions.RESOLVEMODE_DYNAMIC );
-		defaultResolveOptions.setConfs( new String[]
-		{
-			"default"
-		} );
+		defaultResolveOptions.setConfs( CONFIGURATIONS );
 		defaultResolveOptions.setCheckIfChanged( true );
 		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() >= 1 ? LogOptions.LOG_DEFAULT : LogOptions.LOG_QUIET );
 	}
@@ -581,6 +584,35 @@ public class Dependencies
 	}
 
 	/**
+	 * Excludes an implicit dependency.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @return True if removed
+	 * @throws SincerityException
+	 */
+	public boolean exclude( String group, String name ) throws SincerityException
+	{
+		for( ExcludeRule exclude : moduleDescriptor.getExcludeRules( CONFIGURATIONS ) )
+		{
+			ModuleId id = exclude.getId().getModuleId();
+			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) )
+				return false;
+		}
+
+		ArtifactId id = new ArtifactId( new ModuleId( group, name ), PatternMatcher.ANY_EXPRESSION, PatternMatcher.ANY_EXPRESSION, PatternMatcher.ANY_EXPRESSION );
+		DefaultExcludeRule exclude = new DefaultExcludeRule( id, new ExactPatternMatcher(), null );
+		exclude.addConfiguration( "default" );
+		moduleDescriptor.addExcludeRule( exclude );
+
+		save();
+
+		return true;
+	}
+
+	/**
 	 * Deletes all managed artifacts which no longer have an origin.
 	 * 
 	 * @throws SincerityException
@@ -697,6 +729,11 @@ public class Dependencies
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	private static final String[] CONFIGURATIONS = new String[]
+	{
+		"default"
+	};
 
 	private final File ivyFile;
 
