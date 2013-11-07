@@ -475,7 +475,7 @@ public class Dependencies
 
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
 		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, false, true );
-		dependency.addDependencyConfiguration( "default", "*" );
+		dependency.addDependencyConfiguration( "default", "runtime" );
 		moduleDescriptor.addDependency( dependency );
 
 		save();
