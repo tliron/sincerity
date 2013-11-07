@@ -1,2 +1,3 @@
 
-repository.getLogger('org.eclipse.jetty').level = Level.INFO
+var logger = repository.getLogger('org.eclipse.jetty')
+logger.level = Level.INFO

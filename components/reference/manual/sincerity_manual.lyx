@@ -12127,8 +12127,9 @@ official
 \end_layout
 
 \begin_layout Standard
-Note that Jetty's NCSA-style web log does not use the logging plugin and
- must be configured independently under 
+Though Jetty can use the logging plugin (see below), it also supports its
+ own internal logging mechanism for the web (NCSA-style) log.
+ To configure it, see 
 \begin_inset Quotes eld
 \end_inset
 
@@ -12137,7 +12138,7 @@ Note that Jetty's NCSA-style web log does not use the logging plugin and
 \end_inset
 
 .
- By default, the logs will appear under the 
+ By default, these logs will appear under the 
 \begin_inset Quotes eld
 \end_inset
 
