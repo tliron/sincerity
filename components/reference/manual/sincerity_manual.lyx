@@ -11801,7 +11801,7 @@ target "http://jetty.codehaus.org/jetty/"
 
 \end_inset
 
-is a very robust, modular web server with excellent asynchronous performance,
+ is a very robust, modular web server with excellent asynchronous performance,
  and lots of features and extensions.
  With this skeleton we've provided you with the lightweight, bare minimum
  dependencies to serve just static files for a single web site.
@@ -12033,7 +12033,7 @@ Servlets let you generate dynamic content for a web site, usually using
 \end_layout
 
 \begin_layout Standard
-To install a barebones servlet skeleton, based on 
+To install a bare servlet skeleton, based on 
 \begin_inset CommandInset href
 LatexCommand href
 name "Jetty"
@@ -12083,8 +12083,8 @@ target "http://localhost:8080"
 \end_inset
 
 .
- But, you won't see anything yet: this is a barebones skeleton waiting for
- you to add your application.
+ But, you won't see anything yet: this is a bare skeleton waiting for you
+ to add your application to it.
  You might want to start by installing 
 \begin_inset Quotes eld
 \end_inset
@@ -12188,6 +12188,15 @@ Note that Jetty's NCSA-style web log does not use the logging plugin and
 \end_inset
 
 .
+ By default, the logs will appear under the 
+\begin_inset Quotes eld
+\end_inset
+
+/logs/web/
+\begin_inset Quotes erd
+\end_inset
+
+ directory, and will be named according to the date.
 \end_layout
 
 \begin_layout Subsubsection*
