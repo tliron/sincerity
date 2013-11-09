@@ -12915,7 +12915,7 @@ The example at
 
 \begin_layout Standard
 The skeleton does not install any connectors by default, relying instead
- on the default connector.
+ on the default Restlet connector.
  To install the 
 \begin_inset CommandInset href
 LatexCommand href
@@ -12924,27 +12924,8 @@ target "http://jetty.codehaus.org/jetty/"
 
 \end_inset
 
- server connector:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-sincerity add restlet.jetty : install
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The above installs Jetty 8, which required JVM 6.
- If you have JVM 7 or above, then you can use Jetty 9:
+ server connector, you have the choice of either Jetty 9 (requires JVM 7)
+ or Jetty 8 (required JVM 6):
 \end_layout
 
 \begin_layout Standard
@@ -12955,6 +12936,25 @@ status open
 \begin_layout Plain Layout
 
 sincerity add restlet.jetty9 : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Or:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add restlet.jetty8 : install
 \end_layout
 
 \end_inset
@@ -13066,8 +13066,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add restlet.example : add restlet.logging :
- add service : install : service restlet start
+sincerity create mycontainer : add restlet.example : add restlet.jetty9 :
+ add restlet.logging : add service : install : service restlet start
 \end_layout
 
 \end_inset
