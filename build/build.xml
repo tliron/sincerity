@@ -90,7 +90,7 @@
 		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" />
 		<path id="dependencies">
 			<path refid="dependencies-ivy" />
-			<fileset dir="${dependencies}" includes="**/*.jar" />
+			<fileset dir="${dependencies.jars}" includes="**/*.jar" />
 		</path>
 	</target>
 
