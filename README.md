@@ -83,5 +83,5 @@ Maven repository using the "deploy-maven" Ant target. To enable this, you must i
 Still Having Trouble?
 ---------------------
 
-Join the [Prudence Community](http://groups.google.com/group/prudence-community), and
+Join the [Sincerity Community](http://groups.google.com/group/sincerity-community), and
 tell us where you're stuck! We're very happy to help newcomers get up and running.

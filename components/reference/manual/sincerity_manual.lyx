@@ -11746,7 +11746,7 @@ sincerity add jetty.web : install
 \begin_inset CommandInset href
 LatexCommand href
 name "Jetty"
-target "http://jetty.codehaus.org/jetty/"
+target "http://www.eclipse.org/jetty/"
 
 \end_inset
 
@@ -11986,7 +11986,7 @@ To install a bare servlet skeleton, based on
 \begin_inset CommandInset href
 LatexCommand href
 name "Jetty"
-target "http://jetty.codehaus.org/jetty/"
+target "http://www.eclipse.org/jetty/"
 
 \end_inset
 
@@ -12492,7 +12492,7 @@ Under
 \begin_inset CommandInset href
 LatexCommand href
 name "API documentation"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Server.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/Server.html"
 
 \end_inset
 
@@ -12584,7 +12584,7 @@ Under
 \begin_inset CommandInset href
 LatexCommand href
 name "API documentation"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/routing/VirtualHost.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/routing/VirtualHost.html"
 
 \end_inset
 
@@ -12618,7 +12618,7 @@ Under
 \begin_inset CommandInset href
 LatexCommand href
 name "API documentation"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Client.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/Client.html"
 
 \end_inset
 
@@ -12740,7 +12740,7 @@ The
 \begin_inset CommandInset href
 LatexCommand href
 name "Restlet services"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/service/package-summary.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/service/package-summary.html"
 
 \end_inset
 
@@ -12763,7 +12763,7 @@ Finally,
 \begin_inset CommandInset href
 LatexCommand href
 name "API documentation"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/Application.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/Application.html"
 
 \end_inset
 
@@ -12776,7 +12776,7 @@ d that you attach them to virtual hosts, even if it's just the default host,
 \begin_inset CommandInset href
 LatexCommand href
 name "Router"
-target "http://www.restlet.org/documentation/2.1/jse/api/index.html?org/restlet/routing/Router.html"
+target "http://restlet.org/learn/javadocs/2.2/jse/api/index.html?org/restlet/routing/Router.html"
 
 \end_inset
 
@@ -12920,7 +12920,7 @@ The skeleton does not install any connectors by default, relying instead
 \begin_inset CommandInset href
 LatexCommand href
 name "Jetty"
-target "http://jetty.codehaus.org/jetty/"
+target "http://www.eclipse.org/jetty/"
 
 \end_inset
 
