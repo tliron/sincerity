@@ -10,7 +10,7 @@ documentation.
 
 
 Building Sincerity
------------------- 
+------------------
 
 All you need to build Sincerity is [Ant](http://ant.apache.org/).
 
