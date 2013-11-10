@@ -12,12 +12,12 @@
 	<property name="component.source" value="${root}/components/${component}/source" />
 	<property name="component.resources" value="${root}/components/${component}/resources" />
 	<property name="component.notices" value="${root}/components/notices" />
-	<property name="reference" value="${root}/components/reference" />
-	<property name="scripts" value="${root}/components/scripts" />
-	<property name="sincerity-javascript-library" value="${root}/components/sincerity-javascript-library" />
-	<property name="templates" value="${root}/components/templates" />
-	<property name="eclipsePlugin" value="${root}/components/eclipse-plugin/plugin" />
-	<property name="agent" value="${root}/components/firewall-friendly-agent" />
+	<property name="component.reference" value="${root}/components/reference" />
+	<property name="component.scripts" value="${root}/components/scripts" />
+	<property name="component.sincerity-javascript-library" value="${root}/components/sincerity-javascript-library" />
+	<property name="component.templates" value="${root}/components/templates" />
+	<property name="component.eclipsePlugin" value="${root}/components/eclipse-plugin/plugin" />
+	<property name="component.agent" value="${root}/components/firewall-friendly-agent" />
 
 	<property name="dependencies" value="${root}/dependencies" />
 	<property name="dependencies.jars" value="${dependencies}/libraries/jars" />
@@ -96,13 +96,13 @@
 
 	<target name="classes-eclipse" if="eclipse.home" description="Compile Eclipse Plugin Java code">
 		<mkdir dir="${cache.eclipsePlugin}" />
-		<javac srcdir="${eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" bootclasspath="${compile.boot}">
+		<javac srcdir="${component.eclipsePlugin}/src" destdir="${cache.eclipsePlugin}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}" bootclasspath="${compile.boot}">
 			<classpath>
 				<fileset dir="${eclipse.home}/plugins" includes="**/*.jar" />
 			</classpath>
 		</javac>
 		<copy todir="${cache.eclipsePlugin}">
-			<fileset dir="${eclipsePlugin}" includes="icons/**, schema/**, plugin.xml" />
+			<fileset dir="${component.eclipsePlugin}" includes="icons/**, schema/**, plugin.xml" />
 		</copy>
 	</target>
 		
@@ -116,7 +116,7 @@
 		</copy>
 
 		<mkdir dir="${cache.agent}" />
-		<javac srcdir="${agent}/source" destdir="${cache.agent}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}"  bootclasspath="${compile.boot}"/>
+		<javac srcdir="${component.agent}/source" destdir="${cache.agent}" source="${compile.version}" target="${compile.version}" includeAntRuntime="no" debug="${compile.debug}"  bootclasspath="${compile.boot}"/>
 
 		<antcall target="classes-eclipse" />
 	</target>
@@ -186,7 +186,7 @@
 	<target name="manual-overwrite" description="Create manual" unless="manual-present">
 		<mkdir dir="${distribution.manual}" />
 		<copy todir="${distribution.manual}">
-			<fileset dir="${reference}/manual" excludes="**/*~" />
+			<fileset dir="${component.reference}/manual" excludes="**/*~" />
 			<filterchain>
 				<replacetokens>
 					<token key="VERSION" value="${component.version}${component.version.postfix}" />
@@ -198,7 +198,7 @@
 	</target>
 
 	<target name="libraries-eclipse-plugin" if="eclipse.home" description="Create Eclipse Plugin jars">
-		<jar destfile="${distribution.eclipsePlugin}/sincerity-eclipse-plugin.jar" basedir="${cache.eclipsePlugin}" manifest="${eclipsePlugin}/META-INF/MANIFEST.MF" />
+		<jar destfile="${distribution.eclipsePlugin}/sincerity-eclipse-plugin.jar" basedir="${cache.eclipsePlugin}" manifest="${component.eclipsePlugin}/META-INF/MANIFEST.MF" />
 	</target>
 
 	<target name="libraries" depends="classes, version" description="Create jars">
@@ -211,7 +211,7 @@
 		</jar>
 
 		<mkdir dir="${distribution.agent}" />
-		<jar destfile="${distribution.agent}/firewall-friendly-agent.jar" basedir="${cache.agent}" manifest="${agent}/resources/META-INF/MANIFEST.MF" />
+		<jar destfile="${distribution.agent}/firewall-friendly-agent.jar" basedir="${cache.agent}" manifest="${component.agent}/resources/META-INF/MANIFEST.MF" />
 
 		<antcall target="libraries-eclipse-plugin" />
 	</target>
@@ -223,12 +223,12 @@
 		</copy>
 		<copy todir="${distribution.content}">
 			<fileset dir="${component.notices}" />
-			<fileset dir="${scripts}" excludes="*.old" />
+			<fileset dir="${component.scripts}" excludes="*.old" />
 			<fileset dir="${dependencies}" includes="**/ivy.jar" />
-			<fileset dir="${sincerity-javascript-library}" />
+			<fileset dir="${component.sincerity-javascript-library}" />
 		</copy>
 		<copy todir="${distribution.templates}">
-			<fileset dir="${templates}" />
+			<fileset dir="${component.templates}" />
 		</copy>
 		<chmod perm="ugo+rx">
 			<fileset dir="${distribution.content}" includes="sincerity" />
