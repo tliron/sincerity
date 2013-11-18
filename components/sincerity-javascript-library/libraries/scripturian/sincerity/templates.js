@@ -71,7 +71,7 @@ Sincerity.Templates = Sincerity.Templates || function() {
 	 * </pre>
 	 * 
 	 * @param {String} template The template to cast
-	 * @param {Object|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Map.html">java.util.Map</a>|Function} [filling] If a function, accepts arguments (original, key)
+	 * @param {Object|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Map.html">java.util.Map</a>|Function} [filling] If a function, accepts arguments (original, key)
 	 * @returns {String}
 	 */
 	Public.cast = function(template, filling/*, arguments */) {

@@ -53,14 +53,14 @@ document.require(
  * Supported keys are "version" and "built".
  * 
  * @name sincerity.version
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/Map.html">java.util.Map</a>&lt;String, String&gt;
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Map.html">java.util.Map</a>&lt;String, String&gt;
  */
 
 /**
  * The root directory of the Sincerity installation.
  * 
  * @name sincerity.home
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>
  */
 
 /**
@@ -69,7 +69,7 @@ document.require(
  * Will throw an exception if there is no current container.
  * 
  * @name sincerity.containerRoot
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>
  * @see sincerity#container
  */
 
@@ -93,7 +93,7 @@ document.require(
  * Note that you can change this value.
  * 
  * @name sincerity.out
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>
  */
 
 /**
@@ -102,7 +102,7 @@ document.require(
  * Note that you can change this value.
  * 
  * @name sincerity.err
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>
  */
 
 /**
@@ -139,7 +139,7 @@ document.require(
  * Access to the set of container templates supported by this Sincerity installation.
  * 
  * @name sincerity.templates
- * @type <a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/util/List.html">java.util.List</a>&lt;<a href="http://threecrickets.com/api/java/sincerity/index.html?com/threecrickets/sincerity/Template.html">com.threecrickets.sincerity.Template</a>&gt;
+ * @type <a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/List.html">java.util.List</a>&lt;<a href="http://threecrickets.com/api/java/sincerity/index.html?com/threecrickets/sincerity/Template.html">com.threecrickets.sincerity.Template</a>&gt;
  */
 
 /**

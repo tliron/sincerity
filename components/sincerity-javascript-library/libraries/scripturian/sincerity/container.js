@@ -33,14 +33,14 @@ Sincerity.Container = Sincerity.Container || function() {
     /**
      * The container root path.
      * 
-     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>}
      */
     Public.root = com.threecrickets.bootstrap.Bootstrap.attributes.get('com.threecrickets.sincerity.containerRoot')
 
     /**
      * The current path for nested execution.
      * 
-     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>}
      */
     Public.here = null
     
@@ -49,7 +49,7 @@ Sincerity.Container = Sincerity.Container || function() {
      * <p>
      * The arguments are path segments.
      * 
-     * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>}
      * @see Sincerity.Files#build
      */
     Public.getFileFromHere = function(/* arguments */) {
@@ -59,7 +59,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	/**
 	 * Executes the document represented by the file, while keeping track of the current path.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
 	 */
 	Public.execute = function(file) {
     	if (!(file instanceof java.io.File)) {
@@ -74,7 +74,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	/**
 	 * Recursively executes all documents in a directory, while keeping track of the current path.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The path to execute, relative to the 'here' location
 	 * @param {String[]} [exclusions] Paths to avoid
 	 */
 	Public.executeAll = function(file, exclusions) {
@@ -112,7 +112,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	 * "dependencies:add" command.
 	 * 
 	 * @param {String} className The JVM class name
-	 * @returns {<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The class or null if not found
+	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The class or null if not found
 	 */
 	Public.ensureClass = function(className/*, dependencies*/) {
 		var theClass = Sincerity.JVM.getClass(className)

@@ -156,7 +156,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	/**
 	 * Calculates a digest for file contents. See {@link #digest}.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/1.5.0/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 * @param {String} algorithm The digest algorithm ('SHA-1', 'SHA-256', 'MD5', etc.)
 	 * @param {Boolean} [encoding='base64'] The encoding to use for the result
 	 * @returns {String} An encoded digest or null if failed
