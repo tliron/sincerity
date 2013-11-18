@@ -137,6 +137,7 @@ public class Bootstrap extends URLClassLoader
 	 * @param arguments
 	 *        Arguments to delegate to main
 	 * @throws Exception
+	 *         In case of an error during bootstrapping
 	 */
 	public static void main( String[] arguments ) throws Exception
 	{
@@ -151,6 +152,7 @@ public class Bootstrap extends URLClassLoader
 	 * @param arguments
 	 *        Arguments to delegate to main
 	 * @throws Exception
+	 *         In case of an error during bootstrapping
 	 * @see #getBootstrap(Object)
 	 */
 	public static void bootstrap( Object key, String[] arguments ) throws Exception
@@ -166,6 +168,7 @@ public class Bootstrap extends URLClassLoader
 	 * Constructor for child bootstraps.
 	 * 
 	 * @param urls
+	 *        The URLs to add to the classpath
 	 */
 	public Bootstrap( Collection<URL> urls )
 	{
@@ -235,6 +238,7 @@ public class Bootstrap extends URLClassLoader
 	 * @param arguments
 	 *        Arguments to delegate to main
 	 * @throws Exception
+	 *         In case of an error during bootstrapping
 	 */
 	public void bootstrap( String[] arguments ) throws Exception
 	{

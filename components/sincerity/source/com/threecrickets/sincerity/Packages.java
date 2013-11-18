@@ -50,6 +50,7 @@ public class Packages extends ArrayList<Package>
 	 * @param container
 	 *        The container
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Packages( Container container ) throws SincerityException
 	{
@@ -118,6 +119,7 @@ public class Packages extends ArrayList<Package>
 	 * @param overwrite
 	 *        True to force overwriting of modified artifacts
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see Package#unpack(String, ManagedArtifacts, boolean)
 	 */
 	public void install( String filter, boolean overwrite ) throws SincerityException
@@ -135,6 +137,7 @@ public class Packages extends ArrayList<Package>
 	 * Does <i>not</i> prune previously installed artifacts.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void uninstall() throws SincerityException
 	{

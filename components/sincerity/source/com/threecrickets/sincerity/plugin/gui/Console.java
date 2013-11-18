@@ -42,7 +42,8 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 /**
  * Shows the Sincerity output and error in a Swing frame.
  * <p>
- * <a href="http://exampledepot.com/egs/javax.swing.text/ta_Console.html">Source</a>
+ * <a href="http://exampledepot.com/egs/javax.swing.text/ta_Console.html">Source
+ * </a>
  * 
  * @author Tal Liron
  * @see Sincerity#getOut()

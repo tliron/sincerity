@@ -118,6 +118,7 @@ public class Package extends AbstractList<Artifact>
 	 *        The container
 	 * @return The package or null if not a package manifest
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public static Package parsePackage( URL manifestUrl, Container container ) throws SincerityException
 	{
@@ -285,6 +286,7 @@ public class Package extends AbstractList<Artifact>
 	 * Executes the installer class's main() method, if it exists.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void install() throws SincerityException
 	{
@@ -306,6 +308,7 @@ public class Package extends AbstractList<Artifact>
 	 * Executes the uninstaller class's main() method, if it exists.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void uninstall() throws SincerityException
 	{
@@ -327,6 +330,7 @@ public class Package extends AbstractList<Artifact>
 	 * @param overwrite
 	 *        True to force overwriting of modified artifacts
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see Artifact#unpack(ManagedArtifacts, boolean)
 	 */
 	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException

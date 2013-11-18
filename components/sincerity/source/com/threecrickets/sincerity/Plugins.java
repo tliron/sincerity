@@ -46,6 +46,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	 * @param container
 	 *        The container
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Plugins( Container container ) throws SincerityException
 	{
@@ -84,6 +85,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	 * Finds all JVM plugins in the current classpath.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Plugins() throws SincerityException
 	{

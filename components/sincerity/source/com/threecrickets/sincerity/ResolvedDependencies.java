@@ -60,6 +60,7 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	 * @param dependencies
 	 *        The dependencies instance
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public ResolvedDependencies( Dependencies dependencies ) throws SincerityException
 	{
@@ -306,6 +307,7 @@ public class ResolvedDependencies extends AbstractList<ResolvedDependency>
 	 *        The dependency's name
 	 * @return The resolved version or null
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public String getVersion( String group, String name ) throws SincerityException
 	{

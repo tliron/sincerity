@@ -92,6 +92,7 @@ public class Dependencies
 	 * @param container
 	 *        The container
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Dependencies( File ivyFile, File artifactsFile, Container container ) throws SincerityException
 	{
@@ -168,6 +169,7 @@ public class Dependencies
 	 * 
 	 * @return The packages
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Packages getPackages() throws SincerityException
 	{
@@ -216,6 +218,7 @@ public class Dependencies
 	 * 
 	 * @return The resolved dependencies
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public ResolvedDependencies getResolvedDependencies() throws SincerityException
 	{
@@ -229,6 +232,7 @@ public class Dependencies
 	 * 
 	 * @return The artifacts
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Set<Artifact> getArtifacts() throws SincerityException
 	{
@@ -245,6 +249,7 @@ public class Dependencies
 	 *        True to force overwriting of existing files
 	 * @return The artifacts
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Set<Artifact> getArtifacts( boolean install, boolean overwrite ) throws SincerityException
 	{
@@ -305,6 +310,7 @@ public class Dependencies
 	 *        True to include the system classpath
 	 * @return The classpath
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getClasspaths(boolean)
 	 */
 	public String getClasspath( boolean includeSystem ) throws SincerityException
@@ -323,6 +329,7 @@ public class Dependencies
 	 *        True to include the system classpath
 	 * @return The classpath
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getClasspath(boolean)
 	 */
 	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
@@ -439,6 +446,7 @@ public class Dependencies
 	 * Does <i>not</i> resolve; only changes the specification.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void reset() throws SincerityException
 	{
@@ -470,6 +478,7 @@ public class Dependencies
 	 *        The dependency's version
 	 * @return True if added
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean add( String group, String name, String version ) throws SincerityException
 	{
@@ -498,6 +507,7 @@ public class Dependencies
 	 *        The dependency's new version
 	 * @return True if changed
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean revise( String group, String name, String newVersion ) throws SincerityException
 	{
@@ -547,6 +557,7 @@ public class Dependencies
 	 *        The dependency's name
 	 * @return True if removed
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean remove( String group, String name ) throws SincerityException
 	{
@@ -592,6 +603,7 @@ public class Dependencies
 	 *        The dependency's name
 	 * @return True if removed
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean exclude( String group, String name ) throws SincerityException
 	{
@@ -616,6 +628,7 @@ public class Dependencies
 	 * Deletes all managed artifacts which no longer have an origin.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void prune() throws SincerityException
 	{
@@ -627,6 +640,7 @@ public class Dependencies
 	 * Uninstalls all packages.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void uninstall() throws SincerityException
 	{
@@ -642,6 +656,7 @@ public class Dependencies
 	 * 
 	 * @return The resolve report
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private ResolveReport resolve() throws SincerityException
 	{
@@ -674,6 +689,7 @@ public class Dependencies
 	 * @param overwrite
 	 *        True to force overwrite of existing artifact files
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void install( boolean overwrite ) throws SincerityException
 	{
@@ -756,6 +772,7 @@ public class Dependencies
 	 * "/configuration/sincerity/dependencies.conf").
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private void save() throws SincerityException
 	{
@@ -774,6 +791,7 @@ public class Dependencies
 	 * 
 	 * @return The report parser
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getResolutionReport()
 	 */
 	private XmlReportParser getParsedResolutionReport() throws SincerityException
@@ -800,6 +818,7 @@ public class Dependencies
 	 * 
 	 * @return The download reports
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private Set<ArtifactDownloadReport> getDownloadReports() throws SincerityException
 	{

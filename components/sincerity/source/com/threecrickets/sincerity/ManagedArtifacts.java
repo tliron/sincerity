@@ -66,6 +66,7 @@ public class ManagedArtifacts
 	 *        The artifact
 	 * @return True if was installed
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean wasInstalled( Artifact artifact ) throws SincerityException
 	{
@@ -85,6 +86,7 @@ public class ManagedArtifacts
 	 *        The artifact
 	 * @return The digest or null
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public byte[] getOriginalDigest( Artifact artifact ) throws SincerityException
 	{
@@ -112,6 +114,7 @@ public class ManagedArtifacts
 	 * @param digest
 	 *        The artifact's digest or null
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void add( Artifact artifact, boolean installed, byte[] digest ) throws SincerityException
 	{
@@ -131,6 +134,7 @@ public class ManagedArtifacts
 	 * Saves the database if there were changes.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void save() throws SincerityException
 	{
@@ -167,6 +171,7 @@ public class ManagedArtifacts
 	 * finally saves the changes.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void prune() throws SincerityException
 	{
@@ -181,6 +186,7 @@ public class ManagedArtifacts
 	 * @param necessaryArtifacts
 	 *        The artifacts that should stay
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void prune( Iterable<Artifact> necessaryArtifacts ) throws SincerityException
 	{
@@ -273,6 +279,7 @@ public class ManagedArtifacts
 	 * Loads and caches the database.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private void load() throws SincerityException
 	{

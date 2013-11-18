@@ -42,6 +42,7 @@ public class DelegatedPlugin implements Plugin1
 	 * @param shell
 	 *        The shell
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public DelegatedPlugin( File pluginFile, ScripturianShell shell ) throws SincerityException
 	{

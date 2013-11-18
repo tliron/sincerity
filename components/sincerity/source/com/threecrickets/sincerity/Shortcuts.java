@@ -61,6 +61,7 @@ public class Shortcuts extends AbstractList<String>
 	 *        The database file (usually
 	 *        "/configuration/sincerity/shortcuts.conf")
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Shortcuts( File file ) throws SincerityException
 	{
@@ -79,6 +80,7 @@ public class Shortcuts extends AbstractList<String>
 	 *        The shortcut identifier
 	 * @return The shortcut values
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public String[] get( String shortcut ) throws SincerityException
 	{
@@ -119,6 +121,7 @@ public class Shortcuts extends AbstractList<String>
 	 * @param arguments
 	 *        The list to which we should add arguments
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void addArgument( String argument, List<String> arguments ) throws SincerityException
 	{
@@ -166,6 +169,7 @@ public class Shortcuts extends AbstractList<String>
 	 * Loads and caches the database.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private void load() throws SincerityException
 	{

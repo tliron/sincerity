@@ -144,6 +144,7 @@ public class Sincerity implements Runnable
 	 * @param arguments
 	 *        The command line
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Sincerity( String[] arguments ) throws SincerityException
 	{
@@ -158,6 +159,7 @@ public class Sincerity implements Runnable
 	 * @param sincerity
 	 *        The instance to clone
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Sincerity( String[] arguments, Sincerity sincerity ) throws SincerityException
 	{
@@ -228,6 +230,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The home directory
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public File getHome() throws SincerityException
 	{
@@ -243,6 +246,7 @@ public class Sincerity implements Runnable
 	 *        The path parts
 	 * @return The absolute file
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public File getHomeFile( String... parts ) throws SincerityException
 	{
@@ -358,6 +362,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The canonical file
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #setContainerRoot(File)
 	 */
 	public File getContainerRoot() throws SincerityException
@@ -379,6 +384,7 @@ public class Sincerity implements Runnable
 	 * @param containerRoot
 	 *        The container root
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getContainerRoot()
 	 */
 	public void setContainerRoot( File containerRoot ) throws SincerityException
@@ -416,6 +422,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The container
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Container getContainer() throws SincerityException
 	{
@@ -456,6 +463,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The plugins
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Plugins getPlugins() throws SincerityException
 	{
@@ -499,6 +507,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The templates
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public List<Template> getTemplates() throws SincerityException
 	{
@@ -533,6 +542,7 @@ public class Sincerity implements Runnable
 	 * @param force
 	 *        True to force overriding of existing files
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void createContainer( File containerRoot, File templateDir, boolean force ) throws SincerityException
 	{
@@ -579,6 +589,7 @@ public class Sincerity implements Runnable
 	 * @param arguments
 	 *        The command arguments
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getPlugins()
 	 */
 	public void run( String... arguments ) throws SincerityException
@@ -596,6 +607,7 @@ public class Sincerity implements Runnable
 	 * Reboots Sincerity without forcing a new container bootstrap.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #reboot(boolean)
 	 */
 	public void reboot() throws SincerityException
@@ -610,6 +622,7 @@ public class Sincerity implements Runnable
 	 * @param forceNewBootstrap
 	 *        True to force the re-creation of the container's bootstrap
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void reboot( boolean forceNewBootstrap ) throws SincerityException
 	{
@@ -729,6 +742,7 @@ public class Sincerity implements Runnable
 	 * 
 	 * @return The canonical file
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private static File findContainerRoot() throws SincerityException
 	{
@@ -889,6 +903,7 @@ public class Sincerity implements Runnable
 	 * @param isManual
 	 *        Whether we are running in manual mode
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private void run( boolean isManual ) throws SincerityException
 	{

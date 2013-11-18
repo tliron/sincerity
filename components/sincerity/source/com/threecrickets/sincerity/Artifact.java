@@ -80,6 +80,7 @@ public class Artifact implements Comparable<Artifact>
 	 * 
 	 * @return The digest
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public byte[] getFileDigest() throws SincerityException
 	{
@@ -112,6 +113,7 @@ public class Artifact implements Comparable<Artifact>
 	 * 
 	 * @return The digest
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public byte[] getOriginDigest() throws SincerityException
 	{
@@ -151,6 +153,7 @@ public class Artifact implements Comparable<Artifact>
 	 *        Whether to overwrite the file if it already exists
 	 * @return The digest
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public byte[] unpack( ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
 	{

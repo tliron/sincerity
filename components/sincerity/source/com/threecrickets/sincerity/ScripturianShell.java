@@ -61,6 +61,7 @@ public class ScripturianShell implements Shell
 	 * @param arguments
 	 *        The arguments sent to {@link Main#main(String[])}
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public ScripturianShell( Container container, File sourceDir, boolean prepare, String... arguments ) throws SincerityException
 	{
@@ -107,6 +108,7 @@ public class ScripturianShell implements Shell
 	 * @param documentName
 	 *        The document name
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void execute( String documentName ) throws SincerityException
 	{
@@ -154,6 +156,7 @@ public class ScripturianShell implements Shell
 	 *        The entering key
 	 * @return The enterable executable
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Executable makeEnterable( String documentName, String enteringKey ) throws SincerityException
 	{

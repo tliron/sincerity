@@ -138,6 +138,7 @@ public class Command
 	 * 
 	 * @return The arguments
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public String[] getArguments() throws SincerityException
 	{
@@ -159,6 +160,7 @@ public class Command
 	 * 
 	 * @return The switches or an empty set
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Set<String> getSwitches() throws SincerityException
 	{
@@ -180,6 +182,7 @@ public class Command
 	 * 
 	 * @return The properties or an empty map
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Map<String, String> getProperties() throws SincerityException
 	{
@@ -292,6 +295,7 @@ public class Command
 	 * Separates switches and properties from the rest of the arguments.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	private void parse() throws SincerityException
 	{

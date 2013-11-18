@@ -37,6 +37,7 @@ public abstract class ClassUtil
 	 * @param arguments
 	 *        The class name followed by the arguments for main()
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public static void main( Sincerity sincerity, String[] arguments ) throws SincerityException
 	{
@@ -56,6 +57,7 @@ public abstract class ClassUtil
 	 * @param arguments
 	 *        The arguments for main()
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public static void main( Sincerity sincerity, String className, String[] arguments ) throws SincerityException
 	{

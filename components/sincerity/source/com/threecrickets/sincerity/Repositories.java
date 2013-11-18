@@ -76,6 +76,7 @@ public class Repositories
 	 * @param ivy
 	 *        The Ivy instance
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Repositories( File ivyFile, Ivy ivy ) throws SincerityException
 	{
@@ -148,6 +149,7 @@ public class Repositories
 	 *        The Maven root URL
 	 * @return True if added
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean addMaven( String section, String name, String url ) throws SincerityException
 	{
@@ -199,6 +201,7 @@ public class Repositories
 	 *        The PyPI root URL
 	 * @return True if added
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean addPyPi( String section, String name, String url ) throws SincerityException
 	{
@@ -246,6 +249,7 @@ public class Repositories
 	 *        The resolver name within the section
 	 * @return True if removed
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean remove( String section, String name ) throws SincerityException
 	{

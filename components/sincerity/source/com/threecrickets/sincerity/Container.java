@@ -85,6 +85,7 @@ public class Container implements IvyListener, TransferListener
 	 * @param debugLevel
 	 *        The Ivy debug level
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see DefaultMessageLogger
 	 */
 	public Container( Sincerity sincerity, File root, int debugLevel ) throws SincerityException
@@ -195,6 +196,7 @@ public class Container implements IvyListener, TransferListener
 	 * 
 	 * @return The plugins
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Plugins getPlugins() throws SincerityException
 	{
@@ -208,6 +210,7 @@ public class Container implements IvyListener, TransferListener
 	 * 
 	 * @return The bootstrap
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Bootstrap getBootstrap() throws SincerityException
 	{
@@ -221,6 +224,7 @@ public class Container implements IvyListener, TransferListener
 	 *        True to ignore cached value and force creation
 	 * @return The bootstrap
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #createBootstrap()
 	 */
 	public Bootstrap getBootstrap( boolean forceCreate ) throws SincerityException
@@ -245,6 +249,7 @@ public class Container implements IvyListener, TransferListener
 	 * 
 	 * @return The language manager
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public LanguageManager getLanguageManager() throws SincerityException
 	{
@@ -483,6 +488,7 @@ public class Container implements IvyListener, TransferListener
 	 * 
 	 * @return The programs
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public List<String> getPrograms() throws SincerityException
 	{
@@ -602,6 +608,7 @@ public class Container implements IvyListener, TransferListener
 	 * 
 	 * @return A bootstrap
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public Bootstrap createBootstrap() throws SincerityException
 	{
@@ -624,6 +631,7 @@ public class Container implements IvyListener, TransferListener
 	 * Recreates and caches the bootstrap.
 	 * 
 	 * @throws SincerityException
+	 *         In case of an error
 	 * @see #getBootstrap(boolean)
 	 */
 	public void updateBootstrap() throws SincerityException

@@ -43,6 +43,7 @@ public interface Plugin1
 	 * 
 	 * @return The interface version number
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public int getInterfaceVersion() throws SincerityException;
 
@@ -52,6 +53,7 @@ public interface Plugin1
 	 * 
 	 * @return The plugin name
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public String getName() throws SincerityException;
 
@@ -61,6 +63,7 @@ public interface Plugin1
 	 * 
 	 * @return An array of command names
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public String[] getCommands() throws SincerityException;
 
@@ -76,6 +79,7 @@ public interface Plugin1
 	 * @param command
 	 *        The command to run
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void run( Command command ) throws SincerityException;
 
@@ -89,6 +93,7 @@ public interface Plugin1
 	 * @param command
 	 *        The command used to invoke the GUI (likely "gui:gui")
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public void gui( Command command ) throws SincerityException;
 }

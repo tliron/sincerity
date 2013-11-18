@@ -18,7 +18,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
-
 /**
  * A Swing node which can be configured with separate value, label and icon.
  * 
