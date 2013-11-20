@@ -57,7 +57,7 @@ function render(command) {
 }
 
 function renderMarkdown(command, sourceFile, renderedFile) {
-	if (null == Sincerity.Container.ensureClass('org.pegdown.PegDownProcessor', ['org.pegdown', 'pegdown', pegdownVersion])) {
+	if (null === Sincerity.Container.ensureClass('org.pegdown.PegDownProcessor', ['org.pegdown', 'pegdown', pegdownVersion])) {
 		return
 	}
 	

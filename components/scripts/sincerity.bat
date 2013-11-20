@@ -17,7 +17,7 @@ REM # Find Sincerity home
 REM #
 
 SET ORIGINAL=%CD%
-REM CD /D %0%
+CD /D %~dp0
 SET SINCERITY_HOME=%CD%
 
 REM #
