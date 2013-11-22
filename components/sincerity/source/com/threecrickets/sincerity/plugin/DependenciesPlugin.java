@@ -130,6 +130,9 @@ public class DependenciesPlugin implements Plugin1
 				return;
 			}
 
+			boolean force = command.getSwitches().contains( "force" );
+			boolean only = command.getSwitches().contains( "only" );
+
 			String group = arguments[0];
 			String name = arguments[1];
 			String version;
@@ -142,7 +145,7 @@ public class DependenciesPlugin implements Plugin1
 				version = "latest.integration";
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			if( !dependencies.add( group, name, version ) )
+			if( !dependencies.add( group, name, version, force, !only ) )
 				if( command.getSincerity().getVerbosity() >= 2 )
 					command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + ":" + version );
 		}

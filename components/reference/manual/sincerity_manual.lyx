@@ -3596,24 +3596,27 @@ reference "dependencies:dependencies"
 \end_layout
 
 \begin_layout Standard
-There is currently no way to fix this with Sincerity commands, but you can
- do this by editing your container's 
+You can overcome this by forcing a specific version, using the 
 \begin_inset Quotes eld
 \end_inset
 
-/configuration/sincerity/dependencies.conf
+--force
 \begin_inset Quotes erd
 \end_inset
 
- file, and adding a 
-\begin_inset Quotes eld
+ switch for 
+\bar under
+dependencies:add (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:add"
+
 \end_inset
 
-force
-\begin_inset Quotes erd
-\end_inset
-
- attribute, which will cause Ivy to avoid resolving the dependency's version:
+)
+\bar default
+.
+ For example:
 \end_layout
 
 \begin_layout Standard
@@ -3623,8 +3626,7 @@ status open
 
 \begin_layout Plain Layout
 
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*" force="true"/>
+sincerity add com.tanukisoftware wrapper-linux 3.5.20 --force
 \end_layout
 
 \end_inset
@@ -3633,24 +3635,7 @@ t->*" force="true"/>
 \end_layout
 
 \begin_layout Standard
-See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for dependencies"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependencies.html"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-If the problem is with an 
-\emph on
-implicit
-\emph default
- dependency, you can make it explicit and use the above method.
- However, Ivy also supports an alternative method, using 
+Another option is to use Ivy's 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3658,7 +3643,17 @@ override
 \begin_inset Quotes erd
 \end_inset
 
-:
+ feature.
+ You will need to edit your container's 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/sincerity/dependencies.conf
+\begin_inset Quotes erd
+\end_inset
+
+ and add it yourself.
+ Here's how it my look:
 \end_layout
 
 \begin_layout Standard
@@ -4719,6 +4714,27 @@ latest
 
  will match versions that are greater than or equal to 1.0 but lesser than
  2.0.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--only
+\series default
+: Ignores all implicit dependencies of this dependency
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--force
+\series default
+: Forces the specified version, even if a different version is preferred
+ by a different dependency
 \end_layout
 
 \begin_layout Quote

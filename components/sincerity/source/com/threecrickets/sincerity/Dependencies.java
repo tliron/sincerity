@@ -476,17 +476,21 @@ public class Dependencies
 	 *        The dependency's name
 	 * @param version
 	 *        The dependency's version
+	 * @param force
+	 *        Whether to force the dependency
+	 * @param transitive
+	 *        Whether to pull in dependencies of the dependency
 	 * @return True if added
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public boolean add( String group, String name, String version ) throws SincerityException
+	public boolean add( String group, String name, String version, boolean force, boolean transitive ) throws SincerityException
 	{
 		if( has( group, name, version ) )
 			return false;
 
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
-		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, false, false, true );
+		DefaultDependencyDescriptor dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, force, false, transitive );
 		dependency.addDependencyConfiguration( "default", "*" );
 		moduleDescriptor.addDependency( dependency );
 
