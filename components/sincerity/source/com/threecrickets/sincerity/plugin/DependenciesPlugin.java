@@ -56,6 +56,12 @@ import com.threecrickets.sincerity.plugin.gui.LicensesPane;
  * dependency.</li>
  * <li><b>remove</b>: removes a single dependency. The two arguments are group
  * and module name. Note that this does not actually uninstall the dependency.</li>
+ * <li><b>exclude</b>: excludes an implicit dependency. The two arguments are
+ * group and module name. Note that this does not actually uninstall the
+ * dependency.</li>
+ * <li><b>override</b>: overrides the version of an implicit dependency. The
+ * three arguments are group, module name and version. Note that this does not
+ * actually install the dependency.</li>
  * </ul>
  * Additionally, this plugin adds "Dependencies" and "Licenses" tabs and an
  * "Add and Install" button to the GUI.
@@ -87,7 +93,7 @@ public class DependenciesPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"dependencies", "licenses", "reset", "add", "revise", "remove", "exclude"
+			"dependencies", "licenses", "reset", "add", "revise", "remove", "exclude", "override"
 		};
 	}
 
@@ -147,7 +153,7 @@ public class DependenciesPlugin implements Plugin1
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.add( group, name, version, force, !only ) )
 				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + ":" + version );
+					command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + " v" + version );
 		}
 		else if( "revise".equals( commandName ) )
 		{
@@ -165,8 +171,8 @@ public class DependenciesPlugin implements Plugin1
 
 			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
 			if( !dependencies.revise( group, name, version ) )
-				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + ":" + version );
+				if( command.getSincerity().getVerbosity() >= 1 )
+					command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + " v" + version );
 		}
 		else if( "remove".equals( commandName ) )
 		{
@@ -197,6 +203,25 @@ public class DependenciesPlugin implements Plugin1
 			if( !dependencies.exclude( group, name ) )
 				if( command.getSincerity().getVerbosity() >= 2 )
 					command.getSincerity().getErr().println( "Exclusion already in container: " + group + ":" + name );
+		}
+		else if( "override".equals( commandName ) )
+		{
+			command.setParse( true );
+			String[] arguments = command.getArguments();
+			if( arguments.length < 3 )
+				throw new BadArgumentsCommandException( command, "group", "name", "version" );
+
+			String group = arguments[0];
+			String name = arguments[1];
+			String version = arguments[2];
+
+			if( "latest".equals( version ) )
+				version = "latest.integration";
+
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			if( !dependencies.override( group, name, version ) )
+				if( command.getSincerity().getVerbosity() >= 1 )
+					command.getSincerity().getErr().println( "Dependency not overridden: " + group + ":" + name + " v" + version );
 		}
 		else
 			throw new UnknownCommandException( command );

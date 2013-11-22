@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.ivy.Ivy;
@@ -34,6 +35,7 @@ import org.apache.ivy.core.module.descriptor.DefaultExcludeRule;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.ExcludeRule;
+import org.apache.ivy.core.module.descriptor.OverrideDependencyDescriptorMediator;
 import org.apache.ivy.core.module.id.ArtifactId;
 import org.apache.ivy.core.module.id.ModuleId;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
@@ -41,6 +43,7 @@ import org.apache.ivy.core.report.ArtifactDownloadReport;
 import org.apache.ivy.core.report.ResolveReport;
 import org.apache.ivy.core.resolve.ResolveOptions;
 import org.apache.ivy.plugins.matcher.ExactPatternMatcher;
+import org.apache.ivy.plugins.matcher.MapMatcher;
 import org.apache.ivy.plugins.matcher.PatternMatcher;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParser;
 import org.apache.ivy.plugins.parser.ModuleDescriptorParserRegistry;
@@ -625,6 +628,36 @@ public class Dependencies
 
 		save();
 
+		return true;
+	}
+
+	/**
+	 * Overrides the version of an implicit dependency.
+	 * 
+	 * @param group
+	 *        The dependency's group
+	 * @param name
+	 *        The dependency's name
+	 * @param version
+	 *        The dependency's version
+	 * @return True if removed
+	 * @return True if overridden
+	 * @throws SincerityException
+	 */
+	public boolean override( String group, String name, String version ) throws SincerityException
+	{
+		@SuppressWarnings("unchecked")
+		Map<MapMatcher, Object> rules = moduleDescriptor.getAllDependencyDescriptorMediators().getAllRules();
+		for( MapMatcher matcher : rules.keySet() )
+		{
+			String matcherGroup = (String) matcher.getAttributes().get( "organisation" );
+			String matcherName = (String) matcher.getAttributes().get( "module" );
+			if( group.equals( matcherGroup ) && name.equals( matcherName ) )
+				return false;
+		}
+
+		moduleDescriptor.addDependencyDescriptorMediator( new ModuleId( group, name ), new ExactPatternMatcher(), new OverrideDependencyDescriptorMediator( null, version ) );
+		save();
 		return true;
 	}
 

@@ -3557,23 +3557,13 @@ target "http://threecrickets.com/scripturian/manual/faq/"
 \end_layout
 
 \begin_layout Subsubsection
-A dependency is being installed at a wrong version.
+The wrong version of a dependency is being installed.
  Why, and how do I fix it?
 \end_layout
 
 \begin_layout Standard
-If this is an 
-\emph on
-explicit 
-\emph default
-dependency that you added, it could be that it is also being included as
- an 
-\emph on
-implicit 
-\emph default
-dependency with different version restrictions, and Ivy has done its best
- to resolve the conflict within the restrictions.
- You can observe this in the dependency tree using the 
+First, diagnose what is going on by viewing the dependency tree, via either
+ the 
 \bar under
 
 \begin_inset Quotes eld
@@ -3592,11 +3582,22 @@ reference "dependencies:dependencies"
 
 )
 \bar default
-.
+ or the GUI.
 \end_layout
 
 \begin_layout Standard
-You can overcome this by forcing a specific version, using the 
+If the problem is with an 
+\emph on
+explicit 
+\emph default
+dependency that you added, it could be that it is also being included as
+ an 
+\emph on
+implicit 
+\emph default
+dependency with different version restrictions, and Ivy has done its best
+ to resolve the conflict within the restrictions.
+ You can overcome Ivy's compromise by using the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3604,18 +3605,7 @@ You can overcome this by forcing a specific version, using the
 \begin_inset Quotes erd
 \end_inset
 
- switch for 
-\bar under
-dependencies:add (page 
-\begin_inset CommandInset ref
-LatexCommand pageref
-reference "dependencies:add"
-
-\end_inset
-
-)
-\bar default
-.
+ when adding the explicit dependency.
  For example:
 \end_layout
 
@@ -3635,25 +3625,31 @@ sincerity add com.tanukisoftware wrapper-linux 3.5.20 --force
 \end_layout
 
 \begin_layout Standard
-Another option is to use Ivy's 
+If the problem is with an 
+\emph on
+implicit
+\emph default
+ dependency, you can override the version by using the 
+\bar under
+
 \begin_inset Quotes eld
 \end_inset
 
-override
+dependencies:override
 \begin_inset Quotes erd
 \end_inset
 
- feature.
- You will need to edit your container's 
-\begin_inset Quotes eld
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:override"
+
 \end_inset
 
-/configuration/sincerity/dependencies.conf
-\begin_inset Quotes erd
-\end_inset
-
- and add it yourself.
- Here's how it my look:
+)
+\bar default
+.
+ For example:
 \end_layout
 
 \begin_layout Standard
@@ -3663,13 +3659,7 @@ status open
 
 \begin_layout Plain Layout
 
-<dependency org="com.tanukisoftware" name="wrapper-linux" rev="3.5.20" conf="defaul
-t->*"/>
-\end_layout
-
-\begin_layout Plain Layout
-
-<override org="com.tanukisoftware" module="wrapper-base" rev="3.5.20"/>
+sincerity override com.tanukisoftware wrapper-linux 3.5.20
 \end_layout
 
 \end_inset
@@ -3678,24 +3668,30 @@ t->*"/>
 \end_layout
 
 \begin_layout Standard
-An 
+Another option is to use the 
 \begin_inset Quotes eld
 \end_inset
 
-override
+--only
 \begin_inset Quotes erd
 \end_inset
 
- is not an actual dependency, and does not affect your dependency tree.
- See the 
-\begin_inset CommandInset href
-LatexCommand href
-name "Ivy documentation for overrides"
-target "http://ant.apache.org/ivy/history/latest-milestone/ivyfile/override.html"
-
+ switch when adding the explicit dependency that pulls in the wrong implicit
+ dependency, and then explicitly adding the sub-dependencies in the versions
+ you want.
+ You can, in fact, only use 
+\begin_inset Quotes eld
 \end_inset
 
-.
+--only
+\begin_inset Quotes erd
+\end_inset
+
+ for 
+\emph on
+all
+\emph default
+ your adds, making 100% sure that only explicit dependencies are used.
 \end_layout
 
 \begin_layout Subsubsection
@@ -5113,6 +5109,58 @@ status open
 \begin_layout Plain Layout
 
 sincerity exclude org.apache.velocity velocity
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+dependencies:override
+\begin_inset CommandInset label
+LatexCommand label
+name "dependencies:override"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Overrides the version of an implicit dependency.
+ Note that this does not actually add the dependency.
+ If the dependency is not in the tree, then the override has no effect.
+ The format is identical to 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+dependencies:add
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "dependencies:add"
+
+\end_inset
+
+)
+\bar default
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity override org.apache.velocity velocity 1.6
 \end_layout
 
 \end_inset
