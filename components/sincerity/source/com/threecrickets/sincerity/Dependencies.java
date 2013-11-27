@@ -640,9 +640,9 @@ public class Dependencies
 	 *        The dependency's name
 	 * @param version
 	 *        The dependency's version
-	 * @return True if removed
 	 * @return True if overridden
 	 * @throws SincerityException
+	 *         In case of an error
 	 */
 	public boolean override( String group, String name, String version ) throws SincerityException
 	{

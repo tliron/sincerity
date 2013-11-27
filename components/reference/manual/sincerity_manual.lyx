@@ -1053,8 +1053,6 @@ rhinoceros.
 
 ) Nashorn will also make good use of the dynamicinvoke opcode introduced
  in version 7, promising especially good performance.
- Sincerity may very well migrate to Nashorn when it becomes available, or
- at least offer it as an option.
 \end_layout
 
 \begin_layout Enumerate
@@ -6863,8 +6861,10 @@ name "javascript"
 \begin_layout Standard
 Though JavaScript was originally designed to be run in web browsers, it
  is a powerful general-purpose C-syntax language with Scheme-like closures
- that supports many programming paradigms.
- Sincerity implements JavaScript via 
+ that supports many programming paradigms, and has proved useful and popular
+ outside the browser.
+ Sincerity runs JavaScript code via either Nashorn (available in JVM 8)
+ or 
 \begin_inset CommandInset href
 LatexCommand href
 name "Rhino"
@@ -6872,18 +6872,18 @@ target "https://developer.mozilla.org/en/docs/Rhino"
 
 \end_inset
 
-, but we are committed in the future to support Nashorn (to be made available
- in JVM 8).
+.
 \end_layout
 
 \begin_layout Quote
 Note:
 \emph on
- You do not need this plugin to install JavaScript support for Sincerity.
+ You do not need this plugin to install JavaScript support in a Sincerity
+ container.
 
 \emph default
- It does, however, provide you with a new command to get easy access to
- a JavaScript shell.
+ All it does is provide you with a new command to get easy access to a JavaScrip
+t shell.
 \end_layout
 
 \begin_layout Standard
@@ -12979,7 +12979,7 @@ The example at
 
 \begin_layout Standard
 The skeleton does not install any connectors by default, relying instead
- on the default Restlet connector.
+ on the default Restlet connectors.
  To install the 
 \begin_inset CommandInset href
 LatexCommand href
@@ -12988,8 +12988,9 @@ target "http://www.eclipse.org/jetty/"
 
 \end_inset
 
- server connector, you have the choice of either Jetty 9 (requires JVM 7)
- or Jetty 8 (required JVM 6):
+ server connector, you have the choice of either Jetty 9 (requires JVM 7,
+ also includes a client connector) or Jetty 8 (requires JVM 6, only has
+ a server connector):
 \end_layout
 
 \begin_layout Standard
@@ -13051,6 +13052,34 @@ sincerity add restlet.httpclient : install
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Other shortcuts include 
+\begin_inset Quotes eld
+\end_inset
+
+result.ssl
+\begin_inset Quotes erd
+\end_inset
+
+ (the Restlet SSL extension) and 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.urlconnection
+\begin_inset Quotes erd
+\end_inset
+
+ (the Restlet 
+\begin_inset Quotes eld
+\end_inset
+
+net
+\begin_inset Quotes erd
+\end_inset
+
+ extension).
 \end_layout
 
 \begin_layout Standard
@@ -14692,9 +14721,8 @@ For Sincerity, we decided that we can do better, and so we present you with
  a collection of useful code called the Sincerity JavaScript Library.
  We should point out from the start that this is not a general-purpose JavaScrip
 t library: it relies on the JVM libraries, and only works in the JVM.
- There are also a few optimizations specific to the Rhino engine, which
- is the only JavaScript engine for the JVM at the moment, but we plan to
- support Oracle's Nashorn, which is scheduled to be included in JVM 8.
+ Included are also optimizations specific to the Nashorn and Rhino JVM JavaScrip
+t engines.
 \end_layout
 
 \begin_layout Standard
@@ -15007,17 +15035,17 @@ target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Lucene"
 \end_layout
 
 \begin_layout Paragraph
-Rhino
+Platform
 \end_layout
 
 \begin_layout Standard
-Access to features of the Rhino JavaScript engine, such as the call stack
- and exception details.
+Access to features of the Nashorn and Rhino JavaScript engines, such as
+ the call stack and exception details.
  
 \begin_inset CommandInset href
 LatexCommand href
-name "Sincerity.Rhino API documentation"
-target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Rhino"
+name "Sincerity.Platform API documentation"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Platform"
 
 \end_inset
 
@@ -15048,7 +15076,7 @@ status open
 
 \begin_layout Plain Layout
 
-document.executeOnce('/sincerity/jvm/')
+document.require('/sincerity/jvm/')
 \end_layout
 
 \begin_layout Plain Layout
@@ -15062,7 +15090,7 @@ try {
 
 \begin_layout Plain Layout
 
-	document.executeOnce('/mongo-db/')
+	document.require('/mongo-db/')
 \end_layout
 
 \begin_layout Plain Layout
@@ -15218,6 +15246,13 @@ Until then, you can use Maven, as detailed below.
 
 \begin_layout Subsection
 How to Create a Sincerity Package Using Maven
+\begin_inset CommandInset label
+LatexCommand label
+name "packaging-maven"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -15954,6 +15989,10 @@ volatile
  would reappear on every change to the dependency structure.
 \end_layout
 
+\begin_layout Subsubsection
+The Manifest
+\end_layout
+
 \begin_layout Standard
 Supported manifest tags:
 \end_layout
@@ -16022,6 +16061,66 @@ Package-Uninstaller
 : specifies a class name which has a main() entry point.
  Simple string arguments can be optionally appended, separated by spaces.
  The uninstaller will be called when the package is to be uninstalled.
+\end_layout
+
+\begin_layout Standard
+For example, here is a 
+\begin_inset Quotes eld
+\end_inset
+
+/META-INF/MANIFEST.MF
+\begin_inset Quotes erd
+\end_inset
+
+ file:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+Manifest-Version: 1.0
+\end_layout
+
+\begin_layout Plain Layout
+
+Package-Folders: package
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All packaged files would be expected under the 
+\begin_inset Quotes eld
+\end_inset
+
+/package/
+\begin_inset Quotes erd
+\end_inset
+
+ directory inside the Jar.
+\end_layout
+
+\begin_layout Standard
+Note that manifests can often be automatically created by packaging tools.
+ See the 
+\bar under
+Maven example (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "packaging-maven"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \end_body
