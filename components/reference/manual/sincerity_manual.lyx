@@ -95,8 +95,8 @@ This work is licensed under a
 
 \begin_inset CommandInset href
 LatexCommand href
-name "Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License"
-target "http://creativecommons.org/licenses/by-nc-sa/3.0/"
+name "Attribution-NonCommercial-ShareAlike 4.0 International License"
+target "http://creativecommons.org/licenses/by-nc-sa/4.0/"
 
 \end_inset
 
@@ -12192,7 +12192,15 @@ official
 
 \begin_layout Standard
 Though Jetty can use the logging plugin (see below), it also supports its
- own internal logging mechanism for the web (NCSA-style) log.
+ own internal logging mechanism for the web (
+\begin_inset CommandInset href
+LatexCommand href
+name "NCSA"
+target "http://en.wikipedia.org/wiki/Common_Log_Format"
+
+\end_inset
+
+-style) log.
  To configure it, see 
 \begin_inset Quotes eld
 \end_inset
@@ -13063,7 +13071,15 @@ result.ssl
 \begin_inset Quotes erd
 \end_inset
 
- (the Restlet SSL extension) and 
+ (the Restlet SSL extension), 
+\begin_inset Quotes eld
+\end_inset
+
+restlet.simple
+\begin_inset Quotes erd
+\end_inset
+
+ (the Restlet Simple server connector), and 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14633,6 +14649,21 @@ TODO
 \end_layout
 
 \begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add jsdoc.sincerity : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 Note that you need to host the documentation via HTTP.
  File does not work.
 \end_layout
@@ -14650,6 +14681,25 @@ reference "jsdoc"
 )
 \bar default
 .
+\end_layout
+
+\begin_layout Subsection
+MongoDB JavaScript Driver
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add mongodb.javascript : install
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Part
