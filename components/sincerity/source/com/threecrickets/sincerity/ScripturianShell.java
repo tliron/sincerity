@@ -21,6 +21,7 @@ import com.threecrickets.scripturian.ExecutionContext;
 import com.threecrickets.scripturian.ExecutionController;
 import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.Main;
+import com.threecrickets.scripturian.ParserManager;
 import com.threecrickets.scripturian.ParsingContext;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
 import com.threecrickets.scripturian.document.DocumentFileSource;
@@ -28,6 +29,7 @@ import com.threecrickets.scripturian.document.DocumentSource;
 import com.threecrickets.scripturian.exception.DocumentException;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
+import com.threecrickets.scripturian.parser.ProgramParser;
 import com.threecrickets.scripturian.service.ApplicationService;
 import com.threecrickets.scripturian.service.DocumentService;
 import com.threecrickets.scripturian.service.Shell;
@@ -77,6 +79,7 @@ public class ScripturianShell implements Shell
 
 		parsingContext = new ParsingContext();
 		parsingContext.setLanguageManager( container.getLanguageManager() );
+		parsingContext.setParserManager( container.getParserManager() );
 		parsingContext.setDocumentSource( source );
 		parsingContext.setDefaultLanguageTag( "javascript" );
 		parsingContext.setPrepare( prepare );
@@ -164,7 +167,7 @@ public class ScripturianShell implements Shell
 		ExecutionContext executionContext = createExecutionContext();
 		try
 		{
-			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( documentName, false, parsingContext );
+			DocumentDescriptor<Executable> documentDescriptor = Executable.createOnce( documentName, ProgramParser.NAME, parsingContext );
 			Executable executable = documentDescriptor.getDocument();
 			DocumentService documentService = (DocumentService) executionContext.getServices().get( "document" );
 			enterable = executable.makeEnterable( enteringKey, executionContext, documentService, null );
@@ -235,6 +238,11 @@ public class ScripturianShell implements Shell
 	public LanguageManager getLanguageManager()
 	{
 		return parsingContext.getLanguageManager();
+	}
+
+	public ParserManager getParserManager()
+	{
+		return parsingContext.getParserManager();
 	}
 
 	public boolean isPrepare()

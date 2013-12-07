@@ -36,6 +36,7 @@ import org.apache.ivy.util.DefaultMessageLogger;
 
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.scripturian.LanguageManager;
+import com.threecrickets.scripturian.ParserManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
 
@@ -289,6 +290,20 @@ public class Container implements IvyListener, TransferListener
 			}
 		}
 		return languageManager;
+	}
+
+	/**
+	 * The cached Scripturian parser manager, based on the current bootstrap.
+	 * 
+	 * @return The parser manager
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public ParserManager getParserManager() throws SincerityException
+	{
+		if( parserManager == null )
+			parserManager = new ParserManager( getBootstrap() );
+		return parserManager;
 	}
 
 	/**
@@ -725,6 +740,8 @@ public class Container implements IvyListener, TransferListener
 	private Plugins plugins;
 
 	private LanguageManager languageManager;
+
+	private ParserManager parserManager;
 
 	private boolean hasChanged;
 
