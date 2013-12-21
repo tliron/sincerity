@@ -8555,8 +8555,8 @@ reference "restlet-extras"
 
 )
 \bar default
-, which depends on this plugin and additionally adds a Restlet extension
- library that provides direct access to SLF4J.
+, which adds a Restlet extension library that provides direct access to
+ SLF4J.
 \end_layout
 
 \begin_layout Subsubsection*

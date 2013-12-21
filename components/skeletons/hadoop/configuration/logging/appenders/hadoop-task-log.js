@@ -1,6 +1,6 @@
 
-var appender = appenders.hadoopTaskLog = new org.apache.hadoop.mapred.TaskLogAppender()
-appender.name = 'hadoopTaskLog'
+var appender = appenders['file:hadoop.taskLog'] = new org.apache.hadoop.mapred.TaskLogAppender()
+appender.name = 'file:hadoop.taskLog'
 appender.taskId = null
 appender.isCleanup = false
 appender.totalLogFileSize = 100
