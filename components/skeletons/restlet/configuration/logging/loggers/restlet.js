@@ -1,6 +1,10 @@
 
-var logger = repository.getLogger('org.restlet')
-logger.level = Level.INFO
+configuration.logger({
+	name: 'org.restlet',
+	level: 'info'
+})
 
-var logger = repository.getLogger('org.restlet.Application')
-logger.level = Level.WARN
+configuration.logger({
+	name: 'org.reslet.Application',
+	level: 'warn'
+})

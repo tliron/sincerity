@@ -1,3 +1,5 @@
 
-var logger = repository.getLogger('org.eclipse.jetty')
-logger.level = Level.INFO
+configuration.logger({
+	name: 'org.eclipse.jetty',
+	level: 'info'
+})

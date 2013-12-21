@@ -1,2 +1,2 @@
 
-repository.rootLogger.addAppender(appenders['file:hadoop.eventCounter'])
+//repository.rootLogger.addAppender(appenders['file:hadoop.eventCounter'])

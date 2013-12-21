@@ -10,12 +10,12 @@
 //
 
 /*
-var appender = appenders.socket = new org.apache.log4j.net.SocketAppender()
-appender.name = 'socket'
-appender.remoteHost = 'localhost'
-appender.port = 4560 // The default for log4j server is 4560. The default for Ganymede is 4445.
-appender.locationInfo = true
+var appender = configuration.socketAppender({
+	name: 'socket',
+	host: 'localhost', // host
+	port: '4560' // the default for log4j server is 4560. The default for Ganymede is 4445.
+})
 
 // This is a low-priority root appender
-rootAppenders.push(appender)
+configuration.rootAppenders.push(appender)
 */

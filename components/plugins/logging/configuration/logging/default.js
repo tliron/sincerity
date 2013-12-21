@@ -1,20 +1,13 @@
 
-document.require('/sincerity/container/')
+document.require(
+	'/sincerity/container/',
+	'/sincerity/log4j/')
 
-importClass(
-	org.apache.log4j.PatternLayout,
-	org.apache.log4j.Level)
-
-var appenders = {}
-var rootAppenders = []
-var repository = org.apache.log4j.LogManager.loggerRepository
-
-repository.resetConfiguration()
+var configuration = new Sincerity.Log4j.Configuration()
+configuration.rootAppenders = []
 
 Sincerity.Container.here = sincerity.container.getConfigurationFile('logging')
 Sincerity.Container.executeAll('appenders')
 Sincerity.Container.executeAll('loggers')
 
-for (var a in appenders) {
-	appenders[a].activateOptions()
-}
+configuration.use()

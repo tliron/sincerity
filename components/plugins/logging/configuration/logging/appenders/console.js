@@ -1,4 +1,7 @@
 
-var appender = appenders.console = new org.apache.log4j.ConsoleAppender()
-appender.name = 'console'
-appender.layout = new PatternLayout('%d: %-5p [%c] %m%n')
+configuration.consoleAppender({
+	name: 'console',
+	layout: {
+		pattern: '%d: %-5p [%c] %m%n'
+	}
+})

@@ -1,4 +1,6 @@
 
-var logger = repository.getLogger('SecurityLogger')
-logger.addAppender(appenders['file:hadoop.securityAudit'])
-logger.additivity = false
+configuration.logger({
+	name: 'SecurityLogger',
+	appenders: 'file:hadoop.securityAudit',
+	additivity: false
+})
