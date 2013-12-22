@@ -90,8 +90,12 @@ function log(command) {
 	if (command.arguments.length < 1) {
 		throw new BadArgumentsCommandException(command, 'message')
 	}
+	
+	logging(command)
 
-	java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0]);
+	// NPE! see: https://issues.apache.org/jira/browse/LOG4J2-477
+	//java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0])
+	org.apache.logging.log4j.LogManager.getLogger('sincerity').info(command.arguments[0])
 }
 
 function server(command) {
