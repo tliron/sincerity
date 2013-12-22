@@ -5,6 +5,6 @@ configuration.logger({
 })
 
 configuration.logger({
-	name: 'org.reslet.Application',
+	name: 'org.restlet.Application',
 	level: 'warn'
 })

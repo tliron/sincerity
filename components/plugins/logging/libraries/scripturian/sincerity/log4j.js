@@ -42,21 +42,10 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		/** @exports Public as Sincerity.Log4j.Configuration */
 	    var Public = {}
 
+		Public.configuration = new com.threecrickets.sincerity.util.ProgrammableLog4jConfiguration('sincerity')
+
 		Public.use = function() {
-			importClass(org.apache.logging.log4j.core.config.ConfigurationFactory)
-
-			ConfigurationFactory.setConfigurationFactory(
-				new ConfigurationFactory({
-					getConfiguration: function(source) {
-						return Public.configuration
-					}
-				})
-			)
-
-			if (sincerity.verbosity >= 1) {
-				//Public.configuration.start()
-				println('Using logging configuration: "{0}"'.cast(Public.configuration.name))
-			}
+			Public.configuration.use()
 		}
 	
 		/**
@@ -69,7 +58,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param [config.appenders]
 		 */
 		Public.logger = function(config) {
-			config.name = config.name || ''
+			config.name = Sincerity.Objects.ensure(config.name, '')
 			config.async = Sincerity.Objects.ensure(config.async, true)
 			config.level = config.level || 'error'
 			if (Sincerity.Objects.exists(config.additivity)) {
@@ -134,8 +123,10 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			else if (Sincerity.Objects.exists(config.appenders)) {
 				config.appenders = Sincerity.Objects.array(config.appenders)
 				for (var i in config.appenders) {
-					var name = config.appenders[i]
-					var appender = Public.configuration.getAppender(name)
+					var appender = config.appenders[i]
+					if (Sincerity.Objects.isString(appender)) {
+						appender = Public.configuration.getAppender(appender)
+					}
 					if (Sincerity.Objects.exists(appender)) {
 						logger.addAppender(
 							appender, // appender
@@ -171,10 +162,10 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			var layout = Public.patternLayout(config.layout)
 			
 			var appender = org.apache.logging.log4j.core.appender.RollingFileAppender.createAppender(
-				config.fileName, // fileName
-				config.filePattern, // filePattern
+				config.fileName || null, // fileName
+				config.filePattern || null, // filePattern
 				Sincerity.Objects.ensure(config.append, null), // append='true'
-				config.name, // name
+				config.name || null, // name
 				Sincerity.Objects.ensure(config.bufferedIO, null), // bufferedIO='true'
 				Sincerity.Objects.ensure(config.immediateFlush, null), // immediateFlush='true'
 				policy, // policy
@@ -206,7 +197,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				layout, // layout
 				config.filter || null, // filter
 				config.t || null, // t='SYSTEM_OUT'
-				config.name, // name
+				config.name || null, // name
 				Sincerity.Objects.ensure(config.follow, null), // follow
 				Sincerity.Objects.ensure(config.ignore, null) // ignore='true'
 			)
@@ -233,18 +224,38 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			var layout = config.layout ? Public.patternLayout(config.layout) : null
 	
 			var appender = org.apache.logging.log4j.core.appender.SocketAppender.createAppender(
-				config.host, // host
-				String(config.port), // portNum: the default for log4j server is 4560. The default for Ganymede is 4445.
+				config.host || null, // host
+				config.port ? String(config.port) : null, // portNum: the default for log4j server is 4560. The default for Ganymede is 4445.
 				config.protocol || null, // protocol
 				config.delay || null, // delay
 				Sincerity.Objects.ensure(config.immediateFail, null), // immediateFail
-				config.name, // name
+				config.name || null, // name
 				Sincerity.Objects.ensure(config.immediateFlush, null), // immediateFlush
 				Sincerity.Objects.ensure(config.ignore, null), // ignore='true'
 				layout, // layout
 				config.filter || null, // filter
 				Sincerity.Objects.ensure(config.advertise, null), // advertise
 				Public.configuration // config
+			)
+			
+			Public.configuration.addAppender(appender)
+	
+			return appender
+		}
+		
+		Public.noSqlAppender = function(config) {
+			if (Sincerity.Objects.exists(config.ignore)) {
+				config.ignore = config.ignore ? 'true' : 'false'
+			}
+			
+			var provider = Public.mongoDbProvider(config.provider)
+
+			var appender = org.apache.logging.log4j.core.appender.db.nosql.NoSQLAppender.createAppender(
+				config.name || null, // name
+				Sincerity.Objects.ensure(config.ignore, null), // ignore='true'
+				config.filter || null, // filter
+				config.bufferSize ? String(config.bufferSize) : null, // bufferSize
+				provider // provider
 			)
 			
 			Public.configuration.addAppender(appender)
@@ -262,7 +273,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			}
 			
 			return org.apache.logging.log4j.core.layout.PatternLayout.createLayout(
-				config.pattern,
+				config.pattern || null,
 				Public.configuration, // config
 				config.replace || null, // replace
 				config.charset || null, // charsetName
@@ -283,75 +294,33 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			)
 		}
 		
-		//
-		// Initialization
-		//
-
-		Public.configuration = new JavaAdapter(org.apache.logging.log4j.core.config.NullConfiguration, {
-			// Unfortunately, BaseConfiguration uses a private "root" field, which we cannot easily affect,
-			// and that field is used in its private setParents() method. Thus, we will need to calculate
-			// the parenthood ourselves, using our own known root.
-			doConfigure: function() {
-				importClass(org.apache.logging.log4j.core.helpers.NameUtil)
-				
-				if (sincerity.verbosity >= 1) {
-					println('Loggers:')
-				}
-				
-				var root = this.getLogger('')
-
-				for (var i = this.loggers.entrySet().iterator(); i.hasNext(); ) {
-					var e = i.next()
-					var name = e.key
-					var logger = e.value
-
-					logger.parent = null
-					if (name != '') {
-						name = NameUtil.getSubName(name)
-						while (name != '') {
-							var parent = this.getLogger(name)
-							if (Sincerity.Objects.exists(parent)) {
-								logger.parent = parent
-								break
-							}
-							name = NameUtil.getSubName(name)
-						}
-						
-						if (!Sincerity.Objects.exists(logger.parent)) {
-							logger.parent = root
-						}
-					}
-					
-					if (sincerity.verbosity >= 1) {
-						println('  "{0}" ({1}) {2} {3}'.cast(
-							logger.name,
-							logger.level,
-							logger.additive ? '+>' : '>',
-							Sincerity.Objects.exists(logger.parent) ? '"' + logger.parent.name + '"' : ''
-						))
-						
-						for (var ii = logger.appenders.values().iterator(); ii.hasNext(); ) {
-							var appender = ii.next()
-							println('    -> "{0}"'.cast(appender.name))
-						}
-					}
-				}
+		Public.mongoDbProvider = function(config) {
+			if (Sincerity.Objects.exists(config.client)) {
+				com.threecrickets.sincerity.util.MongoDbFactory.client = config.client
+				config.factoryClass = 'com.threecrickets.sincerity.util.MongoDbFactory'
+				config.factoryMethod = 'getClient'
 			}
-
-			/*setup: function() {
-				var loggers = new java.util.concurrent.ConcurrentHashMap(this.loggers)
-				var node = new org.apache.logging.log4j.core.config.Node(this.rootNode, 'Loggers', this.pluginManager.getPluginType('loggers'))
-				println('!!!!!!!!!!! root is: ' + Public.root.name)
-				node.object = new org.apache.logging.log4j.core.config.Loggers(loggers, Public.root)
-				this.rootNode.children.add(node)
-			}*/
+			else if(Sincerity.Objects.exists(config.db) && (!Sincerity.Objects.isString(config.db))) {
+				com.threecrickets.sincerity.util.MongoDbFactory.db = config.db
+				config.factoryClass = 'com.threecrickets.sincerity.util.MongoDbFactory'
+				config.factoryMethod = 'getDB'
+			}
 			
-			/*getLoggerConfig: function(name) {
-				println('>>>>>>>>>>> ' + name + ' ' + this.super$getLoggerConfig(name))
-				return this.super$getLoggerConfig(name) 
-			}*/
-		})
-		Public.configuration.name = 'sincerity'
+			// See: https://issues.apache.org/jira/browse/LOG4J2-474
+			//return org.apache.logging.log4j.core.appender.db.nosql.mongo.MongoDBProvider.createNoSQLProvider(
+			return com.threecrickets.sincerity.util.MongoDbLog4jProvider.createNoSQLProvider(
+				config.collection || null, // collectionName
+				config.writeConcern || null, // writeConcernConstant
+				config.writeConcernClass || null, // writeConcernConstantClassName
+				config.db || null, // databaseName
+				config.host || null, // server
+				config.port || null, // port
+				config.username || null, // username
+				config.password || null, // password
+				config.factoryClass || null, // factoryClassName
+				config.factoryMethod || null // factoryMethodName
+			)
+		}
 		
 		return Public
 	}(Public))

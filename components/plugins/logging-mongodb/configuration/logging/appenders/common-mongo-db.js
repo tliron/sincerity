@@ -1,12 +1,14 @@
 
-// MongoDB:
-// http://log4mongo.org/display/PUB/Log4mongo+for+Java
+document.require('/mongo-db/')
 
-var appender = appenders['mongoDb:common'] = new org.log4mongo.MongoDbAppender()
-appender.name = 'mongoDb:common'
-appender.hostname = 'localhost'
-appender.databaseName = 'logs'
-appender.collectionName = 'common'
+var appender = configuration.noSqlAppender({
+	name: 'mongoDb:common',
+	provider: {
+		client: MongoDB.connect('localhost'),
+		db: 'logs',
+		collection: 'common'
+	}
+}) 
 
 // This is a high-priority root appender
-rootAppenders.unshift(appender)
+configuration.rootAppenders.unshift(appender)

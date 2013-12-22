@@ -7,19 +7,24 @@
 		status="release"
 		default="true" />
 	<configurations>
-		<conf name="default" visibility="public" />
+		<conf name="distribution" visibility="public" />
+		<conf name="compile" visibility="public" extends="distribution" />
 	</configurations>
 	<dependencies>
-		<dependency org="org.apache.commons" name="commons-vfs" rev="1.0+">
+		<dependency org="org.apache.commons" name="commons-vfs" rev="1.0+" conf="distribution->default">
 			<exclude org="org.slf4j" />
 		</dependency>
-		<dependency org="org.apache.commons" name="commons-logging" rev="1.1+" />
-		<dependency org="org.jsoup" name="jsoup" rev="1.7+" />
-		<dependency org="com.threecrickets.scripturian" name="scripturian" rev="1.1+" />
-		<dependency org="org.mozilla" name="rhino" rev="1.7R4" />
-		<!-- <dependency org="jdk.nashorn" name="nashorn-backport" rev="latest.integration" /> -->
-		<dependency org="com.threecrickets.jvm" name="json-jvm" rev="1.1+" />
-		<!-- Note: When invoking Ant through the Maven Ant plugin, we cannot use the includeAntRuntime attributes in the javac task -->
-		<dependency org="org.apache.ant" name="ant" rev="1.8+" />
+		<dependency org="org.apache.commons" name="commons-logging" rev="1.1+" conf="distribution->default" />
+		<dependency org="org.jsoup" name="jsoup" rev="1.7+" conf="distribution->default" />
+		<dependency org="com.threecrickets.scripturian" name="scripturian" rev="1.1+" conf="distribution->default" />
+		<dependency org="com.threecrickets.jvm" name="json-jvm" rev="1.1+" conf="distribution->default" />
+		<dependency org="org.mozilla" name="rhino" rev="1.7R4" conf="distribution->default" />
+		
+		<!-- For compilation only -->
+		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.0+" conf="compile->default" />
+		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.0+" conf="compile->default" />
+		<dependency org="com.mongodb" name="java-driver" rev="2.11+" conf="compile->default" />
+		<dependency org="org.apache.ant" name="ant" rev="1.8+" conf="compile->default" /> <!-- Note: When invoking Ant through the Maven Ant plugin we cannot use the includeAntRuntime attributes in the javac task -->
+		<!-- <dependency org="jdk.nashorn" name="nashorn-backport" rev="latest.integration" conf="compile->default" /> -->
 	</dependencies>
 </ivy-module>

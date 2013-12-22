@@ -87,7 +87,7 @@
 
 	<target name="dependencies" depends="ivy" description="Resolve dependencies">
 		<ivy:resolve file="${root}/build/ivy/${component}.xml" type="jar" log="download-only" resolveId="${component}" />
-		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" />
+		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" conf="compile" />
 		<path id="dependencies">
 			<path refid="dependencies-ivy" />
 			<fileset dir="${dependencies.jars}" includes="**/*.jar" />
@@ -217,7 +217,7 @@
 	</target>
 
 	<target name="distribution-minimal" depends="libraries" description="Assemble distribution">
-		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" />
+		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" conf="distribution" />
 		<copy todir="${distribution.source}">
 			<fileset dir="${component.source}" />
 		</copy>

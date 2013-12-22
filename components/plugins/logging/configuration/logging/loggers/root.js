@@ -3,6 +3,7 @@
 if (configuration.rootAppenders.length > 0) {
 	configuration.logger({
 		level: 'warn',
-		appenders: configuration.rootAppenders[0]
+		appenders: configuration.rootAppenders[0],
+		additivity: false
 	})
 }
