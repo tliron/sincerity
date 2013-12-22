@@ -16,6 +16,6 @@ var appender = configuration.socketAppender({
 	port: '4560' // the default for log4j server is 4560. The default for Ganymede is 4445.
 })
 
-// This is a low-priority root appender
-configuration.rootAppenders.push(appender)
+// This is a high-priority root appender
+configuration.rootAppenders.unshift(appender)
 */

@@ -46,12 +46,23 @@ function logging(command) {
 
 		try {
 			var contents = Sincerity.Files.loadText(configurationFile)
-			if (Sincerity.Objects.startsWith(contents, '<?xml')) {
-				org.apache.log4j.xml.DOMConfigurator.configureAndWatch(configurationFile)
+			var stream = new java.io.FileInputStream(configurationFile)
+			try {
+				var source = new org.apache.logging.log4j.core.config.ConfigurationFactory.ConfigurationSource(stream, configurationFile)
+				
+				var configuration
+				if (Sincerity.Objects.startsWith(contents, '<?xml')) {
+					configuration = org.apache.logging.log4j.core.config.XMLConfiguration(source)
+				}
+				else {
+					configuration = org.apache.logging.log4j.core.config.JSONConfiguration(source)
+				}
 			}
-			else {
-				org.apache.log4j.PropertyConfigurator.configureAndWatch(configurationFile)
+			finally {
+				stream.close()
 			}
+				
+			new com.threecrickets.sincerity.util.ProgrammableLog4jConfigurationFactory(configuration).use()
 		}
 		catch (x if x.javaException instanceof ClassNotFoundException) {
 			throw new CommandException(command, 'Could not find log4j in classpath', x.javaException)

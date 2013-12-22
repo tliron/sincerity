@@ -1,10 +1,12 @@
 
 document.require('/mongo-db/')
 
+var client = MongoDB.connect('localhost:27017')
+
 var appender = configuration.noSqlAppender({
 	name: 'mongoDb:common',
 	provider: {
-		client: MongoDB.connect('localhost'),
+		client: client,
 		db: 'logs',
 		collection: 'common'
 	}

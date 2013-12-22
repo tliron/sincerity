@@ -34,7 +34,7 @@ public class ProgrammableLog4jConfigurationFactory extends ConfigurationFactory
 	 * @param configuration
 	 *        The configuration
 	 */
-	public ProgrammableLog4jConfigurationFactory( ProgrammableLog4jConfiguration configuration )
+	public ProgrammableLog4jConfigurationFactory( Configuration configuration )
 	{
 		super();
 		this.configuration = configuration;
@@ -80,5 +80,5 @@ public class ProgrammableLog4jConfigurationFactory extends ConfigurationFactory
 
 	private final static String[] SUPPORTED_TYPES = new String[0];
 
-	private final ProgrammableLog4jConfiguration configuration;
+	private final Configuration configuration;
 }

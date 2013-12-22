@@ -8385,7 +8385,7 @@ Though the JVM includes a standard logging API, in the
 \begin_inset Quotes eld
 \end_inset
 
-java.util.logging
+java.util.logging Interface
 \begin_inset Quotes erd
 \end_inset
 
@@ -8598,20 +8598,19 @@ Configure your loggers under
 .
  Any JavaScript file you add to these directories will be executed upon
  logging initialization.
- Take a look at the defaults to get a sense of how this works.
+ Take a look at the defaults to get a sense of how this works: the 
+\begin_inset CommandInset href
+LatexCommand href
+name "/sincerity/log4j/"
+target "http://threecrickets.com/api/javascript/?namespace=Sincerity.Log4j"
+
+\end_inset
+
+ library makes it especially easy to use.
 \end_layout
 
 \begin_layout Standard
-For example, if you want to add console logging to root, add the following
- line to 
-\begin_inset Quotes eld
-\end_inset
-
-/configuration/logging/loggers/root.js
-\begin_inset Quotes erd
-\end_inset
-
-:
+For example, here's a definition of a rolling file appender:
 \end_layout
 
 \begin_layout Standard
@@ -8621,7 +8620,91 @@ status open
 
 \begin_layout Plain Layout
 
-logger.addAppender(appenders.console)
+var logFile = sincerity.container.getLogsFile('main.log')
+\end_layout
+
+\begin_layout Plain Layout
+
+logFile.parentFile.mkdirs()
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+configuration.rollingFileAppender({
+\end_layout
+
+\begin_layout Plain Layout
+
+	name: 'main',
+\end_layout
+
+\begin_layout Plain Layout
+
+	layout: {
+\end_layout
+
+\begin_layout Plain Layout
+
+		pattern: '%d: %-5p [%c] %m%n'
+\end_layout
+
+\begin_layout Plain Layout
+
+	},
+\end_layout
+
+\begin_layout Plain Layout
+
+	fileName: String(logFile),
+\end_layout
+
+\begin_layout Plain Layout
+
+	filePattern: String(logFile) + '.%i',
+\end_layout
+
+\begin_layout Plain Layout
+
+	policy: {
+\end_layout
+
+\begin_layout Plain Layout
+
+		size: '5MB'
+\end_layout
+
+\begin_layout Plain Layout
+
+	},
+\end_layout
+
+\begin_layout Plain Layout
+
+	strategy: {
+\end_layout
+
+\begin_layout Plain Layout
+
+		minIndex: '1',
+\end_layout
+
+\begin_layout Plain Layout
+
+		maxIndex: '9'
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+})
 \end_layout
 
 \end_inset
@@ -8648,8 +8731,8 @@ official
 \end_inset
 
  is present, it will be used.
- This file can either be a properties file, or an XML file (in which case
- it must begin with the 
+ This file can either be a properties file, a JSON file, or an XML file
+ (in which case it must begin with the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -8821,15 +8904,7 @@ target "http://www.mongodb.org/"
 
 \end_inset
 
--backed appender, based on 
-\begin_inset CommandInset href
-LatexCommand href
-name "Log4mongo"
-target "http://log4mongo.org/"
-
-\end_inset
-
-:
+-backed appender:
 \end_layout
 
 \begin_layout Standard
@@ -8898,7 +8973,7 @@ status open
 
 \begin_layout Plain Layout
 
-db.createCollection('log', {capped: true, size: 100000})
+db.createCollection('common', {capped: true, size: 100000})
 \end_layout
 
 \end_inset
@@ -8917,7 +8992,7 @@ status open
 
 \begin_layout Plain Layout
 
-db.runCommand({'convertToCapped': 'log', size: 100000})
+db.runCommand({'convertToCapped': 'common', size: 100000})
 \end_layout
 
 \end_inset
@@ -8981,7 +9056,7 @@ logtail
 \begin_inset Quotes erd
 \end_inset
 
- with the following optional parameters:
+ with the MongoDB connection parameters:
 \end_layout
 
 \begin_layout Standard
@@ -8991,8 +9066,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity logtail --connection=localhost:27017 --username=admin --password=admin
-123 --db=logs --collection=common
+sincerity logtail --uri=localhost:27017 --username=admin --password=admin123
+ --db=logs --collection=common
 \end_layout
 
 \end_inset
