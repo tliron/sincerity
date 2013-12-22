@@ -1,5 +1,5 @@
 
-var TEMPLATE = '{timestamp} {level} {host.ip} [{loggerName.fullyQualifiedClassName}] {message}'
+var TEMPLATE = '{timestamp} {level} {origin} [{loggerName}] {message}'
 var TIME_FORMAT = 'yyy-MM-dd HH:mm:ss,SSS'
 
 /*
@@ -7,16 +7,20 @@ Available template values:
 
 timestamp
 level
-thread
-host.process
+loggerName
 message
-loggerName.fullyQualifiedClassName
-filename
-lineNumber
-method
-class.fullyQualifiedClassName
-host.ip
-host.name
+source.className
+source.methodName
+source.fileName
+source.lineNumber
+marker
+threadName
+millis
+date
+thrown
+contextMap
+contextStack
+origin
 */
 
 document.require(
@@ -45,7 +49,7 @@ function logtail(command) {
 	// Properties
 	command.parse = true
 	var properties = command.properties
-	var connection = properties.get('connection')
+	var uri = properties.get('uri') || 'localhost'
 	var username = properties.get('username')
 	var password = properties.get('password')
 	var db = Sincerity.Objects.ensure(properties.get('db'), 'logs')
@@ -55,8 +59,8 @@ function logtail(command) {
 	//println('collection: ' + collection)
 	
 	// Connect
-	var connection = MongoDB.connect(connection, null, username, password)
-	collection = new MongoDB.Collection(collection, {connection: connection, db: db})
+	var client = Sincerity.Objects.exists(username) ? MongoDB.connect(uri, {username: username, password: password}) : MongoDB.connect(uri)
+	collection = new MongoDB.Collection(collection, {client: client, db: db})
 	var c = collection.find().addOption('tailable').addOption('awaitData')
 	
 	var format = new Sincerity.Localization.DateTimeFormat(TIME_FORMAT)
@@ -67,7 +71,7 @@ function logtail(command) {
 		record = Sincerity.Objects.flatten(record)
 		
 		// Format timestamp
-		record.timestamp = format.format(record.timestamp)
+		record.timestamp = format.format(record.date)
 		
 		// Right-pad level
 		while (record.level.length < 5) {
