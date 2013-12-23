@@ -7,8 +7,8 @@ var appender = configuration.noSqlAppender({
 	name: 'mongoDb:common',
 	provider: {
 		client: client,
-		db: 'logs',
-		collection: 'common'
+		databaseName: 'logs',
+		collectionName: 'common'
 	}
 }) 
 

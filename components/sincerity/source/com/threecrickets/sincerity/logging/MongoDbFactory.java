@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity.util;
+package com.threecrickets.sincerity.logging;
 
 import com.mongodb.DB;
 import com.mongodb.MongoClient;

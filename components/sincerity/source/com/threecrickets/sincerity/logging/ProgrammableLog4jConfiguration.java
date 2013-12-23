@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity.util;
+package com.threecrickets.sincerity.logging;
 
 import java.util.Collections;
 import java.util.Comparator;

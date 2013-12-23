@@ -1,4 +1,4 @@
-package com.threecrickets.sincerity.util;
+package com.threecrickets.sincerity.logging;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

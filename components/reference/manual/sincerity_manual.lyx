@@ -8555,8 +8555,7 @@ reference "restlet-extras"
 
 )
 \bar default
-, which adds a Restlet extension library that provides direct access to
- SLF4J.
+, which adds a Restlet extension library that provides direct chute to SLF4J.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -8689,12 +8688,12 @@ configuration.rollingFileAppender({
 
 \begin_layout Plain Layout
 
-		minIndex: '1',
+		min: '1',
 \end_layout
 
 \begin_layout Plain Layout
 
-		maxIndex: '9'
+		max: '9'
 \end_layout
 
 \begin_layout Plain Layout
@@ -8963,7 +8962,15 @@ target "http://www.mongodb.org/display/DOCS/Capped+Collections"
 
  for your log.
  This guarantees both excellent write performance as well as automatic rolling.
- You can create it from the mongo shell like so:
+ You can create it from the 
+\begin_inset Quotes eld
+\end_inset
+
+mongo
+\begin_inset Quotes erd
+\end_inset
+
+ shell tool like so:
 \end_layout
 
 \begin_layout Standard
