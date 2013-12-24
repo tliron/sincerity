@@ -151,11 +151,13 @@ public class Artifact implements Comparable<Artifact>
 	 *        The managed artifacts
 	 * @param overwrite
 	 *        Whether to overwrite the file if it already exists
+	 * @param verify
+	 *        Whether to verify the unpacking
 	 * @return The digest
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public byte[] unpack( ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
+	public byte[] unpack( ManagedArtifacts managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		// Don't reinstall volatile artifacts that were already installed
 		if( isVolatile && managedArtifacts.wasInstalled( this ) )
@@ -226,8 +228,11 @@ public class Artifact implements Comparable<Artifact>
 		fileDigest = null;
 
 		// Verify
-		if( !Arrays.equals( getFileDigest(), getOriginDigest() ) )
-			throw new UnpackingException( "Artifact incorrectly unpacked from " + originUrl + " to " + file );
+		if( verify )
+		{
+			if( !Arrays.equals( getFileDigest(), getOriginDigest() ) )
+				throw new UnpackingException( "Artifact incorrectly unpacked from " + originUrl + " to " + file );
+		}
 
 		return getFileDigest();
 	}

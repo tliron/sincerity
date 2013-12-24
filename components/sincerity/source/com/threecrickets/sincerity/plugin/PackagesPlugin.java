@@ -65,9 +65,10 @@ public class PackagesPlugin implements Plugin1
 
 			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
+			boolean verify = command.getSwitches().contains( "verify" );
 
 			command.remove();
-			command.getSincerity().getContainer().getDependencies().getPackages().install( filter, overwrite );
+			command.getSincerity().getContainer().getDependencies().getPackages().install( filter, overwrite, verify );
 		}
 		else
 			throw new UnknownCommandException( command );

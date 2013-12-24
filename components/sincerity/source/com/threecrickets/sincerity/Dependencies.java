@@ -239,7 +239,7 @@ public class Dependencies
 	 */
 	public Set<Artifact> getArtifacts() throws SincerityException
 	{
-		return getArtifacts( false, false );
+		return getArtifacts( false, false, false );
 	}
 
 	/**
@@ -250,11 +250,13 @@ public class Dependencies
 	 *        True to allow installation of packages
 	 * @param overwrite
 	 *        True to force overwriting of existing files
+	 * @param verify
+	 *        Whether to verify the unpacking
 	 * @return The artifacts
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public Set<Artifact> getArtifacts( boolean install, boolean overwrite ) throws SincerityException
+	public Set<Artifact> getArtifacts( boolean install, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		HashSet<Artifact> artifacts = new HashSet<Artifact>();
 		Packages packages = getPackages();
@@ -276,7 +278,7 @@ public class Dependencies
 				for( Artifact artifact : pack )
 				{
 					if( install )
-						managedArtifacts.add( artifact, true, artifact.unpack( managedArtifacts, overwrite ) );
+						managedArtifacts.add( artifact, true, artifact.unpack( managedArtifacts, overwrite, verify ) );
 					else
 						managedArtifacts.add( artifact, false, null );
 
@@ -725,10 +727,12 @@ public class Dependencies
 	 * 
 	 * @param overwrite
 	 *        True to force overwrite of existing artifact files
+	 * @param verify
+	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public void install( boolean overwrite ) throws SincerityException
+	public void install( boolean overwrite, boolean verify ) throws SincerityException
 	{
 		int installations = container.getInstallations();
 		if( installations == 0 )
@@ -760,7 +764,7 @@ public class Dependencies
 			container.updateBootstrap();
 
 			// Prune unnecessary artifacts
-			managedArtifacts.prune( getArtifacts( true, overwrite ) );
+			managedArtifacts.prune( getArtifacts( true, overwrite, verify ) );
 
 			if( container.hasFinishedInstalling() )
 				printDisclaimer( container.getSincerity().getOut() );
@@ -769,7 +773,7 @@ public class Dependencies
 		else
 		{
 			// Just handle artifact installations
-			getArtifacts( true, overwrite );
+			getArtifacts( true, overwrite, verify );
 
 			if( container.hasFinishedInstalling() )
 				container.getSincerity().getOut().println( "Dependencies have not changed since last install" );

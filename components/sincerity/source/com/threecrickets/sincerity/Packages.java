@@ -118,15 +118,17 @@ public class Packages extends ArrayList<Package>
 	 *        Filter artifacts (currently unused)
 	 * @param overwrite
 	 *        True to force overwriting of modified artifacts
+	 * @param verify
+	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
 	 * @see Package#unpack(String, ManagedArtifacts, boolean)
 	 */
-	public void install( String filter, boolean overwrite ) throws SincerityException
+	public void install( String filter, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		for( Package pack : this )
 		{
-			pack.unpack( filter, container.getDependencies().getManagedArtifacts(), overwrite );
+			pack.unpack( filter, container.getDependencies().getManagedArtifacts(), overwrite, verify );
 			pack.install();
 		}
 	}

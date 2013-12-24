@@ -94,9 +94,10 @@ public class ArtifactsPlugin implements Plugin1
 		{
 			command.setParse( true );
 			boolean overwrite = command.getSwitches().contains( "overwrite" );
+			boolean verify = command.getSwitches().contains( "verify" );
 
 			Container container = command.getSincerity().getContainer();
-			container.getDependencies().install( overwrite );
+			container.getDependencies().install( overwrite, verify );
 
 			if( container.hasFinishedInstalling() )
 			{

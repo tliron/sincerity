@@ -329,16 +329,18 @@ public class Package extends AbstractList<Artifact>
 	 *        The managed artifacts database
 	 * @param overwrite
 	 *        True to force overwriting of modified artifacts
+	 * @param verify
+	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
 	 * @see Artifact#unpack(ManagedArtifacts, boolean)
 	 */
-	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite ) throws SincerityException
+	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		for( Artifact artifact : this )
 		{
 			// TODO: check filter!
-			artifact.unpack( managedArtifacts, overwrite );
+			artifact.unpack( managedArtifacts, overwrite, verify );
 		}
 	}
 

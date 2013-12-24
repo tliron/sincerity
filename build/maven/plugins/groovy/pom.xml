@@ -50,8 +50,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
-			<artifactId>groovy</artifactId>
-			<version>[2.1,2.2)</version>
+			<artifactId>groovy-indy</artifactId>
+			<version>[2.2,2.3)</version>
 		</dependency>
 	</dependencies>
 

@@ -5569,6 +5569,34 @@ reference "packages:unpack"
  for more information.
 \end_layout
 
+\begin_layout Itemize
+
+\series bold
+--verify
+\series default
+: This affects phase 6.
+ See 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+packages:unpack
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "packages:unpack"
+
+\end_inset
+
+)
+\bar default
+ for more information.
+\end_layout
+
 \begin_layout Subsubsection
 artifacts:uninstall
 \begin_inset CommandInset label
@@ -5841,6 +5869,15 @@ unpack
 without
 \emph default
  this switch.
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--verify
+\series default
+: Verifies that artifacts have been unpacked correctly.
+ Slower but safer.
 \end_layout
 
 \begin_layout Subsection
