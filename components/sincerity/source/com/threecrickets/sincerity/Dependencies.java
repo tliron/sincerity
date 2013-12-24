@@ -63,7 +63,7 @@ import com.threecrickets.sincerity.internal.XmlUtil;
  * remove dependencies to a Sincerity container.
  * <p>
  * Changes to dependencies are only actually resolved when
- * {@link #install(boolean)} is called. To access the actually resolved
+ * {@link #install(boolean, boolean)} is called. To access the actually resolved
  * dependencies since the last install, see {@link #getResolvedDependencies()}.
  * <p>
  * To access the Jars, use {@link #getClasspaths(boolean)}. To access the
@@ -217,7 +217,7 @@ public class Dependencies
 
 	/**
 	 * The resolved dependencies (explicit and implicit) based on the explicit
-	 * dependencies, calculated in the last {@link #install(boolean)}.
+	 * dependencies, calculated in the last {@link #install(boolean, boolean)}.
 	 * 
 	 * @return The resolved dependencies
 	 * @throws SincerityException

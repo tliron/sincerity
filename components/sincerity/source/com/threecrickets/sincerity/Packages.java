@@ -122,7 +122,7 @@ public class Packages extends ArrayList<Package>
 	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
-	 * @see Package#unpack(String, ManagedArtifacts, boolean)
+	 * @see Package#unpack(String, ManagedArtifacts, boolean, boolean)
 	 */
 	public void install( String filter, boolean overwrite, boolean verify ) throws SincerityException
 	{

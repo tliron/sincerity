@@ -17,7 +17,7 @@ import com.threecrickets.sincerity.Dependencies;
  * Signifies that dependencies could not be installed.
  * 
  * @author Tal Liron
- * @see Dependencies#install(boolean)
+ * @see Dependencies#install(boolean, boolean)
  */
 public class InstallationException extends SincerityException
 {
