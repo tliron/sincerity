@@ -58,7 +58,7 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 	public void use()
 	{
 		Sincerity sincerity = Sincerity.getCurrent();
-		if( sincerity.getVerbosity() >= 2 )
+		if( ( sincerity != null ) && sincerity.getVerbosity() >= 2 )
 			sincerity.getOut().println( "Using log4j configuration: " + getName() );
 
 		new ProgrammableLog4jConfigurationFactory( this ).use();
@@ -77,7 +77,7 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 
 		Sincerity sincerity = Sincerity.getCurrent();
 
-		if( sincerity.getVerbosity() >= 2 )
+		if( ( sincerity != null ) && sincerity.getVerbosity() >= 2 )
 			sincerity.getOut().println( "Loggers:" );
 
 		LoggerConfig root = getLogger( LogManager.ROOT_LOGGER_NAME );
@@ -106,7 +106,7 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 					logger.setParent( root );
 			}
 
-			if( sincerity.getVerbosity() >= 2 )
+			if( ( sincerity != null ) && sincerity.getVerbosity() >= 2 )
 			{
 				sincerity.getOut().println(
 					"  \"" + logger.getName() + "\" (" + logger.getLevel() + ( logger.isAdditive() ? ") +" : ") " ) + ( logger.getParent() == null ? "" : "> \"" + logger.getParent().getName() + "\"" ) );

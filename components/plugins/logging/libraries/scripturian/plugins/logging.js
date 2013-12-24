@@ -32,16 +32,16 @@ function run(command) {
 }
 
 function logging(command) {
-	// Configure log4j
+	// Configure Log4j
 	var configurationFile = command.sincerity.container.getConfigurationFile('logging.conf')
 	if (configurationFile.exists()) {
-		// Configure by traditional log4j configuration file
+		// Configure by traditional Log4j configuration file
 		
 		// Make sure we have a /logs/ directory
 		var logsDir = command.sincerity.container.getLogsFile()
 		logsDir.mkdirs()
 
-		// The log4j configuration can use this property
+		// The Log4j configuration can use this property
 		System.setProperty('sincerity.logs', logsDir)
 
 		try {
@@ -65,7 +65,7 @@ function logging(command) {
 			new com.threecrickets.sincerity.util.ProgrammableLog4jConfigurationFactory(configuration).use()
 		}
 		catch (x if x.javaException instanceof ClassNotFoundException) {
-			throw new CommandException(command, 'Could not find log4j in classpath', x.javaException)
+			throw new CommandException(command, 'Could not find Log4j in classpath', x.javaException)
 		}
 	}
 	else {
@@ -77,7 +77,7 @@ function logging(command) {
 	System.setProperty('java.util.logging.config.file', 'none')
 	java.util.logging.LogManager.logManager.reset()
 
-	// Bridge JULI to SLF4J, which will in turn use log4j as its engine
+	// Bridge JULI to SLF4J, which will in turn use Log4j as its engine
 	try {
 		org.slf4j.bridge.SLF4JBridgeHandler.install()
 	}
@@ -93,37 +93,16 @@ function log(command) {
 	
 	logging(command)
 
-	// NPE! see: https://issues.apache.org/jira/browse/LOG4J2-477
-	//java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0])
-	org.apache.logging.log4j.LogManager.getLogger('sincerity').info(command.arguments[0])
+	java.util.logging.Logger.getLogger('sincerity').info(command.arguments[0])
 }
 
 function server(command) {
-	importClass(
-		org.apache.log4j.LogManager,
-		org.apache.log4j.net.SocketNode,
-		java.net.ServerSocket,
-		java.lang.Thread)
-
 	command.parse = true
 	var port = command.properties.get('port') || 4560
 
 	logging(command)
 
-	var repository = LogManager.loggerRepository
+	println('Starting Log4j server on port ' + port)
 
-	println('Starting log4j server on port ' + port)
-
-	var serverSocket = new ServerSocket(port)
-	try {
-		while (true) {
-			var socket = serverSocket.accept()
-			var socketNode = new SocketNode(socket, repository)
-			var thread = new Thread(socketNode, 'log4j Server')
-			thread.start()
-		}
-	}
-	finally {
-		serverSocket.close()
-	}
+	new org.apache.logging.log4j.core.net.SocketServer(port).run()
 }

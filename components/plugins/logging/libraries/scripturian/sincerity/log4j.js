@@ -20,7 +20,7 @@ document.require(
 var Sincerity = Sincerity || {}
 
 /**
- * JavaScript-friendly wrapper over <a href="http://logging.apache.org/log4j/>log4j</a>'s configuration API.
+ * JavaScript-friendly wrapper over <a href="http://logging.apache.org/log4j/>Log4j</a>'s configuration API.
  * 
  * @namespace
  * 
