@@ -2,7 +2,7 @@
 // This file is part of the Sincerity Foundation Library
 //
 
-// Copyright 2011-2012 Three Crickets LLC.
+// Copyright 2011-2014 Three Crickets LLC.
 //
 // The contents of this file are subject to the terms of the LGPL version 3.0:
 // http://www.gnu.org/copyleft/lesser.html

@@ -84,7 +84,7 @@ Main text written by Tal Liron
 \begin_layout Standard
 \noindent
 \align center
-Copyright 2011-2013 by Three Crickets LLC.
+Copyright 2011-2014 by Three Crickets LLC.
 \begin_inset Newline newline
 \end_inset
 
@@ -829,7 +829,7 @@ configuration-by-script
  approach before, you might be skeptical about its benefits or worried about
  the extra weight it adds.
  But Sincerity's JavaScript engine is very lightweight, and we're convinced
- that once you try this approach, you will never want another.
+ that once you try this approach, you will avoid all others.
  For an instructive example, install Sincerity's 
 \bar under
 logging plugin (page 
@@ -1177,7 +1177,14 @@ Sincerity vs.
 \end_layout
 
 \begin_layout Standard
-Maven is a comprehensive solution for managing Java projects, handling building,
+\begin_inset CommandInset href
+LatexCommand href
+name "Apache Maven"
+target "http://maven.apache.org/"
+
+\end_inset
+
+is a comprehensive solution for managing Java projects, handling building,
  dependency management and distribution.
  It contrastingly combines a lot flexibility on the one hand---an open plugin
  API built on the Plexus IoC container---with deliberate rigidity on the
@@ -3105,9 +3112,16 @@ One quick issue to note is that your
 \begin_inset Quotes erd
 \end_inset
 
- directory will often be empty, and many VCSes, such as git, tend to ignore
- empty directories.
- To force git to commit it, simply add a 
+ directory will often be empty, and many VCSes, such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "Git"
+target "http://git-scm.com/"
+
+\end_inset
+
+, tend to ignore empty directories.
+ To force Git to commit it, simply add a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3200,7 +3214,7 @@ target "http://git-annex.branchable.com/"
 
 \end_inset
 
- for git.
+ for Git.
 \end_layout
 
 \begin_layout Subsubsection
@@ -9445,7 +9459,24 @@ reference "restlet"
 )
 \bar default
 .
- In our case, we are naming it 
+ It adds a special 
+\begin_inset Quotes eld
+\end_inset
+
+###
+\begin_inset Quotes erd
+\end_inset
+
+ comment block used by Linux's 
+\begin_inset CommandInset href
+LatexCommand href
+name "Standard Base (LSB) specification"
+target "http://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/initscrcomconv.html"
+
+\end_inset
+
+.
+ Let's name it 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9568,6 +9599,19 @@ exit 0
 \end_layout
 
 \begin_layout Standard
+For consistency, make sure to change the 
+\begin_inset Quotes eld
+\end_inset
+
+Provides:
+\begin_inset Quotes erd
+\end_inset
+
+ entry to match the name of the file.
+ 
+\end_layout
+
+\begin_layout Standard
 You can start/stop this service by running the above script directly, for
  example: 
 \begin_inset Quotes eld
@@ -9642,10 +9686,10 @@ ns according to only what it needs: read access to Sincerity and the container,
 \end_layout
 
 \begin_layout Standard
-To have your service start automatically when the system starts depends
+To make your service start automatically when the system starts depends
  on your operating system.
- For Linux, according the Linux Standard Base (LSB) specification, you need
- the 
+ The above script should work on most Linux-based operating systems due
+ to the 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9653,25 +9697,7 @@ To have your service start automatically when the system starts depends
 \begin_inset Quotes erd
 \end_inset
 
- comment block listed above.
- Type 
-\begin_inset Quotes eld
-\end_inset
-
-man insserv
-\begin_inset Quotes erd
-\end_inset
-
- for the documentation the block format.
- For consistency, make sure to change the 
-\begin_inset Quotes eld
-\end_inset
-
-Provides:
-\begin_inset Quotes erd
-\end_inset
-
- entry to match the name of the file.
+ comment block.
  To process this file and the block, effectively installing the service
  into the operating system, run 
 \begin_inset Quotes eld
@@ -9681,7 +9707,8 @@ sudo update-rc.d restlet defaults
 \begin_inset Quotes erd
 \end_inset
 
-, which wraps 
+.
+ That command uses 
 \begin_inset Quotes eld
 \end_inset
 
@@ -9689,7 +9716,15 @@ insserv
 \begin_inset Quotes erd
 \end_inset
 
- internally.
+ internally, so run 
+\begin_inset Quotes eld
+\end_inset
+
+man insserv
+\begin_inset Quotes erd
+\end_inset
+
+ to get documentation for the comment block format.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -15451,7 +15486,7 @@ name "packaging-maven"
 It's relatively easy to use 
 \begin_inset CommandInset href
 LatexCommand href
-name "Maven"
+name "Apache Maven"
 target "http://maven.apache.org/"
 
 \end_inset
