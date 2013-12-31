@@ -1,7 +1,8 @@
 
 document.require(
 	'/sincerity/files/',
-	'/sincerity/objects/')
+	'/sincerity/objects/',
+	'/sincerity/jvm/')
 
 importClass(
 	java.lang.System,
@@ -64,8 +65,8 @@ function logging(command) {
 				
 			new com.threecrickets.sincerity.util.ProgrammableLog4jConfigurationFactory(configuration).use()
 		}
-		catch (x if x.javaException instanceof ClassNotFoundException) {
-			throw new CommandException(command, 'Could not find Log4j in classpath', x.javaException)
+		catch (x if Sincerity.JVM.isException(x, ClassNotFoundException)) {
+			throw new CommandException(command, 'Could not find Log4j in classpath', x.javaException || x)
 		}
 	}
 	else {
@@ -81,8 +82,8 @@ function logging(command) {
 	try {
 		org.slf4j.bridge.SLF4JBridgeHandler.install()
 	}
-	catch (x if x.javaException instanceof ClassNotFoundException) {
-		throw new CommandException(command, 'Could not find SLF4J bridge in classpath', x.javaException)
+	catch (x if Sincerity.JVM.isException(x, ClassNotFoundException)) {
+		throw new CommandException(command, 'Could not find SLF4J bridge in classpath', x.javaException || x)
 	}
 }
 

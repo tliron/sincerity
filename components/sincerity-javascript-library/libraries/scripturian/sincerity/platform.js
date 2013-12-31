@@ -30,7 +30,7 @@ Sincerity.Platform = Sincerity.Platform || function() {
     var Public = {}
     
     /**
-     * The plaform name.
+     * The platform name.
      * 
      * @returns {String}
      */

@@ -28,6 +28,23 @@ var Sincerity = Sincerity || {}
 Sincerity.JVM = Sincerity.JVM || function() {
 	/** @exports Public as Sincerity.JVM */
     var Public = {}
+    
+	/**
+	 * Checks if the exception is of the JVM exception class.
+	 * <p>
+	 * Note: the mechanism is different in Nashorn and Rhino, and this method will adapt
+	 * accordingly.
+	 * 
+	 * @param x The exception
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} c The class name or class
+	 * @returns {Boolean}
+	 */
+    Public.isException = function(x, c) {
+		if (Sincerity.Objects.isString(c)) {
+	    	c = Public.getClass(c)
+		}
+		return (x.javaException || x) instanceof c
+    }
 
 	/**
 	 * Loads a JVM class, using the current thread context.

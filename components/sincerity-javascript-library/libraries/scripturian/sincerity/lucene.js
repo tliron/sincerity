@@ -260,7 +260,7 @@ Sincerity.Lucene = Sincerity.Lucene || function() {
 					var tokens = org.apache.lucene.search.highlight.TokenSources.getAnyTokenStream(this.searcher.indexReader, id, this.previewField, analyzer)
 					value[this.preview] = this.highlighter.getBestFragments(tokens, value[this.previewField], this.maxFragments, this.fragmentsSeparator)
 				}
-				catch (x if x.javaException instanceof java.lang.IllegalArgumentException) {
+				catch (x if Sincerity.JVM.isException(x, java.lang.IllegalArgumentException)) {
 					// Field can't be analyzed; it's probably not stored in the document
 				}
 			}

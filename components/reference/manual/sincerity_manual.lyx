@@ -3827,6 +3827,45 @@ target "http://openjdk.java.net/jeps/122"
 .
 \end_layout
 
+\begin_layout Subsection
+How do I force the use of Rhino with JVM 8?
+\end_layout
+
+\begin_layout Standard
+There is an 
+\bar under
+environment variable (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "environment-variables"
+
+\end_inset
+
+)
+\bar default
+ for it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+SINCERITY_JAVASCRIPT=Rhino sincerity install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+By default, Sincerity will prefer Nashorn, even if Rhino is also on the
+ classpath.
+\end_layout
+
 \begin_layout Part
 Ecosystem
 \end_layout
