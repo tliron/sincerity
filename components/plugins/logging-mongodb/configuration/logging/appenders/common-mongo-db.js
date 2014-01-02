@@ -12,5 +12,17 @@ var appender = configuration.noSqlAppender({
 	}
 }) 
 
+/*
+var appender = configuration.rewriteAppender({
+	name: 'rewrite:mongoDb:common',
+	appenders: ['mongoDb:common'],
+	policy: {
+		values: {
+			test: 'Hello!!!'
+		}
+	}
+})
+*/
+
 // This is a high-priority root appender
 configuration.rootAppenders.unshift(appender)

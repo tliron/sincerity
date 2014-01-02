@@ -304,9 +304,9 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			if (Sincerity.Objects.exists(config.ignoreExceptions)) {
 				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
 			}
-			
-			var provider = Public.mongoDbProvider(config.provider)
 
+			var provider = Public.mongoDbProvider(config.provider)
+			
 			var appender = org.apache.logging.log4j.core.appender.db.nosql.NoSQLAppender.createAppender(
 				config.name || null, // name
 				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
@@ -318,6 +318,75 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			Public.configuration.addAppender(appender)
 	
 			return appender
+		}
+
+		/**
+		 * @param config
+		 * @param {String} config.name
+		 * @param {String[]} config.appenders
+		 * @param config.policy {@link Sincerity.Log4J.Configuration#mapRewritePolicy}
+		 * @param {Boolean} [config.ignoreExceptions=true]
+		 * @param [config.filter] TODO
+		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rewrite/RewriteAppender.html">org.apache.logging.log4j.core.appender.rewrite.RewriteAppender</a>}
+		 */
+		Public.rewriteAppender = function(config) {
+			if (Sincerity.Objects.exists(config.ignoreExceptions)) {
+				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
+			}
+			
+			var policy = Public.mapRewritePolicy(config.policy)
+
+			var size = 0
+			for (var key in config.appenders) {
+				size++
+			}
+			
+			var appenders = Sincerity.JVM.newArray(size, 'org.apache.logging.log4j.core.config.AppenderRef')
+			var i  = 0
+			for (var a in config.appenders) {
+				appenders[a] = org.apache.logging.log4j.core.config.AppenderRef.createAppenderRef(
+					config.appenders[a],
+					null,
+					null
+				)
+			}
+
+			var appender = org.apache.logging.log4j.core.appender.rewrite.RewriteAppender.createAppender(
+				config.name || null, // name
+				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
+				appenders, // appenderRefs,
+				Public.configuration, // configuration
+				policy, // rewritePolicy
+				config.filter || null // filter
+			)
+			
+			Public.configuration.addAppender(appender)
+	
+			return appender
+		}
+		
+		/**
+		 * @param config
+		 * @param {Object} config.values
+		 * @param {String} [config.mode='Add'] 'Add' or 'Update'
+		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rewrite/MapRewritePolicy.html">org.apache.logging.log4j.core.appender.rewrite.MapRewritePolicy</a>}
+		 */
+		Public.mapRewritePolicy = function(config) {
+			var size = 0
+			for (var key in config.values) {
+				size++
+			}
+
+			var keyValuePairs = Sincerity.JVM.newArray(size, 'org.apache.logging.log4j.core.helpers.KeyValuePair')
+			var i = 0
+			for (var key in config.values) {
+				keyValuePairs[i++] = org.apache.logging.log4j.core.helpers.KeyValuePair.createPair(key, config.values[key])
+			}
+			
+			return org.apache.logging.log4j.core.appender.rewrite.MapRewritePolicy.createPolicy(
+				config.mode || null, // mode='Add'
+				keyValuePairs // keyValuePairs
+			)
 		}
 
 		/**

@@ -36,14 +36,12 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * accordingly.
 	 * 
 	 * @param x The exception
-	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} c The class name or class
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} theClass The JVM class or its name
 	 * @returns {Boolean}
 	 */
-    Public.isException = function(x, c) {
-		if (Sincerity.Objects.isString(c)) {
-	    	c = Public.getClass(c)
-		}
-		return (x.javaException || x) instanceof c
+    Public.isException = function(x, theClass) {
+		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
+		return (x.javaException || x) instanceof theClass
     }
 
 	/**
@@ -81,11 +79,11 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * True if the value is an instance of the JVM class (or its sub-classes). 
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The JVM class or its name
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} theClass The JVM class or its name
 	 * @returns {Boolean}
 	 */
 	Public.instanceOf = function(value, theClass) {
-		if (value.getClass) {
+		if (Sincerity.Objects.exists(value) && value.getClass) {
 			theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
 			return value.getClass() === theClass
 		}
@@ -95,7 +93,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates an instance of a JVM class.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The JVM class or its name
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} theClass The JVM class or its name
 	 * @returns An instance
 	 */
 	Public.newInstance = function(theClass) {
@@ -114,7 +112,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 		type = type || 'object'
 		if (Sincerity.Objects.isString(type)) {
 			var theClass = primitiveTypes[String(type)]
-			if (!theClass) {
+			if (!Sincerity.Objects.exists(theClass)) {
 				theClass = Public.getClass(type)
 			}
 			type = theClass

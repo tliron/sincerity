@@ -85,9 +85,7 @@ public final class MongoDbLog4jConnection implements NoSQLConnection<BasicDBObje
 	@Override
 	public MongoDBObject createObject()
 	{
-		MongoDBObject o = new MongoDBObject();
-		o.set( "origin", origin );
-		return o;
+		return new MongoDBObject();
 	}
 
 	@Override
@@ -101,7 +99,9 @@ public final class MongoDbLog4jConnection implements NoSQLConnection<BasicDBObje
 	{
 		try
 		{
-			final WriteResult result = this.collection.insert( object.unwrap(), this.writeConcern );
+			final BasicDBObject o = object.unwrap();
+			o.put( "origin", origin );
+			final WriteResult result = this.collection.insert( o, this.writeConcern );
 			if( result.getError() != null && result.getError().length() > 0 )
 			{
 				throw new AppenderLoggingException( "Failed to write log event to MongoDB due to error: " + result.getError() + "." );
