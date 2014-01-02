@@ -27,8 +27,8 @@ var Sincerity = Sincerity || {}
  */
 Sincerity.JVM = Sincerity.JVM || function() {
 	/** @exports Public as Sincerity.JVM */
-    var Public = {}
-    
+	var Public = {}
+	
 	/**
 	 * Checks if the exception is of the JVM exception class.
 	 * <p>
@@ -39,10 +39,10 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} theClass The JVM class or its name
 	 * @returns {Boolean}
 	 */
-    Public.isException = function(x, theClass) {
+	Public.isException = function(x, theClass) {
 		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
 		return (x.javaException || x) instanceof theClass
-    }
+	}
 
 	/**
 	 * Loads a JVM class, using the current thread context.
@@ -51,7 +51,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Class.html">java.lang.Class</a>} The class or null if not found
 	 */
 	Public.getClass = function(name) {
-    	var classLoader = java.lang.Thread.currentThread().contextClassLoader
+		var classLoader = java.lang.Thread.currentThread().contextClassLoader
 		try {
 			return classLoader.loadClass(name)
 		}
@@ -59,22 +59,22 @@ Sincerity.JVM = Sincerity.JVM || function() {
 			return null
 		}
 	}
-    
+	
 	/**
 	 * Opens a JVM resource for input, using the current thread context.
 	 * 
 	 * @param {String} name The resource name
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/InputStream.html">java.io.InputStream</a>} The stream or null if not found
 	 */
-    Public.getResourceAsStream = function(name) {
-    	var classLoader = java.lang.Thread.currentThread().contextClassLoader
+	Public.getResourceAsStream = function(name) {
+		var classLoader = java.lang.Thread.currentThread().contextClassLoader
 		try {
 			return classLoader.getResourceAsStream(name)
 		}
 		catch (x) {
 			return null
 		}
-    }
+	}
 	
 	/**
 	 * True if the value is an instance of the JVM class (or its sub-classes). 
@@ -342,7 +342,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	Public.loadProperties = function(file) {
 		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 		var properties = new java.util.Properties()
-		var reader = new java.io.BufferedReader(java.io.FileReader(file))
+		var reader = new java.io.BufferedReader(new java.io.FileReader(file))
 		try {
 			properties.load(reader)
 		}
