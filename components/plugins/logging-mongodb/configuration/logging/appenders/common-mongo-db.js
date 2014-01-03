@@ -3,26 +3,26 @@ document.require('/mongo-db/')
 
 var client = MongoDB.connect('localhost:27017')
 
-var appender = configuration.noSqlAppender({
-	name: 'mongoDb:common',
+configuration.noSqlAppender({
+	name: 'raw:mongoDb:common',
 	provider: {
 		client: client,
 		databaseName: 'logs',
 		collectionName: 'common'
 	}
-}) 
+})
 
-/*
+var origin = java.net.InetAddress.localHost.hostAddress
+
 var appender = configuration.rewriteAppender({
-	name: 'rewrite:mongoDb:common',
-	appenders: ['mongoDb:common'],
+	name: 'mongoDb:common',
+	appenders: ['raw:mongoDb:common'],
 	policy: {
-		values: {
-			test: 'Hello!!!'
+		properties: {
+			origin: origin
 		}
 	}
 })
-*/
 
 // This is a high-priority root appender
 configuration.rootAppenders.unshift(appender)

@@ -1,11 +1,11 @@
 
-var TEMPLATE = '{timestamp} {level} {origin} [{loggerName}] {message}'
+var TEMPLATE = '{formattedDate} {level} {contextMap.origin} [{loggerName}] {message}'
 var TIME_FORMAT = 'yyy-MM-dd HH:mm:ss,SSS'
 
 /*
 Available template values:
 
-timestamp
+formattedDate
 level
 loggerName
 message
@@ -18,9 +18,8 @@ threadName
 millis
 date
 thrown
-contextMap
+contextMap.origin
 contextStack
-origin
 */
 
 document.require(
@@ -70,8 +69,8 @@ function logtail(command) {
 		
 		record = Sincerity.Objects.flatten(record)
 		
-		// Format timestamp
-		record.timestamp = format.format(record.date)
+		// Format date
+		record.formattedDate = format.format(record.date)
 		
 		// Right-pad level
 		while (record.level.length < 5) {

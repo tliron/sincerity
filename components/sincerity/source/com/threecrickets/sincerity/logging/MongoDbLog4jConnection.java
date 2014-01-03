@@ -11,9 +11,6 @@
 
 package com.threecrickets.sincerity.logging;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.appender.AppenderLoggingException;
@@ -34,8 +31,7 @@ import com.mongodb.WriteResult;
 
 /**
  * Temporary fix for <a
- * href="https://issues.apache.org/jira/browse/LOG4J2-475">LOG4J2-475</a>. and
- * <a href="https://issues.apache.org/jira/browse/LOG4J2-476">LOG4J2-476</a>.
+ * href="https://issues.apache.org/jira/browse/LOG4J2-475">LOG4J2-475</a>.
  * 
  * @author Tal Liron
  */
@@ -65,21 +61,11 @@ public final class MongoDbLog4jConnection implements NoSQLConnection<BasicDBObje
 
 	private final WriteConcern writeConcern;
 
-	private String origin;
-
 	public MongoDbLog4jConnection( final DB database, final WriteConcern writeConcern, final String collectionName )
 	{
 		this.mongo = database.getMongo();
 		this.collection = database.getCollection( collectionName );
 		this.writeConcern = writeConcern;
-
-		try
-		{
-			origin = InetAddress.getLocalHost().getHostAddress();
-		}
-		catch( UnknownHostException x )
-		{
-		}
 	}
 
 	@Override
@@ -99,9 +85,7 @@ public final class MongoDbLog4jConnection implements NoSQLConnection<BasicDBObje
 	{
 		try
 		{
-			final BasicDBObject o = object.unwrap();
-			o.put( "origin", origin );
-			final WriteResult result = this.collection.insert( o, this.writeConcern );
+			final WriteResult result = this.collection.insert( object.unwrap(), this.writeConcern );
 			if( result.getError() != null && result.getError().length() > 0 )
 			{
 				throw new AppenderLoggingException( "Failed to write log event to MongoDB due to error: " + result.getError() + "." );

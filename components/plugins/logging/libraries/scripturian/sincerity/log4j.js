@@ -324,7 +324,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param config
 		 * @param {String} config.name
 		 * @param {String[]} config.appenders
-		 * @param config.policy {@link Sincerity.Log4J.Configuration#mapRewritePolicy}
+		 * @param config.policy {@link Sincerity.Log4J.Configuration#propertiesRewritePolicy}
 		 * @param {Boolean} [config.ignoreExceptions=true]
 		 * @param [config.filter] TODO
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rewrite/RewriteAppender.html">org.apache.logging.log4j.core.appender.rewrite.RewriteAppender</a>}
@@ -334,7 +334,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
 			}
 			
-			var policy = Public.mapRewritePolicy(config.policy)
+			var policy = Public.propertiesRewritePolicy(config.policy)
 
 			var size = 0
 			for (var key in config.appenders) {
@@ -363,6 +363,29 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			Public.configuration.addAppender(appender)
 	
 			return appender
+		}
+		
+		/**
+		 * @param config
+		 * @param {Object} config.properties
+		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rewrite/PropertiesRewritePolicy.html">org.apache.logging.log4j.core.appender.rewrite.PropertiesRewritePolicy</a>}
+		 */
+		Public.propertiesRewritePolicy = function(config) {
+			var size = 0
+			for (var key in config.properties) {
+				size++
+			}
+
+			var properties = Sincerity.JVM.newArray(size, 'org.apache.logging.log4j.core.config.Property')
+			var i = 0
+			for (var key in config.properties) {
+				properties[i++] = org.apache.logging.log4j.core.config.Property.createProperty(key, config.properties[key])
+			}
+			
+			return org.apache.logging.log4j.core.appender.rewrite.PropertiesRewritePolicy.createPolicy(
+				Public.configuration, // config
+				properties // properties
+			)
 		}
 		
 		/**
