@@ -179,11 +179,13 @@ function service(command) {
 				var file = files[f]
 				if (file.name.endsWith('.conf')) {
 					var reader = new BufferedReader(new FileReader(file))
+					var filling = Sincerity.Templates.createSystemFilling(true, true)
 					try {
 						while (null !== (line = reader.readLine())) {
 							if ((line.length() == 0) || line.startsWith('#')) {
 								continue
 							}
+							line = line.cast(filling)
 							configuration.wrapper.java['additional.' + index++] = line
 						}
 					}

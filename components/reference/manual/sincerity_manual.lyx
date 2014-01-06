@@ -9473,6 +9473,42 @@ Additionally, this plugin provides a flexible way for you to send arguments
 \end_inset
 
  files to support the service plugin.
+ These 
+\begin_inset Quotes eld
+\end_inset
+
+.conf
+\begin_inset Quotes erd
+\end_inset
+
+ files all support string interpolation using any JVM system property or
+ environment variable.
+ For example, here's a way to add garbage collection logging:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-Xloggc:{sincerity.container.root}/logs/gc.log
+\end_layout
+
+\begin_layout Plain Layout
+
+-XX:+PrintGCDetails
+\end_layout
+
+\begin_layout Plain Layout
+
+-XX:+PrintTenuringDistribution
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
