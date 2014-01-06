@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.threecrickets.sincerity.skeleton</groupId>
-	<artifactId>sincerity-hadoop</artifactId>
-	<version>@VERSION@</version>
+	<groupId>com.threecrickets.sincerity.plugin</groupId>
+	<artifactId>logging</artifactId>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Sincerity Skeleton: Hadoop</name>
-	<description>A Sincerity skeleton that turns your container into a Hadoop node.</description>
+	<name>Sincerity Plugin: Logging</name>
+	<description>A Sincerity plugin that manages logging for a container.</description>
 	<url>http://threecrickets.com/sincerity/</url>
 	<inceptionYear>2011</inceptionYear>
 
@@ -49,60 +49,45 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-standalone</artifactId>
-			<version>[1.0,1.1)</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.4</version>
 		</dependency>
 		<dependency>
-			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>sincerity-service</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.threecrickets.sincerity.plugin</groupId>
-			<artifactId>sincerity-logging-legacy</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.6.4</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<directory>@CACHE@</directory>
+		<directory>../../../cache/maven</directory>
 
 		<plugins>
 			<!-- jar artifact -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<id>jar</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>attach-artifact</goal>
 						</goals>
 						<configuration>
-							<appendAssemblyId>false</appendAssemblyId>
-							<archive>
-								<manifestEntries>
-									<Package-Folders>package</Package-Folders>
-								</manifestEntries>
-							</archive>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
+							<artifacts>
+								<artifact>
+									<type>jar</type>
+									<file>../../../cache/jars/logging.jar</file>
+								</artifact>
+							</artifacts>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>dependencies</id>
-			<url>@DEPENDENCIES@</url>
-		</repository>
-	</repositories>
 
 </project>

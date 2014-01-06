@@ -1,5 +1,2 @@
 
-configuration.logger({
-	name: 'org.apache.hadoop.metrics2',
-	level: 'info'
-})
+repository.getLogger('org.apache.hadoop.metrics2').level = Level.INFO

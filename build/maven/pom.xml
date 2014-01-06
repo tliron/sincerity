@@ -54,6 +54,7 @@
 		<module>sincerity-jsdoc</module>
 		<module>plugins/logging</module>
 		<module>plugins/logging-mongodb</module>
+		<module>plugins/logging-legacy</module>
 		<module>plugins/redistribution</module>
 		<module>plugins/clojure</module>
 		<module>plugins/groovy</module>
