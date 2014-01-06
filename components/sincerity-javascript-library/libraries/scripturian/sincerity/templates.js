@@ -11,27 +11,9 @@
 // at http://threecrickets.com/
 //
 
-//
-// Templates: A simple-yet-powerful string interpolation implementation.
-// Template fillings can be JavaScript objects, JVM maps, functions,
-// or the serialized function arguments.
-//
-// Examples:
-//   'Created {count} animals of type {type}.'.cast(9, {count: 9, type: 'cat'})
-//
-//   'Created {0} animals of type {1}.'.cast(9, 'cat')
-//
-//   var values = {count: 9, type: 'cat'}
-//   'Created {count} animals of type {type}.'.cast(9, function(original, key) {
-//      return values[key]
-//   })
-//
-// Note: This library modifies the String prototype.
-//
-// Version 1.0
-//
-
-document.require('/sincerity/objects/')
+document.require(
+	'/sincerity/objects/',
+	'/sincerity/jvm/')
 
 var Sincerity = Sincerity || {}
 
@@ -104,6 +86,24 @@ Sincerity.Templates = Sincerity.Templates || function() {
 			return Sincerity.Objects.ensure(filling[key], original)
 		})
 	}
+    
+    /**
+     * Creates a filling using values from the JVM properties and/or the
+     * operating system environment.
+     * 
+     * @param {Boolean} addProperties Whether to add the JVM properties
+     * @param {Boolean} addEnv Whether to add the operating system environment
+     */
+    Public.createSystemFilling = function(addProperties, addEnv) {
+    	var filling = {}
+    	if (addProperties) {
+    		Sincerity.Objects.merge(filling, Sincerity.JVM.fromProperties(java.lang.System.properties))
+    	}
+    	if (addEnv) {
+    		Sincerity.Objects.merge(filling, Sincerity.JVM.fromMap(java.lang.System.getenv()))
+    	}
+    	return filling
+    }
 
 	//
 	// Initialization
