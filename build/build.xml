@@ -51,7 +51,13 @@
 			<pathelement location="${dependencies.jars}/org.bouncycastle/bcprov-jdk15+/${bouncycastle.version}/bcprov-jdk15+.jar" />
 		</classpath>
 	</taskdef>
-	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml" classpath="${dependencies.jars}/org.freecompany.redline/redline/${redline.version}/redline.jar" />
+	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml">
+		<classpath>
+			<pathelement location="${dependencies.jars}/org.freecompany.redline/redline/${redline.version}/redline.jar" />
+			<pathelement location="${dependencies.jars}/org.slf4j/slf4j-api/${slf4j.version}/slf4j-api.jar" />
+			<pathelement location="${dependencies.jars}/org.slf4j/slf4j-simple/${slf4j.version}/slf4j-simple.jar" />
+		</classpath>
+	</taskdef>
 	<taskdef name="izpack" classname="com.izforge.izpack.ant.IzPackTask" classpath="${dependencies.jars}/org.codehaus.izpack/izpack-standalone-compiler/${izpack.version}/izpack-standalone-compiler.jar" />
 	
 	<macrodef name="googledrive">
