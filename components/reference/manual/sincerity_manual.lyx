@@ -13319,35 +13319,11 @@ Other shortcuts include
 \begin_inset Quotes eld
 \end_inset
 
-result.ssl
-\begin_inset Quotes erd
-\end_inset
-
- (the Restlet SSL extension), 
-\begin_inset Quotes eld
-\end_inset
-
 restlet.simple
 \begin_inset Quotes erd
 \end_inset
 
- (the Restlet Simple server connector), and 
-\begin_inset Quotes eld
-\end_inset
-
-restlet.urlconnection
-\begin_inset Quotes erd
-\end_inset
-
- (the Restlet 
-\begin_inset Quotes eld
-\end_inset
-
-net
-\begin_inset Quotes erd
-\end_inset
-
- extension).
+ (the Restlet Simple server connector).
 \end_layout
 
 \begin_layout Standard
