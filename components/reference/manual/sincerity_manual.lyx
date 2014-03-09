@@ -5220,6 +5220,46 @@ sincerity override org.apache.velocity velocity 1.6
 \end_layout
 
 \begin_layout Subsubsection
+dependencies:freeze
+\begin_inset CommandInset label
+LatexCommand label
+name "dependencies:freeze"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Overrides the versions of all explicit and implicit dependencies to be their
+ 
+\emph on
+currently installed
+\emph default
+ versions.
+ This ensure that future runs of 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+artifacts:install
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "artifacts:install"
+
+\end_inset
+
+)
+\bar default
+ will result in exactly the same version installations.
+\end_layout
+
+\begin_layout Subsubsection
 dependencies:reset
 \begin_inset CommandInset label
 LatexCommand label

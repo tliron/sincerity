@@ -62,6 +62,8 @@ import com.threecrickets.sincerity.plugin.gui.LicensesPane;
  * <li><b>override</b>: overrides the version of an implicit dependency. The
  * three arguments are group, module name and version. Note that this does not
  * actually install the dependency.</li>
+ * <li><b>freeze</b>: sets the required versions of all dependencies to the
+ * versions that were actually installed in the "install" run.</li>
  * </ul>
  * Additionally, this plugin adds "Dependencies" and "Licenses" tabs and an
  * "Add and Install" button to the GUI.
@@ -93,7 +95,7 @@ public class DependenciesPlugin implements Plugin1
 	{
 		return new String[]
 		{
-			"dependencies", "licenses", "reset", "add", "revise", "remove", "exclude", "override"
+			"dependencies", "licenses", "reset", "add", "revise", "remove", "exclude", "override", "freeze"
 		};
 	}
 
@@ -222,6 +224,11 @@ public class DependenciesPlugin implements Plugin1
 			if( !dependencies.override( group, name, version ) )
 				if( command.getSincerity().getVerbosity() >= 1 )
 					command.getSincerity().getErr().println( "Dependency not overridden: " + group + ":" + name + " v" + version );
+		}
+		else if( "freeze".equals( commandName ) )
+		{
+			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			dependencies.freeze();
 		}
 		else
 			throw new UnknownCommandException( command );

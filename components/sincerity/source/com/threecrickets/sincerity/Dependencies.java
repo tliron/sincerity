@@ -491,7 +491,7 @@ public class Dependencies
 	 */
 	public boolean add( String group, String name, String version, boolean force, boolean transitive ) throws SincerityException
 	{
-		if( has( group, name, version ) )
+		if( has( group, name ) )
 			return false;
 
 		ModuleRevisionId id = ModuleRevisionId.newInstance( group, name, version );
@@ -530,7 +530,7 @@ public class Dependencies
 			{
 				i.remove();
 				id = ModuleRevisionId.newInstance( id, newVersion );
-				dependency = dependency.clone( id );
+				dependency = new DefaultDependencyDescriptor( moduleDescriptor, id, dependency.isForce(), dependency.isChanging(), dependency.isTransitive() );
 				i.add( dependency );
 				changed = true;
 				break;
@@ -664,6 +664,22 @@ public class Dependencies
 	}
 
 	/**
+	 * Sets the required versions of all explicit and implicit dependencies to
+	 * the those that were last resolved.
+	 * 
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public void freeze() throws SincerityException
+	{
+		if( container.getSincerity().getVerbosity() >= 1 )
+			container.getSincerity().getOut().println( "Freezing versions of all installed dependencies" );
+
+		for( ResolvedDependency resolvedDependency : getResolvedDependencies() )
+			freeze( resolvedDependency );
+	}
+
+	/**
 	 * Deletes all managed artifacts which no longer have an origin.
 	 * 
 	 * @throws SincerityException
@@ -686,40 +702,6 @@ public class Dependencies
 		getPackages().uninstall();
 		managedArtifacts.prune();
 		container.updateBootstrap();
-	}
-
-	/**
-	 * Ivy resolve: checks explicit dependencies' metadata, resolves implicit
-	 * dependency tree, downloads new dependencies, removes unused dependencies,
-	 * creates resolution report.
-	 * 
-	 * @return The resolve report
-	 * @throws SincerityException
-	 *         In case of an error
-	 */
-	private ResolveReport resolve() throws SincerityException
-	{
-		ivy.pushContext();
-		try
-		{
-			ResolveReport report = ivy.resolve( moduleDescriptor, defaultResolveOptions );
-			if( report.hasError() )
-				throw new SincerityException( "Some dependencies could not be installed" );
-			return report;
-
-		}
-		catch( ParseException x )
-		{
-			throw new SincerityException( "Parsing error while resolving dependencies", x );
-		}
-		catch( IOException x )
-		{
-			throw new SincerityException( "I/O error while resolving dependencies", x );
-		}
-		finally
-		{
-			ivy.popContext();
-		}
 	}
 
 	/**
@@ -807,6 +789,64 @@ public class Dependencies
 	private ResolvedDependencies resolvedDependencies;
 
 	private boolean printedDisclaimer;
+
+	/**
+	 * Ivy resolve: checks explicit dependencies' metadata, resolves implicit
+	 * dependency tree, downloads new dependencies, removes unused dependencies,
+	 * creates resolution report.
+	 * 
+	 * @return The resolve report
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	private ResolveReport resolve() throws SincerityException
+	{
+		ivy.pushContext();
+		try
+		{
+			ResolveReport report = ivy.resolve( moduleDescriptor, defaultResolveOptions );
+			if( report.hasError() )
+				throw new SincerityException( "Some dependencies could not be installed" );
+			return report;
+
+		}
+		catch( ParseException x )
+		{
+			throw new SincerityException( "Parsing error while resolving dependencies", x );
+		}
+		catch( IOException x )
+		{
+			throw new SincerityException( "I/O error while resolving dependencies", x );
+		}
+		finally
+		{
+			ivy.popContext();
+		}
+	}
+
+	/**
+	 * Sets the required versions of all explicit and implicit dependencies to
+	 * the those that were last resolved.
+	 * 
+	 * @param resolvedDependency
+	 *        The resolved dependency
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	private void freeze( ResolvedDependency resolvedDependency ) throws SincerityException
+	{
+		if( container.getSincerity().getVerbosity() >= 2 )
+			container.getSincerity().getOut().println( "Freezing: " + resolvedDependency );
+
+		ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
+		override( id.getOrganisation(), id.getName(), id.getRevision() );
+
+		for( Iterator<ResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
+		{
+			ResolvedDependency child = i.next();
+			freeze( child );
+		}
+	}
 
 	/**
 	 * Saves the Ivy module descriptor file (usually
