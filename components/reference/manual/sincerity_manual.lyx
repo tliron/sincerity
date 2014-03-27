@@ -1033,26 +1033,15 @@ ECMAScript
 \begin_inset Quotes erd
 \end_inset
 
-), but it will be baked into Oracle's JVM distribution from version 8, as
- the Nashorn engine.
- (Get it? 
-\begin_inset Quotes eld
+), but it is baked into the JVM (from version 8) as the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Nashorn"
+target "http://openjdk.java.net/projects/nashorn/"
+
 \end_inset
 
-Nashorn
-\begin_inset Quotes erd
-\end_inset
-
- is German for 
-\begin_inset Quotes eld
-\end_inset
-
-rhinoceros.
-\begin_inset Quotes erd
-\end_inset
-
-) Nashorn will also make good use of the dynamicinvoke opcode introduced
- in version 7, promising especially good performance.
+ engine.
 \end_layout
 
 \begin_layout Enumerate
@@ -3708,7 +3697,7 @@ all
 
 \begin_layout Subsubsection
 I'm getting 
-\begin_inset Quotes erd
+\begin_inset Quotes eld
 \end_inset
 
 java.lang.OutOfMemoryError: PermGen space
@@ -3827,7 +3816,7 @@ target "http://openjdk.java.net/jeps/122"
 .
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Subsubsection
 How do I force the use of Rhino with JVM 8?
 \end_layout
 
@@ -6993,8 +6982,15 @@ Though JavaScript was originally designed to be run in web browsers, it
  is a powerful general-purpose C-syntax language with Scheme-like closures
  that supports many programming paradigms, and has proved useful and popular
  outside the browser.
- Sincerity runs JavaScript code via either Nashorn (available in JVM 8)
- or 
+ Sincerity runs JavaScript code via either 
+\begin_inset CommandInset href
+LatexCommand href
+name "Nashorn"
+target "http://openjdk.java.net/projects/nashorn/"
+
+\end_inset
+
+ (available from JVM 8) or 
 \begin_inset CommandInset href
 LatexCommand href
 name "Rhino"
@@ -13363,7 +13359,15 @@ restlet.simple
 \begin_inset Quotes erd
 \end_inset
 
- (the Restlet Simple server connector).
+ (the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Simple Framework"
+target "http://www.simpleframework.org/"
+
+\end_inset
+
+ server connector).
 \end_layout
 
 \begin_layout Standard
@@ -13417,7 +13421,7 @@ restlet.logging
 \begin_inset Quotes erd
 \end_inset
 
- is preferred over Sincerity's 
+ is used here in preference over Sincerity's 
 \begin_inset Quotes eld
 \end_inset
 
