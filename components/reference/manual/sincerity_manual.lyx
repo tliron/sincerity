@@ -12192,6 +12192,13 @@ The Jetty skeletons use Jetty 9, which requires a JVM of at least version
 
 \begin_layout Subsubsection*
 Fleshing Out
+\begin_inset CommandInset label
+LatexCommand label
+name "jetty-fleshing-out"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -12230,13 +12237,129 @@ You can configure the server by editing
 \begin_inset Quotes eld
 \end_inset
 
-/programs/jetty.js
+/configuration/jetty/default.js
 \begin_inset Quotes erd
 \end_inset
 
 .
- For example, you can change the port, add an SSL connector (for https URLs)
- and configure new MIME types.
+ For example, you can change the port, enable SSL, and even SPDY.
+ Note that support for SPDY must be added as an 
+\begin_inset Quotes eld
+\end_inset
+
+extra
+\begin_inset Quotes erd
+\end_inset
+
+ (see below).
+\end_layout
+
+\begin_layout Standard
+For SSL, the example comes with a self-signed key stored in a Java KeyStore
+ (JKS) at 
+\begin_inset Quotes eld
+\end_inset
+
+/configuration/jetty/jetty.jks
+\begin_inset Quotes erd
+\end_inset
+
+.
+ You should use it only for testing! Otherwise, you will want to create
+ or import your own key using the 
+\begin_inset CommandInset href
+LatexCommand href
+name "“keytool” utility"
+target "http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/keytool.html"
+
+\end_inset
+
+ that is bundled with most JDKs.
+ Here's how to create a new, unique key:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+keytool -keystore jetty.jks -alias jetty -genkey -keyalg RSA
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Such self-created keys are useful for controlled intranet environments,
+ in which you can provide clients with the public key, but for Internet
+ applications you will likely want a key created by one of the “certificate
+ authorities” trusted by most web browsers.
+ Some of these certificate authorities may conveniently let you download
+ a key in JKS format.
+ Otherwise, if they support PKCS12 format, you can use keytool (only JVM
+ version 6 and later) to convert PKCS12 to JKS.
+ For example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+keytool -importkeystore -srcstoretype PKCS12 -srckeystore mysite.pkcs12 -destkeys
+tore jetty.jks
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If your certificate authority won't even let you download PKCS12 file, you
+ can create one from your “.key” and “.crt” (or “.pem”) files using 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenSSL"
+target "http://www.openssl.org/"
+
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "breaklines=true"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+openssl pkcs12 -inkey /path/mykey.key -in /path/mykey.crt -export -out mysite.pkcs1
+2 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+(Note that in this case you 
+\emph on
+must
+\emph default
+ give your new PKCS12 a non-empty password, or else keytool will fail with
+ an unhelpful error message.)
 \end_layout
 
 \begin_layout Subsubsection*
@@ -12410,6 +12533,15 @@ npn-boot.jar
 LatexCommand href
 name "your JVM version"
 target "http://www.eclipse.org/jetty/documentation/current/npn-chapter.html#npn-versions"
+
+\end_inset
+
+.
+ To test SPDY we recommend using 
+\begin_inset CommandInset href
+LatexCommand href
+name "spdycat"
+target "https://github.com/tatsuhiro-t/spdylay"
 
 \end_inset
 
@@ -12618,6 +12750,21 @@ official
 \end_inset
 
  Jetty, then you're in for a treat, as well as a sigh of relief.
+\end_layout
+
+\begin_layout Standard
+Configuration is handled similarly to the 
+\bar under
+Jetty web server skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jetty-fleshing-out"
+
+\end_inset
+
+)
+\bar default
+: in the same way, you can add SSL and SPDY support.
 \end_layout
 
 \begin_layout Standard
