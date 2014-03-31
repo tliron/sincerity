@@ -2154,8 +2154,19 @@ JVM_LIBRARIES: Extra libraries to add to the classpath.
 \end_layout
 
 \begin_layout Itemize
-JVM_SWITCHES: Extra switches to add to the JVM invocation.
- 
+JVM_BOOT_LIBRARIES: Extra libraries to prepend to the boot classpath (
+\begin_inset CommandInset href
+LatexCommand href
+name "-Xbootclasspath/p"
+target "http://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Itemize
+JVM_SWITCHES: Extra switches to add to the JVM command.
 \end_layout
 
 \begin_layout Subsection
@@ -12230,6 +12241,13 @@ You can configure the server by editing
 
 \begin_layout Subsubsection*
 Extras
+\begin_inset CommandInset label
+LatexCommand label
+name "jetty-web-extras"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -12275,6 +12293,130 @@ sincerity add logging : add service : install
 \end_layout
 
 \begin_layout Standard
+It is also possible to add 
+\begin_inset CommandInset href
+LatexCommand href
+name "SPDY"
+target "http://www.chromium.org/spdy/spdy-whitepaper"
+
+\end_inset
+
+ support: this protocol, supported by many web browsers, can improve the
+ user experience as well as reduce server load when using 
+\begin_inset Quotes eld
+\end_inset
+
+https
+\begin_inset Quotes erd
+\end_inset
+
+.
+ See the Jetty documentation for 
+\begin_inset CommandInset href
+LatexCommand href
+name "an example of creating a SPDY server"
+target "https://www.eclipse.org/jetty/documentation/current/embedded-examples.html#embedded-spdy-server"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+To install support for SPDY and the required 
+\begin_inset CommandInset href
+LatexCommand href
+name "NPN"
+target "http://technotes.googlecode.com/git/nextprotoneg.html"
+
+\end_inset
+
+ TLS extension:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity add jetty.spdy : install
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To enable NPN, you need to specify you 
+\begin_inset Quotes eld
+\end_inset
+
+npn-boot.jar
+\begin_inset Quotes erd
+\end_inset
+
+ in the 
+\bar under
+JVM_BOOT_LIBRARIES environment variable (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "environment-variables"
+
+\end_inset
+
+)
+\bar default
+, for example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+JVM_BOOT_LIBRARIES=/path/to/mycontainer/libraries/jars/org.mortbay.jetty.npn/npn-bo
+ot/1.1.6/npn-boot.jar 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+sincerity : start jetty
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You will need to change the path to point to the 
+\begin_inset Quotes eld
+\end_inset
+
+npn-boot.jar
+\begin_inset Quotes erd
+\end_inset
+
+ you are using.
+ Which version you should use depends on 
+\begin_inset CommandInset href
+LatexCommand href
+name "your JVM version"
+target "http://www.eclipse.org/jetty/documentation/current/npn-chapter.html#npn-versions"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 The following command will install a web server with the recommended plugins
  into a Sincerity container created in the current directory, and then start
  it a service:
@@ -12287,8 +12429,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add solr : add logging : add service : install
- : service jetty start
+sincerity create mycontainer : add jetty.web : add logging : add service
+ : install : service jetty start
 \end_layout
 
 \end_inset
@@ -12551,9 +12693,42 @@ sincerity add jetty.servlet.jsp : add jetty.servlet.jmx : install
 \end_layout
 
 \begin_layout Standard
-Also, a nice example of a Jetty server with multiple contexts is provided,
- with a static web server, a servlet container, and a web application installed
- as a WAR file:
+It is also possible to add 
+\begin_inset CommandInset href
+LatexCommand href
+name "SPDY"
+target "http://www.chromium.org/spdy/spdy-whitepaper"
+
+\end_inset
+
+ support: this protocol, supported by many web browsers, can improve the
+ user experience as well as reduce server load when using 
+\begin_inset Quotes eld
+\end_inset
+
+https
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For instructions, see the 
+\bar under
+Jetty web server skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jetty-web-extras"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Standard
+A nice example of a Jetty server with multiple contexts is also provided,
+ which includes a static web server, a servlet container, and a web application
+ installed as a WAR file:
 \end_layout
 
 \begin_layout Standard
@@ -13321,6 +13496,39 @@ sincerity add restlet.jetty8 : install
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+It is also possible to add 
+\begin_inset CommandInset href
+LatexCommand href
+name "SPDY"
+target "http://www.chromium.org/spdy/spdy-whitepaper"
+
+\end_inset
+
+ support to Jetty 9: this protocol, supported by many web browsers, can
+ improve the user experience as well as reduce server load when using 
+\begin_inset Quotes eld
+\end_inset
+
+https
+\begin_inset Quotes erd
+\end_inset
+
+.
+ For instructions, see the 
+\bar under
+Jetty web server skeleton (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jetty-web-extras"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Standard

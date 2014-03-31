@@ -14,6 +14,8 @@ set -e
 #    Used only in Darwin (Mac OS X). Defaults to "CurrentJDK".
 #  JVM_LIBRARIES
 #    Extra libraries to add to the classpath.
+#  JVM_BOOT_LIBRARIES
+#    Extra libraries to prepend to the boot classpath.
 #  JVM_SWITCHES
 #    Extra switches to add to the JVM invocation.
 #
@@ -96,6 +98,10 @@ fi
 #
 
 JVM_LIBRARIES="$JVM_LIBRARIES${JVM_LIBRARIES:+:}$SINCERITY_HOME/bootstrap.jar:$TOOLS"
+
+if [ -n "$JVM_BOOT_LIBRARIES" ]; then
+	JVM_SWITCHES="$JVM_SWITCHES -Xbootclasspath/p:$JVM_BOOT_LIBRARIES"
+fi
 
 #
 # Sincerity
