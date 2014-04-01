@@ -66,6 +66,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/config/LoggerConfig.html">org.apache.logging.log4j.core.config.LoggerConfig</a>}
 		 */
 		Public.logger = function(config) {
+			config = Sincerity.Objects.clone(config)
 			config.name = Sincerity.Objects.ensure(config.name, '')
 			config.async = Sincerity.Objects.ensure(config.async, true)
 			config.level = config.level || 'error'
@@ -152,8 +153,11 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param config
 		 * @param {String} config.name
 		 * @param config.layout {@link Sincerity.Log4J.Configuration#patternLayout}
+		 * @param {String} [config.layout.type='pattern']
 		 * @param config.strategy {@link Sincerity.Log4J.Configuration#defaultRolloverStrategy}
+		 * @param {String} [config.strategy.type='defaultRollover']
 		 * @param config.policy {@link Sincerity.Log4J.Configuration#sizeBasedTriggeringPolicy}
+		 * @param {String} [config.policy.type='sizeBasedTriggering']
 		 * @param {Boolean} [config.append=true]
 		 * @param {Boolean} [config.bufferedIO=true]
 		 * @param {Boolean} [config.immediateFlush=true]
@@ -164,6 +168,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/RollingFileAppender.html">org.apache.logging.log4j.core.appender.RollingFileAppender</a>}
 		 */
 		Public.rollingFileAppender = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.append)) {
 				config.append = config.append ? 'true' : 'false'
 			}
@@ -179,24 +184,44 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			if (Sincerity.Objects.exists(config.advertise)) {
 				config.advertise = config.advertise ? 'true' : 'false'
 			}
-			
-			var policy = Public.sizeBasedTriggeringPolicy(config.policy)
-			var strategy = Public.defaultRolloverStrategy(config.strategy)
-			var layout = Public.patternLayout(config.layout)
+
+			var policy = null
+			if (config.policy) {
+				var policyType = Sincerity.Objects.ensure(config.policy.type, 'sizeBasedTriggering')
+				if (policyType == 'sizeBasedTriggering') {
+					policy = Public.sizeBasedTriggeringPolicy(config.policy)
+				}
+			}
+
+			var strategy = null
+			if (config.strategy) {
+				var strategyType = Sincerity.Objects.ensure(config.strategy.type, 'defaultRollover')
+				if (strategyType == 'defaultRollover') {
+					strategy = Public.defaultRolloverStrategy(config.strategy)
+				}
+			}
+
+			var layout = null
+			if (config.layout) {
+				var layoutType = Sincerity.Objects.ensure(config.layout.type, 'pattern')
+				if (layoutType == 'pattern') {
+					layout = Public.patternLayout(config.layout)
+				}
+			}
 			
 			var appender = org.apache.logging.log4j.core.appender.RollingFileAppender.createAppender(
 				config.fileName || null, // fileName
 				config.filePattern || null, // filePattern
-				Sincerity.Objects.ensure(config.append, null), // append='true'
+				config.append || null, // append='true'
 				config.name || null, // name
-				Sincerity.Objects.ensure(config.bufferedIO, null), // bufferedIO='true'
-				Sincerity.Objects.ensure(config.immediateFlush, null), // immediateFlush='true'
+				config.bufferedIO || null, // bufferedIO='true'
+				config.immediateFlush || null, // immediateFlush='true'
 				policy, // policy
 				strategy, // strategy
 				layout, // layout
 				config.filter || null, // filter
-				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
-				Sincerity.Objects.ensure(config.advertise, null), // advertise
+				config.ignoreExceptions || null, // ignoreExceptions='true'
+				config.advertise || null, // advertise
 				config.advertiseURI || null, // advertiseURI
 				Public.configuration // config
 			)
@@ -210,6 +235,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param config
 		 * @param {String} config.name
 		 * @param config.layout {@link Sincerity.Log4J.Configuration#patternLayout}
+		 * @param {String} [config.layout.type='pattern']
 		 * @param {String} [config.target='SYSTEM_OUT']
 		 * @param {Boolean} [config.follow]
 		 * @param {Boolean} [config.ignoreExceptions=true]
@@ -217,6 +243,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/ConsoleAppender.html">org.apache.logging.log4j.core.appender.ConsoleAppender</a>}
 		 */
 		Public.consoleAppender = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.follow)) {
 				config.follow = config.follow ? 'true' : 'false'
 			}
@@ -224,15 +251,21 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
 			}
 	
-			var layout = Public.patternLayout(config.layout)
+			var layout = null
+			if (config.layout) {
+				var layoutType = Sincerity.Objects.ensure(config.layout.type, 'pattern')
+				if (layoutType == 'pattern') {
+					layout = Public.patternLayout(config.layout)
+				}
+			}
 	
 			var appender = org.apache.logging.log4j.core.appender.ConsoleAppender.createAppender(
 				layout, // layout
 				config.filter || null, // filter
 				config.target || null, // target='SYSTEM_OUT'
 				config.name || null, // name
-				Sincerity.Objects.ensure(config.follow, null), // follow
-				Sincerity.Objects.ensure(config.ignoreExceptions, null) // ignoreExceptions='true'
+				config.follow || null, // follow
+				config.ignoreExceptions || null // ignoreExceptions='true'
 			)
 			
 			Public.configuration.addAppender(appender)
@@ -244,6 +277,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param config
 		 * @param {String} config.name
 		 * @param config.layout {@link Sincerity.Log4J.Configuration#patternLayout}
+		 * @param {String} [config.layout.type='pattern']
 		 * @param {String} config.host
 		 * @param {String} config.port
 		 * @param {String} [config.protocol]
@@ -256,6 +290,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/SocketAppender.html">org.apache.logging.log4j.core.appender.SocketAppender</a>}
 		 */
 		Public.socketAppender = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.immediateFail)) {
 				config.immediateFail = config.immediateFail ? 'true' : 'false'
 			}
@@ -268,21 +303,27 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			if (Sincerity.Objects.exists(config.advertise)) {
 				config.advertise = config.advertise ? 'true' : 'false'
 			}
-	
-			var layout = config.layout ? Public.patternLayout(config.layout) : null
+
+			var layout = null
+			if (config.layout) {
+				var layoutType = Sincerity.Objects.ensure(config.layout.type, 'pattern')
+				if (layoutType == 'pattern') {
+					layout = Public.patternLayout(config.layout)
+				}
+			}
 	
 			var appender = org.apache.logging.log4j.core.appender.SocketAppender.createAppender(
 				config.host || null, // host
-				config.port ? String(config.port) : null, // portNum: the default for log4j server is 4560. The default for Ganymede is 4445.
+				Sincerity.Objects.exists(config.port) ? String(config.port) : null, // portNum: the default for log4j server is 4560. The default for Ganymede is 4445.
 				config.protocol || null, // protocol
 				config.reconnectionDelay || null, // reconnectionDelay
-				Sincerity.Objects.ensure(config.immediateFail, null), // immediateFail
+				config.immediateFail || null, // immediateFail
 				config.name || null, // name
-				Sincerity.Objects.ensure(config.immediateFlush, null), // immediateFlush
-				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
+				config.immediateFlush || null, // immediateFlush
+				config.ignoreExceptions || null, // ignoreExceptions='true'
 				layout, // layout
 				config.filter || null, // filter
-				Sincerity.Objects.ensure(config.advertise, null), // advertise
+				config.advertise || null, // advertise
 				Public.configuration // config
 			)
 			
@@ -295,23 +336,31 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param config
 		 * @param {String} config.name
 		 * @param config.provider {@link Sincerity.Log4J.Configuration#mongoDbProvider}
-		 * @param {String} [config.bufferSize] 
+		 * @param {String} [config.provider.type='mongoDb']
+		 * @param {String} [config.bufferSize]
 		 * @param {Boolean} [config.ignoreExceptions=true]
 		 * @param [config.filter] TODO
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/db/nosql/NoSQLAppender.html">org.apache.logging.log4j.core.appender.db.nosql.NoSQLAppender</a>}
 		 */
 		Public.noSqlAppender = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.ignoreExceptions)) {
 				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
 			}
 
-			var provider = Public.mongoDbProvider(config.provider)
+			var provider = null
+			if (config.provider) {
+				var providerType = Sincerity.Objects.ensure(config.provider.type, 'mongoDb')
+				if (providerType == 'mongoDb') {
+					provider = Public.mongoDbProvider(config.provider)
+				}
+			}
 			
 			var appender = org.apache.logging.log4j.core.appender.db.nosql.NoSQLAppender.createAppender(
 				config.name || null, // name
-				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
+				config.ignoreExceptions || null, // ignoreExceptions='true'
 				config.filter || null, // filter
-				config.bufferSize ? String(config.bufferSize) : null, // bufferSize
+				Sincerity.Objects.exists(config.bufferSize) ? String(config.bufferSize) : null, // bufferSize
 				provider // provider
 			)
 			
@@ -325,16 +374,27 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param {String} config.name
 		 * @param {String[]} config.appenders
 		 * @param config.policy {@link Sincerity.Log4J.Configuration#propertiesRewritePolicy}
+		 * @param {String} [config.policy.type='propertiesRewrite']
 		 * @param {Boolean} [config.ignoreExceptions=true]
 		 * @param [config.filter] TODO
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rewrite/RewriteAppender.html">org.apache.logging.log4j.core.appender.rewrite.RewriteAppender</a>}
 		 */
 		Public.rewriteAppender = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.ignoreExceptions)) {
 				config.ignoreExceptions = config.ignoreExceptions ? 'true' : 'false'
 			}
 			
-			var policy = Public.propertiesRewritePolicy(config.policy)
+			var policy = null
+			if (config.policy) {
+				var policyType = Sincerity.Objects.ensure(config.policy.type, 'propertiesRewrite')
+				if (policyType == 'propertiesRewrite') {
+					policy = Public.propertiesRewritePolicy(config.policy)
+				}
+				else if (policyType == 'mapRewrite') {
+					policy = Public.mapRewritePolicy(config.policy)
+				}
+			}
 
 			var size = 0
 			for (var key in config.appenders) {
@@ -353,7 +413,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 
 			var appender = org.apache.logging.log4j.core.appender.rewrite.RewriteAppender.createAppender(
 				config.name || null, // name
-				Sincerity.Objects.ensure(config.ignoreExceptions, null), // ignoreExceptions='true'
+				config.ignoreExceptions || null, // ignoreExceptions='true'
 				appenders, // appenderRefs,
 				Public.configuration, // configuration
 				policy, // rewritePolicy
@@ -426,12 +486,17 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param {String} config.pattern
 		 * @param {String} [config.charset]
 		 * @param {Boolean} [config.alwaysWriteExceptions=true]
+		 * @param {Boolean} [config.noConsoleNoAnsiStr=false]
 		 * @param [config.replace] TODO
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/layout/PatternLayout.html">org.apache.logging.log4j.core.layout.PatternLayout</a>}
 		 */
 		Public.patternLayout = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.alwaysWriteExceptions)) {
 				config.alwaysWriteExceptions = config.alwaysWriteExceptions ? 'true' : 'false'
+			}
+			if (Sincerity.Objects.exists(config.noConsoleNoAnsiStr)) {
+				config.noConsoleNoAnsiStr = config.noConsoleNoAnsiStr ? 'true' : 'false'
 			}
 			
 			return org.apache.logging.log4j.core.layout.PatternLayout.createLayout(
@@ -439,7 +504,8 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				Public.configuration, // config
 				config.replace || null, // replace
 				config.charset || null, // charset
-				Sincerity.Objects.ensure(config.alwaysWriteExceptions, null) // always='true'
+				config.alwaysWriteExceptions || null, // always='true'
+				config.noConsoleNoAnsiStr || null // ='false'
 			)
 		}
 	
@@ -453,10 +519,10 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 */
 		Public.defaultRolloverStrategy = function(config) {
 			return org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy.createStrategy(
-				config.max ? String(config.max) : null, // max
-				config.min ? String(config.min) : null, // min
+				Sincerity.Objects.exists(config.max) ? String(config.max) : null, // max
+				Sincerity.Objects.exists(config.min) ? String(config.min) : null, // min
 				config.fileIndex || null, // fileIndex='max'
-				config.compressionLevel ? String(config.compressionLevel) : null, // compressionLevel
+				Sincerity.Objects.exists(config.compressionLevel) ? String(config.compressionLevel) : null, // compressionLevel
 				Public.configuration // config
 			)
 		}
@@ -468,16 +534,17 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param {String} [config.server]
 		 * @param {String} [config.port]
 		 * @param {String} [config.username]
-		 * @param {String} [config.passwrd]
+		 * @param {String} [config.password]
 		 * @param {String} [config.writeConcernConstant]
 		 * @param {String} [config.writeConcernConstantClass]
 		 * @param {String} [config.factoryClassName]
 		 * @param {String} [config.factoryMethodName]
 		 * @param {<a href="http://api.mongodb.org/java/current/index.html?com/mongodb/MongoClient.html">com.mongodb.MongoClient</a>} [config.client]
 		 * @param {<a href="http://api.mongodb.org/java/current/index.html?com/mongodb/DB.html">com.mongodb.DB</a>} [config.db]
-		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/db/nosql/mongo/MongoDBProvider.html">org.apache.logging.log4j.core.appender.db.nosql.mongo.MongoDBProvider</a>}
+		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/db/nosql/mongodb/MongoDBProvider.html">org.apache.logging.log4j.core.appender.db.nosql.mongodb.MongoDBProvider</a>}
 		 */
 		Public.mongoDbProvider = function(config) {
+			config = Sincerity.Objects.clone(config)
 			if (Sincerity.Objects.exists(config.client)) {
 				com.threecrickets.sincerity.logging.MongoDbFactory.client = config.client
 				config.factoryClassName = 'com.threecrickets.sincerity.logging.MongoDbFactory'
@@ -490,14 +557,14 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			}
 			
 			// See: https://issues.apache.org/jira/browse/LOG4J2-474
-			//return org.apache.logging.log4j.core.appender.db.nosql.mongo.MongoDBProvider.createNoSQLProvider(
+			//return org.apache.logging.log4j.core.appender.db.nosql.mongodb.MongoDBProvider.createNoSQLProvider(
 			return com.threecrickets.sincerity.logging.MongoDbLog4jProvider.createNoSQLProvider(
 				config.collectionName || null, // collectionName
 				config.writeConcernConstant || null, // writeConcernConstant
 				config.writeConcernConstantClass || null, // writeConcernConstantClass
 				config.databaseName || null, // databaseName
 				config.server || null, // server
-				config.port || null, // port
+				Sincerity.Objects.exists(config.port) ? String(config.port) : null, // port
 				config.username || null, // username
 				config.password || null, // password
 				config.factoryClassName || null, // factoryClassName

@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.appender.AppenderLoggingException;
 import org.apache.logging.log4j.core.appender.db.nosql.NoSQLConnection;
 import org.apache.logging.log4j.core.appender.db.nosql.NoSQLObject;
-import org.apache.logging.log4j.core.appender.db.nosql.mongo.MongoDBObject;
+import org.apache.logging.log4j.core.appender.db.nosql.mongodb.MongoDBObject;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.bson.BSON;
 import org.bson.Transformer;
@@ -31,7 +31,7 @@ import com.mongodb.WriteResult;
 
 /**
  * Temporary fix for <a
- * href="https://issues.apache.org/jira/browse/LOG4J2-475">LOG4J2-475</a>.
+ * href="https://issues.apache.org/jira/browse/LOG4J2-591">LOG4J2-591</a>.
  * 
  * @author Tal Liron
  */
@@ -100,7 +100,8 @@ public final class MongoDbLog4jConnection implements NoSQLConnection<BasicDBObje
 	@Override
 	public void close()
 	{
-		this.mongo.close();
+		// See: https://issues.apache.org/jira/browse/LOG4J2-591
+		// this.mongo.close();
 	}
 
 	@Override
