@@ -750,7 +750,6 @@ public class Dependencies
 
 			if( container.hasFinishedInstalling() )
 				printDisclaimer( container.getSincerity().getOut() );
-
 		}
 		else
 		{

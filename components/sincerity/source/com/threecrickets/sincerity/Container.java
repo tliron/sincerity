@@ -127,7 +127,7 @@ public class Container implements IvyListener, TransferListener
 		}
 
 		// Resolution cache manager
-		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( ivy.getSettings().getDefaultResolutionCacheBasedir() ) );
+		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( new File( ivy.getSettings().getDefaultResolutionCacheBasedir(), "cache/sincerity" ), getSincerityFile( "resolution" ) ) );
 
 		File configuration = getFile( "configuration", "sincerity" );
 		configuration.mkdirs();

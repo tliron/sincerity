@@ -39,10 +39,10 @@ public class ExtendedResolutionCacheManager extends DefaultResolutionCacheManage
 	// Construction
 	//
 
-	public ExtendedResolutionCacheManager( File baseDir )
+	public ExtendedResolutionCacheManager( File cacheBaseDir, File reportBaseDir )
 	{
-		super( new File( baseDir, "cache/sincerity" ) );
-		resolveReportRoot = new File( getResolutionCacheRoot(), "resolution" );
+		super( cacheBaseDir );
+		resolveReportRoot = reportBaseDir;
 		setResolvedIvyPattern( RESOLVED_IVY_PATTERN );
 		setResolvedIvyPropertiesPattern( RESOLVED_IVY_PROPERTIES_PATTERN );
 	}

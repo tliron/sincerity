@@ -1703,6 +1703,8 @@ Sincerity can only point to one container at a time.
 
 \begin_layout Enumerate
 You can change the container or explicitly point to one using the 
+\bar under
+
 \begin_inset Quotes eld
 \end_inset
 
@@ -1710,7 +1712,16 @@ container:use
 \begin_inset Quotes erd
 \end_inset
 
- command.
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "container:use"
+
+\end_inset
+
+)
+\bar default
+.
 \end_layout
 
 \begin_layout Enumerate
@@ -2137,6 +2148,37 @@ Rhino
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Itemize
+SINCERITY_CONTAINER: The path of the container to use.
+ If not specified, will search up the filesystem tree from the current path.
+ See also the 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+container:use
+\begin_inset Quotes erd
+\end_inset
+
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "container:use"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Itemize
+SINCERITY_DEBUG: An integer specifying the internal debug level.
+ Higher numbers will display more debugging information.
+ Defaults to 0.
 \end_layout
 
 \begin_layout Itemize
