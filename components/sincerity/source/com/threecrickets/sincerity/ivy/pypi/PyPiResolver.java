@@ -800,34 +800,41 @@ public class PyPiResolver extends BasicResolver
 	{
 		ArrayList<ModuleRevisionId> dependencyIds = new ArrayList<ModuleRevisionId>();
 		ZipFile zip = new ZipFile( eggFile );
-		ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
-		if( requiresEntry != null )
+		try
 		{
-			List<String> lines = IoUtil.readLines( zip.getInputStream( requiresEntry ) );
-			for( String line : lines )
+			ZipEntry requiresEntry = zip.getEntry( REQUIRES_FILENAME );
+			if( requiresEntry != null )
 			{
-				String name = null, dependencyVersion = null;
-				if( line.contains( "==" ) )
+				List<String> lines = IoUtil.readLines( zip.getInputStream( requiresEntry ) );
+				for( String line : lines )
 				{
-					String[] split = line.split( "==", 2 );
-					name = split[0];
-					dependencyVersion = split[1];
-				}
-				else if( line.contains( ">=" ) )
-				{
-					// See:
-					// https://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependency.html#revision
-					String[] split = line.split( ">=", 2 );
-					name = split[0];
-					dependencyVersion = "[" + split[1] + ",)";
-				}
-				if( name != null )
-				{
-					name = PyPi.EGG_MODE_PREFIX + name;
-					ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
-					dependencyIds.add( dependencyId );
+					String name = null, dependencyVersion = null;
+					if( line.contains( "==" ) )
+					{
+						String[] split = line.split( "==", 2 );
+						name = split[0];
+						dependencyVersion = split[1];
+					}
+					else if( line.contains( ">=" ) )
+					{
+						// See:
+						// https://ant.apache.org/ivy/history/latest-milestone/ivyfile/dependency.html#revision
+						String[] split = line.split( ">=", 2 );
+						name = split[0];
+						dependencyVersion = "[" + split[1] + ",)";
+					}
+					if( name != null )
+					{
+						name = PyPi.EGG_MODE_PREFIX + name;
+						ModuleRevisionId dependencyId = ModuleRevisionId.newInstance( getOrganisation(), name, dependencyVersion );
+						dependencyIds.add( dependencyId );
+					}
 				}
 			}
+		}
+		finally
+		{
+			zip.close();
 		}
 		return dependencyIds;
 	}
