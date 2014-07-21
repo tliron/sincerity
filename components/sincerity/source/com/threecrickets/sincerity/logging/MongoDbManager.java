@@ -90,40 +90,50 @@ public class MongoDbManager extends AbstractDatabaseManager
 	@Override
 	protected void startupInternal() throws Exception
 	{
+		MongoClientURI uri = this.uri;
+		if( uri == null )
+			uri = new MongoClientURI( "mongodb://localhost:27017/" );
+
+		try
+		{
+			client = new MongoClient( uri );
+		}
+		catch( UnknownHostException e )
+		{
+			throw new AppenderLoggingException( "Can't connect to MongoDB: " + uri, e );
+		}
+
+		db = client.getDB( dbName );
+		if( db == null )
+		{
+			client.close();
+			client = null;
+			throw new AppenderLoggingException( "Can't access MongoDB database: " + dbName );
+		}
+
+		collection = db.getCollection( collectionName );
+		if( collection == null )
+		{
+			client.close();
+			client = null;
+			db = null;
+			throw new AppenderLoggingException( "Can't access MongoDB collection: " + collectionName );
+		}
 	}
 
 	@Override
 	protected void shutdownInternal() throws Exception
 	{
-		commitAndClose();
+		if( client != null )
+			client.close();
+		client = null;
+		db = null;
+		collection = null;
 	}
 
 	@Override
 	protected void connectAndStart()
 	{
-		if( client == null )
-		{
-			MongoClientURI uri = this.uri;
-			if( uri == null )
-				uri = new MongoClientURI( "mongodb://localhost:27017/" );
-
-			try
-			{
-				client = new MongoClient( uri );
-			}
-			catch( UnknownHostException e )
-			{
-				throw new AppenderLoggingException( "Can't connect to MongoDB: " + uri, e );
-			}
-		}
-
-		db = client.getDB( dbName );
-		if( db == null )
-			throw new AppenderLoggingException( "Can't access MongoDB database: " + dbName );
-
-		collection = db.getCollection( collectionName );
-		if( collection == null )
-			throw new AppenderLoggingException( "Can't access MongoDB collection: " + collectionName );
 	}
 
 	@Override
@@ -134,7 +144,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 
 		BasicDBObject o = new BasicDBObject();
 
-		o.put( "time", new Date( event.getTimeMillis() ) );
+		o.put( "timestamp", new Date( event.getTimeMillis() ) );
 		o.put( "logger", event.getLoggerName() );
 
 		Level level = event.getLevel();
@@ -193,10 +203,6 @@ public class MongoDbManager extends AbstractDatabaseManager
 	@Override
 	protected void commitAndClose()
 	{
-		client.close();
-		client = null;
-		db = null;
-		collection = null;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

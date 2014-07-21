@@ -1,6 +1,4 @@
 
-document.require('/mongo-db/')
-
 configuration.mongoDbAppender({
 	name: 'raw:mongoDb:common',
 	uri: 'mongodb://localhost:27017/',
