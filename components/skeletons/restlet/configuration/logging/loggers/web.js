@@ -1,7 +1,7 @@
 
 configuration.logger({
 	name: 'web', // 'org.restlet.Component.LogService'
-	level: 'all',
+	level: 'info',
 	appenders: ['mongoDb:web', 'file:web'],
 	additivity: false
 })

@@ -15,14 +15,15 @@ import java.net.URI;
 
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 
 /**
  * A simple configuration factory that returns a specified instance of
- * {@link ProgrammableLog4jConfiguration}.
+ * {@link ProgrammableConfiguration}.
  * 
  * @author Tal Liron
  */
-public class ProgrammableLog4jConfigurationFactory extends ConfigurationFactory
+public class ProgrammableConfigurationFactory extends ConfigurationFactory
 {
 	//
 	// Construction
@@ -34,7 +35,7 @@ public class ProgrammableLog4jConfigurationFactory extends ConfigurationFactory
 	 * @param configuration
 	 *        The configuration
 	 */
-	public ProgrammableLog4jConfigurationFactory( Configuration configuration )
+	public ProgrammableConfigurationFactory( Configuration configuration )
 	{
 		super();
 		this.configuration = configuration;

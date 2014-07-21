@@ -1,15 +1,11 @@
 
 document.require('/mongo-db/')
 
-var client = MongoDB.connect('localhost:27017')
-
-configuration.noSqlAppender({
+configuration.mongoDbAppender({
 	name: 'raw:mongoDb:common',
-	provider: {
-		client: client,
-		databaseName: 'logs',
-		collectionName: 'common'
-	}
+	uri: 'mongodb://localhost:27017/',
+	db: 'logs',
+	collection: 'common'
 })
 
 var origin = java.net.InetAddress.localHost.hostAddress

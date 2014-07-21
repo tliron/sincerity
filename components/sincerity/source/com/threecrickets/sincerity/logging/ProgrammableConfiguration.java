@@ -19,9 +19,10 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.config.BaseConfiguration;
+import org.apache.logging.log4j.core.config.AbstractConfiguration;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.helpers.NameUtil;
+import org.apache.logging.log4j.core.util.NameUtil;
 
 import com.threecrickets.sincerity.Sincerity;
 
@@ -30,7 +31,7 @@ import com.threecrickets.sincerity.Sincerity;
  * 
  * @author Tal Liron
  */
-public class ProgrammableLog4jConfiguration extends BaseConfiguration
+public class ProgrammableConfiguration extends AbstractConfiguration
 {
 	//
 	// Construction
@@ -42,9 +43,9 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 	 * @param name
 	 *        The configuration name
 	 */
-	public ProgrammableLog4jConfiguration( String name )
+	public ProgrammableConfiguration( String name )
 	{
-		super();
+		super( ConfigurationSource.NULL_SOURCE );
 		setName( name );
 	}
 
@@ -59,9 +60,9 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 	{
 		Sincerity sincerity = Sincerity.getCurrent();
 		if( ( sincerity != null ) && sincerity.getVerbosity() >= 2 )
-			sincerity.getOut().println( "Using log4j configuration: " + getName() );
+			sincerity.getOut().println( "Using Log4j configuration: " + getName() );
 
-		new ProgrammableLog4jConfigurationFactory( this ).use();
+		new ProgrammableConfigurationFactory( this ).use();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -70,8 +71,8 @@ public class ProgrammableLog4jConfiguration extends BaseConfiguration
 	@Override
 	protected void doConfigure()
 	{
-		// Unfortunately, BaseConfiguration uses a private "root" field, which
-		// we cannot easily affect, and that field is used in its private
+		// Unfortunately, AbstractConfiguration uses a private "root" field,
+		// which we cannot easily affect, and that field is used in its private
 		// setParents() method. Thus, we will need to calculate the parenthood
 		// ourselves, using our own known root.
 
