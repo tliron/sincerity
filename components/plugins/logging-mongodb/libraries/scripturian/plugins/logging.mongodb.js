@@ -1,5 +1,5 @@
 
-var TEMPLATE = '{formattedTimestamp} {level} {context.origin} [{logger}] {message}'
+var TEMPLATE = '{formattedTimestamp} {level} {thread.contextMap.origin} [{logger}] {message}'
 var TIME_FORMAT = 'yyy-MM-dd HH:mm:ss,SSS'
 
 /*
@@ -8,15 +8,14 @@ Available template values:
 formattedTimestamp
 level
 logger
+marker
 message
 source.class
 source.method
 source.file
 source.line
-marker
-thread
-context.origin
-stack
+thread.name
+thread.contextMap.origin
 */
 
 document.require(
