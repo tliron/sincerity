@@ -21,6 +21,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.util.Booleans;
 
 import com.mongodb.MongoClientURI;
+import com.mongodb.WriteConcern;
 
 /**
  * A Log4j appender for MongoDB.
@@ -48,24 +49,28 @@ public class MongoDbAppender extends AbstractDatabaseAppender<MongoDbManager>
 	 *        If an integer greater than 0, this causes the appender to buffer
 	 *        log events and flush whenever the buffer reaches this size.
 	 * @param uri
-	 *        TODO
+	 *        The MongoDB URI (see {@link MongoClientURI})
 	 * @param db
-	 *        TODO
+	 *        The MongoDB database name
 	 * @param collection
-	 *        TODO
+	 *        The MongoDB collection name
+	 * @param writeConcern
+	 *        The MongoDB write concern (see
+	 *        {@link WriteConcern#valueOf(String)})
 	 * @return a new JDBC appender.
 	 */
 	@PluginFactory
 	public static MongoDbAppender createAppender( @PluginAttribute("name") final String name, @PluginAttribute("ignoreExceptions") final String ignore, @PluginElement("Filter") final Filter filter,
-		@PluginAttribute("bufferSize") final String bufferSize, @PluginAttribute("uri") final String uri, @PluginAttribute("db") final String db, @PluginAttribute("collection") final String collection )
+		@PluginAttribute("bufferSize") final String bufferSize, @PluginAttribute("uri") final String uri, @PluginAttribute("db") final String db, @PluginAttribute("collection") final String collection,
+		@PluginAttribute("writeConcern") final String writeConcern )
 	{
 		int bufferSizeInt = AbstractAppender.parseInt( bufferSize, 0 );
 		boolean ignoreExceptions = Booleans.parseBoolean( ignore, true );
 
 		StringBuilder managerName = new StringBuilder( "mongoDbManager{ description=" ).append( name ).append( ", bufferSize=" ).append( bufferSizeInt ).append( ", uri=" ).append( uri ).append( ", db=" ).append( db )
-			.append( ", collection=" ).append( collection ).append( " }" );
+			.append( ", collection=" ).append( collection ).append( ", writeConcern=" ).append( writeConcern ).append( " }" );
 
-		MongoDbManager manager = MongoDbManager.getMongoDbManager( managerName.toString(), bufferSizeInt, new MongoClientURI( uri ), null, db, collection );
+		MongoDbManager manager = MongoDbManager.getMongoDbManager( managerName.toString(), bufferSizeInt, new MongoClientURI( uri ), null, db, collection, writeConcern );
 		if( manager == null )
 			return null;
 

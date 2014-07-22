@@ -31,6 +31,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
+import com.mongodb.WriteConcern;
 
 /**
  * A Log4j database manager for MongoDB.
@@ -53,18 +54,22 @@ public class MongoDbManager extends AbstractDatabaseManager
 	 * @param bufferSize
 	 *        The size of the log event buffer.
 	 * @param uri
-	 *        TODO
+	 *        The MongoDB URI (see {@link MongoClientURI}) (not used if "client"
+	 *        is specified)
 	 * @param client
-	 *        TODO
+	 *        The MongoDB client (not used if "uri" is specified)
 	 * @param dbName
-	 *        TODO
+	 *        The MongoDB database name
 	 * @param collectionName
-	 *        TODO
+	 *        The MongoDB collection name
+	 * @param writeConcernName
+	 *        The MongoDB write concern (see
+	 *        {@link WriteConcern#valueOf(String)})
 	 * @return a new or existing MongoDB manager as applicable.
 	 */
-	public static MongoDbManager getMongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName )
+	public static MongoDbManager getMongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
 	{
-		return AbstractDatabaseManager.getManager( name, new FactoryData( bufferSize, uri, client, dbName, collectionName ), FACTORY );
+		return AbstractDatabaseManager.getManager( name, new FactoryData( bufferSize, uri, client, dbName, collectionName, writeConcernName ), FACTORY );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -74,13 +79,14 @@ public class MongoDbManager extends AbstractDatabaseManager
 	// Construction
 	//
 
-	protected MongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String db, String collectionName )
+	protected MongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String db, String collectionName, String writeConcernName )
 	{
 		super( name, bufferSize );
 		this.uri = uri;
 		this.client = client;
 		this.dbName = db;
 		this.collectionName = collectionName;
+		this.writeConcernName = writeConcernName;
 	}
 
 	//
@@ -90,6 +96,9 @@ public class MongoDbManager extends AbstractDatabaseManager
 	@Override
 	protected void startupInternal() throws Exception
 	{
+		if( client != null )
+			return;
+
 		MongoClientURI uri = this.uri;
 		if( uri == null )
 			uri = new MongoClientURI( "mongodb://localhost:27017/" );
@@ -118,6 +127,14 @@ public class MongoDbManager extends AbstractDatabaseManager
 			client = null;
 			db = null;
 			throw new AppenderLoggingException( "Can't access MongoDB collection: " + collectionName );
+		}
+
+		if( writeConcernName != null )
+		{
+			WriteConcern writeConcern = WriteConcern.valueOf( writeConcernName );
+			if( writeConcern == null )
+				throw new AppenderLoggingException( "Unsupported MongoDB write concern: " + writeConcernName );
+			collection.setWriteConcern( writeConcern );
 		}
 	}
 
@@ -151,11 +168,13 @@ public class MongoDbManager extends AbstractDatabaseManager
 		if( level != null )
 			o.put( "level", level.name() );
 
+		Marker marker = event.getMarker();
+		if( marker != null )
+			o.put( "marker", marker.getName() );
+
 		Message message = event.getMessage();
 		if( message != null )
 			o.put( "message", message.getFormattedMessage() );
-
-		o.put( "thread", event.getThreadName() );
 
 		StackTraceElement eventSource = event.getSource();
 		if( eventSource != null )
@@ -168,27 +187,29 @@ public class MongoDbManager extends AbstractDatabaseManager
 			o.put( "source", source );
 		}
 
-		Map<String, String> eventContext = event.getContextMap();
-		if( eventContext != null )
+		BasicDBObject thread = new BasicDBObject();
+
+		thread.put( "name", event.getThreadName() );
+
+		Map<String, String> eventContextMap = event.getContextMap();
+		if( eventContextMap != null )
 		{
-			BasicDBObject context = new BasicDBObject();
-			for( Map.Entry<String, String> entry : eventContext.entrySet() )
-				context.put( entry.getKey(), entry.getValue() );
-			o.put( "context", context );
+			BasicDBObject contextMap = new BasicDBObject();
+			for( Map.Entry<String, String> entry : eventContextMap.entrySet() )
+				contextMap.put( entry.getKey(), entry.getValue() );
+			thread.put( "contextMap", contextMap );
 		}
 
-		ContextStack eventStack = event.getContextStack();
-		if( eventStack != null )
+		ContextStack eventContextStack = event.getContextStack();
+		if( eventContextStack != null )
 		{
-			BasicDBList stack = new BasicDBList();
-			for( String entry : eventStack )
-				stack.add( entry );
-			o.put( "stack", stack );
+			BasicDBList contextStack = new BasicDBList();
+			for( String entry : eventContextStack )
+				contextStack.add( entry );
+			thread.put( "contextStack", contextStack );
 		}
 
-		Marker marker = event.getMarker();
-		if( marker != null )
-			o.put( "marker", marker.getName() );
+		o.put( "thread", thread );
 
 		try
 		{
@@ -216,35 +237,13 @@ public class MongoDbManager extends AbstractDatabaseManager
 
 	private final String collectionName;
 
+	private final String writeConcernName;
+
 	private MongoClient client;
 
 	private DB db;
 
 	private DBCollection collection;
-
-	/**
-	 * Encapsulates data that {@link MongoDbManagerFactory} uses to create
-	 * managers.
-	 */
-	private static final class FactoryData extends AbstractDatabaseManager.AbstractFactoryData
-	{
-		protected FactoryData( final int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName )
-		{
-			super( bufferSize );
-			this.uri = uri;
-			this.client = client;
-			this.dbName = dbName;
-			this.collectionName = collectionName;
-		}
-
-		private final MongoClientURI uri;
-
-		private final MongoClient client;
-
-		private final String dbName;
-
-		private final String collectionName;
-	}
 
 	/**
 	 * Creates managers.
@@ -254,7 +253,34 @@ public class MongoDbManager extends AbstractDatabaseManager
 		@Override
 		public MongoDbManager createManager( final String name, final FactoryData data )
 		{
-			return new MongoDbManager( name, data.getBufferSize(), data.uri, data.client, data.dbName, data.collectionName );
+			return new MongoDbManager( name, data.getBufferSize(), data.uri, data.client, data.dbName, data.collectionName, data.writeConcernName );
 		}
+	}
+
+	/**
+	 * Encapsulates data that {@link MongoDbManagerFactory} uses to create
+	 * managers.
+	 */
+	private static final class FactoryData extends AbstractDatabaseManager.AbstractFactoryData
+	{
+		protected FactoryData( final int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
+		{
+			super( bufferSize );
+			this.uri = uri;
+			this.client = client;
+			this.dbName = dbName;
+			this.collectionName = collectionName;
+			this.writeConcernName = writeConcernName;
+		}
+
+		private final MongoClientURI uri;
+
+		private final MongoClient client;
+
+		private final String dbName;
+
+		private final String collectionName;
+
+		private final String writeConcernName;
 	}
 }

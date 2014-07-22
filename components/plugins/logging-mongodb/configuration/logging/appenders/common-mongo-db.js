@@ -3,7 +3,8 @@ configuration.mongoDbAppender({
 	name: 'raw:mongoDb:common',
 	uri: 'mongodb://localhost:27017/',
 	db: 'logs',
-	collection: 'common'
+	collection: 'common',
+	writeConcern: 'acknowledged'
 })
 
 var origin = java.net.InetAddress.localHost.hostAddress

@@ -353,6 +353,10 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param {String} [config.bufferSize]
 		 * @param {Boolean} [config.ignoreExceptions=true]
 		 * @param [config.filter] TODO
+		 * @param [config.uri]
+		 * @param [config.db]
+		 * @param [config.collection]
+		 * @param [config.writeConcern]
 		 * @returns {<a href="">com.threecrickets.sincerity.logging.MongoDbAppender</a>}
 		 */
 		Public.mongoDbAppender = function(config) {
@@ -368,7 +372,8 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				Sincerity.Objects.exists(config.bufferSize) ? String(config.bufferSize) : null, // bufferSize
 				config.uri || null, // uri
 				config.db || null, // db
-				config.collection || null // collection
+				config.collection || null, // collection
+				config.writeConcern || null // writeConcern
 			)
 			
 			Public.configuration.addAppender(appender)
