@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass article
@@ -17,13 +17,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -34,15 +34,24 @@
 \use_hyperref false
 \papersize default
 \use_geometry true
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 0
 \index Index
 \shortcut idx
@@ -7252,6 +7261,11 @@ sincerity python
 
 \end_layout
 
+\begin_layout Quote
+Ruby note: Due to conflicts in their implementations, you cannot currently
+ use the Python and Ruby plugins in the same container.
+\end_layout
+
 \begin_layout Subsubsection*
 Fleshing Out
 \end_layout
@@ -7537,6 +7551,11 @@ sincerity ruby
 \end_inset
 
 
+\end_layout
+
+\begin_layout Quote
+Python note: Due to conflicts in their implementations, you cannot currently
+ use the Python and Ruby plugins in the same container.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -8610,6 +8629,8 @@ target "http://logging.apache.org/log4j/"
 
 , which was the inspiration for JULI, enjoys broad support and a more robust
  implementation.
+ Especially since Log4j 2.0, it provides state-of-the-art scalability for
+ high loads using innovative asynchronous handling.
  We've thus preferred to use Log4j for our actual implementation, and rely
  on the excellent 
 \begin_inset CommandInset href
@@ -8621,7 +8642,7 @@ target "http://www.slf4j.org/"
 
  library for bridging JULI to it.
  SLF4J has become popular enough that several libraries support it directly,
- so that we can even avoid the minimal overhead introduced by bridging.
+ so that we can avoid even the minimal overhead introduced by bridging.
 \end_layout
 
 \begin_layout Standard
@@ -8758,6 +8779,37 @@ reference "restlet-extras"
 )
 \bar default
 , which adds a Restlet extension library that provides direct chute to SLF4J.
+\end_layout
+
+\begin_layout Quote
+
+\series bold
+High CPU usage?
+\series default
+ On some rare combinations of operating systems and JVMs, Log4j 2.0 (well,
+ actually the 
+\begin_inset CommandInset href
+LatexCommand href
+name "LMAX Disruptor"
+target "http://lmax-exchange.github.io/disruptor/"
+
+\end_inset
+
+ library it uses) may use too much CPU time, even when idle.
+ You can reduce CPU usage in these cases, at the expense of affecting the
+ high-scalability profile, by using the following JVM switch: 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+-DAsyncLoggerConfig.WaitStrategy=Block
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection*

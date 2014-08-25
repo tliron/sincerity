@@ -70,6 +70,9 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			config.name = Sincerity.Objects.ensure(config.name, '')
 			config.async = Sincerity.Objects.ensure(config.async, true)
 			config.level = config.level || 'error'
+			if (Sincerity.Objects.isString(config.level)) {
+				config.level = levels[config.level.toLowerCase()]
+			}
 			if (Sincerity.Objects.exists(config.additivity)) {
 				config.additivity = config.additivity ? 'true' : 'false'
 			}
@@ -99,7 +102,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			if (config.name == '') {
 				logger = clazz.createLogger(
 					Sincerity.Objects.ensure(config.additivity, null), // additivity='true'
-					Sincerity.Objects.ensure(config.level, null), // levelName='error'
+					Sincerity.Objects.ensure(config.level, null), // level='error'
 					Sincerity.Objects.ensure(config.includeLocation, null), // includeLocation
 					Sincerity.JVM.newArray(0, 'org.apache.logging.log4j.core.config.AppenderRef'), // refs
 					config.properties || null, // properties
@@ -110,7 +113,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			else {
 				logger = clazz.createLogger(
 					Sincerity.Objects.ensure(config.additivity, null), // additivity='true'
-					Sincerity.Objects.ensure(config.level, null), // levelName='error'
+					Sincerity.Objects.ensure(config.level, null), // level='error'
 					config.name, // loggerName
 					Sincerity.Objects.ensure(config.includeLocation, null), // includeLocation
 					Sincerity.JVM.newArray(0, 'org.apache.logging.log4j.core.config.AppenderRef'), // refs
