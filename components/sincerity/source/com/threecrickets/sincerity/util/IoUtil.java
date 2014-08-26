@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity.internal;
+package com.threecrickets.sincerity.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -69,6 +69,7 @@ public abstract class IoUtil
 	 * @param workDir
 	 *        The work directory
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void unpack( File archiveFile, File destinationDir, File workDir ) throws IOException
 	{
@@ -143,6 +144,7 @@ public abstract class IoUtil
 	 * @param folder
 	 *        The target folder
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void copyRecursive( FileSystemManager manager, FileObject file, FileObject folder ) throws IOException
 	{
@@ -166,6 +168,7 @@ public abstract class IoUtil
 	 * @param toDir
 	 *        The target directory
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void copyRecursive( File fromDir, File toDir ) throws IOException
 	{
@@ -193,6 +196,7 @@ public abstract class IoUtil
 	 * @param out
 	 *        The output stream
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void copy( InputStream in, OutputStream out ) throws IOException
 	{
@@ -211,6 +215,7 @@ public abstract class IoUtil
 	 * @param file
 	 *        The target file
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void copy( URL url, File file ) throws IOException
 	{
@@ -241,6 +246,7 @@ public abstract class IoUtil
 	 * @param directory
 	 *        The start directory
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void deleteEmptyDirectoryRecursive( File directory ) throws IOException
 	{
@@ -262,6 +268,7 @@ public abstract class IoUtil
 	 * @param file
 	 *        The file or directory
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void deleteRecursive( File file ) throws IOException
 	{
@@ -321,6 +328,7 @@ public abstract class IoUtil
 	 *        The digest
 	 * @return True if the digests are equal
 	 * @throws IOException
+	 *         In case of an I/O error
 	 * @see #getDigest(InputStream)
 	 */
 	public static boolean isSameContent( File file, byte[] digest ) throws IOException
@@ -345,6 +353,7 @@ public abstract class IoUtil
 	 *        The stream
 	 * @return The digest
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static byte[] getDigest( InputStream stream ) throws IOException
 	{
@@ -377,6 +386,7 @@ public abstract class IoUtil
 	 *        The file
 	 * @return The digest
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static byte[] getDigest( File file ) throws IOException
 	{
@@ -390,6 +400,7 @@ public abstract class IoUtil
 	 *        The URL
 	 * @return The digest
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static byte[] getDigest( URL url ) throws IOException
 	{
@@ -418,6 +429,7 @@ public abstract class IoUtil
 	 *        The file
 	 * @return The lines
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static List<String> readLines( File file ) throws IOException
 	{
@@ -438,6 +450,7 @@ public abstract class IoUtil
 	 *        The stream
 	 * @return The lines
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static List<String> readLines( InputStream stream ) throws IOException
 	{
@@ -477,6 +490,7 @@ public abstract class IoUtil
 	 * @param lines
 	 *        The lines
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void writeLines( File file, Iterable<String> lines ) throws IOException
 	{
@@ -518,6 +532,7 @@ public abstract class IoUtil
 	 * @param file
 	 *        The file
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void touch( File file ) throws IOException
 	{

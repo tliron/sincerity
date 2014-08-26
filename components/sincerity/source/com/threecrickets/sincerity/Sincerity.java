@@ -34,11 +34,11 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.RebootException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.internal.IoUtil;
-import com.threecrickets.sincerity.internal.NativeUtil;
-import com.threecrickets.sincerity.internal.Pipe;
-import com.threecrickets.sincerity.internal.StringUtil;
 import com.threecrickets.sincerity.plugin.gui.Frame;
+import com.threecrickets.sincerity.util.IoUtil;
+import com.threecrickets.sincerity.util.NativeUtil;
+import com.threecrickets.sincerity.util.Pipe;
+import com.threecrickets.sincerity.util.StringUtil;
 
 /**
  * This is the highest level instance for the Sincerity runtime.

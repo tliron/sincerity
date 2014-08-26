@@ -53,9 +53,9 @@ import org.apache.ivy.plugins.repository.url.URLResource;
 
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.IoUtil;
-import com.threecrickets.sincerity.internal.StringUtil;
-import com.threecrickets.sincerity.internal.XmlUtil;
+import com.threecrickets.sincerity.util.IoUtil;
+import com.threecrickets.sincerity.util.StringUtil;
+import com.threecrickets.sincerity.util.XmlUtil;
 
 /**
  * Manages the dependencies of a {@link Container}, including its classpath of

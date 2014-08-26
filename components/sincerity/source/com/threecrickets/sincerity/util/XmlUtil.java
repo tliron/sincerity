@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity.internal;
+package com.threecrickets.sincerity.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,8 +57,11 @@ public abstract class XmlUtil
 	 * @param file
 	 *        The target XML file
 	 * @throws TransformerFactoryConfigurationError
+	 *         In case of an XML transformation factory configuration error
 	 * @throws TransformerException
+	 *         In case of an XML transformation error
 	 * @throws IOException
+	 *         In case of an I/O error
 	 */
 	public static void saveHumanReadable( Document document, File file ) throws TransformerFactoryConfigurationError, TransformerException, IOException
 	{

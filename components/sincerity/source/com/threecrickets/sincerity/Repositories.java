@@ -37,8 +37,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.XmlUtil;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
+import com.threecrickets.sincerity.util.XmlUtil;
 
 /**
  * Manages the source repositories for a {@link Container}.

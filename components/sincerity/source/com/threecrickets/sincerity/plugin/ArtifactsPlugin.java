@@ -28,8 +28,8 @@ import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
+import com.threecrickets.sincerity.util.TreeUtil;
 
 /**
  * The artifact plugin supports the following commands:

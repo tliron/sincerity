@@ -11,10 +11,6 @@
 
 package com.threecrickets.sincerity.logging;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,6 +21,7 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.util.NameUtil;
 
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.util.CollectionUtil;
 
 /**
  * A configuration that is prepared via API, rather than loading it from file.
@@ -83,7 +80,7 @@ public class ProgrammableConfiguration extends AbstractConfiguration
 
 		LoggerConfig root = getLogger( LogManager.ROOT_LOGGER_NAME );
 
-		for( Map.Entry<String, LoggerConfig> entry : sortedMap( getLoggers() ).entrySet() )
+		for( Map.Entry<String, LoggerConfig> entry : CollectionUtil.sortedMap( getLoggers() ).entrySet() )
 		{
 			String name = entry.getKey();
 			LoggerConfig logger = entry.getValue();
@@ -116,47 +113,5 @@ public class ProgrammableConfiguration extends AbstractConfiguration
 					sincerity.getOut().println( "    -> \"" + appender.getName() + "\"" );
 			}
 		}
-	}
-
-	// //////////////////////////////////////////////////////////////////////////
-	// Private
-
-	/**
-	 * Sort a map by the natural order of its keys.
-	 * 
-	 * @param <K>
-	 *        The map key class
-	 * @param <V>
-	 *        The map value class
-	 * @param map
-	 *        The map
-	 * @return The sorted map
-	 */
-	private static <K extends Comparable<? super K>, V> LinkedHashMap<K, V> sortedMap( Map<K, V> map )
-	{
-		LinkedList<Map.Entry<K, V>> list = new LinkedList<Map.Entry<K, V>>( map.entrySet() );
-		Collections.sort( list, new Comparator<Map.Entry<K, V>>()
-		{
-			public int compare( Map.Entry<K, V> o1, Map.Entry<K, V> o2 )
-			{
-				try
-				{
-					return ( o1.getKey() ).compareTo( o2.getKey() );
-				}
-				catch( ClassCastException x )
-				{
-					// Because Java generics are erased, we could get a wrong
-					// key type
-					Map.Entry<?, ?> oo1 = o1;
-					Map.Entry<?, ?> oo2 = o2;
-					return ( oo1.getKey().toString() ).compareTo( oo2.getKey().toString() );
-				}
-			}
-		} );
-
-		LinkedHashMap<K, V> result = new LinkedHashMap<K, V>();
-		for( Map.Entry<K, V> entry : list )
-			result.put( entry.getKey(), entry.getValue() );
-		return result;
 	}
 }

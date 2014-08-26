@@ -62,8 +62,8 @@ import org.apache.ivy.util.Message;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.IoUtil;
 import com.threecrickets.sincerity.ivy.SincerityRepositoryCacheManager;
+import com.threecrickets.sincerity.util.IoUtil;
 
 /**
  * An Ivy resolver for <a href="http://pypi.python.org/">PyPI</a>-compatible

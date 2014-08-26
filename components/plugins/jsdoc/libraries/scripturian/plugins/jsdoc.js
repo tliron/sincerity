@@ -21,6 +21,9 @@ function jsdoc(command) {
 	var run = String(command.sincerity.container.getLibrariesFile('javascript', 'jsdoc-toolkit', 'app', 'run.js'))
 
 	var runArguments = ['javascript:javascript', run]
+	if (Sincerity.Platform.isNashorn) {
+		runArguments.push('--')
+	}
 	var arguments = command.arguments
 	for (var i in arguments) {
 		runArguments.push(arguments[i])

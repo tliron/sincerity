@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
-import com.threecrickets.sincerity.internal.IoUtil;
+import com.threecrickets.sincerity.util.IoUtil;
 
 /**
  * @author Tal Liron

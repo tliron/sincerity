@@ -18,7 +18,7 @@ import com.threecrickets.scripturian.Executable;
 import com.threecrickets.scripturian.exception.ExecutionException;
 import com.threecrickets.scripturian.exception.ParsingException;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.IoUtil;
+import com.threecrickets.sincerity.util.IoUtil;
 
 /**
  * Allows you to delegate the {@link Plugin1} interface to non-Java languages

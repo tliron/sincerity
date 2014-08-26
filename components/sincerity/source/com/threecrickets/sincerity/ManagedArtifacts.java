@@ -23,8 +23,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.internal.IoUtil;
-import com.threecrickets.sincerity.internal.StringUtil;
+import com.threecrickets.sincerity.util.IoUtil;
+import com.threecrickets.sincerity.util.StringUtil;
 
 /**
  * This class manages a database of artifacts for a a {@link Dependencies}

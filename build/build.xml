@@ -145,8 +145,7 @@
 			destdir="${distribution.api}" sourcepath="${component.source}" excludepackagenames="**.internal.*"
 			access="protected" source="${compile.version}"
 			windowtitle="${documentation.title} ${component.version}${component.version.postfix}" doctitle="${documentation.title} ${component.version}${component.version.postfix}"
-			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
-			bootclasspath="${compile.boot}">
+			author="true" splitindex="true" use="true" version="true" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false">
 
 			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->

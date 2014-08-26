@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity.internal;
+package com.threecrickets.sincerity.util;
 
 import java.io.File;
 import java.lang.reflect.Field;

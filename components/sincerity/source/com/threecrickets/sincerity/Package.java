@@ -31,7 +31,7 @@ import java.util.jar.Manifest;
 import com.threecrickets.sincerity.exception.InstallationException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
-import com.threecrickets.sincerity.internal.ClassUtil;
+import com.threecrickets.sincerity.util.ClassUtil;
 
 /**
  * Packages are collections of artifacts (see {@link Artifact}). They are

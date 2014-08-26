@@ -28,11 +28,11 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.internal.TreeUtil;
 import com.threecrickets.sincerity.plugin.gui.AddDependenciesButton;
 import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.LicensesPane;
+import com.threecrickets.sincerity.util.TreeUtil;
 
 /**
  * The dependencies plugin supports the following commands:
