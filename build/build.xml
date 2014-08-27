@@ -2,7 +2,7 @@
 <project name="Sincerity" default="build"
 	xmlns:ivy="antlib:org.apache.ivy.ant"
 	xmlns:jdeb='antlib:org.vafer.jdeb.ant'
-	xmlns:redline='antlib:org.freecompany.redline.ant'>
+	xmlns:redline='antlib:org.redline_rpm.ant'>
 
 	<property name="root" location="${basedir}/.." />
 	
@@ -47,13 +47,16 @@
 	<taskdef uri="antlib:org.vafer.jdeb.ant" resource="org/vafer/jdeb/ant/antlib.xml">
 		<classpath>
 			<pathelement location="${dependencies.jars}/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
-			<pathelement location="${dependencies.jars}/org.bouncycastle/bcpg-jdk15+/${bouncycastle.version}/bcpg-jdk15+.jar" />
-			<pathelement location="${dependencies.jars}/org.bouncycastle/bcprov-jdk15+/${bouncycastle.version}/bcprov-jdk15+.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcpg-jdk15on/${bouncycastle.version}/bcpg-jdk15on.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcprov-jdk15on/${bouncycastle.version}/bcprov-jdk15on.jar" />
 		</classpath>
 	</taskdef>
-	<taskdef uri="antlib:org.freecompany.redline.ant" resource="org/freecompany/redline/ant/antlib.xml">
+	<taskdef uri="antlib:org.redline_rpm.ant" resource="org/redline_rpm/antlib.xml">
 		<classpath>
-			<pathelement location="${dependencies.jars}/org.freecompany.redline/redline/${redline.version}/redline.jar" />
+			<pathelement location="${dependencies.jars}/org.redline-rpm/redline/${redline.version}/redline.jar" />
+			<pathelement location="${dependencies.jars}/org.apache.commons/commons-compress/${commons-compress.version}/commons-compress.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcpg-jdk15on/${bouncycastle.version}/bcpg-jdk15on.jar" />
+			<pathelement location="${dependencies.jars}/org.bouncycastle/bcprov-jdk15on/${bouncycastle.version}/bcprov-jdk15on.jar" />
 			<pathelement location="${dependencies.jars}/org.slf4j/slf4j-api/${slf4j.version}/slf4j-api.jar" />
 			<pathelement location="${dependencies.jars}/org.slf4j/slf4j-simple/${slf4j.version}/slf4j-simple.jar" />
 		</classpath>
