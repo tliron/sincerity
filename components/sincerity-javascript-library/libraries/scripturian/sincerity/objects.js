@@ -630,6 +630,20 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		Public.merge(flat, nonFlat)
 		return flat
 	}
+	
+	/**
+	 * Clones the dict, such that iterating the clone's keys would be
+	 * in the natural order of the keys (alphabetic).
+	 * <p>
+	 * Note that JavaScript dicts have an undefined iteration order, so
+	 * this function must return a JVM LinkedHashMap.
+	 * 
+	 * @param value The value
+	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/LinkedHashMap.html">java.util.LinkedHashMap</a>}
+	 */
+	Public.sortByKeys = function(value) {
+		return com.threecrickets.sincerity.util.CollectionUtil.sortedMap(value)
+	}
 
 	//
 	// Arrays
