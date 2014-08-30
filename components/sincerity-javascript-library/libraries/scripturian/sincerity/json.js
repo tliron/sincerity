@@ -20,7 +20,7 @@ document.require(
 var Sincerity = Sincerity || {}
 
 /**
- * JSON encoding and decoding. Uses the high-performance JSON Rhino
+ * JSON encoding and decoding. Uses the high-performance JSON JVM
  * library if available, otherwise falls back to a 100%-JavaScript
  * version.
  * 
@@ -33,6 +33,13 @@ var Sincerity = Sincerity || {}
 Sincerity.JSON = Sincerity.JSON || com.threecrickets.jvm.json.JSON
 
 if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
+	if (executable.context.adapter.attributes.get('name') == 'Rhino') {
+		Sincerity.JSON.implementation = new com.threecrickets.jvm.json.rhino.RhinoJsonImplementation()
+	}
+	else {
+		Sincerity.JSON.implementation = new com.threecrickets.jvm.json.nashorn.NashornJsonImplementation()
+	}
+
 	/**
 	 * Streaming JSON array parser.
 	 * <p>
@@ -45,7 +52,7 @@ if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
 	 * @param {String|java.io.File} [params.file] The file or its path (ignored if params.reader is used)
 	 * @param {java.io.Reader} [params.reader] A reader
 	 */
-	Sincerity.Iterators.JsonArray = Sincerity.Classes.define(function() {
+	Sincerity.Iterators.JsonArray = Sincerity.Iterators.JsonArray || Sincerity.Classes.define(function() {
 		/** @exports Public as Sincerity.Iterators.JsonArray */
 		var Public = {}
 		
@@ -115,7 +122,7 @@ if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
 	}())
 }
 else {
-	// Fallback to JSON JavaScript library if the com.threecrickets.json library isn't found
+	// Fallback to JSON JavaScript library if the com.threecrickets.jvm.json library isn't found
 	
 	document.require('/sincerity/internal/json2/')
 	

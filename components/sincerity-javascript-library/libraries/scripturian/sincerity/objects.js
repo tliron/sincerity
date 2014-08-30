@@ -633,7 +633,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	
 	/**
 	 * Clones the dict, such that iterating the clone's keys would be
-	 * in the natural order of the keys (alphabetic).
+	 * in their natural order (alphabetic).
 	 * <p>
 	 * Note that JavaScript dicts have an undefined iteration order, so
 	 * this function must return a JVM LinkedHashMap.
