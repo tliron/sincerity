@@ -30,6 +30,7 @@ div.title {
 
 div.subtitle {
 	font-weight: bold;
+	padding-top: 5px;
 }
 
 /* Tree View */
