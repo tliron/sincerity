@@ -151,7 +151,7 @@ Ext.onReady(function() {
 			appendId: false
 			//noCache: false
 		},
-		autoLoad: true,
+		//autoLoad: true,
 		listeners: {
 			load: function() {
 				if (args.namespace) {
