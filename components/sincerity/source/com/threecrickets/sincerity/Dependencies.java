@@ -834,11 +834,26 @@ public class Dependencies
 	 */
 	private void freeze( ResolvedDependency resolvedDependency ) throws SincerityException
 	{
-		if( container.getSincerity().getVerbosity() >= 2 )
-			container.getSincerity().getOut().println( "Freezing: " + resolvedDependency );
+		if( resolvedDependency.evicted != null )
+		{
+			if( container.getSincerity().getVerbosity() >= 2 )
+				container.getSincerity().getOut().println( "Not freezing: " + resolvedDependency );
+			return;
+		}
 
 		ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
-		override( id.getOrganisation(), id.getName(), id.getRevision() );
+		if( resolvedDependency.isRoot )
+		{
+			if( container.getSincerity().getVerbosity() >= 2 )
+				container.getSincerity().getOut().println( "Freezing explicit: " + resolvedDependency );
+			revise( id.getOrganisation(), id.getName(), id.getRevision() );
+		}
+		else
+		{
+			if( container.getSincerity().getVerbosity() >= 2 )
+				container.getSincerity().getOut().println( "Freezing implicit: " + resolvedDependency );
+			override( id.getOrganisation(), id.getName(), id.getRevision() );
+		}
 
 		for( Iterator<ResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
 		{
