@@ -230,7 +230,7 @@ function service(command) {
 		if (verb == 'console') {
 			command.sincerity.out.println('Running {0}...'.cast(displayName))
 		}
-		command.sincerity.run(runArguments)
+		command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 		if ((verb == 'start') || (verb == 'restart')) {
 			command.sincerity.out.println('Started {0}'.cast(displayName))
 		}
