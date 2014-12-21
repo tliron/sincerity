@@ -1,5 +1,7 @@
 
-document.require('/sincerity/platform/')
+document.require(
+	'/sincerity/platform/',
+	'/sincerity/jvm/')
 
 var MAIN_CLASS = Sincerity.Platform.isRhino ? 'org.mozilla.javascript.tools.shell.Main' : 'jdk.nashorn.tools.Shell'
 
@@ -25,5 +27,5 @@ function javascript(command) {
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 var MAIN_CLASS = 'org.apache.felix.main.Main'
 
 importClass(java.lang.System)
@@ -32,5 +34,5 @@ function gogo(command) {
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

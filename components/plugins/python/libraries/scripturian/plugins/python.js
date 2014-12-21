@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 importClass(
 	org.python.core.Py,
 	org.python.core.PyString,
@@ -64,8 +66,7 @@ function python(command) {
 		runArguments.push(arguments[i])
 		sys.argv.add(new PyString(arguments[i]))
 	}
-
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }
 
 function easy_install(command) {
@@ -75,5 +76,5 @@ function easy_install(command) {
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

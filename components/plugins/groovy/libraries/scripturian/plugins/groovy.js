@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 var MAIN_CLASS = 'groovy.ui.GroovyMain'
 
 function getInterfaceVersion() {
@@ -23,5 +25,5 @@ function groovy(command) {
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

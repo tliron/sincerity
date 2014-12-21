@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 importClass(java.lang.System)
 
 var MAIN_CLASS = 'org.jruby.Main'
@@ -53,7 +55,7 @@ function ruby(command, preArguments, postArguments) {
 			runArguments.push(postArguments[i])
 		}
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }
 
 function gem(command) {
@@ -66,5 +68,5 @@ function gem(command) {
 			runArguments.push('--bindir', sincerity.container.getExecutablesFile())
 		}
 	}
-	sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

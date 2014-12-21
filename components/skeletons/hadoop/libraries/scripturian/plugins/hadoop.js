@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 importClass(
 	java.lang.System,
 	com.threecrickets.sincerity.exception.CommandException,
@@ -110,7 +112,7 @@ function hadoop(command) {
 	
 	command.sincerity.container.bootstrap.addFile(command.sincerity.container.getConfigurationFile('hadoop'))
 	
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }
 
 function getPlatform() {

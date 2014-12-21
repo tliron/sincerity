@@ -51,5 +51,5 @@ function orientdb(command, className, isServer) {
 		}
 	}
 
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

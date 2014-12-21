@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 var MAIN_CLASS = 'com.izforge.izpack.compiler.Compiler'
 	
 importClass(
@@ -42,5 +44,5 @@ function izpack(command) {
 		'-k', 'standard'
 	)
 	
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

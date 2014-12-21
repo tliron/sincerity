@@ -1,5 +1,7 @@
 
-document.require('/sincerity/platform/')
+document.require(
+	'/sincerity/platform/',
+	'/sincerity/jvm/')
 
 function getInterfaceVersion() {
 	return 1
@@ -31,5 +33,5 @@ function jsdoc(command) {
 	if (Sincerity.Platform.isRhino) {
 		runArguments.push('-j=' + run)
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }

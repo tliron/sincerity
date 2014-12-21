@@ -1,4 +1,6 @@
 
+document.require('/sincerity/jvm/')
+
 function getInterfaceVersion() {
 	return 1
 }
@@ -21,5 +23,5 @@ function rails(command) {
 	for (var i in arguments) {
 		runArguments.push(arguments[i])
 	}
-	command.sincerity.run(runArguments)
+	command.sincerity.run(Sincerity.JVM.toArray(runArguments, 'java.lang.String'))
 }
