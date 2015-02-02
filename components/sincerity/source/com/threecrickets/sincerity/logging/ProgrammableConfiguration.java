@@ -114,4 +114,9 @@ public class ProgrammableConfiguration extends AbstractConfiguration
 			}
 		}
 	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private static final long serialVersionUID = 1L;
 }

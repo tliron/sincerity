@@ -230,6 +230,7 @@ public class Container implements IvyListener, TransferListener
 	 */
 	public Bootstrap getBootstrap( boolean forceCreate ) throws SincerityException
 	{
+		@SuppressWarnings("resource")
 		Bootstrap bootstrap = forceCreate ? null : Bootstrap.getBootstrap( root );
 		if( bootstrap == null )
 		{

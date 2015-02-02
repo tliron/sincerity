@@ -103,5 +103,7 @@ public class MongoDbAppender extends AbstractDatabaseAppender<MongoDbManager>
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
+	private static final long serialVersionUID = 1L;
+
 	private final String description;
 }

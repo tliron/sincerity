@@ -29,13 +29,13 @@ import javax.swing.border.Border;
  * <p>
  * <a href="http://www.devx.com/tips/Tip/5342">Source</a>.
  */
-public class CheckBoxList extends JList
+public class CheckBoxList extends JList<JCheckBox>
 {
 	//
 	// Construction
 	//
 
-	public CheckBoxList( Object[] listData )
+	public CheckBoxList( JCheckBox[] listData )
 	{
 		super( listData );
 		setCellRenderer( new CellRenderer() );
@@ -47,7 +47,7 @@ public class CheckBoxList extends JList
 				int index = locationToIndex( e.getPoint() );
 				if( index != -1 )
 				{
-					JCheckBox checkbox = (JCheckBox) getModel().getElementAt( index );
+					JCheckBox checkbox = getModel().getElementAt( index );
 					checkbox.setSelected( !checkbox.isSelected() );
 					repaint();
 				}
@@ -60,12 +60,10 @@ public class CheckBoxList extends JList
 	// //////////////////////////////////////////////////////////////////////////
 	// Protected
 
-	protected class CellRenderer implements ListCellRenderer
+	protected class CellRenderer implements ListCellRenderer<JCheckBox>
 	{
-		public Component getListCellRendererComponent( JList list, Object value, int index, boolean isSelected, boolean cellHasFocus )
+		public Component getListCellRendererComponent( JList<? extends JCheckBox> list, JCheckBox checkbox, int index, boolean isSelected, boolean cellHasFocus )
 		{
-			JCheckBox checkbox = (JCheckBox) value;
-
 			checkbox.setFont( getFont() );
 			checkbox.setFocusPainted( false );
 			checkbox.setBorderPainted( true );
