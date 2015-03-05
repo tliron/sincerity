@@ -273,8 +273,7 @@ public class Container implements IvyListener, TransferListener
 			if( javaScriptEngine == null )
 				javaScriptEngine = System.getenv( "SINCERITY_JAVASCRIPT" );
 			if( javaScriptEngine == null )
-				javaScriptEngine = "Rhino"; // TODO: wait for JDK 8u40 in March
-											// 2015
+				javaScriptEngine = "Nashorn";
 
 			// Adapter preferences
 			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + "Jython", 1 );
