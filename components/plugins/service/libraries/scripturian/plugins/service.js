@@ -183,15 +183,13 @@ function service(command) {
 					try {
 						while (null !== (line = reader.readLine())) {
 							if ((line.length() == 0) || line.startsWith('#')) {
-								continue
+								line = null
 							}
-							line = line.cast(filling)
-							configuration.wrapper.java['additional.' + index++] = line
+							if (null !== line) {
+								line = line.cast(filling)
+								configuration.wrapper.java['additional.' + index++] = line
+							}
 						}
-					}
-					catch (x) {
-						// Nashorn hack:
-						// java.io.IOException: stream closed
 					}
 					finally {
 						reader.close()
