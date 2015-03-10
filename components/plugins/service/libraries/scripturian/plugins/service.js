@@ -180,20 +180,20 @@ function service(command) {
 				if (file.name.endsWith('.conf')) {
 					var reader = new BufferedReader(new FileReader(file))
 					var filling = Sincerity.Templates.createSystemFilling(true, true)
-					try {
+					var line
+					// Nashorn bug:
+					//try {
 						while (null !== (line = reader.readLine())) {
 							if ((line.length() == 0) || line.startsWith('#')) {
-								line = null
+								continue
 							}
-							if (null !== line) {
-								line = line.cast(filling)
-								configuration.wrapper.java['additional.' + index++] = line
-							}
+							line = line.cast(filling)
+							configuration.wrapper.java['additional.' + index++] = line
 						}
-					}
-					finally {
+					//}
+					//finally {
 						reader.close()
-					}
+					//}
 				}
 			}
 		}
