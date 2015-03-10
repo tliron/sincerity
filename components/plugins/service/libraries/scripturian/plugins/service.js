@@ -180,9 +180,9 @@ function service(command) {
 				if (file.name.endsWith('.conf')) {
 					var reader = new BufferedReader(new FileReader(file))
 					var filling = Sincerity.Templates.createSystemFilling(true, true)
-					var line
-					// Nashorn bug:
-					//try {
+					try {
+						var line
+						(function() { // Nashorn bug workaround: https://www.mail-archive.com/nashorn-dev@openjdk.java.net/msg03419.html
 						while (null !== (line = reader.readLine())) {
 							if ((line.length() == 0) || line.startsWith('#')) {
 								continue
@@ -190,10 +190,11 @@ function service(command) {
 							line = line.cast(filling)
 							configuration.wrapper.java['additional.' + index++] = line
 						}
-					//}
-					//finally {
+						})() // Nashorn bug workaround
+					}
+					finally {
 						reader.close()
-					//}
+					}
 				}
 			}
 		}

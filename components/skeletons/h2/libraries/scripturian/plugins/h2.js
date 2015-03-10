@@ -82,12 +82,15 @@ function h2(command, className, confName) {
 	if (file.exists()) {
 		var reader = new java.io.BufferedReader(new java.io.FileReader(file))
 		try {
+			var line
+			(function() { // Nashorn bug workaround: https://www.mail-archive.com/nashorn-dev@openjdk.java.net/msg03419.html
 			while (null !== (line = reader.readLine())) {
 				if ((line.length() == 0) || line.startsWith('#')) {
 					continue
 				}
 				runArguments.push(line)
 			}
+			})() // Nashorn bug workaround
 		}
 		finally {
 			reader.close()
