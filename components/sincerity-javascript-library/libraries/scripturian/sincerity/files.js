@@ -235,7 +235,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	/**
 	 * Opens a file for writing text, optionally with gzip compression.
 	 * 
-	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 * @param {Boolean} [gzip=false] True to gzip the output
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>}
 	 */
