@@ -67,9 +67,11 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * 
 	 * @param {Number} duration The duration
 	 * @param {Boolean} [longFormat=false]
+	 * @param {Number} [decimals=2] The number of decimal digits after the dot (only used for minutes, hours, and days)
 	 * @returns {String}
 	 */
-	Public.formatDuration = function(duration, longFormat) {
+	Public.formatDuration = function(duration, longFormat, decimals) {
+		decimals = Sincerity.Objects.ensure(decimals, 2)
 		if (duration < 1000) {
 			return Public.formatNumber(Public.round(duration, 0)) + (longFormat ? ' milliseconds' : 'ms')
 		}
@@ -77,13 +79,13 @@ Sincerity.Localization = Sincerity.Localization || function() {
 			return Public.formatNumber(Public.round(duration / 1000, 0)) + (longFormat ? ' seconds' : 's')
 		}
 		else if (duration < 3600000) {
-			return Public.formatNumber(Public.round(duration / 60000, 2)) + (longFormat ? ' minutes' : 'm')
+			return Public.formatNumber(Public.round(duration / 60000, decimals)) + (longFormat ? ' minutes' : 'm')
 		}
 		else if (duration < 86400000) {
-			return Public.formatNumber(Public.round(duration / 3600000, 2)) + (longFormat ? ' hours' : 'h')
+			return Public.formatNumber(Public.round(duration / 3600000, decimals)) + (longFormat ? ' hours' : 'h')
 		}
 		else {
-			return Public.formatNumber(Public.round(duration / 86400000, 2)) + (longFormat ? ' days' : 'd')
+			return Public.formatNumber(Public.round(duration / 86400000, decimals)) + (longFormat ? ' days' : 'd')
 		}
 	}
 	
