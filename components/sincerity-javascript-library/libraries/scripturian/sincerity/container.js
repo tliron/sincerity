@@ -106,7 +106,7 @@ Sincerity.Container = Sincerity.Container || function() {
 	}
 	
 	/**
-	 * If the JVM class does not exist, adds and installed dependencies.
+	 * If the JVM class does not exist, adds and installs dependencies.
 	 * <p>
 	 * The arguments after the first are each an array of values to send to a
 	 * "dependencies:add" command.

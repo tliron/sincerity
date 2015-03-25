@@ -239,6 +239,10 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		if (typeof value === 'number') {
 			return true
 		}
+		// In Nashorn, a string ending with 'd' is numerical!
+		if (Public.endsWith(value, 'd')) {
+			return false
+		}
 		return !isNaN(value - 0)
 	}
 	
