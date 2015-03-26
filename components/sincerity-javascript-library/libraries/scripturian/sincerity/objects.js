@@ -806,7 +806,29 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		}
 		return removals
 	}		
-	
+
+	/**
+	 * Removes items from an array.
+	 * 
+	 * @param {Array} array The array
+	 * @param {Array} positions The positions to remove
+	 * @returns {Array} The items that were removed
+	 */
+	Public.removePositions = function(array, positions) {
+		var removals = []
+		for (var p in positions) {
+			var position = positions[p]
+			removals.push(array[position])
+			array.splice(position, 1)
+			for (var pp in positions) {
+				if (positions[pp] > position) {
+					positions[pp]--
+				}
+			}
+		}
+		return removals
+	}
+
 	//
 	// Initialization
 	//
