@@ -15628,8 +15628,8 @@ JSON
 High-performance JSON parsing and rendering using the 
 \begin_inset CommandInset href
 LatexCommand href
-name "JSON Rhino library"
-target "http://code.google.com/p/json-rhino/"
+name "JSON JVM library"
+target "https://github.com/tliron/json-jvm"
 
 \end_inset
 
