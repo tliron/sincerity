@@ -39,6 +39,7 @@ import org.apache.ivy.core.module.descriptor.DefaultDependencyDescriptor;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyArtifactDescriptor;
 import org.apache.ivy.core.module.descriptor.DependencyDescriptor;
+import org.apache.ivy.core.module.descriptor.ExtraInfoHolder;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.apache.ivy.core.report.ArtifactDownloadReport;
@@ -282,7 +283,8 @@ public class PyPiResolver extends BasicResolver
 					{
 						String version = artifact[2];
 						DefaultModuleDescriptor artifactDescriptor = DefaultModuleDescriptor.newDefaultInstance( ModuleRevisionId.newInstance( id, version ) );
-						artifactDescriptor.getExtraInfo().put( "artifact", artifact );
+						for( int i = 0; i < artifact.length; i++ )
+							artifactDescriptor.addExtraInfo( new ExtraInfoHolder( "artifact" + i, artifact[i] ) );
 						artifactDescriptors.add( artifactDescriptor );
 					}
 
@@ -297,7 +299,16 @@ public class PyPiResolver extends BasicResolver
 					{
 						DefaultModuleDescriptor artifactDescriptor = i.previous();
 						if( revision == null || revision.equals( artifactDescriptor.getRevision() ) )
-							artifacts.add( (String[]) artifactDescriptor.getExtraInfo().get( "artifact" ) );
+						{
+							ArrayList<String> strings = new ArrayList<String>();
+							List<ExtraInfoHolder> extraInfos = artifactDescriptor.getExtraInfos();
+							for( ExtraInfoHolder extraInfo : extraInfos )
+							{
+								if( extraInfo.getName().startsWith( "artifact" ) )
+									strings.add( extraInfo.getContent() );
+							}
+							artifacts.add( strings.toArray( new String[strings.size()] ) );
+						}
 						else
 							break;
 					}
@@ -586,7 +597,7 @@ public class PyPiResolver extends BasicResolver
 
 	private static boolean isPostponed( ModuleDescriptor moduleDesctiptor )
 	{
-		return "true".equals( moduleDesctiptor.getExtraInfo().get( POSTPONE_ATTRIBUTE ) );
+		return "true".equals( moduleDesctiptor.getExtraInfoContentByTagName( POSTPONE_ATTRIBUTE ) );
 	}
 
 	private static File findEgg( File eggDir )
@@ -861,7 +872,6 @@ public class PyPiResolver extends BasicResolver
 		return createModuleDescriptorResource( id, artifactDescriptors, dependencyIds, false );
 	}
 
-	@SuppressWarnings("unchecked")
 	private ResolvedResource createModuleDescriptorResource( ModuleRevisionId id, ArrayList<DependencyArtifactDescriptor> artifactDescriptors, ArrayList<ModuleRevisionId> dependencyIds, boolean postpone )
 		throws IOException
 	{
@@ -875,7 +885,7 @@ public class PyPiResolver extends BasicResolver
 		if( postpone )
 		{
 			moduleDescriptor.addExtraAttributeNamespace( "sincerity", "http://threecrickets.com/sincerity/" );
-			moduleDescriptor.getExtraInfo().put( POSTPONE_ATTRIBUTE, "true" );
+			moduleDescriptor.addExtraInfo( new ExtraInfoHolder( POSTPONE_ATTRIBUTE, "true" ) );
 		}
 
 		// Dependencies
