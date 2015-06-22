@@ -186,10 +186,12 @@ public class ScripturianShell implements Shell
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );
+			throw new SincerityException( "Could not execute: " + documentName, x );
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( IOException x )
 		{

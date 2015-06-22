@@ -1,12 +1,6 @@
 
 document.require('/sincerity/jvm/')
 
-importClass(
-	org.python.core.Py,
-	org.python.core.PyString,
-	org.python.core.Options,
-	java.lang.System)
-
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getInterfaceVersion() {
@@ -29,6 +23,12 @@ function run(command) {
 }
 
 function python(command) {
+	importClass(
+			org.python.core.Py,
+			org.python.core.PyString,
+			org.python.core.Options,
+			java.lang.System)
+
 	// The Python standard library is here (Jython expects a "Lib" subdirectory underneath)
 	System.setProperty('python.home', command.sincerity.container.getLibrariesFile('python'))
 
@@ -41,8 +41,8 @@ function python(command) {
 	// This is Jython's 'sys' module (a singleton)
 	var sys = Py.systemState
 
-	sys.exec_prefix = new PyString(command.sincerity.container.getExecutablesFile())
-	sys.executable = new PyString(command.sincerity.container.getExecutablesFile('python'))
+	sys.exec_prefix = new PyString(String(command.sincerity.container.getExecutablesFile()))
+	sys.executable = new PyString(String(command.sincerity.container.getExecutablesFile('python')))
 	
 	// Put eggs into sys.path
 	/*var eggsDir = command.sincerity.container.getLibrariesFile('eggs')

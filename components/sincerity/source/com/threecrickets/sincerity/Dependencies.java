@@ -726,8 +726,6 @@ public class Dependencies
 		if( resolve().hasChanged() )
 			container.setChanged( true );
 
-		container.updateBootstrap();
-
 		/*
 		 * for( ResolvedDependency r : getResolvedDependencies().getAll() ) {
 		 * System.out.println(r.descriptor.getRevision()); }
@@ -745,7 +743,7 @@ public class Dependencies
 		{
 			container.updateBootstrap();
 
-			// Prune unnecessary artifacts
+			// Install and prune unnecessary artifacts
 			managedArtifacts.prune( getArtifacts( true, overwrite, verify ) );
 
 			if( container.hasFinishedInstalling() )
