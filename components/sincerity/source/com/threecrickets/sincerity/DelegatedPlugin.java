@@ -73,10 +73,11 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
+			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
+			/*if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getCause() );
+				throw new SincerityException( x.getCause() );*/
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -99,10 +100,11 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
+			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
+			/*if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getCause() );
+				throw new SincerityException( x.getCause() );*/
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -132,10 +134,11 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
+			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
+			/*if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getCause() );
+				throw new SincerityException( x.getCause() );*/
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -155,10 +158,11 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
+			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
+			/*if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getCause() );
+				throw new SincerityException( x.getCause() );*/
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -178,10 +182,11 @@ public class DelegatedPlugin implements Plugin1
 		}
 		catch( ExecutionException x )
 		{
-			if( x.getCause() instanceof SincerityException )
+			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
+			/*if( x.getCause() instanceof SincerityException )
 				throw (SincerityException) x.getCause();
 			else
-				throw new SincerityException( x.getCause() );
+				throw new SincerityException( x.getCause() );*/
 		}
 		catch( NoSuchMethodException x )
 		{
