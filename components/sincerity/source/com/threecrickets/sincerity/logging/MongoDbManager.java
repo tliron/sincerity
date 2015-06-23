@@ -11,7 +11,6 @@
 
 package com.threecrickets.sincerity.logging;
 
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 
@@ -23,18 +22,23 @@ import org.apache.logging.log4j.core.appender.AppenderLoggingException;
 import org.apache.logging.log4j.core.appender.ManagerFactory;
 import org.apache.logging.log4j.core.appender.db.AbstractDatabaseManager;
 import org.apache.logging.log4j.message.Message;
+import org.bson.Document;
 
 import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * A Log4j database manager for MongoDB.
+ * <p>
+ * <b>Warning:</n> Because the MongoDB driver itself emits log messages, you
+ * might cause recursion here that would lead to hangs and timeouts. The easiest
+ * solution is to simply disable its logging via your Log4j configuration: just
+ * set the <code>org.mongodb.driver</code> logger to level {@link Level.OFF}.
  * 
  * @author Tal Liron
  */
@@ -67,7 +71,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 	 *        {@link WriteConcern#valueOf(String)})
 	 * @return a new or existing MongoDB manager as applicable.
 	 */
-	public static MongoDbManager getMongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
+	public static MongoDbManager getMongoDbManager( String name, int bufferSize, String uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
 	{
 		return AbstractDatabaseManager.getManager( name, new FactoryData( bufferSize, uri, client, dbName, collectionName, writeConcernName ), FACTORY );
 	}
@@ -79,12 +83,12 @@ public class MongoDbManager extends AbstractDatabaseManager
 	// Construction
 	//
 
-	protected MongoDbManager( String name, int bufferSize, MongoClientURI uri, MongoClient client, String db, String collectionName, String writeConcernName )
+	protected MongoDbManager( String name, int bufferSize, String uri, MongoClient client, String databaseName, String collectionName, String writeConcernName )
 	{
 		super( name, bufferSize );
 		this.uri = uri;
 		this.client = client;
-		this.dbName = db;
+		this.databaseName = databaseName;
 		this.collectionName = collectionName;
 		this.writeConcernName = writeConcernName;
 	}
@@ -96,36 +100,55 @@ public class MongoDbManager extends AbstractDatabaseManager
 	@Override
 	protected void startupInternal() throws Exception
 	{
-		if( client != null )
+		if( collection != null )
 			return;
 
-		MongoClientURI uri = this.uri;
-		if( uri == null )
-			uri = new MongoClientURI( "mongodb://localhost:27017/" );
+		client = null;
+		database = null;
+		collection = null;
+
+		MongoClientURI uri;
+		try
+		{
+			if( this.uri == null )
+				uri = new MongoClientURI( this.uri );
+			else
+				uri = new MongoClientURI( "mongodb://localhost:27017/" );
+		}
+		catch( IllegalArgumentException x )
+		{
+			throw new AppenderLoggingException( "Can't parse MongoDB uri: " + this.uri );
+		}
 
 		try
 		{
 			client = new MongoClient( uri );
 		}
-		catch( UnknownHostException e )
+		catch( MongoException x )
 		{
-			throw new AppenderLoggingException( "Can't connect to MongoDB: " + uri, e );
+			throw new AppenderLoggingException( "Can't create MongoDB client: " + uri );
 		}
 
-		db = client.getDB( dbName );
-		if( db == null )
+		try
+		{
+			database = client.getDatabase( databaseName );
+		}
+		catch( MongoException x )
 		{
 			client.close();
 			client = null;
-			throw new AppenderLoggingException( "Can't access MongoDB database: " + dbName );
+			throw new AppenderLoggingException( "Can't access MongoDB database: " + databaseName );
 		}
 
-		collection = db.getCollection( collectionName );
-		if( collection == null )
+		try
+		{
+			collection = database.getCollection( collectionName );
+		}
+		catch( MongoException x )
 		{
 			client.close();
 			client = null;
-			db = null;
+			database = null;
 			throw new AppenderLoggingException( "Can't access MongoDB collection: " + collectionName );
 		}
 
@@ -134,7 +157,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 			WriteConcern writeConcern = WriteConcern.valueOf( writeConcernName );
 			if( writeConcern == null )
 				throw new AppenderLoggingException( "Unsupported MongoDB write concern: " + writeConcernName );
-			collection.setWriteConcern( writeConcern );
+			collection = collection.withWriteConcern( writeConcern );
 		}
 	}
 
@@ -144,7 +167,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 		if( client != null )
 			client.close();
 		client = null;
-		db = null;
+		database = null;
 		collection = null;
 	}
 
@@ -159,7 +182,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 		if( collection == null )
 			throw new AppenderLoggingException( "Not connected to MongoDB" );
 
-		BasicDBObject o = new BasicDBObject();
+		Document o = new Document();
 
 		o.put( "timestamp", new Date( event.getTimeMillis() ) );
 		o.put( "logger", event.getLoggerName() );
@@ -179,7 +202,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 		StackTraceElement eventSource = event.getSource();
 		if( eventSource != null )
 		{
-			BasicDBObject source = new BasicDBObject();
+			Document source = new Document();
 			source.put( "class", eventSource.getClassName() );
 			source.put( "method", eventSource.getMethodName() );
 			source.put( "file", eventSource.getFileName() );
@@ -187,14 +210,14 @@ public class MongoDbManager extends AbstractDatabaseManager
 			o.put( "source", source );
 		}
 
-		BasicDBObject thread = new BasicDBObject();
+		Document thread = new Document();
 
 		thread.put( "name", event.getThreadName() );
 
 		Map<String, String> eventContextMap = event.getContextMap();
 		if( eventContextMap != null )
 		{
-			BasicDBObject contextMap = new BasicDBObject();
+			Document contextMap = new Document();
 			for( Map.Entry<String, String> entry : eventContextMap.entrySet() )
 				contextMap.put( entry.getKey(), entry.getValue() );
 			thread.put( "contextMap", contextMap );
@@ -213,7 +236,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 
 		try
 		{
-			collection.save( o );
+			collection.insertOne( o );
 		}
 		catch( MongoException e )
 		{
@@ -231,9 +254,9 @@ public class MongoDbManager extends AbstractDatabaseManager
 
 	private static final MongoDbManagerFactory FACTORY = new MongoDbManagerFactory();
 
-	private final MongoClientURI uri;
+	private final String uri;
 
-	private final String dbName;
+	private final String databaseName;
 
 	private final String collectionName;
 
@@ -241,9 +264,9 @@ public class MongoDbManager extends AbstractDatabaseManager
 
 	private MongoClient client;
 
-	private DB db;
+	private MongoDatabase database;
 
-	private DBCollection collection;
+	private MongoCollection<Document> collection;
 
 	/**
 	 * Creates managers.
@@ -263,7 +286,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 	 */
 	private static final class FactoryData extends AbstractDatabaseManager.AbstractFactoryData
 	{
-		protected FactoryData( final int bufferSize, MongoClientURI uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
+		protected FactoryData( final int bufferSize, String uri, MongoClient client, String dbName, String collectionName, String writeConcernName )
 		{
 			super( bufferSize );
 			this.uri = uri;
@@ -273,7 +296,7 @@ public class MongoDbManager extends AbstractDatabaseManager
 			this.writeConcernName = writeConcernName;
 		}
 
-		private final MongoClientURI uri;
+		private final String uri;
 
 		private final MongoClient client;
 

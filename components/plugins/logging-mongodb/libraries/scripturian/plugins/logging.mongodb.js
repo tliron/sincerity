@@ -1,4 +1,11 @@
 
+document.require(
+		'/mongodb/',
+		'/sincerity/json/',
+		'/sincerity/templates/',
+		'/sincerity/objects/',
+		'/sincerity/localization/')
+
 var TEMPLATE = '{formattedTimestamp} {level} {thread.contextMap.origin} [{logger}] {message}'
 var TIME_FORMAT = 'yyy-MM-dd HH:mm:ss,SSS'
 
@@ -17,12 +24,6 @@ source.line
 thread.name
 thread.contextMap.origin
 */
-
-document.require(
-	'/mongo-db/',
-	'/sincerity/templates/',
-	'/sincerity/objects/',
-	'/sincerity/localization/')
 
 function getInterfaceVersion() {
 	return 1
@@ -49,27 +50,38 @@ function logtail(command) {
 	var password = properties.get('password')
 	var db = Sincerity.Objects.ensure(properties.get('db'), 'logs')
 	var collection = Sincerity.Objects.ensure(properties.get('collection'), 'common')
-	
-	// Connect
-	var client = Sincerity.Objects.exists(username) ? MongoDB.connect(uri, {username: username, password: password}) : MongoDB.connect(uri)
-	collection = new MongoDB.Collection(collection, {client: client, db: db})
-	var c = collection.find().addOption('tailable').addOption('awaitData').addOption('noTimeout')
-	
-	var format = new Sincerity.Localization.DateTimeFormat(TIME_FORMAT)
-	
-	while (true) {
-		var record = c.next()
+
+	try {
+		// Connect
+		//var client = Sincerity.Objects.exists(username) ? MongoDB.connect(uri, {username: username, password: password}) : MongoDB.connect(uri)
+		var client = MongoClient.connect(uri)
+		db = client.database(db)
+		collection = db.collection(collection, db)
+		var cursor = collection.find(null, {cursorType: 'tailableAwait'})
 		
-		record = Sincerity.Objects.flatten(record)
+		var format = new Sincerity.Localization.DateTimeFormat(TIME_FORMAT)
 		
-		// Format date
-		record.formattedTimestamp = format.format(record.timestamp)
-		
-		// Right-pad level
-		while (record.level.length < 5) {
-			record.level += ' '
+		while (true) {
+			var record = cursor.next()
+			
+			record = Sincerity.Objects.flatten(record)
+			
+			// Format date
+			record.formattedTimestamp = format.format(record.timestamp)
+			
+			// Right-pad level
+			while (record.level.length < 5) {
+				record.level += ' '
+			}
+			
+			println(TEMPLATE.cast(record))
 		}
-		
-		println(TEMPLATE.cast(record))
+	}
+	catch (x) {
+		if (x instanceof MongoError) {
+			command.sincerity.err.println('MongoError:')
+			command.sincerity.err.println(Sincerity.JSON.to(x.clean(), true))
+		}
+		throw x
 	}
 }

@@ -351,6 +351,11 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		}
 		
 		/**
+		 * <b>Warning:</n> Because the MongoDB driver itself emits log messages, you
+		 * might cause recursion here that would lead to hangs and timeouts. The easiest
+		 * solution is to simply disable its logging via your Log4j configuration: just
+		 * set the <code>org.mongodb.driver</code> logger to level {@link Level.OFF}.
+		 *
 		 * @param config
 		 * @param {String} config.name
 		 * @param {String} [config.bufferSize]

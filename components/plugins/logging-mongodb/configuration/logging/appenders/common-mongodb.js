@@ -21,3 +21,8 @@ var appender = configuration.rewriteAppender({
 
 // This is a high-priority root appender
 configuration.rootAppenders.unshift(appender)
+
+// We must avoid logging the MongoDB driver itself, otherwise we
+// would get recursion hangs with the MongoDB appender.
+//
+// See: ../loggers/mongodb.js

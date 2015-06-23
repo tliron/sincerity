@@ -11,6 +11,7 @@
 
 package com.threecrickets.sincerity.logging;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.db.AbstractDatabaseAppender;
@@ -25,6 +26,11 @@ import com.mongodb.WriteConcern;
 
 /**
  * A Log4j appender for MongoDB.
+ * <p>
+ * <b>Warning:</n> Because the MongoDB driver itself emits log messages, you
+ * might cause recursion here that would lead to hangs and timeouts. The easiest
+ * solution is to simply disable its logging via your Log4j configuration: just
+ * set the <code>org.mongodb.driver</code> logger to level {@link Level.OFF}.
  * 
  * @author Tal Liron
  */
@@ -70,7 +76,7 @@ public class MongoDbAppender extends AbstractDatabaseAppender<MongoDbManager>
 		StringBuilder managerName = new StringBuilder( "mongoDbManager{ description=" ).append( name ).append( ", bufferSize=" ).append( bufferSizeInt ).append( ", uri=" ).append( uri ).append( ", db=" ).append( db )
 			.append( ", collection=" ).append( collection ).append( ", writeConcern=" ).append( writeConcern ).append( " }" );
 
-		MongoDbManager manager = MongoDbManager.getMongoDbManager( managerName.toString(), bufferSizeInt, new MongoClientURI( uri ), null, db, collection, writeConcern );
+		MongoDbManager manager = MongoDbManager.getMongoDbManager( managerName.toString(), bufferSizeInt, uri, null, db, collection, writeConcern );
 		if( manager == null )
 			return null;
 
