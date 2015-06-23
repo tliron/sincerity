@@ -1,10 +1,10 @@
 
 document.require(
-		'/mongodb/',
-		'/sincerity/json/',
-		'/sincerity/templates/',
-		'/sincerity/objects/',
-		'/sincerity/localization/')
+	'/mongodb/',
+	'/sincerity/json/',
+	'/sincerity/templates/',
+	'/sincerity/objects/',
+	'/sincerity/localization/')
 
 var TEMPLATE = '{formattedTimestamp} {level} {thread.contextMap.origin} [{logger}] {message}'
 var TIME_FORMAT = 'yyy-MM-dd HH:mm:ss,SSS'
