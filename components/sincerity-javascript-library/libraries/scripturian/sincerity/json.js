@@ -33,12 +33,12 @@ var Sincerity = Sincerity || {}
 Sincerity.JSON = Sincerity.JSON || com.threecrickets.jvm.json.JSON
 
 if (Sincerity.Objects.isJVM(Sincerity.JSON)) {
-	if (executable.context.adapter.attributes.get('name') == 'Rhino') {
+	/*if (executable.context.adapter.attributes.get('name') == 'Rhino') {
 		Sincerity.JSON.implementation = new com.threecrickets.jvm.json.rhino.RhinoJsonImplementation()
 	}
 	else {
 		Sincerity.JSON.implementation = new com.threecrickets.jvm.json.nashorn.NashornJsonImplementation()
-	}
+	}*/
 
 	/**
 	 * Streaming JSON array parser.
