@@ -27,7 +27,7 @@ import com.mongodb.WriteConcern;
 /**
  * A Log4j appender for MongoDB.
  * <p>
- * <b>Warning:</n> Because the MongoDB driver itself emits log messages, you
+ * <b>Warning:</b> Because the MongoDB driver itself emits log messages, you
  * might cause recursion here that would lead to hangs and timeouts. The easiest
  * solution is to simply disable its logging via your Log4j configuration: just
  * set the <code>org.mongodb.driver</code> logger to level {@link Level.OFF}.
