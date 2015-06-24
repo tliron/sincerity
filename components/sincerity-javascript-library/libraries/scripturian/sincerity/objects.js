@@ -471,7 +471,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		try {
 			type = typeof value
 		}
-		catch(x) {
+		catch (x) {
 			// This is a JVM object
 			return false
 		}
@@ -602,6 +602,8 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * Flattening happens recursively, but can be stopped at any branch by
 	 * using the 'separator' as a dict key. Everything under that key will
 	 * be stored as is under the parent flat path.
+	 * <p>
+	 * A dict can avoid flattening by setting the '_flatten' key to false.
 	 * 
 	 * @param value The value
 	 * @param {String} [separator='.'] The path separator
@@ -611,7 +613,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		flat = flat || {}
 		nonFlat = nonFlat || {}
 
-		if (Public.isDict(value, true)) {
+		if (Public.isDict(value, true) && (value._flatten !== false)) {
 			separator = separator || '.'
 
 			for (var key in value) {
