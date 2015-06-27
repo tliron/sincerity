@@ -138,6 +138,7 @@
 			<link href="http://jsoup.org/apidocs/" />
 			<link href="http://threecrickets.com/api/java/scripturian/" />
 			<link href="http://www.mozilla.org/rhino/apidocs/" />
+			<link href="https://logging.apache.org/log4j/2.x/log4j-api/apidocs/" />
 			<classpath refid="dependencies" />
 			<bottom>
 				<![CDATA[<i>${documentation.copyright}</i>]]>

@@ -30,7 +30,7 @@ import com.mongodb.WriteConcern;
  * <b>Warning:</b> Because the MongoDB driver itself emits log messages, you
  * might cause recursion here that would lead to hangs and timeouts. The easiest
  * solution is to simply disable its logging via your Log4j configuration: just
- * set the <code>org.mongodb.driver</code> logger to level {@link Level.OFF}.
+ * set the <code>org.mongodb.driver</code> logger to level {@link Level#OFF}.
  * 
  * @author Tal Liron
  */
@@ -66,9 +66,9 @@ public class MongoDbAppender extends AbstractDatabaseAppender<MongoDbManager>
 	 * @return a new JDBC appender.
 	 */
 	@PluginFactory
-	public static MongoDbAppender createAppender( @PluginAttribute("name") final String name, @PluginAttribute("ignoreExceptions") final String ignore, @PluginElement("Filter") final Filter filter,
+	public static MongoDbAppender createAppender( @PluginAttribute("name" ) final String name, @PluginAttribute("ignoreExceptions") final String ignore, @PluginElement("Filter") final Filter filter,
 		@PluginAttribute("bufferSize") final String bufferSize, @PluginAttribute("uri") final String uri, @PluginAttribute("db") final String db, @PluginAttribute("collection") final String collection,
-		@PluginAttribute("writeConcern") final String writeConcern )
+		@PluginAttribute("writeConcern") final String writeConcern)
 	{
 		int bufferSizeInt = AbstractAppender.parseInt( bufferSize, 0 );
 		boolean ignoreExceptions = Booleans.parseBoolean( ignore, true );
