@@ -194,10 +194,19 @@
 
 	<target name="libraries" depends="classes, version" description="Create jars">
 		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/${component.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*" />
+		<jar destfile="${distribution.jars}/${component.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*">
+			<manifest>
+				<attribute name="Implementation-Title" value="${component.group}:${component.artifact}" />
+				<attribute name="Implementation-Version" value="${component.version}${component.version.postfix}" />
+				<attribute name="Implementation-Vendor" value="Three Crickets" />
+			</manifest>
+		</jar>
 		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">
 			<manifest>
 				<attribute name="Main-Class" value="com.threecrickets.bootstrap.Bootstrap" />
+				<attribute name="Implementation-Title" value="com.threecrickets:bootstrap" />
+				<attribute name="Implementation-Version" value="${component.version}${component.version.postfix}" />
+				<attribute name="Implementation-Vendor" value="Three Crickets" />
 			</manifest>
 		</jar>
 
