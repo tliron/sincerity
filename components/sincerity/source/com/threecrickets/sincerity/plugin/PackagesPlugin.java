@@ -11,8 +11,14 @@
 
 package com.threecrickets.sincerity.plugin;
 
+import java.util.Set;
+
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
+import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
@@ -54,6 +60,8 @@ public class PackagesPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+
 		if( "unpack".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
@@ -64,11 +72,16 @@ public class PackagesPlugin implements Plugin1
 				filter = arguments[0];
 
 			command.setParse( true );
-			boolean overwrite = command.getSwitches().contains( "overwrite" );
-			boolean verify = command.getSwitches().contains( "verify" );
+			Set<String> switches = command.getSwitches();
+			boolean overwrite = switches.contains( "overwrite" );
+			boolean verify = switches.contains( "verify" );
 
 			command.remove();
-			command.getSincerity().getContainer().getDependencies().getPackages().install( filter, overwrite, verify );
+
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+			Packages packages = dependencies.getPackages();
+			packages.install( filter, overwrite, verify );
 		}
 		else
 			throw new UnknownCommandException( command );

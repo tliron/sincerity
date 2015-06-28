@@ -15,10 +15,12 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ResolvedDependencies;
@@ -49,13 +51,15 @@ import com.threecrickets.sincerity.util.TreeUtil;
  * "add"-type shortcut. If it's two arguments, they are the group and module
  * name of the dependency, leaving Sincerity to pick the highest available
  * version. If it's three arguments, they are the group, module name and version
- * of the dependency. Note that this does not actually install the dependency.</li>
+ * of the dependency. Note that this does not actually install the dependency.
+ * </li>
  * <li><b>revise</b>: allows you to change the version of a previously added
  * dependency. The first two arguments are the group and module name, and the
  * third is the new version. Note that this does not actually install the
  * dependency.</li>
  * <li><b>remove</b>: removes a single dependency. The two arguments are group
- * and module name. Note that this does not actually uninstall the dependency.</li>
+ * and module name. Note that this does not actually uninstall the dependency.
+ * </li>
  * <li><b>exclude</b>: excludes an implicit dependency. The two arguments are
  * group and module name. Note that this does not actually uninstall the
  * dependency.</li>
@@ -102,26 +106,36 @@ public class DependenciesPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+		PrintWriter err = sincerity.getErr();
+
 		if( "dependencies".equals( commandName ) )
 		{
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printTree( dependencies, command.getSincerity().getOut() );
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+			printTree( dependencies, out );
 		}
 		else if( "licenses".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean verbose = command.getSwitches().contains( "verbose" );
+			Set<String> switches = command.getSwitches();
+			boolean verbose = switches.contains( "verbose" );
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printLicenses( dependencies, command.getSincerity().getOut(), verbose );
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
+			printLicenses( dependencies, out, verbose );
 		}
 		else if( "reset".equals( commandName ) )
 		{
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			dependencies.reset();
 
 			command.remove();
-			command.getSincerity().reboot();
+			sincerity.reboot();
 		}
 		else if( "add".equals( commandName ) )
 		{
@@ -134,12 +148,13 @@ public class DependenciesPlugin implements Plugin1
 			{
 				String shortcut = arguments[0];
 				command.remove();
-				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "add" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
+				sincerity.run( Shortcuts.SHORTCUT_PREFIX + "add" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
 				return;
 			}
 
-			boolean force = command.getSwitches().contains( "force" );
-			boolean only = command.getSwitches().contains( "only" );
+			Set<String> switches = command.getSwitches();
+			boolean force = switches.contains( "force" );
+			boolean only = switches.contains( "only" );
 
 			String group = arguments[0];
 			String name = arguments[1];
@@ -152,10 +167,12 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			if( !dependencies.add( group, name, version, force, !only ) )
-				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Dependency already in container: " + group + ":" + name + " v" + version );
+				if( sincerity.getVerbosity() >= 2 )
+					err.println( "Dependency already in container: " + group + ":" + name + " v" + version );
 		}
 		else if( "revise".equals( commandName ) )
 		{
@@ -171,10 +188,12 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			if( !dependencies.revise( group, name, version ) )
-				if( command.getSincerity().getVerbosity() >= 1 )
-					command.getSincerity().getErr().println( "Dependency not revised: " + group + ":" + name + " v" + version );
+				if( sincerity.getVerbosity() >= 1 )
+					err.println( "Dependency not revised: " + group + ":" + name + " v" + version );
 		}
 		else if( "remove".equals( commandName ) )
 		{
@@ -186,10 +205,12 @@ public class DependenciesPlugin implements Plugin1
 			String group = arguments[0];
 			String name = arguments[1];
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			if( !dependencies.remove( group, name ) )
-				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Dependency was not in container: " + group + ":" + name );
+				if( sincerity.getVerbosity() >= 2 )
+					err.println( "Dependency was not in container: " + group + ":" + name );
 		}
 		else if( "exclude".equals( commandName ) )
 		{
@@ -201,10 +222,12 @@ public class DependenciesPlugin implements Plugin1
 			String group = arguments[0];
 			String name = arguments[1];
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			if( !dependencies.exclude( group, name ) )
-				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Exclusion already in container: " + group + ":" + name );
+				if( sincerity.getVerbosity() >= 2 )
+					err.println( "Exclusion already in container: " + group + ":" + name );
 		}
 		else if( "override".equals( commandName ) )
 		{
@@ -220,14 +243,17 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			if( !dependencies.override( group, name, version ) )
-				if( command.getSincerity().getVerbosity() >= 1 )
-					command.getSincerity().getErr().println( "Dependency not overridden: " + group + ":" + name + " v" + version );
+				if( sincerity.getVerbosity() >= 1 )
+					err.println( "Dependency not overridden: " + group + ":" + name + " v" + version );
 		}
 		else if( "freeze".equals( commandName ) )
 		{
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
 			dependencies.freeze();
 		}
 		else

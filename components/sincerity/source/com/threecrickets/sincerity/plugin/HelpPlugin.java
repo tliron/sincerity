@@ -11,6 +11,7 @@
 
 package com.threecrickets.sincerity.plugin;
 
+import java.io.PrintWriter;
 import java.util.Map;
 
 import com.threecrickets.sincerity.Command;
@@ -60,27 +61,30 @@ public class HelpPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+
 		if( "version".equals( commandName ) )
 		{
-			Map<String, String> version = command.getSincerity().getVersion();
+			Map<String, String> version = sincerity.getVersion();
 			for( Map.Entry<String, String> entry : version.entrySet() )
-				command.getSincerity().getOut().println( entry.getKey() + "=" + entry.getValue() );
+				out.println( entry.getKey() + "=" + entry.getValue() );
 		}
 		else if( "help".equals( commandName ) )
 		{
-			for( Plugin1 plugin : command.getSincerity().getPlugins().values() )
+			for( Plugin1 plugin : sincerity.getPlugins().values() )
 				for( String pluginCommand : plugin.getCommands() )
-					command.getSincerity().getOut().println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
+					out.println( plugin.getName() + Command.PLUGIN_COMMAND_SEPARATOR + pluginCommand );
 		}
 		else if( "verbosity".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
-				command.getSincerity().getOut().println( command.getSincerity().getVerbosity() );
+				out.println( sincerity.getVerbosity() );
 			else
 			{
 				int verbosity = Integer.parseInt( arguments[0] );
-				command.getSincerity().setVerbosity( verbosity );
+				sincerity.setVerbosity( verbosity );
 			}
 		}
 		else

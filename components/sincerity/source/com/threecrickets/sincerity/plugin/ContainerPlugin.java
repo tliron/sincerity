@@ -13,6 +13,7 @@ package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
@@ -79,12 +80,15 @@ public class ContainerPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+
 		if( "create".equals( commandName ) )
 		{
 			command.setParse( true );
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "container root path", "[template]" );
+			Set<String> switches = command.getSwitches();
 
 			File containerRoot = new File( arguments[0] );
 			String template;
@@ -92,15 +96,15 @@ public class ContainerPlugin implements Plugin1
 				template = "default";
 			else
 				template = arguments[1];
-			boolean force = command.getSwitches().contains( "force" );
-			File templateDir = new File( new File( command.getSincerity().getHome(), "templates" ), template );
+			boolean force = switches.contains( "force" );
+			File templateDir = new File( new File( sincerity.getHome(), "templates" ), template );
 
 			// TODO: look for templates according to ~/.sincerity/sincerity.conf
 			// first (likely ~/.sincerity/templates
 			// same for 'templatize'
 
 			command.remove();
-			command.getSincerity().createContainer( containerRoot, templateDir, force );
+			sincerity.createContainer( containerRoot, templateDir, force );
 		}
 		else if( "use".equals( commandName ) )
 		{
@@ -116,25 +120,29 @@ public class ContainerPlugin implements Plugin1
 				throw new NoContainerException( "The folder is not a valid container: " + containerRoot );
 
 			command.remove();
-			command.getSincerity().setContainerRoot( containerRoot );
+			sincerity.setContainerRoot( containerRoot );
 		}
 		else if( "clone".equals( commandName ) )
 		{
 			command.setParse( true );
 			String[] arguments = command.getArguments();
+			Set<String> switches = command.getSwitches();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "target container root path" );
-			boolean force = command.getSwitches().contains( "force" );
+			boolean force = switches.contains( "force" );
 
 			File containerRoot = new File( arguments[0] );
 
+			Container container = sincerity.getContainer();
+
 			command.remove();
-			command.getSincerity().createContainer( containerRoot, command.getSincerity().getContainer().getRoot(), force );
+			sincerity.createContainer( containerRoot, container.getRoot(), force );
 		}
 		else if( "clean".equals( commandName ) )
 		{
-			Container container = command.getSincerity().getContainer();
+			Container container = sincerity.getContainer();
 			Dependencies dependencies = container.getDependencies();
+
 			dependencies.uninstall();
 
 			File cache = container.getFile( "cache" );
@@ -151,7 +159,7 @@ public class ContainerPlugin implements Plugin1
 			}
 
 			command.remove();
-			command.getSincerity().reboot();
+			sincerity.reboot();
 		}
 		else
 			throw new UnknownCommandException( command );

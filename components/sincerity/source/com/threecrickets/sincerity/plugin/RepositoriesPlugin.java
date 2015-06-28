@@ -19,6 +19,7 @@ import org.apache.ivy.plugins.resolver.DependencyResolver;
 import org.apache.ivy.plugins.resolver.IBiblioResolver;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
 import com.threecrickets.sincerity.Shortcuts;
@@ -78,11 +79,17 @@ public class RepositoriesPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+		PrintWriter err = sincerity.getErr();
+
 		if( "repositories".equals( commandName ) )
 		{
-			Repositories repositories = command.getSincerity().getContainer().getRepositories();
-			printRepositories( command.getSincerity().getOut(), "Private", repositories.getResolvers( "private" ) );
-			printRepositories( command.getSincerity().getOut(), "Public", repositories.getResolvers( "public" ) );
+			Container container = sincerity.getContainer();
+			Repositories repositories = container.getRepositories();
+
+			printRepositories( out, "Private", repositories.getResolvers( "private" ) );
+			printRepositories( out, "Public", repositories.getResolvers( "public" ) );
 		}
 		else if( "attach".equals( commandName ) )
 		{
@@ -95,13 +102,16 @@ public class RepositoriesPlugin implements Plugin1
 			{
 				String shortcut = arguments[0];
 				command.remove();
-				command.getSincerity().run( Shortcuts.SHORTCUT_PREFIX + "attach" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
+				sincerity.run( Shortcuts.SHORTCUT_PREFIX + "attach" + Shortcuts.SHORTCUT_TYPE_SEPARATOR + shortcut );
 				return;
 			}
 
 			String section = arguments[0];
 			String name = arguments[1];
 			String type = arguments[2];
+
+			Container container = sincerity.getContainer();
+			Repositories repositories = container.getRepositories();
 
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )
 			{
@@ -110,10 +120,9 @@ public class RepositoriesPlugin implements Plugin1
 
 				String url = arguments[3];
 
-				Repositories repositories = command.getSincerity().getContainer().getRepositories();
 				if( !repositories.addMaven( section, name, url ) )
-					if( command.getSincerity().getVerbosity() >= 2 )
-						command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
+					if( sincerity.getVerbosity() >= 2 )
+						err.println( "Repository already in use: " + section + ":" + name );
 			}
 			else if( "pypi".equals( type ) || "python".equals( type ) )
 			{
@@ -122,13 +131,12 @@ public class RepositoriesPlugin implements Plugin1
 
 				String url = arguments[3];
 
-				Repositories repositories = command.getSincerity().getContainer().getRepositories();
 				if( !repositories.addPyPi( section, name, url ) )
-					if( command.getSincerity().getVerbosity() >= 2 )
-						command.getSincerity().getErr().println( "Repository already in use: " + section + ":" + name );
+					if( sincerity.getVerbosity() >= 2 )
+						err.println( "Repository already in use: " + section + ":" + name );
 			}
 			else
-				command.getSincerity().getErr().println( "Unknown repository type: " + type );
+				err.println( "Unknown repository type: " + type );
 		}
 		else if( "detach".equals( commandName ) )
 		{
@@ -140,10 +148,12 @@ public class RepositoriesPlugin implements Plugin1
 			String section = arguments[0];
 			String name = arguments[1];
 
-			Repositories repositories = command.getSincerity().getContainer().getRepositories();
+			Container container = sincerity.getContainer();
+			Repositories repositories = container.getRepositories();
+
 			if( !repositories.remove( section, name ) )
-				if( command.getSincerity().getVerbosity() >= 2 )
-					command.getSincerity().getErr().println( "Repository was not in use: " + section + ":" + name );
+				if( sincerity.getVerbosity() >= 2 )
+					err.println( "Repository was not in use: " + section + ":" + name );
 		}
 		else
 			throw new UnknownCommandException( command );

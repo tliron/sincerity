@@ -20,6 +20,7 @@ import java.util.Collection;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 
@@ -63,9 +64,11 @@ public class JavaPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+
 		if( "compile".equals( commandName ) )
 		{
-			Container container = command.getSincerity().getContainer();
+			Container container = sincerity.getContainer();
 
 			String[] arguments = command.getArguments();
 			File javaDir;

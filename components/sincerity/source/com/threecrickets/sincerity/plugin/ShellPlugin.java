@@ -11,20 +11,32 @@
 
 package com.threecrickets.sincerity.plugin;
 
+import java.io.IOException;
+
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.plugin.console.CommandCompleter;
 import com.threecrickets.sincerity.plugin.gui.Console;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.Splash;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.util.ClassUtil;
+
+import jline.Terminal;
+import jline.TerminalFactory;
+import jline.console.ConsoleReader;
+import jline.console.UserInterruptException;
 
 /**
- * The GUI plugin supports the following commands:
+ * The shell plugin supports the following commands:
  * <ul>
+ * <li><b>console</b>: starts the Sincerity console, which is a simple REPL
+ * through which Sincerity commands can be run interactively.</li>
  * <li><b>gui</b>: starts the Sincerity GUI, using all available plugins. Note
  * that this command can either run with a container or without one, in which
  * case it would prompt the user to create a new container. Use the --ui=
@@ -35,7 +47,7 @@ import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
  * @author Tal Liron
  * @see Plugin1#gui(Command)
  */
-public class GuiPlugin implements Plugin1
+public class ShellPlugin implements Plugin1
 {
 	//
 	// Plugin
@@ -48,21 +60,74 @@ public class GuiPlugin implements Plugin1
 
 	public String getName()
 	{
-		return "gui";
+		return "shell";
 	}
 
 	public String[] getCommands()
 	{
 		return new String[]
 		{
-			"gui"
+			"console", "gui"
 		};
 	}
 
 	public void run( final Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
-		if( "gui".equals( commandName ) )
+		Sincerity sincerity = Sincerity.getCurrent();
+
+		if( "console".equals( commandName ) )
+		{
+			sincerity.getOut().println( "Sincerity " + sincerity.getVersion().get( "version" ) );
+
+			Container container = sincerity.getContainer();
+			if( container != null )
+				sincerity.getOut().println( "Container: " + container.getRoot() );
+
+			Terminal terminal = TerminalFactory.create();
+			try
+			{
+				try
+				{
+					ConsoleReader console = new ConsoleReader();
+					console.addCompleter( new CommandCompleter() );
+					console.setHandleUserInterrupt( true );
+					console.setPrompt( "> " );
+
+					while( true )
+					{
+						String line = console.readLine();
+						if( "exit".equals( line ) )
+							break;
+
+						ClassUtil.main( sincerity, Sincerity.class.getCanonicalName(), line.split( " " ) );
+					}
+				}
+				catch( UserInterruptException x )
+				{
+				}
+				catch( IOException x )
+				{
+					sincerity.getErr().println( "Console error" );
+					if( sincerity.getVerbosity() >= 2 )
+						x.printStackTrace( sincerity.getErr() );
+				}
+			}
+			finally
+			{
+				try
+				{
+					terminal.reset();
+				}
+				catch( Exception x )
+				{
+					sincerity.getErr().println( "Could not reset terminal" );
+					if( sincerity.getVerbosity() >= 2 )
+						x.printStackTrace( sincerity.getErr() );
+				}
+			}
+		}
+		else if( "gui".equals( commandName ) )
 		{
 			// Don't show GUI while console is up
 			if( Console.getCurrent() != null )
@@ -110,6 +175,7 @@ public class GuiPlugin implements Plugin1
 		}
 		else
 			throw new UnknownCommandException( command );
+
 	}
 
 	public void gui( Command command ) throws SincerityException

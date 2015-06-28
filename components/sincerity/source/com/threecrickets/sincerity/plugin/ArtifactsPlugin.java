@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
@@ -81,23 +82,32 @@ public class ArtifactsPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+
 		if( "artifacts".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean packages = command.getSwitches().contains( "packages" );
-			boolean verbose = command.getSwitches().contains( "verbose" );
+			Set<String> switches = command.getSwitches();
+			boolean packages = switches.contains( "packages" );
+			boolean verbose = switches.contains( "verbose" );
 
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
-			printArtifacts( dependencies, command.getSincerity().getOut(), packages, verbose );
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
+			printArtifacts( dependencies, out, packages, verbose );
 		}
 		else if( "install".equals( commandName ) )
 		{
 			command.setParse( true );
-			boolean overwrite = command.getSwitches().contains( "overwrite" );
-			boolean verify = command.getSwitches().contains( "verify" );
+			Set<String> switches = command.getSwitches();
+			boolean overwrite = switches.contains( "overwrite" );
+			boolean verify = switches.contains( "verify" );
 
-			Container container = command.getSincerity().getContainer();
-			container.getDependencies().install( overwrite, verify );
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
+			dependencies.install( overwrite, verify );
 
 			if( container.hasFinishedInstalling() )
 			{
@@ -108,7 +118,9 @@ public class ArtifactsPlugin implements Plugin1
 		}
 		else if( "uninstall".equals( commandName ) )
 		{
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			dependencies.uninstall();
 
 			command.remove();
@@ -116,7 +128,9 @@ public class ArtifactsPlugin implements Plugin1
 		}
 		else if( "prune".equals( commandName ) )
 		{
-			Dependencies dependencies = command.getSincerity().getContainer().getDependencies();
+			Container container = sincerity.getContainer();
+			Dependencies dependencies = container.getDependencies();
+
 			dependencies.prune();
 
 			command.remove();
@@ -136,8 +150,9 @@ public class ArtifactsPlugin implements Plugin1
 	// Operations
 	//
 
-	public void printArtifacts( Dependencies dependencies, Writer writer, boolean packages, boolean verbose ) throws SincerityException
+	public void printArtifacts( Dependencies dependencies, Writer writer, boolean withPackages, boolean verbose ) throws SincerityException
 	{
+		Container container = dependencies.getContainer();
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
 		{
@@ -150,7 +165,7 @@ public class ArtifactsPlugin implements Plugin1
 
 				String location = artifact.getId().getAttribute( "location" );
 				if( location != null )
-					location = dependencies.getContainer().getRelativePath( location );
+					location = container.getRelativePath( location );
 				boolean installed = location != null && new File( location ).exists();
 
 				if( !installed )
@@ -185,7 +200,7 @@ public class ArtifactsPlugin implements Plugin1
 
 				printWriter.println();
 
-				if( packages )
+				if( withPackages )
 				{
 					Package pack = location != null ? dependencies.getPackages().getPackage( new File( location ) ) : null;
 					if( pack != null )
@@ -195,7 +210,7 @@ public class ArtifactsPlugin implements Plugin1
 							Artifact packedArtifact = ii.next();
 							printWriter.print( "    " );
 							printWriter.print( ii.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
-							printWriter.println( dependencies.getContainer().getRelativeFile( packedArtifact.getFile() ) );
+							printWriter.println( container.getRelativeFile( packedArtifact.getFile() ) );
 						}
 					}
 				}

@@ -107,8 +107,8 @@ public class Sincerity implements Runnable
 	//
 
 	/**
-	 * Executes a Sincerity command line, defaulting to the "gui:gui" command if
-	 * no commands are given.
+	 * Executes a Sincerity command line, defaulting to the "shell:console"
+	 * command if no commands are given.
 	 * 
 	 * @param arguments
 	 *        The command line
@@ -121,7 +121,7 @@ public class Sincerity implements Runnable
 			Sincerity sincerity = new Sincerity( arguments, getCurrent() );
 
 			if( !started && sincerity.commands.isEmpty() )
-				sincerity.commands.add( new Command( "gui", "gui", false, sincerity ) );
+				sincerity.commands.add( new Command( "shell", "console", false, sincerity ) );
 
 			if( !started )
 				Bootstrap.getAttributes().put( STARTED_ATTRIBUTE, true );

@@ -13,10 +13,12 @@ package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import com.threecrickets.scripturian.LanguageAdapter;
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ScripturianShell;
 import com.threecrickets.sincerity.Sincerity;
@@ -80,13 +82,16 @@ public class DelegatePlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+
 		if( "main".equals( commandName ) )
 		{
 			String[] arguments = command.getArguments();
 			if( arguments.length < 1 )
 				throw new BadArgumentsCommandException( command, "main class name" );
 
-			ClassUtil.main( command.getSincerity(), arguments );
+			ClassUtil.main( sincerity, arguments );
 		}
 		else if( "start".equals( commandName ) )
 		{
@@ -97,7 +102,9 @@ public class DelegatePlugin implements Plugin1
 			if( !arguments[0].startsWith( "/" ) )
 				arguments[0] = "/programs/" + arguments[0];
 
-			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true, arguments );
+			Container container = sincerity.getContainer();
+
+			ScripturianShell shell = new ScripturianShell( container, null, true, arguments );
 			shell.execute( arguments[0] );
 		}
 		else if( "execute".equals( commandName ) )
@@ -117,14 +124,16 @@ public class DelegatePlugin implements Plugin1
 					arguments = newArguments;
 				}
 
-				File executable = command.getSincerity().getContainer().getExecutablesFile( arguments[0] );
+				Container container = sincerity.getContainer();
+
+				File executable = container.getExecutablesFile( arguments[0] );
 				if( executable.exists() )
 					arguments[0] = executable.getPath();
 
 				ProcessBuilder processBuilder = new ProcessBuilder( arguments );
 				Map<String, String> environment = processBuilder.environment();
 				String path = environment.get( "PATH" );
-				String sincerityPath = command.getSincerity().getContainer().getExecutablesFile().getPath();
+				String sincerityPath = container.getExecutablesFile().getPath();
 				if( path != null )
 					environment.put( "PATH", sincerityPath + File.pathSeparator + path );
 				else
@@ -134,7 +143,7 @@ public class DelegatePlugin implements Plugin1
 				if( !background )
 					ProcessDestroyer.addShutdownHook( process );
 
-				command.getSincerity().captureOutput( process );
+				sincerity.captureOutput( process );
 
 				if( !background )
 				{
@@ -150,22 +159,23 @@ public class DelegatePlugin implements Plugin1
 			}
 			catch( IOException x )
 			{
-				command.getSincerity().dumpStackTrace( x );
+				sincerity.dumpStackTrace( x );
 				throw new SincerityException( "Error executing system process: " + StringUtil.join( arguments, " " ), x );
 			}
 		}
 		else if( "programs".equals( commandName ) )
 		{
-			for( String program : command.getSincerity().getContainer().getPrograms() )
-				command.getSincerity().getOut().println( program );
+			for( String program : sincerity.getContainer().getPrograms() )
+				out.println( program );
 		}
 		else if( "languages".equals( commandName ) )
 		{
-			ScripturianShell shell = new ScripturianShell( command.getSincerity().getContainer(), null, true );
+			Container container = sincerity.getContainer();
+			ScripturianShell shell = new ScripturianShell( container, null, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
 			{
 				Map<String, Object> attributes = languageAdapter.getAttributes();
-				command.getSincerity().getOut().println( attributes.get( LanguageAdapter.LANGUAGE_NAME ) + " (" + attributes.get( LanguageAdapter.NAME ) + ")" );
+				out.println( attributes.get( LanguageAdapter.LANGUAGE_NAME ) + " (" + attributes.get( LanguageAdapter.NAME ) + ")" );
 			}
 		}
 		else

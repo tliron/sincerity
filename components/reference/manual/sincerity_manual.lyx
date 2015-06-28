@@ -1556,8 +1556,7 @@ name "cli"
 \end_layout
 
 \begin_layout Standard
-If you run Sincerity without any command line options, it will default the
- 
+If you run Sincerity with a 
 \bar under
 Graphical User Interface (GUI) (page 
 \begin_inset CommandInset ref
@@ -1568,6 +1567,14 @@ reference "gui"
 
 )
 \bar default
+ using 
+\begin_inset Quotes eld
+\end_inset
+
+sincerity gui
+\begin_inset Quotes erd
+\end_inset
+
 .
  However, it's strongly recommended that you learn how to use the command
  line.
@@ -2063,21 +2070,21 @@ sincerity
 \begin_inset Quotes erd
 \end_inset
 
- without any command, it will default to starting the GUI.
+ without any command, it will default to starting the shell.
  You can also start the GUI via the 
 \bar under
 
 \begin_inset Quotes eld
 \end_inset
 
-gui:gui
+shell:gui
 \begin_inset Quotes erd
 \end_inset
 
  command (page 
 \begin_inset CommandInset ref
 LatexCommand pageref
-reference "gui:gui"
+reference "shell:gui"
 
 \end_inset
 
@@ -6748,11 +6755,26 @@ reference "logging"
 \end_layout
 
 \begin_layout Subsection
-GUI
+Shell
 \end_layout
 
 \begin_layout Standard
-Manages the 
+Manages user interfaces to Sincerity.
+\end_layout
+
+\begin_layout Subsubsection
+shell:gui
+\begin_inset CommandInset label
+LatexCommand label
+name "shell:gui"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Starts the Sincerity 
 \bar under
 Sincerity GUI (page 
 \begin_inset CommandInset ref
@@ -6764,21 +6786,6 @@ reference "gui"
 )
 \bar default
 .
-\end_layout
-
-\begin_layout Subsubsection
-gui:gui
-\begin_inset CommandInset label
-LatexCommand label
-name "gui:gui"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Starts the Sincerity GUI.
  The GUI will go through all available plugins and try to call the optional
  gui() entry point if they have them, allowing plugins to enhance the GUI
  as is appropriate.
@@ -6824,6 +6831,21 @@ unless the native platform is GTK
 .
  We found the GTK look-and-feel to be so riddled with bugs that we decided
  to spare you from it.
+\end_layout
+
+\begin_layout Subsubsection
+shell:shell
+\begin_inset CommandInset label
+LatexCommand label
+name "shell:shell"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO
 \end_layout
 
 \begin_layout Subsection

@@ -13,6 +13,7 @@ package com.threecrickets.sincerity.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Plugin1;
@@ -66,10 +67,13 @@ public class TemplatesPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+		Sincerity sincerity = command.getSincerity();
+		PrintWriter out = sincerity.getOut();
+
 		if( "templates".equals( commandName ) )
 		{
-			for( Template template : command.getSincerity().getTemplates() )
-				command.getSincerity().getOut().println( template );
+			for( Template template : sincerity.getTemplates() )
+				out.println( template );
 		}
 		else if( "templatize".equals( commandName ) )
 		{
@@ -78,8 +82,8 @@ public class TemplatesPlugin implements Plugin1
 				throw new BadArgumentsCommandException( command, "template name" );
 
 			String template = arguments[0];
-			File sincerityHome = command.getSincerity().getHome();
-			File containerRoot = command.getSincerity().getContainer().getRoot();
+			File sincerityHome = sincerity.getHome();
+			File containerRoot = sincerity.getContainer().getRoot();
 
 			File templateDir = new File( new File( sincerityHome, "templates" ), template );
 			if( templateDir.exists() )

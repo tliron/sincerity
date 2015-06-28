@@ -15,7 +15,7 @@ import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.CommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.GuiPlugin;
+import com.threecrickets.sincerity.plugin.ShellPlugin;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 
 /**
@@ -84,14 +84,14 @@ public interface Plugin1
 	public void run( Command command ) throws SincerityException;
 
 	/**
-	 * Called by the {@link GuiPlugin} to allow this plugin to activate its own
-	 * extension to the GUI. This is an optional operation.
+	 * Called by the {@link ShellPlugin} to allow this plugin to activate its
+	 * own extension to the GUI. This is an optional operation.
 	 * <p>
 	 * The {@link Frame} can be accessed at {@link Sincerity#getFrame()}. Note
 	 * that when this hook is called, the frame is not yet made visible.
 	 * 
 	 * @param command
-	 *        The command used to invoke the GUI (likely "gui:gui")
+	 *        The command used to invoke the GUI (likely "shell:gui")
 	 * @throws SincerityException
 	 *         In case of an error
 	 */

@@ -950,7 +950,7 @@ public class Dependencies
 		out.println( "is available under multiple licenses." );
 		out.println();
 		out.println( "Use the \"sincerity dependencies:licenses\" command to see a list of all licenses, or" );
-		out.println( "\"sincerity gui:gui\" for a graphical interface." );
+		out.println( "\"sincerity shell:gui\" for a graphical interface." );
 		out.println();
 
 		printedDisclaimer = true;

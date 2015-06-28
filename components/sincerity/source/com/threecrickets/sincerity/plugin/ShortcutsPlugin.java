@@ -14,6 +14,7 @@ package com.threecrickets.sincerity.plugin;
 import java.io.PrintWriter;
 
 import com.threecrickets.sincerity.Command;
+import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
@@ -59,10 +60,13 @@ public class ShortcutsPlugin implements Plugin1
 	public void run( Command command ) throws SincerityException
 	{
 		String commandName = command.getName();
+
 		if( "shortcuts".equals( commandName ) )
 		{
-			Shortcuts shortcuts = command.getSincerity().getContainer().getShortcuts();
-			PrintWriter out = command.getSincerity().getOut();
+			Sincerity sincerity = command.getSincerity();
+			Container container = sincerity.getContainer();
+			Shortcuts shortcuts = container.getShortcuts();
+			PrintWriter out = sincerity.getOut();
 			for( String shortcut : shortcuts )
 			{
 				out.print( shortcut );

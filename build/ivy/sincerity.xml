@@ -16,7 +16,8 @@
 		<dependency org="org.apache.commons" name="commons-vfs" rev="1.0+" conf="distribution->default" />
 		<dependency org="org.apache.commons" name="commons-logging" rev="1.1+" conf="distribution->default" />
 		<dependency org="org.jsoup" name="jsoup" rev="1.8+" conf="distribution->default" />
-		<dependency org="org.mozilla" name="rhino" rev="1.7R4" conf="distribution->default" />
+		<dependency org="org.mozilla" name="rhino" rev="1.7+" conf="distribution->default" />
+		<dependency org="jline" name="jline" rev="2.12+" conf="distribution->default" />
 		
 		<!-- For compilation only -->
 		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.0+" conf="compile->default" />
