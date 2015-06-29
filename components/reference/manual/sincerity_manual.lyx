@@ -2070,7 +2070,26 @@ sincerity
 \begin_inset Quotes erd
 \end_inset
 
- without any command, it will default to starting the shell.
+ without any command, it will default to starting the console: 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+shell:console
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "shell:console"
+
+\end_inset
+
+).
+
+\bar default
  You can also start the GUI via the 
 \bar under
 
@@ -6763,6 +6782,66 @@ Manages user interfaces to Sincerity.
 \end_layout
 
 \begin_layout Subsubsection
+shell:console
+\begin_inset CommandInset label
+LatexCommand label
+name "shell:console"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A straightforward console in which you can run Sincerity commands.
+ The console supports basic command completion using the TAB key and history
+ using the UP and DOWN keys.
+\end_layout
+
+\begin_layout Standard
+Use 
+\begin_inset Quotes eld
+\end_inset
+
+exit
+\begin_inset Quotes erd
+\end_inset
+
+ (or CTRL+C) to exit the console.
+\end_layout
+
+\begin_layout Paragraph
+Arguments
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+[Script path]
+\series default
+: If present, the console will load this script file, run it one line at
+ a time, and then exit.
+ Empty lines and lines beginning with a 
+\begin_inset Quotes eld
+\end_inset
+
+#
+\begin_inset Quotes erd
+\end_inset
+
+ (comments) will be ignored.
+ In the script, you may separate commands via 
+\begin_inset Quotes eld
+\end_inset
+
+:
+\begin_inset Quotes erd
+\end_inset
+
+ or a newline, with the same final effect.
+\end_layout
+
+\begin_layout Subsubsection
 shell:gui
 \begin_inset CommandInset label
 LatexCommand label
@@ -6831,21 +6910,6 @@ unless the native platform is GTK
 .
  We found the GTK look-and-feel to be so riddled with bugs that we decided
  to spare you from it.
-\end_layout
-
-\begin_layout Subsubsection
-shell:shell
-\begin_inset CommandInset label
-LatexCommand label
-name "shell:shell"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-TODO
 \end_layout
 
 \begin_layout Subsection

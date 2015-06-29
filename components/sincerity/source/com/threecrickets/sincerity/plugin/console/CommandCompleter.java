@@ -34,6 +34,20 @@ import jline.console.completer.Completer;
 public class CommandCompleter implements Completer
 {
 	//
+	// Construction
+	//
+
+	public CommandCompleter()
+	{
+		this( "" );
+	}
+
+	public CommandCompleter( String prefix )
+	{
+		this.prefix = prefix;
+	}
+
+	//
 	// Completer
 	//
 
@@ -41,10 +55,10 @@ public class CommandCompleter implements Completer
 	public int complete( String buffer, int cursor, List<CharSequence> candidates )
 	{
 		if( buffer == null )
-			candidates.addAll( getStrings() );
+			candidates.addAll( getCommands() );
 		else
 		{
-			for( String match : getStrings().tailSet( buffer ) )
+			for( String match : getCommands().tailSet( buffer ) )
 			{
 				if( !match.startsWith( buffer ) || buffer.equals( match ) )
 					break;
@@ -61,31 +75,33 @@ public class CommandCompleter implements Completer
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private SortedSet<String> getStrings()
+	private final String prefix;
+
+	private SortedSet<String> getCommands()
 	{
-		TreeSet<String> strings = new TreeSet<String>();
+		TreeSet<String> commands = new TreeSet<String>();
 		try
 		{
-			Plugins plugins = Sincerity.getCurrent().getContainer().getPlugins();
+			Plugins plugins = Sincerity.getCurrent().getPlugins();
 			ArrayList<String> removes = new ArrayList<String>();
 			for( Map.Entry<String, Plugin1> entry : plugins.entrySet() )
 			{
-				strings.add( entry.getKey() + Command.PLUGIN_COMMAND_SEPARATOR );
+				commands.add( prefix + entry.getKey() + Command.PLUGIN_COMMAND_SEPARATOR );
 				for( String command : entry.getValue().getCommands() )
 				{
-					strings.add( entry.getKey() + Command.PLUGIN_COMMAND_SEPARATOR + command );
-					if( strings.contains( command ) )
+					commands.add( prefix + entry.getKey() + Command.PLUGIN_COMMAND_SEPARATOR + command );
+					if( commands.contains( prefix + command ) )
 						// This command is not unique, so it can't be called
 						// without the group prefix
-						removes.add( command );
-					strings.add( command );
+						removes.add( prefix + command );
+					commands.add( prefix + command );
 				}
 			}
-			strings.removeAll( removes );
+			commands.removeAll( removes );
 		}
 		catch( SincerityException x )
 		{
 		}
-		return strings;
+		return commands;
 	}
 }
