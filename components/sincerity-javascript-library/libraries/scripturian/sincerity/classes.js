@@ -78,7 +78,7 @@ var Sincerity = Sincerity || {}
  *   }
  *   
  *   // Inheritance annotation
- *   Public._inherit = 'MyParentClass'
+ *   Public._inherit = MyParentClass
  *   
  *   // A custom annotation, which may be used by other systems in our application
  *   Public._saveToDatabase = 'people'
@@ -171,7 +171,7 @@ Sincerity.Classes = Sincerity.Classes || function() {
      * 
      * @param definition
      * @param {Function} [definition._construct] Becomes the class constructor (if not provided, a default no-op constructor is used)
-     * @param {String} [definition._inherit] The name of the class from which we will {@link #inherit}
+     * @param {Object} [definition._inherit] The class from which we will {@link #inherit}
      * @returns The class constructor, with the prototype properly initialized
      */
     Public.define = function(definition) {
