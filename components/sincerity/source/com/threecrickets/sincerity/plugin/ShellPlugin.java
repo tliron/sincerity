@@ -11,6 +11,8 @@
 
 package com.threecrickets.sincerity.plugin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.threecrickets.sincerity.Command;
@@ -26,6 +28,7 @@ import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.plugin.gui.Splash;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
 import com.threecrickets.sincerity.util.ClassUtil;
+import com.threecrickets.sincerity.util.IoUtil;
 
 import jline.Terminal;
 import jline.TerminalFactory;
@@ -78,11 +81,41 @@ public class ShellPlugin implements Plugin1
 
 		if( "console".equals( commandName ) )
 		{
-			sincerity.getOut().println( "Sincerity " + sincerity.getVersion().get( "version" ) );
+			command.setParse( true );
+			String[] arguments = command.getArguments();
+			File script = null;
+			if( arguments.length > 0 )
+				script = new File( arguments[0] );
 
-			Container container = sincerity.getContainer();
-			if( container != null )
+			if( script != null )
+			{
+				try
+				{
+					for( String line : IoUtil.readLines( new FileInputStream( script ) ) )
+					{
+						line = line.trim();
+						if( line.isEmpty() || ( line.startsWith( "#" ) ) )
+							continue;
+						ClassUtil.main( sincerity, Sincerity.class.getCanonicalName(), line.split( " " ) );
+					}
+					return;
+				}
+				catch( IOException x )
+				{
+					throw new SincerityException( x );
+				}
+			}
+
+			sincerity.getOut().println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
+
+			try
+			{
+				Container container = sincerity.getContainer();
 				sincerity.getOut().println( "Container: " + container.getRoot() );
+			}
+			catch( NoContainerException x )
+			{
+			}
 
 			Terminal terminal = TerminalFactory.create();
 			try

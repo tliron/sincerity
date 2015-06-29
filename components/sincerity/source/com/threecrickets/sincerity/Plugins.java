@@ -41,8 +41,6 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	//
 
 	/**
-	 * Finds all delegated and JVM plugins in the container's classpath.
-	 * 
 	 * @param container
 	 *        The container
 	 * @throws SincerityException
@@ -50,15 +48,69 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	 */
 	public Plugins( Container container ) throws SincerityException
 	{
+		this( container.getSincerity(), container );
+	}
+
+	/**
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public Plugins( Sincerity sincerity ) throws SincerityException
+	{
+		this( sincerity, null );
+	}
+
+	/**
+	 * Finds all delegated and JVM plugins in the container's classpath.
+	 * 
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @param container
+	 *        The container or null
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public Plugins( Sincerity sincerity, Container container ) throws SincerityException
+	{
 		super();
 
-		ClassLoader classLoader = container.getBootstrap();
+		ClassLoader classLoader = container != null ? container.getBootstrap() : getClass().getClassLoader();
 
 		// Delegated plugins
-		File pluginsDir = container.getLibrariesFile( "scripturian", "plugins" );
+
+		ScripturianShell shell = null;
+
+		if( container != null )
+		{
+			File pluginsDir = container.getLibrariesFile( "scripturian", "plugins" );
+			if( pluginsDir.isDirectory() )
+			{
+				shell = new ScripturianShell( container, true );
+				for( File pluginFile : pluginsDir.listFiles() )
+				{
+					if( pluginFile.isHidden() )
+						continue;
+
+					try
+					{
+						Plugin1 plugin = new DelegatedPlugin( pluginFile, container, shell );
+						plugins.put( plugin.getName(), plugin );
+					}
+					catch( Exception x )
+					{
+						container.getSincerity().dumpStackTrace( x );
+					}
+				}
+			}
+		}
+
+		File pluginsDir = sincerity.getHomeFile( "libraries", "scripturian", "plugins" );
 		if( pluginsDir.isDirectory() )
 		{
-			ScripturianShell shell = new ScripturianShell( container, null, true );
+			if( shell == null )
+				shell = new ScripturianShell( sincerity, true );
 			for( File pluginFile : pluginsDir.listFiles() )
 			{
 				if( pluginFile.isHidden() )
@@ -66,32 +118,15 @@ public class Plugins extends AbstractMap<String, Plugin1>
 
 				try
 				{
-					Plugin1 plugin = new DelegatedPlugin( pluginFile, shell );
+					Plugin1 plugin = new DelegatedPlugin( pluginFile, sincerity, shell );
 					plugins.put( plugin.getName(), plugin );
 				}
 				catch( Exception x )
 				{
-					container.getSincerity().dumpStackTrace( x );
+					sincerity.dumpStackTrace( x );
 				}
 			}
 		}
-
-		// JVM plugins
-		for( Plugin1 plugin : ServiceLoader.load( Plugin1.class, classLoader ) )
-			plugins.put( plugin.getName(), plugin );
-	}
-
-	/**
-	 * Finds all JVM plugins in the current classpath.
-	 * 
-	 * @throws SincerityException
-	 *         In case of an error
-	 */
-	public Plugins() throws SincerityException
-	{
-		super();
-
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
 		// JVM plugins
 		for( Plugin1 plugin : ServiceLoader.load( Plugin1.class, classLoader ) )

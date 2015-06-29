@@ -15,6 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**
@@ -70,7 +71,17 @@ public abstract class ClassUtil
 
 		try
 		{
-			Class<?> theClass = Class.forName( className, true, sincerity.getContainer().getBootstrap() );
+			ClassLoader classLoader;
+			try
+			{
+				classLoader = sincerity.getContainer().getBootstrap();
+			}
+			catch( NoContainerException x )
+			{
+				classLoader = ClassUtil.class.getClassLoader();
+			}
+
+			Class<?> theClass = Class.forName( className, true, classLoader );
 			Method mainMethod = theClass.getMethod( "main", String[].class );
 			mainMethod.invoke( null, (Object) arguments );
 		}

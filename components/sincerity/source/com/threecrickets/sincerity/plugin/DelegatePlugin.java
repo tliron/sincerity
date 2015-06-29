@@ -23,6 +23,7 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ScripturianShell;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
+import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.plugin.gui.ProgramsPane;
@@ -102,9 +103,16 @@ public class DelegatePlugin implements Plugin1
 			if( !arguments[0].startsWith( "/" ) )
 				arguments[0] = "/programs/" + arguments[0];
 
-			Container container = sincerity.getContainer();
-
-			ScripturianShell shell = new ScripturianShell( container, null, true, arguments );
+			ScripturianShell shell;
+			try
+			{
+				Container container = sincerity.getContainer();
+				shell = new ScripturianShell( container, true, arguments );
+			}
+			catch( NoContainerException x )
+			{
+				shell = new ScripturianShell( sincerity, true, arguments );
+			}
 			shell.execute( arguments[0] );
 		}
 		else if( "execute".equals( commandName ) )
@@ -171,7 +179,7 @@ public class DelegatePlugin implements Plugin1
 		else if( "languages".equals( commandName ) )
 		{
 			Container container = sincerity.getContainer();
-			ScripturianShell shell = new ScripturianShell( container, null, true );
+			ScripturianShell shell = new ScripturianShell( container, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
 			{
 				Map<String, Object> attributes = languageAdapter.getAttributes();

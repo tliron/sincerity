@@ -11,7 +11,6 @@
 
 package com.threecrickets.sincerity;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
@@ -23,6 +22,7 @@ import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.Main;
 import com.threecrickets.scripturian.ParserManager;
 import com.threecrickets.scripturian.ParsingContext;
+import com.threecrickets.scripturian.document.ChainDocumentSource;
 import com.threecrickets.scripturian.document.DocumentDescriptor;
 import com.threecrickets.scripturian.document.DocumentFileSource;
 import com.threecrickets.scripturian.document.DocumentSource;
@@ -56,8 +56,6 @@ public class ScripturianShell implements Shell
 	 * 
 	 * @param container
 	 *        The container
-	 * @param sourceDir
-	 *        The document source directory
 	 * @param prepare
 	 *        True to prepare documents
 	 * @param arguments
@@ -65,21 +63,39 @@ public class ScripturianShell implements Shell
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public ScripturianShell( Container container, File sourceDir, boolean prepare, String... arguments ) throws SincerityException
+	public ScripturianShell( Container container, boolean prepare, String... arguments ) throws SincerityException
 	{
-		if( sourceDir == null )
-			sourceDir = container.getRoot();
-
-		this.container = container;
+		this.sincerity = container.getSincerity();
 		this.arguments = arguments;
 
-		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "container/", sourceDir, "default", "js", 1000 );
-		librarySources.add( new DocumentFileSource<Executable>( "container/libraries/scripturian/", container.getLibrariesFile( "scripturian" ), "default", "js", -1 ) );
-		librarySources.add( new DocumentFileSource<Executable>( "sincerity/", container.getSincerity().getHomeFile( "libraries", "scripturian" ), "default", "js", -1 ) );
+		DocumentFileSource<Executable> containerSource = new DocumentFileSource<Executable>( "container/", container.getRoot(), "default", "js", 1000 );
+		DocumentFileSource<Executable> sinceritySource = new DocumentFileSource<Executable>( "sincerity/", this.sincerity.getHome(), "default", "js", 1000 );
+		librarySources.add( new DocumentFileSource<Executable>( "container/libraries/scripturian/", container.getLibrariesFile( "scripturian" ), "default", "js", 1000 ) );
+		librarySources.add( new DocumentFileSource<Executable>( "sincerity/libraries/scripturian/", this.sincerity.getHomeFile( "libraries", "scripturian" ), "default", "js", 1000 ) );
+
+		ChainDocumentSource<Executable> source = new ChainDocumentSource<Executable>( "chain/" );
+		source.getSources().add( containerSource );
+		source.getSources().add( sinceritySource );
 
 		parsingContext = new ParsingContext();
 		parsingContext.setLanguageManager( container.getLanguageManager() );
 		parsingContext.setParserManager( container.getParserManager() );
+		parsingContext.setDocumentSource( source );
+		parsingContext.setDefaultLanguageTag( "javascript" );
+		parsingContext.setPrepare( prepare );
+	}
+
+	public ScripturianShell( Sincerity sincerity, boolean prepare, String... arguments ) throws SincerityException
+	{
+		this.sincerity = sincerity;
+		this.arguments = arguments;
+
+		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "sincerity/", sincerity.getHome(), "default", "js", 1000 );
+		librarySources.add( new DocumentFileSource<Executable>( "sincerity/libraries/scripturian/", sincerity.getHomeFile( "libraries", "scripturian" ), "default", "js", 1000 ) );
+
+		parsingContext = new ParsingContext();
+		parsingContext.setLanguageManager( new LanguageManager() );
+		parsingContext.setParserManager( new ParserManager() );
 		parsingContext.setDocumentSource( source );
 		parsingContext.setDefaultLanguageTag( "javascript" );
 		parsingContext.setPrepare( prepare );
@@ -96,12 +112,12 @@ public class ScripturianShell implements Shell
 	 */
 	public ExecutionContext createExecutionContext()
 	{
-		ExecutionContext executionContext = new ExecutionContext( container.getSincerity().getOut(), container.getSincerity().getErr() );
+		ExecutionContext executionContext = new ExecutionContext( sincerity.getOut(), sincerity.getErr() );
 		DocumentService documentService = new DocumentService( this, executionContext );
 		documentService.setDefaultLanguageTag( parsingContext.getDefaultLanguageTag() );
 		executionContext.getServices().put( "document", documentService );
 		executionContext.getServices().put( "application", new ApplicationService( this ) );
-		executionContext.getServices().put( "sincerity", container.getSincerity() );
+		executionContext.getServices().put( "sincerity", sincerity );
 		return executionContext;
 	}
 
@@ -205,20 +221,6 @@ public class ScripturianShell implements Shell
 	}
 
 	//
-	// Attributes
-	//
-
-	/**
-	 * The container.
-	 * 
-	 * @return The container
-	 */
-	public Container getContainer()
-	{
-		return container;
-	}
-
-	//
 	// Shell
 	//
 
@@ -270,7 +272,7 @@ public class ScripturianShell implements Shell
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final Container container;
+	private final Sincerity sincerity;
 
 	private final String[] arguments;
 

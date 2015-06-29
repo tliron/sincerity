@@ -444,7 +444,8 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Reads all lines in a stream using UTF-8.
+	 * Reads all lines in a stream using UTF-8. The stream will be consumed and
+	 * closed.
 	 * 
 	 * @param stream
 	 *        The stream
@@ -470,7 +471,7 @@ public abstract class IoUtil
 		{
 			try
 			{
-				reader.close();
+				stream.close();
 			}
 			catch( IOException x )
 			{
@@ -498,7 +499,8 @@ public abstract class IoUtil
 		// See:
 		// http://tripoverit.blogspot.com/2007/04/javas-utf-8-and-unicode-writing-is.html
 
-		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) );
+		FileOutputStream stream = new FileOutputStream( file );
+		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( stream, "UTF-8" ) );
 		try
 		{
 			for( String line : lines )
@@ -515,7 +517,7 @@ public abstract class IoUtil
 		{
 			try
 			{
-				writer.close();
+				stream.close();
 			}
 			catch( IOException x )
 			{

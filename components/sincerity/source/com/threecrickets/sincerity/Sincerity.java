@@ -257,6 +257,39 @@ public class Sincerity implements Runnable
 	}
 
 	/**
+	 * If the file is under to the root directory, returns a relative path.
+	 * 
+	 * @param file
+	 *        The absolute file
+	 * @return The relative path
+	 * @see #getRelativeHomePath(File)
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public String getRelativeHomePath( File file ) throws SincerityException
+	{
+		return getRelativeHomePath( file.getAbsolutePath() );
+	}
+
+	/**
+	 * If the path is under to the root directory, returns a relative path.
+	 * 
+	 * @param path
+	 *        The absolute path
+	 * @return The relative path
+	 * @see #getRelativeHomePath(File)
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public String getRelativeHomePath( String path ) throws SincerityException
+	{
+		String root = getHome().getPath();
+		if( path.startsWith( root ) )
+			path = path.substring( root.length() + 1 );
+		return path;
+	}
+
+	/**
 	 * @return The verbosity level
 	 * @see #setVerbosity(int)
 	 */
@@ -474,7 +507,7 @@ public class Sincerity implements Runnable
 		catch( NoContainerException x )
 		{
 			if( plugins == null )
-				plugins = new Plugins();
+				plugins = new Plugins( this );
 
 			return plugins;
 		}
@@ -932,13 +965,19 @@ public class Sincerity implements Runnable
 				if( command.getName().startsWith( Shortcuts.SHORTCUT_PREFIX ) )
 				{
 					// Expands shortcuts into current command queue
-					String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( Shortcuts.SHORTCUT_PREFIX_LENGTH ) );
-					LinkedList<Command> shortcutCommands = parseCommands( shortcut );
-					commands.remove( command );
-					commands.addAll( 0, shortcutCommands );
-					command = commands.peek();
-					if( command == null )
-						break;
+					try
+					{
+						String[] shortcut = getContainer().getShortcuts().get( command.getName().substring( Shortcuts.SHORTCUT_PREFIX_LENGTH ) );
+						LinkedList<Command> shortcutCommands = parseCommands( shortcut );
+						commands.remove( command );
+						commands.addAll( 0, shortcutCommands );
+						command = commands.peek();
+						if( command == null )
+							break;
+					}
+					catch( NoContainerException x )
+					{
+					}
 				}
 
 				if( command.plugin != null )

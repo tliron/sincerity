@@ -41,13 +41,34 @@ public class DelegatedPlugin implements Plugin1
 	 *        name)
 	 * @param shell
 	 *        The shell
+	 * @param container
+	 *        The container
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public DelegatedPlugin( File pluginFile, ScripturianShell shell ) throws SincerityException
+	public DelegatedPlugin( File pluginFile, Container container, ScripturianShell shell ) throws SincerityException
 	{
 		defaultName = IoUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
-		executable = shell.makeEnterable( "/" + shell.getContainer().getRelativePath( pluginFile ), ENTERING_KEY );
+		executable = shell.makeEnterable( "/" + container.getRelativePath( pluginFile ), ENTERING_KEY );
+	}
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param pluginFile
+	 *        The Scripturian library file (also determines the plugin's default
+	 *        name)
+	 * @param shell
+	 *        The shell
+	 * @param sincerity
+	 *        The Sincerity instance
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	public DelegatedPlugin( File pluginFile, Sincerity sincerity, ScripturianShell shell ) throws SincerityException
+	{
+		defaultName = IoUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
+		executable = shell.makeEnterable( "/" + sincerity.getRelativeHomePath( pluginFile ), ENTERING_KEY );
 	}
 
 	//
@@ -74,10 +95,11 @@ public class DelegatedPlugin implements Plugin1
 		catch( ExecutionException x )
 		{
 			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
-			/*if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );*/
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -101,10 +123,11 @@ public class DelegatedPlugin implements Plugin1
 		catch( ExecutionException x )
 		{
 			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
-			/*if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );*/
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -135,10 +158,11 @@ public class DelegatedPlugin implements Plugin1
 		catch( ExecutionException x )
 		{
 			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
-			/*if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );*/
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -159,10 +183,11 @@ public class DelegatedPlugin implements Plugin1
 		catch( ExecutionException x )
 		{
 			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
-			/*if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );*/
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( NoSuchMethodException x )
 		{
@@ -183,10 +208,11 @@ public class DelegatedPlugin implements Plugin1
 		catch( ExecutionException x )
 		{
 			throw new SincerityException( "Could not run delegated plugin: " + defaultName, x );
-			/*if( x.getCause() instanceof SincerityException )
-				throw (SincerityException) x.getCause();
-			else
-				throw new SincerityException( x.getCause() );*/
+			/*
+			 * if( x.getCause() instanceof SincerityException ) throw
+			 * (SincerityException) x.getCause(); else throw new
+			 * SincerityException( x.getCause() );
+			 */
 		}
 		catch( NoSuchMethodException x )
 		{
