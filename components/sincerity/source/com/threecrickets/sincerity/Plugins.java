@@ -16,9 +16,10 @@ import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
-import com.threecrickets.scripturian.internal.ServiceLoader;
+import com.threecrickets.sincerity.exception.ReenteringDocumentException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**
@@ -116,10 +117,17 @@ public class Plugins extends AbstractMap<String, Plugin1>
 				if( pluginFile.isHidden() )
 					continue;
 
+				Plugin1 plugin = null;
 				try
 				{
-					Plugin1 plugin = new DelegatedPlugin( pluginFile, sincerity, shell );
-					plugins.put( plugin.getName(), plugin );
+					plugin = new DelegatedPlugin( pluginFile, sincerity, shell );
+					if( !plugins.containsKey( plugin.getName() ) )
+						plugins.put( plugin.getName(), plugin );
+				}
+				catch( ReenteringDocumentException x )
+				{
+					// Likely because the same plugin exists both in the
+					// container and in the Sincerity home
 				}
 				catch( Exception x )
 				{

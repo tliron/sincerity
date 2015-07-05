@@ -33,6 +33,8 @@ import com.threecrickets.scripturian.parser.ProgramParser;
 import com.threecrickets.scripturian.service.ApplicationService;
 import com.threecrickets.scripturian.service.DocumentService;
 import com.threecrickets.scripturian.service.Shell;
+import com.threecrickets.sincerity.exception.ReenteringDocumentException;
+import com.threecrickets.sincerity.exception.ScripturianException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**
@@ -126,10 +128,10 @@ public class ScripturianShell implements Shell
 	 * 
 	 * @param documentName
 	 *        The document name
-	 * @throws SincerityException
+	 * @throws ScripturianException
 	 *         In case of an error
 	 */
-	public void execute( String documentName ) throws SincerityException
+	public void execute( String documentName ) throws ScripturianException
 	{
 		ExecutionContext executionContext = createExecutionContext();
 		try
@@ -141,22 +143,22 @@ public class ScripturianShell implements Shell
 			}
 			catch( ParsingException x )
 			{
-				throw new SincerityException( "Could not parse source code for execution: " + documentName, x );
+				throw new ScripturianException( "Could not parse source code for execution: " + documentName, x );
 			}
 			catch( DocumentException x )
 			{
-				throw new SincerityException( "Could not read source code for execution: " + documentName, x );
+				throw new ScripturianException( "Could not read source code for execution: " + documentName, x );
 			}
 			catch( ExecutionException x )
 			{
-				if( x.getCause() instanceof SincerityException )
-					throw (SincerityException) x.getCause();
+				if( x.getCause() instanceof ScripturianException )
+					throw (ScripturianException) x.getCause();
 				else
-					throw new SincerityException( x.getCause() );
+					throw new ScripturianException( x.getCause() );
 			}
 			catch( IOException x )
 			{
-				throw new SincerityException( "Could not read source code for execution: " + documentName, x );
+				throw new ScripturianException( "Could not read source code for execution: " + documentName, x );
 			}
 		}
 		finally
@@ -174,10 +176,10 @@ public class ScripturianShell implements Shell
 	 * @param enteringKey
 	 *        The entering key
 	 * @return The enterable executable
-	 * @throws SincerityException
+	 * @throws ScripturianException
 	 *         In case of an error
 	 */
-	public Executable makeEnterable( String documentName, String enteringKey ) throws SincerityException
+	public Executable makeEnterable( String documentName, String enteringKey ) throws ScripturianException
 	{
 		boolean enterable = false;
 		ExecutionContext executionContext = createExecutionContext();
@@ -190,28 +192,26 @@ public class ScripturianShell implements Shell
 			if( enterable )
 				return executable;
 			else
-				throw new SincerityException( "Tried to reenter executable: " + documentName );
+				throw new ReenteringDocumentException( "Tried to reenter executable: " + documentName );
 		}
 		catch( ParsingException x )
 		{
-			throw new SincerityException( "Could not parse source code for execution: " + documentName, x );
+			throw new ScripturianException( "Could not parse source code for execution: " + documentName, x );
 		}
 		catch( DocumentException x )
 		{
-			throw new SincerityException( "Could not read source code for execution: " + documentName, x );
+			throw new ScripturianException( "Could not read source code for execution: " + documentName, x );
 		}
 		catch( ExecutionException x )
 		{
-			throw new SincerityException( "Could not execute: " + documentName, x );
-			/*
-			 * if( x.getCause() instanceof SincerityException ) throw
-			 * (SincerityException) x.getCause(); else throw new
-			 * SincerityException( x.getCause() );
-			 */
+			if( x.getCause() instanceof ScripturianException )
+				throw (ScripturianException) x.getCause();
+			else
+				throw new ScripturianException( x.getCause() );
 		}
 		catch( IOException x )
 		{
-			throw new SincerityException( "Could not read source code for execution: " + documentName, x );
+			throw new ScripturianException( "Could not read source code for execution: " + documentName, x );
 		}
 		finally
 		{
