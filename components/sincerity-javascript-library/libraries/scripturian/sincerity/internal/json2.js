@@ -1,6 +1,6 @@
 /*
-    http://www.JSON.org/json2.js
-    2008-11-19
+    json2.js
+    2015-05-03
 
     Public Domain.
 
@@ -8,8 +8,18 @@
 
     See http://www.JSON.org/js.html
 
+
+    This code should be minified before deployment.
+    See http://javascript.crockford.com/jsmin.html
+
+    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
+    NOT CONTROL.
+
+
     This file creates a global JSON object containing two methods: stringify
-    and parse.
+    and parse. This file is provides the ES5 JSON capability to ES3 systems.
+    If a project might run on IE8 or earlier, then this file should be included.
+    This file does nothing on ES5 systems.
 
         JSON.stringify(value, replacer, space)
             value       any JavaScript value, usually an object or array.
@@ -33,14 +43,16 @@
             value represented by the name/value pair that should be serialized,
             or undefined if nothing should be serialized. The toJSON method
             will be passed the key associated with the value, and this will be
-            bound to the object holding the key.
+            bound to the value
 
             For example, this would serialize Dates as ISO strings.
 
                 Date.prototype.toJSON = function (key) {
                     function f(n) {
                         // Format integers to have at least two digits.
-                        return n < 10 ? '0' + n : n;
+                        return n < 10 
+                            ? '0' + n 
+                            : n;
                     }
 
                     return this.getUTCFullYear()   + '-' +
@@ -86,8 +98,9 @@
             // text is '[\n\t"e",\n\t{\n\t\t"pluribus": "unum"\n\t}\n]'
 
             text = JSON.stringify([new Date()], function (key, value) {
-                return this[key] instanceof Date ?
-                    'Date(' + this[key] + ')' : value;
+                return this[key] instanceof Date 
+                    ? 'Date(' + this[key] + ')' 
+                    : value;
             });
             // text is '["Date(---current time---)"]'
 
@@ -136,70 +149,70 @@
 
     This is a reference implementation. You are free to copy, modify, or
     redistribute.
-
-    This code should be minified before deployment.
-    See http://javascript.crockford.com/jsmin.html
-
-    USE YOUR OWN COPY. IT IS EXTREMELY UNWISE TO LOAD CODE FROM SERVERS YOU DO
-    NOT CONTROL.
 */
 
-/*jslint evil: true */
+/*jslint 
+    eval, for, this 
+*/
 
-/*global JSON */
-
-/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
-    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+/*property
+    JSON, apply, call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
     getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
     lastIndex, length, parse, prototype, push, replace, slice, stringify,
     test, toJSON, toString, valueOf
 */
 
+
 // Create a JSON object only if one does not already exist. We create the
 // methods in a closure to avoid creating global variables.
 
-if (!this.JSON) {
+if (typeof JSON !== 'object') {
     JSON = {};
 }
+
 (function () {
+    'use strict';
+    
+    var rx_one = /^[\],:{}\s]*$/,
+        rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,
+        rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,
+        rx_four = /(?:^|:|,)(?:\s*\[)+/g,
+        rx_escapable = /[\\\"\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        rx_dangerous = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;
 
     function f(n) {
         // Format integers to have at least two digits.
-        return n < 10 ? '0' + n : n;
+        return n < 10 
+            ? '0' + n 
+            : n;
+    }
+    
+    function this_value() {
+        return this.valueOf();
     }
 
     if (typeof Date.prototype.toJSON !== 'function') {
 
-        Date.prototype.toJSON = function (key) {
+        Date.prototype.toJSON = function () {
 
-            return this.getUTCFullYear()   + '-' +
-                 f(this.getUTCMonth() + 1) + '-' +
-                 f(this.getUTCDate())      + 'T' +
-                 f(this.getUTCHours())     + ':' +
-                 f(this.getUTCMinutes())   + ':' +
-                 f(this.getUTCSeconds())   + 'Z';
+            return isFinite(this.valueOf())
+                ? this.getUTCFullYear() + '-' +
+                        f(this.getUTCMonth() + 1) + '-' +
+                        f(this.getUTCDate()) + 'T' +
+                        f(this.getUTCHours()) + ':' +
+                        f(this.getUTCMinutes()) + ':' +
+                        f(this.getUTCSeconds()) + 'Z'
+                : null;
         };
 
-        String.prototype.toJSON =
-        Number.prototype.toJSON =
-        Boolean.prototype.toJSON = function (key) {
-            return this.valueOf();
-        };
+        Boolean.prototype.toJSON = this_value;
+        Number.prototype.toJSON = this_value;
+        String.prototype.toJSON = this_value;
     }
 
-    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-        gap,
+    var gap,
         indent,
-        meta = {    // table of character substitutions
-            '\b': '\\b',
-            '\t': '\\t',
-            '\n': '\\n',
-            '\f': '\\f',
-            '\r': '\\r',
-            '"' : '\\"',
-            '\\': '\\\\'
-        },
+        meta,
         rep;
 
 
@@ -210,14 +223,15 @@ if (!this.JSON) {
 // Otherwise we must also replace the offending characters with safe escape
 // sequences.
 
-        escapable.lastIndex = 0;
-        return escapable.test(string) ?
-            '"' + string.replace(escapable, function (a) {
+        rx_escapable.lastIndex = 0;
+        return rx_escapable.test(string) 
+            ? '"' + string.replace(rx_escapable, function (a) {
                 var c = meta[a];
-                return typeof c === 'string' ? c :
-                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-            }) + '"' :
-            '"' + string + '"';
+                return typeof c === 'string'
+                    ? c
+                    : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' 
+            : '"' + string + '"';
     }
 
 
@@ -257,7 +271,9 @@ if (!this.JSON) {
 
 // JSON numbers must be finite. Encode non-finite numbers as null.
 
-            return isFinite(value) ? String(value) : 'null';
+            return isFinite(value) 
+                ? String(value) 
+                : 'null';
 
         case 'boolean':
         case 'null':
@@ -300,11 +316,11 @@ if (!this.JSON) {
 // Join all of the elements together, separated with commas, and wrap them in
 // brackets.
 
-                v = partial.length === 0 ? '[]' :
-                    gap ? '[\n' + gap +
-                            partial.join(',\n' + gap) + '\n' +
-                                mind + ']' :
-                          '[' + partial.join(',') + ']';
+                v = partial.length === 0
+                    ? '[]'
+                    : gap
+                        ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
+                        : '[' + partial.join(',') + ']';
                 gap = mind;
                 return v;
             }
@@ -314,11 +330,15 @@ if (!this.JSON) {
             if (rep && typeof rep === 'object') {
                 length = rep.length;
                 for (i = 0; i < length; i += 1) {
-                    k = rep[i];
-                    if (typeof k === 'string') {
+                    if (typeof rep[i] === 'string') {
+                        k = rep[i];
                         v = str(k, value);
                         if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? ': ' 
+                                    : ':'
+                            ) + v);
                         }
                     }
                 }
@@ -327,10 +347,14 @@ if (!this.JSON) {
 // Otherwise, iterate through all of the keys in the object.
 
                 for (k in value) {
-                    if (Object.hasOwnProperty.call(value, k)) {
+                    if (Object.prototype.hasOwnProperty.call(value, k)) {
                         v = str(k, value);
                         if (v) {
-                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            partial.push(quote(k) + (
+                                gap 
+                                    ? ': ' 
+                                    : ':'
+                            ) + v);
                         }
                     }
                 }
@@ -339,9 +363,11 @@ if (!this.JSON) {
 // Join all of the member texts together, separated with commas,
 // and wrap them in braces.
 
-            v = partial.length === 0 ? '{}' :
-                gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
-                        mind + '}' : '{' + partial.join(',') + '}';
+            v = partial.length === 0
+                ? '{}'
+                : gap
+                    ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
+                    : '{' + partial.join(',') + '}';
             gap = mind;
             return v;
         }
@@ -350,6 +376,15 @@ if (!this.JSON) {
 // If the JSON object does not yet have a stringify method, give it one.
 
     if (typeof JSON.stringify !== 'function') {
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"': '\\"',
+            '\\': '\\\\'
+        };
         JSON.stringify = function (value, replacer, space) {
 
 // The stringify method takes a value and an optional replacer, and an optional
@@ -382,7 +417,7 @@ if (!this.JSON) {
             rep = replacer;
             if (replacer && typeof replacer !== 'function' &&
                     (typeof replacer !== 'object' ||
-                     typeof replacer.length !== 'number')) {
+                    typeof replacer.length !== 'number')) {
                 throw new Error('JSON.stringify');
             }
 
@@ -412,7 +447,7 @@ if (!this.JSON) {
                 var k, v, value = holder[key];
                 if (value && typeof value === 'object') {
                     for (k in value) {
-                        if (Object.hasOwnProperty.call(value, k)) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
                             v = walk(value, k);
                             if (v !== undefined) {
                                 value[k] = v;
@@ -430,11 +465,12 @@ if (!this.JSON) {
 // Unicode characters with escape sequences. JavaScript handles many characters
 // incorrectly, either silently deleting them, or treating them as line endings.
 
-            cx.lastIndex = 0;
-            if (cx.test(text)) {
-                text = text.replace(cx, function (a) {
+            text = String(text);
+            rx_dangerous.lastIndex = 0;
+            if (rx_dangerous.test(text)) {
+                text = text.replace(rx_dangerous, function (a) {
                     return '\\u' +
-                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                            ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
                 });
             }
 
@@ -451,10 +487,14 @@ if (!this.JSON) {
 // we look to see that the remaining characters are only whitespace or ']' or
 // ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
 
-            if (/^[\],:{}\s]*$/.
-test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@').
-replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
-replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+            if (
+                rx_one.test(
+                    text
+                        .replace(rx_two, '@')
+                        .replace(rx_three, ']')
+                        .replace(rx_four, '')
+                )
+            ) {
 
 // In the third stage we use the eval function to compile the text into a
 // JavaScript structure. The '{' operator is subject to a syntactic ambiguity
@@ -466,8 +506,9 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 // In the optional fourth stage, we recursively walk the new structure, passing
 // each name/value pair to a reviver function for possible transformation.
 
-                return typeof reviver === 'function' ?
-                    walk({'': j}, '') : j;
+                return typeof reviver === 'function'
+                    ? walk({'': j}, '')
+                    : j;
             }
 
 // If the text is not JSON parseable, then a SyntaxError is thrown.
@@ -475,4 +516,4 @@ replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
             throw new SyntaxError('JSON.parse');
         };
     }
-})();
+}());
