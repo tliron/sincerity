@@ -218,8 +218,15 @@ Sincerity.Objects = Sincerity.Objects || function() {
     	if (!Public.exists(value)) {
     		return false
     	}
-    	var type = Object.prototype.toString.call(value)
-    	return (type === '[object jdk.internal.dynalink.beans.StaticClass]') || (type === '[object JavaClass]')
+    	try {
+    		// Might throw an exception in Rhino in some cases  (if value is a package or class)
+    		return value.class !== undefined // TODO: can't JS objects also define this?
+    	}
+    	catch (x) {
+    		return true
+    	}
+    	//var type = Object.prototype.toString.call(value)
+    	//return (type === '[object jdk.internal.dynalink.beans.StaticClass]') || (type === '[object JavaObject]')
     }
     
 	//
