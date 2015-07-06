@@ -1,6 +1,12 @@
 
 document.require('/sincerity/jvm/')
 
+importClass(
+		org.python.core.Py,
+		org.python.core.PyString,
+		org.python.core.Options,
+		java.lang.System)
+
 var MAIN_CLASS = 'org.python.util.jython'
 
 function getInterfaceVersion() {
@@ -23,12 +29,6 @@ function run(command) {
 }
 
 function python(command) {
-	importClass(
-			org.python.core.Py,
-			org.python.core.PyString,
-			org.python.core.Options,
-			java.lang.System)
-
 	// The Python standard library is here (Jython expects a "Lib" subdirectory underneath)
 	System.setProperty('python.home', command.sincerity.container.getLibrariesFile('python'))
 

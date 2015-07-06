@@ -142,15 +142,16 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 			this.out.println(String(o))
 		}
 		else if (Sincerity.Objects.exists(o)) {
-			// Print dicts that are purely data
 			var printable = true
+			/*
+			// Print dicts that are purely data
 			for (var k in o) {
 				if (typeof o[k] == 'function') {
 					// TODO Recursive
 					printable = false
 					break
 				}
-			}
+			}*/
 			if (printable || this.showAll) {
 				if (!Sincerity.Objects.exists(indent)) {
 					indent = this.showIndent
