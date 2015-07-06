@@ -34,6 +34,7 @@ import jline.Terminal;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
+import jline.console.history.FileHistory;
 
 /**
  * The shell plugin supports the following commands:
@@ -108,9 +109,10 @@ public class ShellPlugin implements Plugin1
 
 			sincerity.getOut().println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
 
+			Container container = null;
 			try
 			{
-				Container container = sincerity.getContainer();
+				container = sincerity.getContainer();
 				sincerity.getOut().println( "Container: " + container.getRoot() );
 			}
 			catch( NoContainerException x )
@@ -125,13 +127,42 @@ public class ShellPlugin implements Plugin1
 					ConsoleReader console = new ConsoleReader();
 					console.addCompleter( new CommandCompleter() );
 					console.setHandleUserInterrupt( true );
+					console.setCopyPasteDetection( true );
+					console.setExpandEvents( false );
 					console.setPrompt( "> " );
+
+					FileHistory history = null;
+					if( container != null )
+					{
+						history = new FileHistory( container.getCacheFile( "shell", "console.history" ) );
+						console.setHistory( history );
+					}
 
 					while( true )
 					{
 						String line = console.readLine();
+
+						try
+						{
+							history.flush();
+						}
+						catch( IOException x )
+						{
+						}
+
 						if( "exit".equals( line ) )
 							break;
+						else if( "reset".equals( line ) )
+						{
+							try
+							{
+								history.purge();
+								console.println( "History reset!" );
+							}
+							catch( IOException x )
+							{
+							}
+						}
 
 						ClassUtil.main( sincerity, Sincerity.class.getCanonicalName(), line.split( " " ) );
 					}

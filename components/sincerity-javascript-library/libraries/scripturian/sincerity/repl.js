@@ -31,11 +31,19 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
     var Public = {}
     
     /** @ignore */
-    Public._construct = function() {
+    Public._construct = function(historyFile) {
     	repl = this
 		this.out = null
 		this.showIndent = false
 		this.showStackTrace = false
+		this.history = null
+
+		if (Sincerity.Objects.exists(historyFile)) {
+			if (!(historyFile instanceof java.io.File)) {
+				historyFile = new java.io.File(String(historyFile))
+			}
+			this.history = new Packages.jline.console.history.FileHistory(historyFile)
+		}
     }
 
 	Public.initialize = function() {
@@ -64,14 +72,26 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 		this.console = new ConsoleReader()
 
 		this.console.handleUserInterrupt = true
-		this.out = this.console
+		this.console.copyPasteDetection = true
+		this.console.expandEvents = false
+		if (Sincerity.Objects.exists(this.history)) {
+			this.console.history = this.history
+		}
 
+		this.out = this.console
+		
 		this.initialize()
 
 		this.isExiting = false
 		while (!this.isExiting) {
 			try {
 				var line = String(this.console.readLine())
+				if (Sincerity.Objects.exists(this.history)) {
+					try {
+						this.history.flush()
+					}
+					catch (x) {}
+				}
 				line = this.toJavaScript(line)
 				
 				var r = this.evaluate(line)
@@ -166,6 +186,16 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 		}
 	}
 	
+	Public.reset = function() {
+		if (Sincerity.Objects.exists(this.history)) {
+			try {
+				this.history.purge()
+				this.out.println('History reset!')
+			}
+			catch (x) {}
+		}
+	}
+	
 	// Private
 	
 	var repl
@@ -176,6 +206,10 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 	
 	function show(o, indent) {
 		repl.show(o, indent)
+	}
+	
+	function reset() {
+		repl.reset()
 	}
 	
 	return Public

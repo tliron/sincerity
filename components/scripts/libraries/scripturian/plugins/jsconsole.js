@@ -46,7 +46,12 @@ function jsconsole(command) {
 	    Public._inherit = Sincerity.REPL
 	
 	    Public._construct = function() {
-	    	arguments.callee.overridden.call(this)
+	    	try {
+	    		arguments.callee.overridden.call(this, command.sincerity.container.getCacheFile(['shell', 'jsconsole.history']))
+	    	}
+	    	catch (x) {
+	    		arguments.callee.overridden.call(this)
+	    	}
 	    }
 	
 	    Public.initialize = function() {
@@ -84,6 +89,10 @@ function jsconsole(command) {
 	
 	function show(o, indent) {
 		repl.show(o, indent)
+	}
+
+	function reset() {
+		repl.reset()
 	}
 
 	var repl = new JSConsole()
