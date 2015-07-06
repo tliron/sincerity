@@ -83,10 +83,10 @@ public class ShellPlugin implements Plugin1
 		if( "console".equals( commandName ) )
 		{
 			command.setParse( true );
-			String[] arguments = command.getArguments();
+			String scriptString = command.getProperties().get( "script" );
 			File script = null;
-			if( arguments.length > 0 )
-				script = new File( arguments[0] );
+			if( scriptString != null )
+				script = new File( scriptString );
 
 			if( script != null )
 			{

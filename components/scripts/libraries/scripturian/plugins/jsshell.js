@@ -1,5 +1,8 @@
 
-document.require('/sincerity/repl/')
+document.require(
+	'/sincerity/repl/',
+	'/sincerity/files/',
+	'/sincerity/objects/')
 
 importClass(
 	com.threecrickets.sincerity.plugin.console.CommandCompleter,
@@ -22,6 +25,8 @@ function run(command) {
 }
 
 function jsconsole(command) {
+	command.parse = true
+
 	// Welcome
 	command.sincerity.out.println('Sincerity jsconsole ' + command.sincerity.version.get('version'))
 	var adapter = executable.context.adapter.attributes
@@ -40,6 +45,14 @@ function jsconsole(command) {
 		java.util.logging.Logger.getLogger('').level = java.util.logging.Level.WARNING
 	}
 
+	// Script parameter?
+	var script = command.properties.get('script')
+	if (Sincerity.Objects.exists(script)) {
+		script = Sincerity.Files.loadText(script)
+		eval(String(script))
+		return
+	}
+
 	var JSConsole = Sincerity.Classes.define(function() {
 	    var Public = {}
 	    
@@ -47,7 +60,7 @@ function jsconsole(command) {
 	
 	    Public._construct = function() {
 	    	try {
-	    		arguments.callee.overridden.call(this, command.sincerity.container.getCacheFile(['shell', 'jsconsole.history']))
+	    		arguments.callee.overridden.call(this, command.sincerity.container.getCacheFile(['jsshell', 'jsconsole.history']))
 	    	}
 	    	catch (x) {
 	    		arguments.callee.overridden.call(this)

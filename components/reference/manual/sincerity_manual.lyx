@@ -2129,6 +2129,30 @@ sincerity use container1 : gui
 \end_layout
 
 \begin_layout Standard
+A richer console, in which you can use full JavaScript, is available via
+ the 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+jsshell:jsconsole
+\begin_inset Quotes erd
+\end_inset
+
+ command (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jsshell:jsconsole"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Standard
 If you are designing your own Sincerity plugin, it is strongly recommend
  that you include GUI support if appropriate via the optional gui() entry
  point.
@@ -6794,8 +6818,8 @@ name "shell:console"
 
 \begin_layout Standard
 A straightforward console in which you can run Sincerity commands.
- The console supports basic command completion using the TAB key and history
- using the UP and DOWN keys.
+ The console supports basic command completion using the TAB key and persistent
+ command history using the UP and DOWN keys.
 \end_layout
 
 \begin_layout Standard
@@ -6808,16 +6832,57 @@ exit
 \end_inset
 
  (or CTRL+C) to exit the console.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+reset
+\begin_inset Quotes erd
+\end_inset
+
+ to reset the command history.
+ The history is available in the 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/shell/console.history
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Standard
+See 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+jsshell:jsconsole
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "jsshell:jsconsole"
+
+\end_inset
+
+)
+\bar default
+ for a richer console, in which you can use full JavaScript code.
 \end_layout
 
 \begin_layout Paragraph
-Arguments
+Switches
 \end_layout
 
-\begin_layout Enumerate
+\begin_layout Itemize
 
 \series bold
-[Script path]
+--script=
 \series default
 : If present, the console will load this script file, run it one line at
  a time, and then exit.
@@ -6910,6 +6975,119 @@ unless the native platform is GTK
 .
  We found the GTK look-and-feel to be so riddled with bugs that we decided
  to spare you from it.
+\end_layout
+
+\begin_layout Subsection
+JsShell
+\end_layout
+
+\begin_layout Standard
+JavaScript shells.
+\end_layout
+
+\begin_layout Subsubsection
+jsshell:jsconsole
+\begin_inset CommandInset label
+LatexCommand label
+name "jsshell:jsconsole"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A JavaScript console in which you can run JavaScript code, with full access
+ to all JavaScript and JVM libraries in the container.
+ The console supports basic command completion using the TAB key and persistent
+ command history using the UP and DOWN keys.
+\end_layout
+
+\begin_layout Standard
+As a shortcut, any line beginning with a 
+\begin_inset Quotes eld
+\end_inset
+
+:
+\begin_inset Quotes erd
+\end_inset
+
+ will execute a Sincerity command, similar to using the basic 
+\bar under
+
+\begin_inset Quotes eld
+\end_inset
+
+shell:console
+\begin_inset Quotes erd
+\end_inset
+
+ (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "shell:console"
+
+\end_inset
+
+)
+\bar default
+.
+\end_layout
+
+\begin_layout Standard
+Use 
+\begin_inset Quotes eld
+\end_inset
+
+exit
+\begin_inset Quotes erd
+\end_inset
+
+ (or CTRL+C) to exit the console.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+reset
+\begin_inset Quotes erd
+\end_inset
+
+ to reset the command history.
+ The history is available in the 
+\begin_inset Quotes eld
+\end_inset
+
+/cache/jsshell/jsconsole.history
+\begin_inset Quotes erd
+\end_inset
+
+ file.
+\end_layout
+
+\begin_layout Paragraph
+Switches
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+--script=
+\series default
+: If present, the console will load this script file, run it 
+\emph on
+all at once
+\emph default
+, and then exit.
+ Note that you cannot use the 
+\begin_inset Quotes eld
+\end_inset
+
+:
+\begin_inset Quotes erd
+\end_inset
+
+ shortcut to run Sincerity commands here, because this file is pure JavaScript.
+ However, you can run Sincerity commands using sincerity.run(...) calls.
 \end_layout
 
 \begin_layout Subsection
