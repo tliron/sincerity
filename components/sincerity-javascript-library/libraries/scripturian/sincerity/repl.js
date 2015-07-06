@@ -35,7 +35,6 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
     	repl = this
 		this.out = null
 		this.showIndent = false
-		this.showAll = false
 		this.showStackTrace = false
     }
 
@@ -74,9 +73,16 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 			try {
 				var line = String(this.console.readLine())
 				line = this.toJavaScript(line)
-				r = this.evaluate(line)
+				
+				var r = this.evaluate(line)
+				
+				var type = null
+				try {
+					type = typeof r
+				}
+				catch (x) {}
 
-				if (typeof r == 'function') {
+				if (type == 'function') {
 					// Call all functions (they are commands)
 					r()
 				}
@@ -136,27 +142,26 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 	}
 	
 	Public.show = function(o, indent) {
-		var type = typeof o
-		if (Sincerity.Objects.isString(o) || (type == 'boolean') || (type == 'number')) {
+		var type = null
+		try {
+			type = typeof o
+		}
+		catch (x) {}
+		
+		if (Sincerity.Objects.isString(o) || (type == 'boolean') || (type == 'number') || (null === o)) {
 			// Print all primitives
 			this.out.println(String(o))
 		}
 		else if (Sincerity.Objects.exists(o)) {
-			var printable = true
-			/*
-			// Print dicts that are purely data
-			for (var k in o) {
-				if (typeof o[k] == 'function') {
-					// TODO Recursive
-					printable = false
-					break
-				}
-			}*/
-			if (printable || this.showAll) {
-				if (!Sincerity.Objects.exists(indent)) {
-					indent = this.showIndent
-				}
-				this.out.println(String(Sincerity.JSON.to(o, indent)))					
+			if (!Sincerity.Objects.exists(indent)) {
+				indent = this.showIndent
+			}
+			var out = String(Sincerity.JSON.to(o, indent))
+			if (out != 'null') {
+				this.out.println(out)
+			}
+			else {
+				this.out.println(String(o))
 			}
 		}
 	}
