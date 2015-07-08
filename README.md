@@ -6,7 +6,9 @@ Sincerity is a tool for installing and bootstrapping software stacks on top of
 the JVM. It makes these otherwise tedious tasks easy, simple and fun.
 
 Please see the [Sincerity web site] (http://threecrickets.com/sincerity/) for
-for downloadable distributions and comprehensive documentation.
+for comprehensive documentation. Here we will only explain how to build it.
+
+[![Download](http://threecrickets.com/media/download.png "Download")](http://threecrickets.com/sincerity/download/)
 
 
 Building Sincerity
@@ -24,10 +26,6 @@ The result of the build will go into the "/build/distribution/" directory.
 Temporary files used during the build process will go into "/build/cache/",
 which you are free to delete.
 
-To avoid the "bootstrap class path not set" warning during compilation
-(harmless), configure the "compile.boot" setting in "private.properties" to the
-location of an "rt.jar" file belonging to JVM version 6.
-
 
 Configuring the Build
 ---------------------
@@ -38,13 +36,16 @@ however to avoid git conflicts, it would be better to create your own
 "/build/private.properties" instead, in which you can override any of the
 settings. That file will be ignored by git.
 
+To avoid the "bootstrap class path not set" warning during compilation
+(harmless), configure the "compile.boot" setting in "private.properties" to the
+location of an "rt.jar" file belonging to JVM version 7.
+
 
 Building the Sincerity Manual
 -----------------------------
 
 To build the manual, as part of the standard build process, you will need to
-install 
-[LyX] (http://www.lyx.org/) and [eLyXer] (http://elyxer.nongnu.org/),
+install [LyX](http://www.lyx.org/) and [eLyXer](http://elyxer.nongnu.org/),
 and configure their paths in "private.properties".
 
 
@@ -80,8 +81,7 @@ Deploying to Maven
 
 You do *not* need Maven to build Sincerity, however you can deploy your build to
 a Maven repository using the "deploy-maven" Ant target. To enable this, you must
-install 
-[Maven] (http://maven.apache.org/) and configure its path in
+install [Maven] (http://maven.apache.org/) and configure its path in
 "private.properties".
 
 
