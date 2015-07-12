@@ -1002,9 +1002,8 @@ JavaScript is very well known.
 Its implementations are relatively lightweight, in that JavaScript is both
  fairly minimal linguistically, and also does not have anything like a standard
  library, of the kind you would find in Python and Ruby.
- Thus the Rhino JavaScript engine, which Sincerity currently uses, allows
- Sincerity to have a much smaller footprint than if it were to use Jython,
- JRuby or even Groovy.
+ This allows Sincerity to have a much smaller footprint than if it were
+ to use Jython, JRuby or even Groovy.
  Note that not having a standard library can also be seen as a disadvantage,
  but in the case of Sincerity it's dealt with in two ways:
 \end_layout
@@ -2070,7 +2069,7 @@ sincerity
 \begin_inset Quotes erd
 \end_inset
 
- without any command, it will default to starting the console: 
+ without any command, it will default to running 
 \bar under
 
 \begin_inset Quotes eld
@@ -6802,7 +6801,7 @@ Shell
 \end_layout
 
 \begin_layout Standard
-Manages user interfaces to Sincerity.
+User interfaces to Sincerity.
 \end_layout
 
 \begin_layout Subsubsection
@@ -6978,11 +6977,11 @@ unless the native platform is GTK
 \end_layout
 
 \begin_layout Subsection
-JsShell
+JavaScript Shell
 \end_layout
 
 \begin_layout Standard
-JavaScript shells.
+User interfaces to Sincerity using JavaScript.
 \end_layout
 
 \begin_layout Subsubsection
@@ -12544,8 +12543,8 @@ restlet.jetty
 \end_layout
 
 \begin_layout Quote
-The Jetty skeletons use Jetty 9, which requires a JVM of at least version
- 7.
+The Jetty skeletons use Jetty 9.3, which requires a JVM of at least version
+ 8.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -13076,8 +13075,8 @@ reference "prudence"
 \end_layout
 
 \begin_layout Quote
-The Jetty skeletons use Jetty 9, which requires a JVM of at least version
- 7.
+The Jetty skeletons use Jetty 9.3, which requires a JVM of at least version
+ 8.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -13195,6 +13194,17 @@ sincerity add jetty.servlet.jsp : add jetty.servlet.jmx : install
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+(You can test JSP support in the example WAR below, at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080/test/jsp/"
+
+\end_inset
+
+.)
 \end_layout
 
 \begin_layout Standard

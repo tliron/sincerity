@@ -7,6 +7,7 @@ importClass(
 	org.eclipse.jetty.server.handler.ContextHandlerCollection,
 	org.eclipse.jetty.webapp.WebAppContext,
 	org.eclipse.jetty.security.HashLoginService,
+	java.lang.System,
 	java.io.File)
 
 var server = new Server()
@@ -30,6 +31,25 @@ try {
 }
 catch (x) {}
 
+// Force standard javac for Jasper
+//System.setProperty('org.apache.jasper.compiler.disablejsr199', 'false')
+
+function addJspSupport(context) {
+	importClass(
+		org.eclipse.jetty.annotations.ServletContainerInitializersStarter,
+		org.eclipse.jetty.plus.annotation.ContainerInitializer,
+		org.eclipse.jetty.apache.jsp.JettyJasperInitializer,
+		org.apache.tomcat.SimpleInstanceManager,
+		java.util.ArrayList)
+
+	// See: http://zetcode.com/java/jetty/embedded/ 
+	// And: https://github.com/jetty-project/embedded-jetty-jsp/blob/master/src/main/java/org/eclipse/jetty/demo/Main.java
+	var initializers = new ArrayList()
+	initializers.add(new ContainerInitializer(new JettyJasperInitializer(), null))
+	context.setAttribute('org.eclipse.jetty.containerInitializers', initializers)
+	context.addBean(new ServletContainerInitializersStarter(context), true)
+}
+
 // Assemble server
 Sincerity.Container.here = sincerity.container.getFile('server')
 Sincerity.Container.executeAll('connectors')
@@ -49,7 +69,8 @@ if (warsDir.directory) {
 			var context = new WebAppContext(server.handler, file, '/' + name)
 			cacheDir.mkdirs()
 			context.tempDirectory = new File(cacheDir, name)
-			context.securityHandler.loginService = new HashLoginService() 
+			context.securityHandler.loginService = new HashLoginService()
+			addJspSupport(context)
 		}
 	}
 }
