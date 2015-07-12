@@ -64,7 +64,7 @@
 			<artifactId>jetty-annotations</artifactId>
 			<version>[9.3,9.4)</version>
 		</dependency>
-		<!-- JSTL -->
+		<!-- Apache JSTL implementation (Taglibs) -->
 		<dependency>
 			<groupId>org.apache.taglibs</groupId>
 			<artifactId>taglibs-standard-impl</artifactId>
