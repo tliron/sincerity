@@ -625,14 +625,15 @@ public class Sincerity implements Runnable
 	 *         In case of an error
 	 * @see #getPlugins()
 	 */
-	public void run( String... arguments ) throws SincerityException
+	public void run( Object... arguments ) throws SincerityException
 	{
 		// Insert at beginning of current command line queue with an "until" tag
-		LinkedList<Command> newCommands = parseCommands( arguments );
+		String[] argumentsAsStrings = StringUtil.toStringArray( arguments );
+		LinkedList<Command> newCommands = parseCommands( argumentsAsStrings );
 		newCommands.add( Command.UNTIL );
 		commands.addAll( 0, newCommands );
 		if( getVerbosity() >= 3 )
-			getOut().println( "Sincerity running: " + StringUtil.join( arguments, " " ) + "..." );
+			getOut().println( "Sincerity running: " + StringUtil.join( argumentsAsStrings, " " ) + "..." );
 		run( true );
 	}
 

@@ -27,18 +27,20 @@ function run(command) {
 function jsconsole(command) {
 	command.parse = true
 
+	var sincerity = command.sincerity
+	
 	// Welcome
-	command.sincerity.out.println('Sincerity jsconsole ' + command.sincerity.version.get('version'))
+	sincerity.out.println('Sincerity jsconsole ' + sincerity.version.get('version'))
 	var adapter = executable.context.adapter.attributes
-	command.sincerity.out.println('JavaScript engine: ' + adapter.get('name') + ' ' + adapter.get('version'))
+	sincerity.out.println('JavaScript engine: ' + adapter.get('name') + ' ' + adapter.get('version'))
 	try {
-		command.sincerity.out.println('Container: ' + command.sincerity.container.root)
+		sincerity.out.println('Container: ' + sincerity.container.root)
 	}
 	catch (x) {}
 
 	// Logging
 	try {
-		command.sincerity.run(['logging:logging'])
+		sincerity.run(['logging:logging'])
 	}
 	catch (x) {
 		// If logging is not configured, at least avoid annoying log messages to the console
@@ -60,7 +62,7 @@ function jsconsole(command) {
 	
 	    Public._construct = function() {
 	    	try {
-	    		arguments.callee.overridden.call(this, command.sincerity.container.getCacheFile(['jsshell', 'jsconsole.history']))
+	    		arguments.callee.overridden.call(this, sincerity.container.getCacheFile(['jsshell', 'jsconsole.history']))
 	    	}
 	    	catch (x) {
 	    		arguments.callee.overridden.call(this)
@@ -73,7 +75,7 @@ function jsconsole(command) {
 	    }
 	    
 	    Public.finalize = function() {
-	    	command.sincerity.out.println('Bye!')
+	    	sincerity.out.println('Bye!')
 	    }
 	
 	    Public.toJavaScript = function(line) {
@@ -93,7 +95,7 @@ function jsconsole(command) {
 
 	function sincerity(c) {
 		c = Sincerity.Objects.trim(c)
-		ClassUtil.main(command.sincerity, 'com.threecrickets.sincerity.Sincerity', c.split(' '))
+		ClassUtil.main(sincerity, 'com.threecrickets.sincerity.Sincerity', c.split(' '))
 	}
 
 	function exit() {

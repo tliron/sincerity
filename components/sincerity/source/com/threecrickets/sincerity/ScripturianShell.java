@@ -95,9 +95,10 @@ public class ScripturianShell implements Shell
 		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "sincerity/", sincerity.getHome(), "default", "js", 1000 );
 		librarySources.add( new DocumentFileSource<Executable>( "sincerity/libraries/scripturian/", sincerity.getHomeFile( "libraries", "scripturian" ), "default", "js", 1000 ) );
 
+		ClassLoader classLoader = sincerity.getClass().getClassLoader();
 		parsingContext = new ParsingContext();
-		parsingContext.setLanguageManager( new LanguageManager() );
-		parsingContext.setParserManager( new ParserManager() );
+		parsingContext.setLanguageManager( new LanguageManager( classLoader ) );
+		parsingContext.setParserManager( new ParserManager( classLoader ) );
 		parsingContext.setDocumentSource( source );
 		parsingContext.setDefaultLanguageTag( "javascript" );
 		parsingContext.setPrepare( prepare );

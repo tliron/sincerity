@@ -27,6 +27,26 @@ public abstract class StringUtil
 	//
 
 	/**
+	 * Converts an array of objects to an array of strings by calling
+	 * {@link Object#toString()} on each.
+	 * 
+	 * @param objects
+	 *        An array of objects
+	 * @return An array of strings
+	 */
+	public static String[] toStringArray( Object[] objects )
+	{
+		int length = objects.length;
+		String[] strings = new String[length];
+		for( int i = 0; i < length; i++ )
+		{
+			Object object = objects[i];
+			strings[i] = object != null ? object.toString() : null;
+		}
+		return strings;
+	}
+
+	/**
 	 * Joins a list strings into a single string.
 	 * 
 	 * @param strings

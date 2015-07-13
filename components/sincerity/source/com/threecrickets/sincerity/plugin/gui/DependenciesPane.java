@@ -182,7 +182,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 
 	private boolean showLicenses = false;
 
-	private boolean showArtifacts = true;
+	private boolean showArtifacts = false;
 
 	private boolean showPackageContents = false;
 }
