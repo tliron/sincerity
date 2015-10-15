@@ -3652,6 +3652,527 @@ reference "nexus"
  organization, even if the third party repositories fail.
 \end_layout
 
+\begin_layout Subsection
+Working with Docker
+\begin_inset CommandInset label
+LatexCommand label
+name "docker"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Machine virtualization brought about a revolution in deployment strategies.
+ And then came 
+\begin_inset CommandInset href
+LatexCommand href
+name "LXC"
+target "https://linuxcontainers.org/"
+
+\end_inset
+
+, providing a more limited set of features via built-in isolation features
+ in Linux: think chroot, but with filesystem and networking containment.
+ LXC allows for much lighter containers as compared to virtualization.
+\end_layout
+
+\begin_layout Standard
+So lightweight, in fact, that it makes sense to package and distribute applicati
+ons via LXC.
+ That's exactly what 
+\begin_inset CommandInset href
+LatexCommand href
+name "Docker"
+target "https://www.docker.com/"
+
+\end_inset
+
+ does, by providing an easy-to-use set of tools, standardized packaging,
+ repository management, and a curated catalog of ready-to-run base images.
+ Many workload distribution systems, such as 
+\begin_inset CommandInset href
+LatexCommand href
+name "Mesos"
+target "http://mesos.apache.org/"
+
+\end_inset
+
+, support Docker packages, allowing you to deploy applications with exceptional
+ flexibility, robustness, and economical utilization of resources.
+\end_layout
+
+\begin_layout Standard
+(It's also interesting to see LXC encroaching into the data center market,
+ which until now was dominated virtualization: 
+\begin_inset CommandInset href
+LatexCommand href
+name "LXD"
+target "https://linuxcontainers.org/lxd/introduction/"
+
+\end_inset
+
+ will allow you to manage a cloud of 
+\begin_inset Quotes eld
+\end_inset
+
+machines
+\begin_inset Quotes erd
+\end_inset
+
+ that are actually LXC containers, offering much greater density on existing
+ hardware.
+ It will even integrate with 
+\begin_inset CommandInset href
+LatexCommand href
+name "OpenStack"
+target "https://www.openstack.org/"
+
+\end_inset
+
+, allowing data centers a smooth transition to this exciting technology.)
+\end_layout
+
+\begin_layout Subsubsection
+Running in Docker
+\end_layout
+
+\begin_layout Standard
+Because Sincerity puts your entire container in one root directory, it's
+ trivial to run your Sincerity container in a Docker image.
+ In this example, we'll create a container with the Prudence example application
+, and then run it inside the ready-made 
+\begin_inset Quotes eld
+\end_inset
+
+java
+\begin_inset Quotes erd
+\end_inset
+
+ Docker image:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sincerity create /path/to/mycontainer : add prudence.example : install
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+sudo docker run --rm -it 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+-v /path/to/mycontainer/:/opt/mycontainer/ 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+-p 8080:8080 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+java:8u45-jre 
+\backslash
+
+\end_layout
+
+\begin_layout Plain Layout
+
+/opt/mycontainer/sincerity use /opt/mycontainer/ : start prudence
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+If you haven't used the 
+\begin_inset Quotes eld
+\end_inset
+
+java:8u45-jre
+\begin_inset Quotes erd
+\end_inset
+
+ Docker image yet, it will have to download it.
+\end_layout
+
+\begin_layout Standard
+In this example, we've mapped our Sincerity container to 
+\begin_inset Quotes eld
+\end_inset
+
+/opt/sincerity/
+\begin_inset Quotes erd
+\end_inset
+
+ in the Docker image, and Prudence's default HTTP port to a port in the
+ host, so that we could access the site at 
+\begin_inset CommandInset href
+LatexCommand href
+target "http://localhost:8080/"
+
+\end_inset
+
+.
+ We've also enabled an interactive pseudo-TTY (
+\begin_inset Quotes eld
+\end_inset
+
+-it
+\begin_inset Quotes erd
+\end_inset
+
+) so that we can press CTRL+C to quit.
+\end_layout
+
+\begin_layout Standard
+The result seems identical to running 
+\begin_inset Quotes eld
+\end_inset
+
+normally
+\begin_inset Quotes erd
+\end_inset
+
+: and that's the beauty of Docker.
+\end_layout
+
+\begin_layout Standard
+What good is this? Well, for one, it allows you to easily test your Sincerity
+ container in various versions of the JVM without having to install them
+ on your main operating system.
+ But also, Docker can offer tighter security more easily than just, for
+ example, running your Sincerity container under a custom user.
+\end_layout
+
+\begin_layout Subsubsection
+Packaging in Docker
+\end_layout
+
+\begin_layout Standard
+Once you've tested your Sincerity container in Docker, it's time to package
+ it for deployment.
+\end_layout
+
+\begin_layout Standard
+First, create a 
+\begin_inset Quotes eld
+\end_inset
+
+Dockerfile
+\begin_inset Quotes erd
+\end_inset
+
+ in your container's directory.
+ For our example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+FROM java:8u45-jre
+\end_layout
+
+\begin_layout Plain Layout
+
+MAINTAINER Three Crickets
+\end_layout
+
+\begin_layout Plain Layout
+
+ADD .
+ /opt/mycontainer/
+\end_layout
+
+\begin_layout Plain Layout
+
+CMD /opt/mycontainer/sincerity use /opt/mycontainer/ : start prudence
+\end_layout
+
+\begin_layout Plain Layout
+
+EXPOSE 8080
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You'll also want to create a 
+\begin_inset Quotes eld
+\end_inset
+
+.dockerignore
+\begin_inset Quotes erd
+\end_inset
+
+ file (which uses the same syntax as 
+\begin_inset Quotes eld
+\end_inset
+
+.gitignore
+\begin_inset Quotes erd
+\end_inset
+
+).
+ For our example:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+/cache
+\end_layout
+
+\begin_layout Plain Layout
+
+/logs
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Now we can build it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo docker build -t threecrickets:mycontainer .
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+That's it! It was very fast, because Docker uses a transaction system: our
+ new package is only a small diff over the original image.
+ Running it is very similar to before:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo docker run -it -p 8080:8080 threecrickets:mycontainer
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+You can also run it in 
+\begin_inset Quotes eld
+\end_inset
+
+detached
+\begin_inset Quotes erd
+\end_inset
+
+ mode (like a daemon) using 
+\begin_inset Quotes eld
+\end_inset
+
+docker run -d
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Use 
+\begin_inset Quotes eld
+\end_inset
+
+docker ps
+\begin_inset Quotes erd
+\end_inset
+
+ to list existing running images, and 
+\begin_inset Quotes eld
+\end_inset
+
+docker stop
+\begin_inset Quotes erd
+\end_inset
+
+ to stop any.
+\end_layout
+
+\begin_layout Standard
+To save the image into a self-contained, redistributable file:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo docker save threecrickets:mycontainer | bzip2 > mycontainer.tar.bz2
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To load it:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+cat mycontainer.tar.bz2 | bunzip2 | sudo docker load
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that because the image is self-contained, the environment loading it
+ does not need access to the repository where 
+\begin_inset Quotes eld
+\end_inset
+
+java:8u45-jre
+\begin_inset Quotes erd
+\end_inset
+
+ came from (it essentially includes the JVM).
+ However, because all transactions have GUIDs, it would be identical to
+ having retrieved 
+\begin_inset Quotes eld
+\end_inset
+
+java:8u45-jre
+\begin_inset Quotes erd
+\end_inset
+
+.
+ So, if that environment were to be running 100 images based on 
+\begin_inset Quotes eld
+\end_inset
+
+java:8u45-jre
+\begin_inset Quotes erd
+\end_inset
+
+, it would only keep the actual installation once.
+ (You can also 
+\begin_inset Quotes eld
+\end_inset
+
+flatten
+\begin_inset Quotes erd
+\end_inset
+
+ your image, as if it were a single commit, using 
+\begin_inset Quotes eld
+\end_inset
+
+docker export
+\begin_inset Quotes erd
+\end_inset
+
+.)
+\end_layout
+
+\begin_layout Standard
+Also note that 
+\begin_inset Quotes eld
+\end_inset
+
+save
+\begin_inset Quotes erd
+\end_inset
+
+ does not keep the tags, though you can re-tag the image via its ID like
+ so:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+sudo docker images
+\end_layout
+
+\begin_layout Plain Layout
+
+...
+\end_layout
+
+\begin_layout Plain Layout
+
+sudo docker tag ...
+ threecrickets:mycontainer
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+See the Docker documentation for more information about how to work with
+ repositories.
+\end_layout
+
 \begin_layout Section
 FAQ
 \end_layout
@@ -12599,7 +13120,7 @@ You can configure the server by editing
 \end_inset
 
 .
- For example, you can change the port, enable SSL, and even SPDY.
+ For example, you can change the port, enable SSL, and also HTTP/2.
  Note that support for SPDY must be added as an 
 \begin_inset Quotes eld
 \end_inset
@@ -12776,8 +13297,8 @@ sincerity add logging : add service : install
 It is also possible to add 
 \begin_inset CommandInset href
 LatexCommand href
-name "SPDY"
-target "http://www.chromium.org/spdy/spdy-whitepaper"
+name "HTTP/2"
+target "https://http2.github.io/"
 
 \end_inset
 
@@ -12791,27 +13312,18 @@ https
 \end_inset
 
 .
- See the Jetty documentation for 
-\begin_inset CommandInset href
-LatexCommand href
-name "an example of creating a SPDY server"
-target "https://www.eclipse.org/jetty/documentation/current/embedded-examples.html#embedded-spdy-server"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
-To install support for SPDY and the required 
+To install support for HTTP/2, as well as the required 
 \begin_inset CommandInset href
 LatexCommand href
-name "NPN"
-target "http://technotes.googlecode.com/git/nextprotoneg.html"
+name "ALPN"
+target "https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation"
 
 \end_inset
 
- TLS extension:
+ support:
 \end_layout
 
 \begin_layout Standard
@@ -12821,7 +13333,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add jetty.spdy : install
+sincerity add jetty.http2 : install
 \end_layout
 
 \end_inset
@@ -12830,11 +13342,11 @@ sincerity add jetty.spdy : install
 \end_layout
 
 \begin_layout Standard
-To enable NPN, you need to specify you 
+To enable ALPN, you need to specify your 
 \begin_inset Quotes eld
 \end_inset
 
-npn-boot.jar
+alpn-boot.jar
 \begin_inset Quotes erd
 \end_inset
 
@@ -12859,8 +13371,8 @@ status open
 
 \begin_layout Plain Layout
 
-JVM_BOOT_LIBRARIES=/path/to/mycontainer/libraries/jars/org.mortbay.jetty.npn/npn-bo
-ot/1.1.6/npn-boot.jar 
+JVM_BOOT_LIBRARIES=/path/to/mycontainer/libraries/jars/org.mortbay.jetty.alpn/alpn-
+boot/8.1.3/alpn-boot.jar 
 \backslash
 
 \end_layout
@@ -12876,33 +13388,8 @@ sincerity : start jetty
 \end_layout
 
 \begin_layout Standard
-You will need to change the path to point to the 
-\begin_inset Quotes eld
-\end_inset
-
-npn-boot.jar
-\begin_inset Quotes erd
-\end_inset
-
- you are using.
- Which version you should use depends on 
-\begin_inset CommandInset href
-LatexCommand href
-name "your JVM version"
-target "http://www.eclipse.org/jetty/documentation/current/npn-chapter.html#npn-versions"
-
-\end_inset
-
-.
- To test SPDY we recommend using 
-\begin_inset CommandInset href
-LatexCommand href
-name "spdycat"
-target "https://github.com/tatsuhiro-t/spdylay"
-
-\end_inset
-
-.
+It's a bit awkward, but necessary due to the way ALPN is securely implemented
+ in the JVM.
 \end_layout
 
 \begin_layout Standard
@@ -13974,9 +14461,9 @@ target "http://www.eclipse.org/jetty/"
 
 \end_inset
 
- server connector, you have the choice of either Jetty 9 (requires JVM 7,
- also includes a client connector) or Jetty 8 (requires JVM 6, only has
- a server connector):
+ server connector, you have the choice of either Jetty 9.3 (requires JVM
+ 8) or Jetty 9.2 (requires JVM 7).
+ For 9.3:
 \end_layout
 
 \begin_layout Standard
@@ -13986,7 +14473,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add restlet.jetty9 : install
+sincerity add restlet.jetty : install
 \end_layout
 
 \end_inset
@@ -13995,7 +14482,7 @@ sincerity add restlet.jetty9 : install
 \end_layout
 
 \begin_layout Standard
-Or:
+For 9.2:
 \end_layout
 
 \begin_layout Standard
@@ -14005,7 +14492,7 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity add restlet.jetty8 : install
+sincerity add restlet.jetty.legacy : install
 \end_layout
 
 \end_inset
@@ -14014,16 +14501,9 @@ sincerity add restlet.jetty8 : install
 \end_layout
 
 \begin_layout Standard
-It is also possible to add 
-\begin_inset CommandInset href
-LatexCommand href
-name "SPDY"
-target "http://www.chromium.org/spdy/spdy-whitepaper"
-
-\end_inset
-
- support to Jetty 9: this protocol, supported by many web browsers, can
- improve the user experience as well as reduce server load when using 
+It is possible to add HTTP/2 support to Jetty 9.3: this protocol, supported
+ by many web browsers, can improve the user experience as well as reduce
+ server load when using 
 \begin_inset Quotes eld
 \end_inset
 
@@ -14170,8 +14650,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create mycontainer : add restlet.example : add restlet.jetty9 :
- add restlet.logging : add service : install : service restlet start
+sincerity create mycontainer : add restlet.example : add restlet.jetty : add
+ restlet.logging : add service : install : service restlet start
 \end_layout
 
 \end_inset
