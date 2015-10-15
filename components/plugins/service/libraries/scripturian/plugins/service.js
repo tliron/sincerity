@@ -160,7 +160,14 @@ function service(command) {
 						'path.1': command.sincerity.container.getLibrariesFile('native')
 					}
 				},
-				app: {
+				app: verbose ? {
+					'parameter.1': 'com.threecrickets.sincerity.Sincerity',
+					'parameter.2': 'help:verbosity',
+					'parameter.3': '2',
+					'parameter.4': 'delegate:start',
+					'parameter.5': uri
+				} :
+				{
 					'parameter.1': 'com.threecrickets.sincerity.Sincerity',
 					'parameter.2': 'delegate:start',
 					'parameter.3': uri
