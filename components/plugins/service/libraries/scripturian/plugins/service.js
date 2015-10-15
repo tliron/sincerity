@@ -164,8 +164,9 @@ function service(command) {
 					'parameter.1': 'com.threecrickets.sincerity.Sincerity',
 					'parameter.2': 'help:verbosity',
 					'parameter.3': '2',
-					'parameter.4': 'delegate:start',
-					'parameter.5': uri
+					'parameter.4': ':',
+					'parameter.5': 'delegate:start',
+					'parameter.6': uri
 				} :
 				{
 					'parameter.1': 'com.threecrickets.sincerity.Sincerity',
