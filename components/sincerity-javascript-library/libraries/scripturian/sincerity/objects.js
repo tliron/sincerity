@@ -385,8 +385,8 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @returns {String}
 	 */
 	Public.escapeRegExp = function(string) {
-		// See: http://stackoverflow.com/a/2593661/849021
-		return Public.exists(string) ? String(string).replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1") : ''
+		// See: http://stackoverflow.com/a/6969486/849021
+		return Public.exists(string) ? String(string).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') : ''
 	}
 
 	/**
@@ -432,8 +432,8 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * Returns 0 if string are equal, 1 if a > b, and -1 if a < b.
 	 * Useful for sorting arrays of strings.
 	 * 
-	 * @param a The string on the left
-	 * @param b The string on the right
+	 * @param {String} a The string on the left
+	 * @param {String} b The string on the right
 	 * @returns {Number}
 	 */
 	Public.compareStrings = function(a, b) {
@@ -455,7 +455,72 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		array.length = times
 		return array.join(String(string))
 	}
-	
+
+	/**
+	 * Matches a string against a simple pattern.
+	 * <p>
+	 * The pattern may contain any number of '*' or '?' wildcards.
+	 * Escape '*' or '?' using a preceding '\'.
+	 * <p>
+	 * An empty pattern matches everything.
+	 * 
+	 * @param string The string
+	 * @param [pattern] The pattern
+	 * @returns {Boolean} true if the string matches the pattern
+	 */
+	Public.matchSimple = function(string, pattern) {
+		if (!Public.exists(pattern)) {
+			// Match everything
+			return true
+		}
+		
+		pattern = String(pattern)
+		if (!pattern.length || (pattern === '*')) {
+			// Match everything
+			return true
+		}
+		
+		string = String(string)
+
+		function nextWildcard(from) {
+			from = from || 0
+			var wildcard = pattern.substring(from).search(/[\*|\?]/)
+			if (wildcard !== -1) {
+				wildcard += from
+			}
+			if ((wildcard > 0) && (pattern.charAt(wildcard - 1) === '\\')) {
+				// Don't count escaped wildcards
+				pattern = pattern.substring(0, wildcard - 1) + pattern.substring(wildcard)
+				return nextWildcard(wildcard) // note: pattern length was decreased by 1
+			}
+			return wildcard
+		}
+
+		var wildcard = nextWildcard()
+		if (wildcard === -1) {
+			// Strict pattern
+			return pattern === string
+		}
+		
+		// Convert pattern to regular expression
+		var regexp = '^'
+		while (wildcard !== -1) {
+			regexp += Public.escapeRegExp(pattern.substring(0, wildcard))
+			regexp += '[\\s\\S]'
+			if (pattern.charAt(wildcard) === '*') {
+				regexp += '*'
+			}
+			
+			pattern = pattern.substring(wildcard + 1)
+			wildcard = nextWildcard()
+		}
+		regexp += Public.escapeRegExp(pattern)
+		regexp += '$'
+		regexp = new RegExp(regexp)
+		
+		return null !== string.match(regexp)
+	}
+
 	//
 	// Objects (dicts, arrays, dates, functions)
 	//
@@ -955,4 +1020,21 @@ String.prototype.capitalize = String.prototype.capitalize || function() {
  */ 
 String.prototype.repeat = String.prototype.repeat || function(times) {
 	return Sincerity.Objects.repeat(this, times)
+}
+
+/**
+ * Matches a string against a simple pattern.
+ * <p>
+ * The pattern may contain any number of '*' or '?' wildcards.
+ * Escape '*' or '?' using a preceding '\'.
+ * <p>
+ * An empty pattern matches everything.
+ *
+ * @methodOf String#
+ * @see Sincerity.Objects#matchSimple
+ * @param [pattern] The pattern
+ * @returns {Boolean} true if the string matches the pattern
+ */
+String.prototype.matchSimple = String.prototype.matchSimple || function(pattern) {
+	return Sincerity.Objects.matchSimple(this, pattern)
 }
