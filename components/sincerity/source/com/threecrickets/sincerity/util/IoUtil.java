@@ -25,6 +25,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -204,6 +207,28 @@ public abstract class IoUtil
 		int length = 0;
 		while( ( length = in.read( buffer ) ) != -1 )
 			out.write( buffer, 0, length );
+	}
+
+	/**
+	 * Copies a channel.
+	 * 
+	 * @param in
+	 *        The input channel
+	 * @param out
+	 *        The output channel
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static void copy( ReadableByteChannel in, WritableByteChannel out ) throws IOException
+	{
+		ByteBuffer buffer = ByteBuffer.allocate( BUFFER_SIZE );
+		while( in.read( buffer ) != -1 )
+		{
+			buffer.flip();
+			while( buffer.hasRemaining() )
+				out.write( buffer );
+			buffer.clear();
+		}
 	}
 
 	/**
@@ -552,7 +577,7 @@ public abstract class IoUtil
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static final int BUFFER_SIZE = 2048;
+	private static final int BUFFER_SIZE = 16 * 1024;
 
 	private IoUtil()
 	{
