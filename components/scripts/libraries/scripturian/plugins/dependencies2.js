@@ -28,23 +28,23 @@ function test(command) {
 
 	var sincerity = command.sincerity
 	
-	var d = [
-		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
-		{group: 'com.github.sommeri', name: 'less4j', version: '1.15.2'}
-	]
-	
-	
-	var repository = new Sincerity.Dependencies.Maven.Repository('file:/Depot/DevRepository/')
+	var repository = new Sincerity.Dependencies.Maven.Repository({uri: 'file:/Depot/DevRepository/'})
 	var id = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var id2 = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var constraints = new Sincerity.Dependencies.Maven.ModuleConstraints('org.jsoup', 'jsoup', '1.8.1')
 	var id3 = new Sincerity.Dependencies.Maven.ModuleIdentifier('com.github.sommeri:less4j:1.15.2')
 	var resolver = new Sincerity.Dependencies.Resolver()
-
-	resolver.rules = [
-  		{type: 'rewriteVersion', group: 'com.beust', name: 'jcommander', newVersion: '1.35+'},
-  		{type: 'rewriteGroupName'}
-  	]
+	
+	// matchSimple
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple())
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple(''))
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*'))
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('This*'))
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*the ? text*'))
+	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*the \\? text*'))
+	sincerity.out.println('true=' + 'This is the ! text'.matchSimple('*the ? text*'))
+	sincerity.out.println('false=' + 'This is the ! text'.matchSimple('*the \\? text*'))
+	sincerity.out.println()
 
 	// toString
 	sincerity.out.println(repository.toString())
@@ -56,17 +56,18 @@ function test(command) {
 	sincerity.out.println()
 
 	// Versions
-	sincerity.out.println('0=' +  Sincerity.Dependencies.compareVersions('', ''))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2', ''))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2', '1'))
-	sincerity.out.println('-1=' + Sincerity.Dependencies.compareVersions('1', '2'))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2.2', '2'))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2.2', '2.1'))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2.2', '2.2-b1'))
-	sincerity.out.println('-1=' + Sincerity.Dependencies.compareVersions('2.2-b1', '2.2-b2'))
-	sincerity.out.println('-1=' + Sincerity.Dependencies.compareVersions('2.2-alpha2', '2.2-beta1'))
-	sincerity.out.println('1=' +  Sincerity.Dependencies.compareVersions('2.2-2', '2.2-1'))
-	sincerity.out.println('0=' +  Sincerity.Dependencies.compareVersions('2.2-', '2.2'))
+	sincerity.out.println('Versions:')
+	sincerity.out.println('0=' +  Sincerity.Dependencies.Versions.compare('', ''))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2', ''))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2', '1'))
+	sincerity.out.println('-1=' + Sincerity.Dependencies.Versions.compare('1', '2'))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2.2', '2'))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2.2', '2.1'))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2.2', '2.2-b1'))
+	sincerity.out.println('-1=' + Sincerity.Dependencies.Versions.compare('2.2-b1', '2.2-b2'))
+	sincerity.out.println('-1=' + Sincerity.Dependencies.Versions.compare('2.2-alpha2', '2.2-beta1'))
+	sincerity.out.println('1=' +  Sincerity.Dependencies.Versions.compare('2.2-2', '2.2-1'))
+	sincerity.out.println('0=' +  Sincerity.Dependencies.Versions.compare('2.2-', '2.2'))
 	sincerity.out.println()
 
 	// URI
@@ -103,10 +104,34 @@ function test(command) {
 	}
 	sincerity.out.println()
 	
-	// Resolve
-	sincerity.out.println('Resolve:')
+	// Resolve Module
+	sincerity.out.println('Resolve Module:')
 	var module = new Sincerity.Dependencies.Module()
 	module.constraints = new Sincerity.Dependencies.Maven.ModuleConstraints('com.github.sommeri:less4j:1.15.2')
-	resolver.resolveModule(module, [repository])
+	resolver.resolveModule(module, [repository], [], true)
 	module.dump(sincerity.out, true)
+	sincerity.out.println()
+
+	// Resolve
+	sincerity.out.println('Resolve:')
+
+	var dependencies = [
+ 		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
+ 		{group: 'com.fasterxml.jackson', name: 'jackson'},
+ 		{group: 'com.github.sommeri', name: 'less4j'}
+ 	]
+	
+	var repositories = [
+		{uri: 'file:/Depot/DevRepository/'}
+	]
+	
+	var rules = [
+   		{rule: 'rewriteGroupName'},
+  		{rule: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
+  	]
+	
+	var modules = resolver.resolve(dependencies, repositories, rules)
+	for (var m in modules) {
+		modules[m].dump(sincerity.out, true)
+	}
 }

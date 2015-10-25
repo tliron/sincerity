@@ -62,7 +62,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 	    
 	    Public.toString = function() {
-	    	return this.group + ':' + this.name + ':' + this.version
+	    	return 'maven:' + this.group + ':' + this.name + ':' + this.version
 	    }
 	
 	    return Public
@@ -82,18 +82,28 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    /** @ignore */
 	    Public._construct = function(group, name, version) {
 	    	if (arguments.length == 1) {
-	    		var parts = group.split(':')
-		    	this.options = [{
-		    		group: parts[0],
-			    	name: parts[1],
-			    	version: parts[2]
-		    	}]
+	    		var config = group
+	    		if (Sincerity.Objects.isString(config)) {
+		    		var parts = config.split(':')
+			    	this.options = [{
+			    		group: parts[0] || '*',
+				    	name: parts[1] || '*',
+				    	version: parts[2] || '*'
+			    	}]
+	    		}
+	    		else {
+	    			this.options = [{
+	    				group: config.group || '*',
+	    				name: config.name || '*',
+	    				version: config.version || '*'
+	    			}]
+	    		}
 	    	}
 	    	else {
 		    	this.options = [{
-		    		group: group,
-		    		name: name,
-		    		version: version
+		    		group: group || '*',
+		    		name: name || '*',
+		    		version: version || '*'
 		    	}]
 	    	}
 	    }
@@ -102,29 +112,27 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	for (var o in this.options) {
 	    		var option = this.options[o]
 	    		
-	    		if ((option.group != moduleIdentifier.group) || (option.name != moduleIdentifier.name)) {
-	    			continue
-	    		}
-	    		
-	    		if (Sincerity.Dependencies.isSpecificConstraintVersion(option.version)) {
+    			if ((option.group != moduleIdentifier.group) || (option.name != moduleIdentifier.name)) { 
+    				continue
+    			}
+
+	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(option.version)) {
 		    		if (option.version == moduleIdentifier.version) {
 		    			return true
 		    		}
 	    		}
 	    		else {
-	    			if (!option.version.length) {
-	    				return true
-	    			}
 	    			if (Sincerity.Objects.endsWith(option.version, '+')) {
 	    				return true // todo
 	    			}
+	    			return Sincerity.Objects.matchSimple(moduleIdentifier.version, option.version)
 	    		}
 	    	}
 	    	return false
 	    }
 
 	    Public.toString = function() {
-	    	var r = '['
+	    	var r = 'maven:['
 	    	for (var o in this.options) {
 	    		var option = this.options[o]
 	    		r += option.group + ':' + option.name + ':' + option.version
@@ -138,6 +146,10 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 
 	    /**
 	     * Get all the options that match one or more of the parameters.
+	     * <p>
+	     * Parameters may include one or more '*' or '?' wildcards to match any content.
+		 * Escape '*' or '?' using a preceding '\'.
+		 * An empty pattern matches everything.
 	     * 
 	     * @param {String} [group]
 	     * @param {String} [name]
@@ -149,13 +161,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    		var option = this.options[o]
 	    		var matches = true
 	    		if (Sincerity.Objects.exists(group)) {
-	    			matches = (option.group == group)
+	    			matches = Sincerity.Objects.matchSimple(option.group, group)
 	    		}
 	    		if (matches && Sincerity.Objects.exists(name)) {
-	    			matches = (option.name == name)
+	    			matches = Sincerity.Objects.matchSimple(option.name, name)
 	    		}
 	    		if (matches && Sincerity.Objects.exists(version)) {
-	    			matches = (option.version == version)
+	    			matches = Sincerity.Objects.matchSimple(option.version, version)
 	    		}
 	    		if (matches) {
 	    			options.push(option)
@@ -166,6 +178,10 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 
 	    /**
 	     * Rewrites all options that match the group and/or name to a specific version.
+	     * <p>
+	     * Parameters may include one or more '*' or '?' wildcards to match any content.
+		 * Escape '*' or '?' using a preceding '\'.
+		 * An empty pattern matches everything.
 	     * 
 	     * @param {String} [group]
 	     * @param {String} [name]
@@ -186,6 +202,10 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    
 	    /**
 	     * Rewrites all options that match the group and/or name to a new group and/or name.
+	     * <p>
+	     * Parameters may include one or more '*' or '?' wildcards to match any content.
+		 * Escape '*' or '?' using a preceding '\'.
+		 * An empty pattern matches everything.
 	     * 
 	     * @param {String} [group]
 	     * @param {String} [name]
@@ -209,7 +229,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			}
 			return true
 	    }
-
+	    
 	    return Public
 	}())
 
@@ -225,13 +245,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public._inherit = Sincerity.Dependencies.Repository
 	    
 	    /** @ignore */
-	    Public._construct = function(uri) {
+	    Public._construct = function(config) {
+	    	this.uri = config.uri
+
 	    	// Remove trailing slash
-	    	if (Sincerity.Objects.endsWith(uri, '/')) {
-	    		uri = uri.substring(0, uri.length - 1)
+	    	if (Sincerity.Objects.endsWith(this.uri, '/')) {
+	    		this.uri = this.uri.substring(0, this.uri.length - 1)
 	    	}
-	    	
-	    	this.uri = uri
 	    }
 	    
 	    Public.hasModule = function(moduleIdentifier) {
@@ -268,7 +288,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	for (var o in moduleConstraints.options) {
 	    		var option = moduleConstraints.options[o]
 	    		
-	    		if (Sincerity.Dependencies.isSpecificConstraintVersion(option.version)) {
+	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(option.version)) {
+	    			// When the constraint is specific, we can skip the metadata analysis
 		    		var moduleIdentifier = new Sincerity.Dependencies.Maven.ModuleIdentifier(option.group, option.name, option.version)
 		    		if (this.hasModule(moduleIdentifier)) {
 		    			Sincerity.Objects.pushUnique(suitableModuleIdentifiers, moduleIdentifier)
@@ -290,6 +311,16 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public.fetchModule = function(moduleIdentifier, file) {
 	    	var uri = this.getUri(moduleIdentifier, 'jar')
 	    	com.threecrickets.sincerity.util.IoUtil.copy(uri.toURL(), new java.io.File(file).canonicalFile)
+	    }
+
+	    Public.applyModuleRule = function(module, rule) {
+			if (rule.type == 'maven') {
+				if (rule.rule == 'rewriteVersion') {
+					module.constraints.rewriteVersion(rule.group, rule.name, rule.newVersion)
+					return true
+				}
+			}
+			return false
 	    }
 
 	    Public.toString = function() {
