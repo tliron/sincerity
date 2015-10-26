@@ -81,7 +81,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	 * @returns {String}
 	 */
 	Public.toHex = function(bytes) {
-		return String(com.threecrickets.sincerity.internal.StringUtil.toHex(bytes))
+		return String(com.threecrickets.sincerity.util.StringUtil.toHex(bytes))
 	}
 	
 	/**
@@ -126,20 +126,18 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	}
 
 	/**
-	 * Calculates the digest for a textual payload, with support for optionally prefixing it
-	 * with salt (before calculating the digest).
+	 * Calculates the digest for a binary payload.
 	 * 
-	 * @param {byte[]} payload The textual payload
-	 * @param {byte[]} saltBytes The salt or null
+	 * @param {byte[]} payload The binary payload
 	 * @param {Number} iterations The number of digest iterations to run
 	 * @param {String} algorithm The digest algorithm ('SHA-1', 'SHA-256', 'MD5', etc.)
 	 * @param {Boolean} [encoding='base64'] The encoding to use for the result
 	 * @returns {String} An encoded digest or null if failed
 	 */
-	Public.digest = function(payload, saltBytes, iterations, algorithm, encoding) {
+	Public.bytesDigest = function(payload, iterations, algorithm, encoding) {
 		var messageDigest = java.security.MessageDigest.getInstance(algorithm)
 		if (Sincerity.Objects.exists(messageDigest)) {
-			var digest = Public.toByteArray(payload, saltBytes)
+			var digest = payload
 			
 			for (var i = 0; i < iterations; i++) {
 				messageDigest.reset()
@@ -151,6 +149,22 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 		}
 		
 		return null
+	}
+
+	/**
+	 * Calculates the digest for a textual payload, with support for optionally prefixing it
+	 * with salt (before calculating the digest).
+	 * 
+	 * @param {String} payload The textual payload
+	 * @param {byte[]} saltBytes The salt or null
+	 * @param {Number} iterations The number of digest iterations to run
+	 * @param {String} algorithm The digest algorithm ('SHA-1', 'SHA-256', 'MD5', etc.)
+	 * @param {Boolean} [encoding='base64'] The encoding to use for the result
+	 * @returns {String} An encoded digest or null if failed
+	 */
+	Public.digest = function(payload, saltBytes, iterations, algorithm, encoding) {
+		payload = Public.toByteArray(payload, saltBytes)
+		return Public.bytesDigest(payload, iterations, algorithm, encoding)
 	}
 	
 	/**
@@ -164,7 +178,7 @@ Sincerity.Cryptography = Sincerity.Cryptography || function() {
 	Public.fileDigest = function(file, algorithm, encoding) {
 		var messageDigest = java.security.MessageDigest.getInstance(algorithm)
 		if (Sincerity.Objects.exists(messageDigest)) {
-			file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
+			file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
 			var stream = new java.io.FileInputStream(file)
 			try {
 				stream = new java.security.DigestInputStream(stream, messageDigest)
