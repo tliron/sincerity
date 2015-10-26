@@ -484,7 +484,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 
 		function nextWildcard(from) {
 			from = from || 0
-			var wildcard = pattern.substring(from).search(/[\*|\?]/)
+			var wildcard = pattern.substring(from).search(/[\*\?]/)
 			if (wildcard !== -1) {
 				wildcard += from
 			}
