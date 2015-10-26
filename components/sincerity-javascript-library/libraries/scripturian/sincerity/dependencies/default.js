@@ -18,18 +18,38 @@ document.require(
 var Sincerity = Sincerity || {}
 
 /**
+ * Dependency management services and utilities.
+ * 
  * @namespace
+ * 
+ * @author Tal Liron
  */
 Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	/** @exports Public as Sincerity.Dependencies */
 	var Public = {}
 	
+	/**
+	 * Creates a repository instance.
+	 * 
+	 * @param {Object} config
+	 * @param {String} [config.type=defaultType] The repository type
+	 * @param {String} [defaultType] Optional default type to fallback to if not specified in config
+	 * @returns {Sincerity.Dependency.Repository}
+	 */
 	Public.createRepository = function(config, defaultType) {
 		var className = Sincerity.Objects.capitalize(config.type || defaultType)
 		var clazz = Sincerity.Dependencies[className].Repository
 		return new clazz(config)
 	}
 
+	/**
+	 * Creates a module constraints instance.
+	 * 
+	 * @param {Object} config
+	 * @param {String} [config.type=defaultType] The module constraints type
+	 * @param {String} [defaultType] Optional default type to fallback to if not specified in config
+	 * @returns {Sincerity.Dependency.ModuleConstraints}
+	 */
 	Public.createModuleConstraints = function(config, defaultType) {
 		var className = Sincerity.Objects.capitalize(config.type || defaultType)
 		var clazz = Sincerity.Dependencies[className].ModuleConstraints
@@ -37,6 +57,10 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}
 
 	/**
+	 * Base class for module identifiers.
+	 * <p>
+	 * These are implemented differently per repository type.
+	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.ModuleIdentifier
 	 */
@@ -44,10 +68,22 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 		/** @exports Public as Sincerity.Dependencies.ModuleIdentifier */
 	    var Public = {}
 	    
+	    /**
+	     * Compare to another module identifier. Note that the
+	     * module identifiers should be the same or of compatible types.
+	     * 
+	     * @param {Sincerity.Dependencies.ModuleIdentifier} moduleIdentifier The module identifier to compare with us 
+	     * @returns {Boolean} true if the identifiers are equal
+	     */
 	    Public.isEqual = function(moduleIdentifier) {
 	    	return false
 	    }
 
+	    /**
+	     * Represent the instance as a string.
+	     * 
+	     * @returns {String} A string representation
+	     */
 	    Public.toString = function() {
 	    	return ''
 	    }
@@ -56,6 +92,10 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}())
 	
 	/**
+	 * Base class for module constraints.
+	 * <p>
+	 * These are implemented differently per repository type.
+	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.ModuleConstraints
 	 */
@@ -63,21 +103,81 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 		/** @exports Public as Sincerity.Dependencies.ModuleConstraints */
 	    var Public = {}
 	    
-	    Public.isSuitable = function(moduleIdentifier) {
+	    /**
+	     * Checks whether a module identifier matches the constraints.
+	     * 
+	     * @param {Sincerity.Dependencies.ModuleIdentifier} moduleIdentifier
+	     * @returns {Boolean} true if the module identifier is suitable
+	     * @see Sincerity.Dependencies.ModuleConstraints#getSuitableModuleIdentifiers
+	     */
+	    Public.isSuitableModuleIdentifer = function(moduleIdentifier) {
 	    	return false
 	    }
 
+	    /**
+	     * Filters out those module identifiers that match the constraints.
+	     * 
+	     * @param {Sincerity.Dependencies.ModuleIdentifier[]} moduleIdentifier
+	     * @returns {Sincerity.Dependencies.ModuleIdentifier[]}
+	     * @see Sincerity.Dependencies.ModuleConstraints#isSuitableModuleIdentifer
+	     */
 	    Public.getSuitableModuleIdentifiers = function(moduleIdentifiers) {
 	    	var suitableModuleIdentifiers = []
 	    	for (var m in moduleIdentifiers) {
 	    		var moduleIdentifier = moduleIdentifiers[m]
-	    		if (this.isSuitable(moduleIdentifier)) {
+	    		if (this.isSuitableModuleIdentifer(moduleIdentifier)) {
 	    			suitableModuleIdentifiers.push(moduleIdentifier)
 	    		}
 	    	}
 	    	return suitableModuleIdentifiers
 	    }
 
+	    /**
+	     * Represent the instance as a string.
+	     * 
+	     * @returns {String} A string representation
+	     */
+	    Public.toString = function() {
+	    	return ''
+	    }
+
+	    return Public
+	}())
+
+	/**
+	 * Base class for repositories.
+	 * 
+	 * @class
+	 * @name Sincerity.Dependencies.Repository
+	 */
+	Public.Repository = Sincerity.Classes.define(function() {
+		/** @exports Public as Sincerity.Dependencies.Repository */
+	    var Public = {}
+	    
+	    Public.hasModule = function(moduleIdentifier) {
+	    	return false
+	    }
+
+	    Public.getModule = function(moduleIdentifier) {
+	    	return null
+	    }
+
+	    Public.getSuitableModuleIdentifiers = function(moduleConstraints) {
+	    	return []
+	    }
+
+	    Public.fetchModule = function(moduleIdentifier, file) {
+	    }
+	    
+	    Public.applyModuleRule = function(module, rule) {
+	    	return false
+	    }
+
+	    /**
+	     * Represent the instance as a string.
+	     * 
+	     * @returns {String} A string representation
+	     */
 	    Public.toString = function() {
 	    	return ''
 	    }
@@ -86,6 +186,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}())
 	
 	/**
+	 * Represents a single dependency.
+	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Module
 	 */
@@ -101,6 +203,11 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.transitive = null
 	    }
 	    
+	    /**
+	     * Represent the instance as a string.
+	     * 
+	     * @returns {String} A string representation
+	     */
 	    Public.toString = function() {
 	    	var r = ''
 	    	if (this.transitive) {
@@ -139,40 +246,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}())
 
 	/**
-	 * @class
-	 * @name Sincerity.Dependencies.Repository
-	 */
-	Public.Repository = Sincerity.Classes.define(function() {
-		/** @exports Public as Sincerity.Dependencies.Repository */
-	    var Public = {}
-	    
-	    Public.hasModule = function(moduleIdentifier) {
-	    	return false
-	    }
-
-	    Public.getModule = function(moduleIdentifier) {
-	    	return null
-	    }
-
-	    Public.getSuitableModuleIdentifiers = function(moduleConstraints) {
-	    	return []
-	    }
-
-	    Public.fetchModule = function(moduleIdentifier, file) {
-	    }
-	    
-	    Public.applyModuleRule = function(module, rule) {
-	    	return false
-	    }
-
-	    Public.toString = function() {
-	    	return ''
-	    }
-
-	    return Public
-	}())
-
-	/**
+	 * Handles resolving and fetching of dependency tree.
+	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Resolver
 	 */
@@ -186,15 +261,16 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 
 	    /**
-	     * @param dependencies
-	     * @param repositories
-	     * @param rules
+	     * @param {Object[]} dependencies Constraint configurations
+	     * @param {Object[]} repositories Repository configurations
+	     * @param {Object[]} rules Rule configurations
 	     */
 	    Public.resolve = function(dependencies, repositories, rules) {
 	    	dependencies = Sincerity.Objects.clone(dependencies)
 	    	repositories = Sincerity.Objects.clone(repositories)
 	    	rules = Sincerity.Objects.clone(rules)
 	    	
+	    	// Create modules
 	    	for (var d in dependencies) {
 	    		var dependency = dependencies[d]
 	    		var module = new Sincerity.Dependencies.Module()
@@ -203,10 +279,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		dependencies[d] = module
 	    	}
 
+	    	// Create repositories
 	    	for (var r in repositories) {
 	    		repositories[r] = Sincerity.Dependencies.createRepository(repositories[r], this.defaultType)
 	    	}
 
+	    	// Adjust rules
 			for (var r in rules) {
 				var rule = rules[r]
 				rule.type = rule.type || this.defaultType
@@ -277,6 +355,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}())
 
 	/**
+	 * Utilities for working with dependency versions.
+	 * 
 	 * @namespace
 	 */
 	Public.Versions = {
@@ -285,6 +365,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * <p>
 	     * Resolving a non-specific version would require fetching metadata.
 	     * 
+	     * @param {String} version
 	     * @returns {Boolean} true if specific
 	     */
 	    isSpecificConstraint: function(version) {
@@ -310,7 +391,20 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    },
 		
 		/**
+		 * Compares two versions.
+		 * <p>
+		 * Versions should have forms such as '1.0' or '2.4.1-beta1'.
+		 * <p>
+		 * The comparison first takes into account the dot-separated integer parts.
+		 * In case both versions are identical on those terms, then the postfix after
+		 * the dash is compared.
+		 * <p>
+		 * Postfix comparison takes into account its semantic meaning. Thus,
+		 * 'beta2' would be greater than 'alpha3', and 'alpha3' would be greater than
+		 * 'dev12'. 
 		 * 
+	     * @param {String} version1
+	     * @param {String} version2
 		 * @returns {Number} -1 if version2 is greater, 0 if equal, 1 if version1 is greater
 		 */
 		compare: function(version1, version2) {
@@ -344,6 +438,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			return 0
 		},
 		
+		/**
+		 * Utility to parse a version string into parts that can be compared.
+		 * 
+		 * @param {String} version
+		 * @returns {Object}
+		 */
 		parse: function(version) {
 			version = Sincerity.Objects.trim(version)
 			var dash = version.indexOf('-')
@@ -367,18 +467,24 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			}
 		},
 	
+		/**
+		 * Utility to convert a version postfix into a number that can be compared.
+		 * 
+		 * @param {String} version
+		 * @returns {Number}
+		 */
 		parsePostfix: function(postfix) {
 			postfix = postfix.toLowerCase()
-			if ((postfix == 'd') || (postfix == 'dev')) {
-				return -3
-			}
-			if ((postfix == 'a') || (postfix == 'alpha')) {
-				return -2
-			}
-			if ((postfix == 'b') || (postfix == 'beta')) {
-				return -1
-			}
-			return 0
+			return Sincerity.Dependencies.Versions.postfixes[postfix] || 0
+		},
+		
+		postfixes: {
+			'd': -3,
+			'dev': -3,
+			'a': -2,
+			'alpha': -2,
+			'b': -1,
+			'beta': -1
 		}
 	}
 

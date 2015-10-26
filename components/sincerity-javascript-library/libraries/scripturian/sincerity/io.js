@@ -78,7 +78,19 @@ Sincerity.IO = Sincerity.IO || function() {
 	Public.loadText = function(uri, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
 		var bytes = Public.loadBytes(uri)
-		return charset.decode(java.nio.ByteBuffer.wrap(bytes))
+		return Sincerity.JVM.fromBytes(bytes, charset)
+	}
+	
+	/**
+	 * Download all data from a URI to a file.
+	 * 
+     * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/net/URI.html">java.net.URI</a>} uri
+	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
+	 */
+	Public.download = function(uri, file) {
+		uri = Sincerity.Objects.isString(uri) ? new java.net.URI(uri) : uri
+		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		com.threecrickets.sincerity.util.IoUtil.copy(uri.toURL(), file)
 	}
 	
 	var bufferSize = 16 * 1024

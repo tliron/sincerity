@@ -16,13 +16,25 @@ document.require(
 	'/sincerity/classes/',
 	'/sincerity/objects/',
 	'/sincerity/io/',
-	'/sincerity/xml/')
+	'/sincerity/xml/',
+	'/sincerity/cryptography/')
 
 var Sincerity = Sincerity || {}
 Sincerity.Dependencies = Sincerity.Dependencies || {}
 
 /**
+ * Dependency management support for <a href="https://maven.apache.org/">Maven</a> m2 repositories (also known as "ibiblio").
+ * <p>
+ * Supports reading the repository URI structure, retrieving and parsing ".pom" and "maven-metadata.xml" data,
+ * interpreting module identifiers (group/name/version), applying version ranges, downloading ".jar" files,
+ * and validating against signatures in ".sha1" or ".md5" files.
+ * <p>
+ * For convenience, we also support the <a href="http://ant.apache.org/ivy/">Ivy</a>-style "+" version range, even though
+ * it is not part of the Maven standard. 
+ * 
  * @namespace
+ * 
+ * @author Tal Liron
  */
 Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	/** @exports Public as Sincerity.Dependencies.Maven */
@@ -108,7 +120,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	}
 	    }
 
-	    Public.isSuitable = function(moduleIdentifier) {
+	    Public.isSuitableModuleIdentifer = function(moduleIdentifier) {
 	    	for (var o in this.options) {
 	    		var option = this.options[o]
 	    		
@@ -247,6 +259,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    /** @ignore */
 	    Public._construct = function(config) {
 	    	this.uri = config.uri
+	    	this.allowMd5 = true
 
 	    	// Remove trailing slash
 	    	if (Sincerity.Objects.endsWith(this.uri, '/')) {
@@ -310,7 +323,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 
 	    Public.fetchModule = function(moduleIdentifier, file) {
 	    	var uri = this.getUri(moduleIdentifier, 'jar')
-	    	com.threecrickets.sincerity.util.IoUtil.copy(uri.toURL(), new java.io.File(file).canonicalFile)
+	    	var signature = this.getSignature(uri)
+	    	file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+	    	Sincerity.IO.download(uri, file)
+	    	if (!this.isSignatureValid(file, signature)) {
+	    		file['delete']()
+	    		throw ':('
+	    	}
 	    }
 
 	    Public.applyModuleRule = function(module, rule) {
@@ -346,21 +365,6 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	return new java.net.URI(uri)
 	    }
 	    
-	    Public.getPom = function(moduleIdentifier) {
-	    	var uri = this.getUri(moduleIdentifier, 'pom')
-	    	try {
-		    	var text = Sincerity.IO.loadText(uri)
-		    	var xml = Sincerity.XML.from(text)
-		    	var pom = new Sincerity.Dependencies.Maven.POM(xml)
-		    	if (moduleIdentifier.isEqual(pom.getModuleIdentifier())) {
-		    		// Make sure this is a valid POM
-		    		return pom
-		    	}
-	    	}
-	    	catch (x) {}
-	    	return null
-	    }
-	    
 	    Public.getMetaDataUri = function(group, name) {
 	    	var uri = this.uri
 	    	
@@ -376,10 +380,71 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	return new java.net.URI(uri)
 	    }
 	    
+	    Public.getSignature = function(uri) {
+	    	// Try sha1 first
+	    	var type = 'sha1', content
+	    	var signatureUri = uri + '.' + type
+	    	try {
+	    		content = Sincerity.IO.loadText(signatureUri)
+	    	}
+	    	catch (x) {
+	    		if (this.allowMd5) {
+		    		// Fallback to md5
+	    			type = 'md5'
+		    		signatureUri = uri + '.' + type
+		    		content = Sincerity.IO.loadText(signatureUri)
+	    		}
+	    		else {
+	    			throw x
+	    		}
+	    	}
+	    	return {
+	    		type: type,
+	    		content: content 
+	    	}
+	    }
+	    
+	    Public.isSignatureValid = function(content, signature) {
+	    	var algorithm = signature.type
+	    	if (algorithm === 'sha1') {
+	    		algorithm = 'SHA-1'
+	    	}
+	    	else if (algorithm === 'md5') {
+	    		algorithm = 'MD5'
+	    	}
+	    	var digest = content instanceof java.io.File ? Sincerity.Cryptography.fileDigest(content, algorithm, 'hex') : Sincerity.Cryptography.bytesDigest(content, 1, algorithm, 'hex')
+			return digest.toLowerCase() == signature.content.toLowerCase()
+	    }
+	    
+	    Public.getPom = function(moduleIdentifier) {
+	    	var uri = this.getUri(moduleIdentifier, 'pom')
+	    	try {
+		    	var signature = this.getSignature(uri)
+		    	var bytes = Sincerity.IO.loadBytes(uri)
+		    	if (!this.isSignatureValid(bytes, signature)) {
+		    		return null
+		    	}
+		    	var text = Sincerity.JVM.fromBytes(bytes)
+		    	var xml = Sincerity.XML.from(text)
+		    	var pom = new Sincerity.Dependencies.Maven.POM(xml)
+		    	if (moduleIdentifier.isEqual(pom.getModuleIdentifier())) {
+		    		// Make sure this is a valid POM
+		    		return pom
+		    	}
+	    	}
+	    	catch (x) {}
+	    	return null
+	    }
+	    
 	    Public.getMetaData = function(group, name) {
 	    	var uri = this.getMetaDataUri(group, name)
 	    	try {
-		    	var text = Sincerity.IO.loadText(uri)
+		    	var signature = this.getSignature(uri)
+		    	var bytes = Sincerity.IO.loadBytes(uri)
+		    	if (!this.isSignatureValid(bytes, signature)) {
+		    		return null
+		    	}
+		    	var text = Sincerity.JVM.fromBytes(bytes)
 		    	var xml = Sincerity.XML.from(text)
 		    	var metadata = new Sincerity.Dependencies.Maven.MetaData(xml)
 		    	if ((group == metadata.groupId) && (name == metadata.artifactId)) {

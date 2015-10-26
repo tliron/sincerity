@@ -52,7 +52,7 @@ function test(command) {
 	sincerity.out.println(id.isEqual(id2))
 	sincerity.out.println(id3.toString())
 	sincerity.out.println(constraints.toString())
-	sincerity.out.println(constraints.isSuitable(id))
+	sincerity.out.println(constraints.isSuitableModuleIdentifer(id))
 	sincerity.out.println()
 
 	// Versions
@@ -102,6 +102,12 @@ function test(command) {
 		var metadataId = metadataIds[i]
 		sincerity.out.println(metadataId.toString())
 	}
+	sincerity.out.println()
+	
+	// Signatures
+	sincerity.out.println('Signatures:')
+	var signature = repository.getSignature(uri, 'pom')
+	sincerity.out.println(signature.type + ':' + signature.content)
 	sincerity.out.println()
 	
 	// Resolve Module
