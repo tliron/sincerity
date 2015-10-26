@@ -209,13 +209,13 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @returns {String} A string representation
 	     */
 	    Public.toString = function() {
-	    	var r = ''
-	    	if (this.transitive) {
-	    		r += '>'
-	    	}
+	    	var r = '', prefix = ''
 	    	if (Sincerity.Objects.exists(this.identifier)) {
-	    		if (r.length) { r += ' ' }
 	    		r += 'identifier: ' + this.identifier.toString()
+	    		prefix = '*'
+	    	}
+	    	else {
+	    		prefix = '!'
 	    	}
 	    	if (Sincerity.Objects.exists(this.constraints)) {
 	    		if (r.length) { r += ', ' }
@@ -224,6 +224,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	if (this.dependencies.length) {
 	    		if (r.length) { r += ', ' }
 	    		r += 'dependencies: ' + this.dependencies.length
+	    	}
+	    	if (this.transitive) {
+	    		prefix += '>'
+	    	}
+	    	if (prefix.length) {
+	    		r = prefix + ' ' + r
 	    	}
 	    	return r
 	    }
@@ -372,24 +378,19 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			if (!version.length) {
 				return false
 			}
-			if (Sincerity.Objects.endsWith(version, '+')) {
-				return false
-			}
-			if (Sincerity.Objects.startsWith(version, '[')) {
-				return false
-			}
-			if (Sincerity.Objects.startsWith(version, '(')) {
-				return false
-			}
-			if (version.indexOf(',') != -1) {
-				return false
-			}
 			if (version.indexOf('*') != -1) {
+				return false
+			}
+			if (version.indexOf('?') != -1) {
+				return false
+			}
+			var first = version.charAt(0)
+			if ((first == '!') || (first == '[') || (first == '(')) {
 				return false
 			}
 	    	return true
 	    },
-		
+	    
 		/**
 		 * Compares two versions.
 		 * <p>
@@ -477,6 +478,74 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			postfix = postfix.toLowerCase()
 			return Sincerity.Dependencies.Versions.postfixes[postfix] || 0
 		},
+		
+		/**
+		 * Parses a ranges constraint, e.g '[1.2,2.0),[3.0,)'.
+		 * 
+		 * @param {String} version
+		 * @returns {Object}
+		 */
+	    parseRangesConstraint: function(version) {
+	    	version = Sincerity.Objects.trim(version)
+	    	
+	    	var rangeRegExp = /[\[\(]\s*([^,\s]*)\s*,\s*([^,\]\)\s]*)\s*[\]\)]/g
+	    	var matches = rangeRegExp.exec(version)
+	    	if (null === matches) {
+	    		return null
+	    	}
+			
+			var ranges = []
+			
+			while (null !== matches) {
+				var lastIndex = rangeRegExp.lastIndex
+				var start = matches[1]
+				var end = matches[2]
+				var open = version.charAt(matches.index)
+				var close = version.charAt(lastIndex - 1)
+				
+				ranges.push({
+					start: start,
+					end: end,
+					includeStart: open == '[',
+					includeEnd: close == ']'
+				})
+				
+				matches = rangeRegExp.exec(version)
+
+				if (null !== matches) {
+					// Make sure there is a comma in between ranges
+					var between = version.substring(lastIndex, matches.index)
+					if (!/^\s+,\s+$/.test(between)) {
+						return null
+					}
+				}
+			}
+			
+			return ranges
+	    },
+	    
+	    inRangesConstraint: function(version, ranges) {
+	    	var match = false
+	    	for (var r in ranges) {
+	    		var range = ranges[r]
+				var compareStart = range.start ? Sincerity.Dependencies.Versions.compare(version, range.start) : 0
+				var compareEnd = range.end ? Sincerity.Dependencies.Versions.compare(range.end, version) : 0
+				if (range.includeStart && range.includeEnd) {
+					match = (compareStart >= 0) && (compareEnd >= 0) 
+				}
+				else if (range.includeStart && !range.includeEnd) {
+					match = (compareStart >= 0) && (compareEnd == 0) 
+				}
+				else if (!range.includeStart && range.includeEnd) {
+					match = (compareStart == 0) && (compareEnd >= 0) 
+				}
+				match = (compareStart == 0) && (compareEnd == 0)
+				if (!match) {
+					return false // logical and: it takes just one negative to be negative
+				}
+	    	}
+	    	return match
+	    },
 		
 		postfixes: {
 			'd': -3,

@@ -55,14 +55,14 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public._construct = function(group, name, version) {
 	    	if (arguments.length == 1) {
 	    		var parts = group.split(':')
-	    		this.group = parts[0]
-		    	this.name = parts[1]
-		    	this.version = parts[2]
+	    		this.group = Sincerity.Objects.trim(parts[0])
+		    	this.name = Sincerity.Objects.trim(parts[1])
+		    	this.version = Sincerity.Objects.trim(parts[2])
 	    	}
 	    	else {
-		    	this.group = group
-		    	this.name = name
-		    	this.version = version
+		    	this.group = Sincerity.Objects.trim(group)
+		    	this.name = Sincerity.Objects.trim(name)
+		    	this.version = Sincerity.Objects.trim(version)
 	    	}
 	    	
 	    	// After resolve
@@ -98,29 +98,31 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    		if (Sincerity.Objects.isString(config)) {
 		    		var parts = config.split(':')
 			    	this.options = [{
-			    		group: parts[0] || '*',
-				    	name: parts[1] || '*',
-				    	version: parts[2] || '*'
+			    		group: Sincerity.Objects.trim(parts[0]) || '*',
+				    	name: Sincerity.Objects.trim(parts[1]) || '*',
+				    	version: parseVersion(parts[2])
 			    	}]
 	    		}
 	    		else {
 	    			this.options = [{
-	    				group: config.group || '*',
-	    				name: config.name || '*',
-	    				version: config.version || '*'
+	    				group: Sincerity.Objects.trim(config.group) || '*',
+	    				name: Sincerity.Objects.trim(config.name) || '*',
+	    				version: parseVersion(config.version)
 	    			}]
 	    		}
 	    	}
 	    	else {
 		    	this.options = [{
-		    		group: group || '*',
-		    		name: name || '*',
-		    		version: version || '*'
+		    		group: Sincerity.Objects.trim(group) || '*',
+		    		name: Sincerity.Objects.trim(name) || '*',
+		    		version: parseVersion(version)
 		    	}]
 	    	}
 	    }
 
 	    Public.isSuitableModuleIdentifer = function(moduleIdentifier) {
+	    	var suitable = false
+	    	
 	    	for (var o in this.options) {
 	    		var option = this.options[o]
 	    		
@@ -128,23 +130,41 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     				continue
     			}
 
-	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(option.version)) {
-		    		if (option.version == moduleIdentifier.version) {
-		    			return true
-		    		}
+    			var version = option.version
+    			var exclude = false
+    			if (version.charAt(0) == '!') {
+    				version = version.substring(1)
+    				exclude = true
+    			}
+    			
+    			if (suitable && !exclude) {
+    				continue // we're already in, no need to check another option
+    			}
+
+	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(version)) {
+		    		suitable = (version == moduleIdentifier.version)
 	    		}
 	    		else {
-	    			if (Sincerity.Objects.endsWith(option.version, '+')) {
-	    				return true // todo
+	    			var ranges = Sincerity.Dependencies.Versions.parseRangesConstraint(version)
+	    			if (ranges) {
+	    				suitable = Sincerity.Dependencies.Versions.inRangesConstraint(moduleIdentifier.version, ranges)
 	    			}
-	    			return Sincerity.Objects.matchSimple(moduleIdentifier.version, option.version)
+	    			else {
+	    				suitable = Sincerity.Objects.matchSimple(moduleIdentifier.version, version)
+	    			}
 	    		}
+    			
+    			if (suitable && exclude) {
+    				suitable = false
+    				break // exclusions take precedence
+    			}
 	    	}
-	    	return false
+
+	    	return suitable
 	    }
 
 	    Public.toString = function() {
-	    	var r = 'maven:['
+	    	var r = 'maven:{'
 	    	for (var o in this.options) {
 	    		var option = this.options[o]
 	    		r += option.group + ':' + option.name + ':' + option.version
@@ -152,7 +172,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    			r += '|'
 	    		}
 	    	}
-	    	r += ']'
+	    	r += '}'
 	    	return r
 	    }
 
@@ -205,6 +225,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			if (!options.length) {
 				return false
 			}
+			newVersion = parseVersion(newVersion)
 			for (var o in options) {
 				var option = options[o]
 				option.version = newVersion
@@ -240,6 +261,20 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 				}
 			}
 			return true
+	    }
+	    
+	    function parseVersion(version) {
+	    	if (!version) {
+	    		return '*'
+	    	}
+	    	version = Sincerity.Objects.trim(version)
+	    	if (!version.length) {
+	    		return '*'
+	    	}
+	    	if (Sincerity.Objects.endsWith(version, '+')) {
+	    		return '[' + version.substring(0, version.length - 1) + ',)'
+	    	}
+	    	return version
 	    }
 	    
 	    return Public
@@ -309,7 +344,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		}
 	    		}
 	    		else {
-	    			var metadata = this.getMetaData(option.group, option.name) // todo: cache
+	    			var metadata = this.getMetaData(option.group, option.name) // todo: cache?
 	    			if (metadata) {
 	    				var moduleIdentifiers = metadata.getModuleIdentifiers()
 	    				suitableModuleIdentifiers = Sincerity.Objects.concatUnique(suitableModuleIdentifiers, moduleIdentifiers)
