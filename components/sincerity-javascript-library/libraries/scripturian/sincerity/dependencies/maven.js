@@ -30,7 +30,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || {}
  * and validating against signatures in ".sha1" or ".md5" files.
  * <p>
  * For convenience, we also support the <a href="http://ant.apache.org/ivy/">Ivy</a>-style "+" version range, even though
- * it is not part of the Maven standard. 
+ * it is not part of the Maven standard.
+ * <p>
+ * Additionally, pattern matching ("*", "?") is supported, as well as exclusions ("!"). 
  * 
  * @namespace
  * 
@@ -81,6 +83,16 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	}())
 
 	/**
+	 * Constraints support Maven version ranges.
+	 * <p>
+	 * Note that a Maven version range can in fact contain several ranges, in which case they match via a logical or.
+	 * For example. "(,1.1),(1.1,)" means that everything except "1.1" will match.
+	 * <p>
+	 * Likewise, you may have a constraint with more than one option, which will also match via a logical or,
+	 * <i>unless</i> the option has a version beginning with a "!". That signifies an exclusion, which will
+	 * always take precedence. For example, "!1.1" will explicitly reject "1.1", even if "1.1" is matched by
+	 * other options.
+	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Maven.ModuleConstraints
 	 */
@@ -93,30 +105,42 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    
 	    /** @ignore */
 	    Public._construct = function(group, name, version) {
+	    	this.options = []
+	    	this.addOption.apply(this, arguments)
+	    }
+	    
+	    /**
+	     * Adds an option to the constraints.
+	     * 
+	     * @param {String|Object} group The group, or a config, or a complete option string
+	     * @param {String} [name] The name
+	     * @param {String} [version] The version
+	     */
+	    Public.addOption = function(group, name, version) {
 	    	if (arguments.length == 1) {
 	    		var config = group
 	    		if (Sincerity.Objects.isString(config)) {
 		    		var parts = config.split(':')
-			    	this.options = [{
+			    	this.options.push({
 			    		group: Sincerity.Objects.trim(parts[0]) || '*',
 				    	name: Sincerity.Objects.trim(parts[1]) || '*',
 				    	version: parseVersion(parts[2])
-			    	}]
+			    	})
 	    		}
 	    		else {
-	    			this.options = [{
+	    			this.options.push({
 	    				group: Sincerity.Objects.trim(config.group) || '*',
 	    				name: Sincerity.Objects.trim(config.name) || '*',
 	    				version: parseVersion(config.version)
-	    			}]
+	    			})
 	    		}
 	    	}
 	    	else {
-		    	this.options = [{
+		    	this.options.push({
 		    		group: Sincerity.Objects.trim(group) || '*',
 		    		name: Sincerity.Objects.trim(name) || '*',
 		    		version: parseVersion(version)
-		    	}]
+		    	})
 	    	}
 	    }
 
@@ -138,7 +162,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     			}
     			
     			if (suitable && !exclude) {
-    				continue // we're already in, no need to check another option
+    				continue // logical or: we're already in, no need to check another option, *unless* it's an exclusion
     			}
 
 	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(version)) {
@@ -155,8 +179,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    		}
     			
     			if (suitable && exclude) {
-    				suitable = false
-    				break // exclusions take precedence
+    				return false // exclusions take precedence
     			}
 	    	}
 
@@ -369,12 +392,24 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 
 	    Public.applyModuleRule = function(module, rule) {
 			if (rule.type == 'maven') {
-				if (rule.rule == 'rewriteVersion') {
+				if (rule.rule == 'exclude') {
+					var options = module.constraints.getOptions(rule.group, rule.name)
+					if (options.length) {
+						return 'exclude'
+					}
+				}
+				else if (rule.rule == 'excludeDependencies') {
+					var options = module.constraints.getOptions(rule.group, rule.name)
+					if (options.length) {
+						return 'excludeDependencies'
+					}
+				}
+				else if (rule.rule == 'rewriteVersion') {
 					module.constraints.rewriteVersion(rule.group, rule.name, rule.newVersion)
 					return true
 				}
 			}
-			return false
+			return null
 	    }
 
 	    Public.toString = function() {

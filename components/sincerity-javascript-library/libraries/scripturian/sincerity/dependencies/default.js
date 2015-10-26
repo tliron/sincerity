@@ -316,13 +316,27 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	// Apply rules
 			for (var r in rules) {
 				var rule = rules[r]
+				var command = null
+				
+				// Try repositories
 				for (var rr in repositories) {
 					var repository = repositories[rr]
-    				if (repository.applyModuleRule(module, rule)) {
-    					continue
+					command = repository.applyModuleRule(module, rule)
+    				if (command) {
+    					break
     				}
     			}
-    		}
+
+				if (null === command) {
+					// TODO: unsupported rule warning
+				}
+				else if (command == 'exclude') {
+					return
+				}
+				else if (command == 'excludeDependencies') {
+					recursive = false
+				}
+			}
 
     		if (Sincerity.Objects.exists(module.identifier)) {
     			// Already resolved
@@ -525,7 +539,6 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    },
 	    
 	    inRangesConstraint: function(version, ranges) {
-	    	var match = false
 	    	for (var r in ranges) {
 	    		var range = ranges[r]
 				var compareStart = range.start ? Sincerity.Dependencies.Versions.compare(version, range.start) : 0
@@ -540,11 +553,11 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 					match = (compareStart == 0) && (compareEnd >= 0) 
 				}
 				match = (compareStart == 0) && (compareEnd == 0)
-				if (!match) {
-					return false // logical and: it takes just one negative to be negative
+				if (match) {
+					return true // logical or: it takes just one positive to be positive
 				}
 	    	}
-	    	return match
+	    	return false
 	    },
 		
 		postfixes: {

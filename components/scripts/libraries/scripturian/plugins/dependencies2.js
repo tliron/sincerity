@@ -132,6 +132,8 @@ function test(command) {
 	]
 	
 	var rules = [
+ 		{rule: 'exclude', group: '*antlr*'},
+		{rule: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
    		{rule: 'rewriteGroupName'},
   		{rule: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
   	]
