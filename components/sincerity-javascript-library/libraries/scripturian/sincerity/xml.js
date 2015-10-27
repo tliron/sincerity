@@ -43,6 +43,7 @@ Sincerity.XML = Sincerity.XML || function() {
 	 */
 	Public.from = function(xml) {
 		var source = new org.xml.sax.InputSource(new java.io.StringReader(xml))
+		var builder = builderFactory.newDocumentBuilder() // note: builders are *not* thread-safe!
 		var document = builder.parse(source)
 		return new Public.Node(document)
 	}
@@ -547,7 +548,6 @@ Sincerity.XML = Sincerity.XML || function() {
 	//
 
 	var builderFactory = javax.xml.parsers.DocumentBuilderFactory.newInstance()
-	var builder = builderFactory.newDocumentBuilder()
 	var outputFactory = javax.xml.stream.XMLOutputFactory.newInstance()
 	var transformerFactory = javax.xml.transform.TransformerFactory.newInstance()
 	
