@@ -43,6 +43,19 @@ Sincerity.JVM = Sincerity.JVM || function() {
 		theClass = Sincerity.Objects.isString(theClass) ? Public.getClass(theClass) : theClass
 		return (x.javaException || x) instanceof theClass
 	}
+	
+	/**
+	 * Returns the JVM stack trace for a JVM exception.
+	 * 
+	 * @returns {String} The stack trace (multi-line, human-readable)
+	 */
+	Public.getStackTrace = function(exception) {
+		var string = new java.io.StringWriter()
+		var writer = new java.io.PrintWriter(string)
+		exception.printStackTrace(writer)
+		writer.close()
+		return String(string)
+	}
 
 	/**
 	 * Loads a JVM class, using the current thread context.
@@ -122,6 +135,9 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	
 	/**
 	 * Converts a JavaScript array into a new JVM array.
+	 * 
+	 * @param {Array}
+	 * @returns JVM array
 	 */
 	Public.toArray = function(array, type) {
 		var jvmArray = Public.newArray(array.length, type)
@@ -133,6 +149,9 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	
 	/**
 	 * Converts a JVM array into a JavaScript array.
+	 * 
+	 * @param array
+	 * @returns {Array}
 	 */
 	Public.fromArray = function(array) {
 		var jsArray = []
@@ -145,6 +164,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM ArrayList (not thread-safe) or a CopyOnWriteArrayList (thread-safe).
 	 * 
+	 * @param {Boolean} [threadSafe=false]
+	 * @param {Number} [initialCapacity]
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/List.html">java.util.List</a>}
 	 */
 	Public.newList = function(threadSafe, initialCapacity) {
@@ -160,6 +181,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM HashSet (not thread-safe) or a CopyOnWriteArraySet (thread-safe).
 	 * 
+	 * @param {Boolean} [threadSafe=false]
+	 * @param {Number} [initialCapacity]
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Set.html">java.util.Set</a>}
 	 */
 	Public.newSet = function(threadSafe, initialCapacity) {
@@ -175,6 +198,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JavaScript array into a new JVM ArrayList (not thread-safe) or a CopyOnWriteArrayList (thread-safe).
 	 * 
+	 * @param {Array} array
+	 * @param {Boolean} [threadSafe=false]
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/List.html">java.util.List</a>}
 	 */
 	Public.toList = function(array, threadSafe) {
@@ -188,6 +213,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JVM Collection into a new JavaScript array.
 	 * 
+	 * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Collection.html">java.util.Collection</a>} collection
 	 * @returns {Array}
 	 */
 	Public.fromCollection = function(collection) {
@@ -197,6 +223,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Creates a JVM HashMap (not thread-safe) or a ConcurrentHashMap (thread-safe).
 	 * 
+	 * @param {Boolean} [threadSafe=false]
+	 * @param {Number} [initialCapacity]
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Map.html">java.util.Map</a>}
 	 */
 	Public.newMap = function(threadSafe, initialCapacity) {
@@ -210,7 +238,9 @@ Sincerity.JVM = Sincerity.JVM || function() {
 
 	/**
 	 * Converts a JavaScript dict into a new JVM HashMap (not thread-safe) or a ConcurrentHashMap (thread-safe).
-	 * 
+	 *
+	 * @param {Object} dict
+	 * @param {Boolean} [threadSafe=false]
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Map.html">java.util.Map</a>}
 	 */
 	Public.toMap = function(dict, threadSafe) {
@@ -224,6 +254,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	/**
 	 * Converts a JVM Map into a new JavaScript dict.
 	 * 
+	 * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Map.html">java.util.Map</a>} map
 	 * @returns {Object}
 	 */
 	Public.fromMap = function(map) {
@@ -428,16 +459,44 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	}
 	
 	/**
-	 * Returns the JVM stack trace for a JVM exception.
+	 * Wraps a JavaScript function in a new JVM task instance.
+	 * <p>
+	 * Supports java.util.concurrent.Callable, java.util.concurrent.RecursiveTask, and java.lang.Runnable.
 	 * 
-	 * @returns {String} The stack trace (multi-line, human-readable)
+	 * @param {Function} fn The function to wrap
+	 * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
+	 * @returns A new JVM task instance
 	 */
-	Public.getStackTrace = function(exception) {
-		var string = new java.io.StringWriter()
-		var writer = new java.io.PrintWriter(string)
-		exception.printStackTrace(writer)
-		writer.close()
-		return String(string)
+	Public.task = function(fn, type) {
+		if (type == 'callable') {
+			return new java.util.concurrent.Callable({
+				call: fn
+			})
+		}
+		else if (type == 'recursiveTask') {
+			return new java.util.concurrent.RecursiveTask({
+				compute: fn
+			})
+		}
+		else if (type == 'recursiveAction') {
+			return new java.util.concurrent.RecursiveAction({
+				compute: fn
+			})
+		}
+		else { // if (type == 'runnable') {
+			return new java.lang.Runnable({
+				run: fn
+			})
+		}
+	}
+	
+	/**
+	 * Checks if we are in a fork/join pool thread.
+	 * 
+	 * @returns {Boolean} true if in fork/join pool thread
+	 */
+	Public.inForkJoin = function() {
+		return java.util.concurrent.ForkJoinTask.inForkJoinPool()		
 	}
 	
 	/**

@@ -32,7 +32,7 @@ Sincerity.IO = Sincerity.IO || function() {
      * Copies bytes from one JVM channel to another, using an in-memory buffer.
      * 
      * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/channels/ReadableByteChannel.html">java.nio.channels.ReadableByteChannel</a>} inChannel
-     * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/channels/WritableByteChannel">WritableByteChannel</a>} outChannel
+     * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/channels/WritableByteChannel">java.nio.channels.WritableByteChannel</a>} outChannel
      */
     Public.copyChannel = function(inChannel, outChannel) {
 		var buffer = java.nio.ByteBuffer.allocate(bufferSize)
@@ -46,7 +46,7 @@ Sincerity.IO = Sincerity.IO || function() {
     }
 
     /**
-     * Loads all data from a URI into a bytes array.
+     * Loads all data from a URI as a bytes array.
      * 
      * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/net/URI.html">java.net.URI</a>} uri
 	 * @returns {byte[]}
