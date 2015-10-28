@@ -277,6 +277,23 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	}
 	
 	/**
+	 * Executes a closure within a lock.
+	 * 
+	 * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>} lock
+	 * @param {Function} fn
+	 * @param [self]
+	 */
+	Public.withLock = function(lock, fn, self) {
+		lock.lock()
+		try {
+			return fn.apply(self)
+		}
+		finally {
+			lock.unlock()
+		}
+	}
+	
+	/**
 	 * Returns a JVM charset.
 	 * 
 	 * @param {String} [name] Leave empty to get default charset (most likely UTF-8)
