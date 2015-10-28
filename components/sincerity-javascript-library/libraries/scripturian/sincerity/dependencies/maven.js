@@ -368,7 +368,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     			var dependencyModuleSpecification = pom.dependencyModuleSpecifications[d]
     			var dependencyModule = new Sincerity.Dependencies.Module()
     			dependencyModule.specification = dependencyModuleSpecification
-    			dependencyModule.dependents.push(module)
+    			dependencyModule.addDependent(module)
     			module.dependencies.push(dependencyModule)
     		}
     		return module

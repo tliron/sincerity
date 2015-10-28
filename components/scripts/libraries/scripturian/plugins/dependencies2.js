@@ -33,7 +33,6 @@ function test(command) {
 	var id2 = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var specification = new Sincerity.Dependencies.Maven.ModuleSpecification('org.jsoup', 'jsoup', '1.8.1')
 	var id3 = new Sincerity.Dependencies.Maven.ModuleIdentifier('com.github.sommeri:less4j:1.15.2')
-	var resolver = new Sincerity.Dependencies.Resolver()
 	
 	// ForkJoin
 	sincerity.out.println('forkJoin:')
@@ -150,14 +149,6 @@ function test(command) {
 	}
 	sincerity.out.println()
 	
-	// Resolve Module
-	sincerity.out.println('Resolve Module:')
-	var module = new Sincerity.Dependencies.Module()
-	module.specification = new Sincerity.Dependencies.Maven.ModuleSpecification('com.github.sommeri:less4j:1.15.2')
-	resolver.resolveModule(module, [repository], [], true)
-	module.dump(sincerity.out, true)
-	sincerity.out.println()
-
 	// Resolve
 	sincerity.out.println('Resolve:')
 
@@ -178,19 +169,25 @@ function test(command) {
    		//{rule: 'rewriteGroupName'},
   		{rule: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
   	]
-	
-	var result = resolver.resolve(modules, repositories, rules)
+
+	var resolver = new Sincerity.Dependencies.Resolver({
+		modules: modules,
+		repositories: repositories,
+		rules: rules
+	})
+
+	resolver.resolve()
 	sincerity.out.println('Tree:')
-	for (var m in result.roots) {
-		result.roots[m].dump(sincerity.out, true)
+	for (var m in resolver.rootModules) {
+		resolver.rootModules[m].dump(sincerity.out, true)
 	}
-	sincerity.out.println('Resolved:')
-	for (var m in result.resolved) {
-		result.resolved[m].dump(sincerity.out)
+	sincerity.out.println('Resolved: (' + resolver.resolvedModules.length + ')')
+	for (var m in resolver.resolvedModules) {
+		resolver.resolvedModules[m].dump(sincerity.out)
 	}
-	sincerity.out.println('Unresolved:')
-	for (var m in result.unresolved) {
-		result.unresolved[m].dump(sincerity.out)
+	sincerity.out.println('Unresolved: (' + resolver.unresolvedModules.length + ')')
+	for (var m in resolver.unresolvedModules) {
+		resolver.unresolvedModules[m].dump(sincerity.out)
 	}
 	sincerity.out.println('resolveCacheHits: ' + resolver.resolvedCacheHits.get())
 }
