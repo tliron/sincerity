@@ -46,7 +46,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	 * @class
 	 * @name Sincerity.Dependencies.Maven.ModuleIdentifier
 	 */
-	Public.ModuleIdentifier = Sincerity.Classes.define(function() {
+	Public.ModuleIdentifier = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Sincerity.Dependencies.Maven.ModuleIdentifier */
 	    var Public = {}
 
@@ -74,43 +74,118 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public.isEqual = function(moduleIdentifier) {
 	    	return (this.group == moduleIdentifier.group) && (this.name == moduleIdentifier.name) && (this.version == moduleIdentifier.version)
 	    }
-	    
+
+		Public.compare = function(moduleIdentifier) {
+			return Module.Versions.compare(this.version, moduleIdentifier.version) 
+		}
+
 	    Public.toString = function() {
 	    	return 'maven:' + this.group + ':' + this.name + ':' + this.version
 	    }
 	
 	    return Public
-	}())
+	}(Public))
 
 	/**
-	 * Constraints support Maven version ranges.
+	 * Maven specification with support for version ranges.
 	 * <p>
 	 * Note that a Maven version range can in fact contain several ranges, in which case they match via a logical or.
 	 * For example. "(,1.1),(1.1,)" means that everything except "1.1" will match.
 	 * <p>
-	 * Likewise, you may have a constraint with more than one option, which will also match via a logical or,
+	 * Likewise, you may have a specification with more than one option, which will also match via a logical or,
 	 * <i>unless</i> the option has a version beginning with a "!". That signifies an exclusion, which will
 	 * always take precedence. For example, "!1.1" will explicitly reject "1.1", even if "1.1" is matched by
 	 * other options.
 	 * 
 	 * @class
-	 * @name Sincerity.Dependencies.Maven.ModuleConstraints
+	 * @name Sincerity.Dependencies.Maven.ModuleSpecification
 	 */
-	Public.ModuleConstraints = Sincerity.Classes.define(function() {
-		/** @exports Public as Sincerity.Dependencies.Maven.ModuleConstraints */
+	Public.ModuleSpecification = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.Maven.ModuleSpecification */
 	    var Public = {}
 
 	    /** @ignore */
-	    Public._inherit = Sincerity.Dependencies.ModuleConstraints
+	    Public._inherit = Sincerity.Dependencies.ModuleSpecification
 	    
 	    /** @ignore */
 	    Public._construct = function(group, name, version) {
 	    	this.options = []
 	    	this.addOption.apply(this, arguments)
 	    }
-	    
+
+	    Public.isEqual = function(moduleSpecification) {
+	    	if (this.options.length != moduleSpecification.options.length) {
+	    		return false
+	    	}
+	    	
+	    	for (var o in this.options) {
+	    		var option1 = this.options[o]
+	    		var option2 = moduleSpecification.options[o]
+    			if ((option1.group != option2.group) || (option1.name != option2.name) || (option1.version != option2.version)) {
+    				return false
+    			}
+	    	}
+	    	
+	    	return true
+	    }
+
+	    Public.allowsModuleIdentifier = function(moduleIdentifier) {
+	    	var allowed = false
+	    	
+	    	for (var o in this.options) {
+	    		var option = this.options[o]
+	    		
+    			if ((option.group != moduleIdentifier.group) || (option.name != moduleIdentifier.name)) { 
+    				continue
+    			}
+
+    			var version = option.version
+    			var exclude = false
+    			if (version.charAt(0) == '!') {
+    				version = version.substring(1)
+    				exclude = true
+    			}
+    			
+    			if (allowed && !exclude) {
+    				continue // logical or: we're already in, no need to check another option, *unless* it's an exclusion
+    			}
+
+	    		if (Module.Versions.isSpecific(version)) {
+	    			allowed = (version == moduleIdentifier.version)
+	    		}
+	    		else {
+	    			var ranges = Module.Versions.parseRanges(version)
+	    			if (ranges) {
+	    				allowed = Module.Versions.inRanges(moduleIdentifier.version, ranges)
+	    			}
+	    			else {
+	    				allowed = Sincerity.Objects.matchSimple(moduleIdentifier.version, version)
+	    			}
+	    		}
+    			
+    			if (allowed && exclude) {
+    				return false // exclusions take precedence
+    			}
+	    	}
+
+	    	return allowed
+	    }
+
+	    Public.toString = function() {
+	    	var r = 'maven:{'
+	    	for (var o in this.options) {
+	    		var option = this.options[o]
+	    		r += option.group + ':' + option.name + ':' + option.version
+	    		if (o < this.options.length - 1) {
+	    			r += '|'
+	    		}
+	    	}
+	    	r += '}'
+	    	return r
+	    }
+
 	    /**
-	     * Adds an option to the constraints.
+	     * Adds an option to the specification.
 	     * 
 	     * @param {String|Object} group The group, or a config, or a complete option string
 	     * @param {String} [name] The name
@@ -142,61 +217,6 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		version: parseVersion(version)
 		    	})
 	    	}
-	    }
-
-	    Public.isSuitableModuleIdentifer = function(moduleIdentifier) {
-	    	var suitable = false
-	    	
-	    	for (var o in this.options) {
-	    		var option = this.options[o]
-	    		
-    			if ((option.group != moduleIdentifier.group) || (option.name != moduleIdentifier.name)) { 
-    				continue
-    			}
-
-    			var version = option.version
-    			var exclude = false
-    			if (version.charAt(0) == '!') {
-    				version = version.substring(1)
-    				exclude = true
-    			}
-    			
-    			if (suitable && !exclude) {
-    				continue // logical or: we're already in, no need to check another option, *unless* it's an exclusion
-    			}
-
-	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(version)) {
-		    		suitable = (version == moduleIdentifier.version)
-	    		}
-	    		else {
-	    			var ranges = Sincerity.Dependencies.Versions.parseRangesConstraint(version)
-	    			if (ranges) {
-	    				suitable = Sincerity.Dependencies.Versions.inRangesConstraint(moduleIdentifier.version, ranges)
-	    			}
-	    			else {
-	    				suitable = Sincerity.Objects.matchSimple(moduleIdentifier.version, version)
-	    			}
-	    		}
-    			
-    			if (suitable && exclude) {
-    				return false // exclusions take precedence
-    			}
-	    	}
-
-	    	return suitable
-	    }
-
-	    Public.toString = function() {
-	    	var r = 'maven:{'
-	    	for (var o in this.options) {
-	    		var option = this.options[o]
-	    		r += option.group + ':' + option.name + ':' + option.version
-	    		if (o < this.options.length - 1) {
-	    			r += '|'
-	    		}
-	    	}
-	    	r += '}'
-	    	return r
 	    }
 
 	    /**
@@ -301,13 +321,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 	    
 	    return Public
-	}())
+	}(Public))
 
 	/**
 	 * @class
 	 * @name Sincerity.Dependencies.Maven.Repository
 	 */
-	Public.Repository = Sincerity.Classes.define(function() {
+	Public.Repository = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Sincerity.Dependencies.Maven.Repository */
 	    var Public = {}
 	    
@@ -317,6 +337,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    /** @ignore */
 	    Public._construct = function(config) {
 	    	this.uri = config.uri
+	    	this.checkSignatures = true
 	    	this.allowMd5 = true
 
 	    	// Remove trailing slash
@@ -337,46 +358,45 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 
 	    Public.getModule = function(moduleIdentifier) {
-    		var pom = this.getPom(moduleIdentifier)
+    		var pom = this.getPom(moduleIdentifier) // TODO: cache poms!
     		if (!Sincerity.Objects.exists(pom)) {
     			return null
     		}
     		var module = new Sincerity.Dependencies.Module()
     		module.identifier = moduleIdentifier
-    		var dependencyModuleConstraints = pom.getDependencyModuleConstraints()
-    		for (var d in dependencyModuleConstraints) {
-    			var constraints = dependencyModuleConstraints[d]
+    		for (var d in pom.dependencyModuleSpecifications) {
+    			var dependencyModuleSpecification = pom.dependencyModuleSpecifications[d]
     			var dependencyModule = new Sincerity.Dependencies.Module()
-    			dependencyModule.constraints = constraints
+    			dependencyModule.specification = dependencyModuleSpecification
+    			dependencyModule.dependents.push(module)
     			module.dependencies.push(dependencyModule)
     		}
     		return module
 	    }
 
-	    Public.getSuitableModuleIdentifiers = function(moduleConstraints) {
-	    	var suitableModuleIdentifiers = []
+	    Public.getAllowedModuleIdentifiers = function(moduleSpecification) {
+	    	var allowedModuleIdentifiers = []
 	    	
-	    	for (var o in moduleConstraints.options) {
-	    		var option = moduleConstraints.options[o]
+	    	for (var o in moduleSpecification.options) {
+	    		var option = moduleSpecification.options[o]
 	    		
-	    		if (Sincerity.Dependencies.Versions.isSpecificConstraint(option.version)) {
-	    			// When the constraint is specific, we can skip the metadata analysis
-		    		var moduleIdentifier = new Sincerity.Dependencies.Maven.ModuleIdentifier(option.group, option.name, option.version)
+	    		if (Module.Versions.isSpecific(option.version)) {
+	    			// When the version is specific, we can skip the metadata analysis
+		    		var moduleIdentifier = new Module.ModuleIdentifier(option.group, option.name, option.version)
 		    		if (this.hasModule(moduleIdentifier)) {
-		    			Sincerity.Objects.pushUnique(suitableModuleIdentifiers, moduleIdentifier)
+		    			Sincerity.Objects.pushUnique(allowedModuleIdentifiers, moduleIdentifier)
 		    		}
 	    		}
 	    		else {
-	    			var metadata = this.getMetaData(option.group, option.name) // todo: cache?
+	    			var metadata = this.getMetaData(option.group, option.name) // TODO: cache metadata!
 	    			if (metadata) {
-	    				var moduleIdentifiers = metadata.getModuleIdentifiers()
-	    				suitableModuleIdentifiers = Sincerity.Objects.concatUnique(suitableModuleIdentifiers, moduleIdentifiers)
+	    				allowedModuleIdentifiers = Sincerity.Objects.concatUnique(allowedModuleIdentifiers, metadata.moduleIdentifiers)
 	    			}
 	    		}
 	    	}
 	    	
-			suitableModuleIdentifiers = moduleConstraints.getSuitableModuleIdentifiers(suitableModuleIdentifiers)
-	    	return suitableModuleIdentifiers
+			allowedModuleIdentifiers = moduleSpecification.getAllowedModuleIdentifiers(allowedModuleIdentifiers)
+	    	return allowedModuleIdentifiers
 	    }
 
 	    Public.fetchModule = function(moduleIdentifier, file) {
@@ -393,19 +413,19 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public.applyModuleRule = function(module, rule) {
 			if (rule.type == 'maven') {
 				if (rule.rule == 'exclude') {
-					var options = module.constraints.getOptions(rule.group, rule.name)
+					var options = module.specification.getOptions(rule.group, rule.name)
 					if (options.length) {
 						return 'exclude'
 					}
 				}
 				else if (rule.rule == 'excludeDependencies') {
-					var options = module.constraints.getOptions(rule.group, rule.name)
+					var options = module.specification.getOptions(rule.group, rule.name)
 					if (options.length) {
 						return 'excludeDependencies'
 					}
 				}
 				else if (rule.rule == 'rewriteVersion') {
-					module.constraints.rewriteVersion(rule.group, rule.name, rule.newVersion)
+					module.specification.rewriteVersion(rule.group, rule.name, rule.newVersion)
 					return true
 				}
 			}
@@ -451,6 +471,11 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 	    
 	    Public.getSignature = function(uri) {
+	    	if (!this.checkSignatures) {
+	    		// TODO: warning
+	    		return null
+	    	}
+
 	    	// Try sha1 first
 	    	var type = 'sha1', content
 	    	var signatureUri = uri + '.' + type
@@ -475,6 +500,11 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 	    
 	    Public.isSignatureValid = function(content, signature) {
+	    	if (!this.checkSignatures) {
+	    		// TODO: warning
+	    		return true
+	    	}
+	    	
 	    	var algorithm = signature.type
 	    	if (algorithm === 'sha1') {
 	    		algorithm = 'SHA-1'
@@ -496,13 +526,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    	}
 		    	var text = Sincerity.JVM.fromBytes(bytes)
 		    	var xml = Sincerity.XML.from(text)
-		    	var pom = new Sincerity.Dependencies.Maven.POM(xml)
-		    	if (moduleIdentifier.isEqual(pom.getModuleIdentifier())) {
+		    	var pom = new Module.POM(xml)
+		    	if (moduleIdentifier.isEqual(pom.moduleIdentifier)) {
 		    		// Make sure this is a valid POM
 		    		return pom
 		    	}
 	    	}
-	    	catch (x) {}
+	    	catch (x) { println(x) }
 	    	return null
 	    }
 	    
@@ -516,24 +546,24 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    	}
 		    	var text = Sincerity.JVM.fromBytes(bytes)
 		    	var xml = Sincerity.XML.from(text)
-		    	var metadata = new Sincerity.Dependencies.Maven.MetaData(xml)
+		    	var metadata = new Module.MetaData(xml)
 		    	if ((group == metadata.groupId) && (name == metadata.artifactId)) {
 		    		// Make sure this is a valid metadata
 		    		return metadata
 		    	}
 	    	}
-	    	catch (x) {}
+	    	catch (x) { println(x) }
 	    	return null
 	    }
 
 	    return Public
-	}())
+	}(Public))
 	
 	/**
 	 * @class
 	 * @name Sincerity.Dependencies.Maven.POM
 	 */
-	Public.POM = Sincerity.Classes.define(function() {
+	Public.POM = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Sincerity.Dependencies.Maven.POM */
 	    var Public = {}
 	    
@@ -546,42 +576,46 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	this.name = project.getElements('name')[0].getText()
 	    	this.description = project.getElements('description')[0].getText()
 	    	this.dependencies = []
-
+	    	
 	    	try {
 		    	var dependencies = project.getElements('dependencies')[0].getElements('dependency')
 		    	for (var d in dependencies) {
 		    		var dependency = dependencies[d]
+		    		
+		    		function getOptional(name) {
+		    			var elements = dependency.getElements(name)
+		    			return elements.length ? elements[0].getText() : null
+		    		}
+		    		
 		    		this.dependencies.push({
 		    			groupId: dependency.getElements('groupId')[0].getText(),
 		    			artifactId: dependency.getElements('artifactId')[0].getText(),
-		    			version: dependency.getElements('version')[0].getText()
+		    			version: dependency.getElements('version')[0].getText(),
+		    			type: getOptional('type'),
+		    			scope: getOptional('scope')
 		    		})
+			    	// TODO: take into account <type> and <scope>
 		    	}
 	    	}
 	    	catch (x) {}
-	    }
-	    
-	    Public.getModuleIdentifier = function() {
-	    	return new Sincerity.Dependencies.Maven.ModuleIdentifier(this.groupId, this.artifactId, this.version)
-	    }
-	    
-	    Public.getDependencyModuleConstraints = function() {
-	    	var moduleConstraints = []
+	    	
+	    	// Parse
+	    	this.moduleIdentifier = new Module.ModuleIdentifier(this.groupId, this.artifactId, this.version)
+	    	this.dependencyModuleSpecifications = []
 	    	for (var d in this.dependencies) {
 	    		var dependency = this.dependencies[d]
-	    		moduleConstraints.push(new Sincerity.Dependencies.Maven.ModuleConstraints(dependency.groupId, dependency.artifactId, dependency.version))
+	    		this.dependencyModuleSpecifications.push(new Module.ModuleSpecification(dependency.groupId, dependency.artifactId, dependency.version))
 	    	}
-	    	return moduleConstraints
 	    }
-
+	    
 	    return Public
-	}())
+	}(Public))
 
 	/**
 	 * @class
 	 * @name Sincerity.Dependencies.Maven.MetaData
 	 */
-	Public.MetaData = Sincerity.Classes.define(function() {
+	Public.MetaData = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Sincerity.Dependencies.Maven.MetaData */
 	    var Public = {}
 	    
@@ -601,25 +635,228 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		this.versions.push(version.getText())
 		    	}
 	    	}
-	    	catch (x) {}
-	    }
-
-	    Public.getModuleIdentifier = function() {
-	    	return new Sincerity.Dependencies.Maven.ModuleIdentifier(this.groupId, this.artifactId, this.release)
-	    }
-
-	    Public.getModuleIdentifiers = function() {
-	    	var moduleIdentifiers = []
+	    	catch (x) { println(x) }
+	    	
+	    	// Parse
+	    	this.moduleIdentifier = new Module.ModuleIdentifier(this.groupId, this.artifactId, this.release)
+	    	this.moduleIdentifiers = []
 	    	for (var v in this.versions) {
 	    		var version = this.versions[v]
-	    		var moduleIdentifier = new Sincerity.Dependencies.Maven.ModuleIdentifier(this.groupId, this.artifactId, version)
-	    		moduleIdentifiers.push(moduleIdentifier)
+	    		var moduleIdentifier = new Module.ModuleIdentifier(this.groupId, this.artifactId, version)
+	    		this.moduleIdentifiers.push(moduleIdentifier)
 	    	}
-	    	return moduleIdentifiers
 	    }
 
 	    return Public
-	}())
+	}(Public))
+
+	/**
+	 * Utilities for working with Maven versions.
+	 * 
+	 * @namespace
+	 */
+	Public.Versions = function(Module) {
+		/** @exports Public as Sincerity.Dependencies.Maven */
+		var Public = {}
+		
+	    /**
+	     * Checks if the version is specific.
+	     * <p>
+	     * Resolving a non-specific version would require fetching metadata.
+	     * 
+	     * @param {String} version
+	     * @returns {Boolean} true if specific
+	     */
+	    Public.isSpecific = function(version) {
+			if (!version.length) {
+				return false
+			}
+			if (version.indexOf('*') != -1) {
+				return false
+			}
+			if (version.indexOf('?') != -1) {
+				return false
+			}
+			var first = version.charAt(0)
+			if ((first == '!') || (first == '[') || (first == '(')) {
+				return false
+			}
+	    	return true
+	    }
+	    
+		/**
+		 * Compares two versions.
+		 * <p>
+		 * Versions should have forms such as '1.0' or '2.4.1-beta1'.
+		 * <p>
+		 * The comparison first takes into account the dot-separated integer parts.
+		 * In case both versions are identical on those terms, then the postfix after
+		 * the dash is compared.
+		 * <p>
+		 * Postfix comparison takes into account its semantic meaning. Thus,
+		 * 'beta2' would be greater than 'alpha3', and 'alpha3' would be greater than
+		 * 'dev12'. 
+		 * 
+	     * @param {String} version1
+	     * @param {String} version2
+		 * @returns {Number} -1 if version2 is greater, 0 if equal, 1 if version1 is greater
+		 */
+	    Public.compare = function(version1, version2) {
+			version1 = Public.parse(version1)
+			version2 = Public.parse(version2)
+			
+			var length1 = version1.parts.length
+			var length2 = version2.parts.length
+			var length = Math.max(length1, length2)
+			for (var p = 0; p < length; p++) {
+				var part1 = p <= length1 - 1 ? version1.parts[p] : null
+				var part2 = p <= length2 - 1 ? version2.parts[p] : null
+				if ((null === part1) && (null === part2)) {
+					return 0
+				}
+				if (null === part1) {
+					return -1
+				}
+				if (null === part2) {
+					return 1
+				}
+				if (part1 != part2) {
+					return part1 - part2 > 0 ? 1 : -1
+				}
+				// Equal, so continue
+			}
+			
+			if (version1.extra != version2.extra) {
+				return version1.extra - version2.extra > 0 ? 1 : -1
+			}
+		
+			return 0
+		}
+		
+		/**
+		 * Utility to parse a version string into parts that can be compared.
+		 * 
+		 * @param {String} version
+		 * @returns {Object}
+		 */
+		Public.parse = function(version) {
+			version = Sincerity.Objects.trim(version)
+			var dash = version.indexOf('-')
+			var main = dash == -1 ? version : version.substring(0, dash)
+			var postfix = dash == -1 ? '' : version.substring(dash + 1)
+					
+			var parts = main.length ? main.split('.') : []
+			for (var p in parts) {
+				parts[p] = parseInt(parts[p])
+			}
+			
+			var postfixFirstDigit = postfix.search(/\d/)
+			var postfixMain = postfixFirstDigit == -1 ? postfix : postfix.substring(0, postfixFirstDigit)
+			var postfixNumber = postfixFirstDigit == -1 ? 0 : parseInt(postfix.substring(postfixFirstDigit)) / 10
+			var extra = postfixMain.length ? Public.parsePostfix(postfixMain) : 0
+			extra += postfixNumber
+			
+			return {
+				parts: parts,
+				extra: extra
+			}
+		}
+	
+		/**
+		 * Utility to convert a version postfix into a number that can be compared.
+		 * 
+		 * @param {String} version
+		 * @returns {Number}
+		 */
+		Public.parsePostfix = function(postfix) {
+			postfix = postfix.toLowerCase()
+			return Public.postfixes[postfix] || 0
+		}
+		
+		/**
+		 * Parses a ranges specification, e.g '[1.2,2.0),[3.0,)'.
+		 * 
+		 * @param {String} version
+		 * @returns {Object}
+		 */
+		Public.parseRanges = function(version) {
+	    	version = Sincerity.Objects.trim(version)
+	    	
+	    	var rangeRegExp = /[\[\(]\s*([^,\s]*)\s*,\s*([^,\]\)\s]*)\s*[\]\)]/g
+	    	var matches = rangeRegExp.exec(version)
+	    	if (null === matches) {
+	    		return null
+	    	}
+			
+			var ranges = []
+			
+			while (null !== matches) {
+				var lastIndex = rangeRegExp.lastIndex
+				var start = matches[1]
+				var end = matches[2]
+				var open = version.charAt(matches.index)
+				var close = version.charAt(lastIndex - 1)
+				
+				ranges.push({
+					start: start,
+					end: end,
+					includeStart: open == '[',
+					includeEnd: close == ']'
+				})
+				
+				matches = rangeRegExp.exec(version)
+
+				if (null !== matches) {
+					// Make sure there is a comma in between ranges
+					var between = version.substring(lastIndex, matches.index)
+					if (!/^\s+,\s+$/.test(between)) {
+						return null
+					}
+				}
+			}
+			
+			return ranges
+	    }
+	    
+		Public.inRanges = function(version, ranges) {
+	    	for (var r in ranges) {
+	    		var range = ranges[r]
+				var compareStart = range.start ? Public.compare(version, range.start) : 1
+				var compareEnd = range.end ? Public.compare(range.end, version) : 1
+				//println(version + (compareStart == 0 ? '=' : (compareStart > 0 ? '>' : '<')) + range.start)
+				//println(version + (compareEnd == 0 ? '=' : (compareEnd > 0 ? '<' : '>')) + range.end)
+				if (range.includeStart && range.includeEnd) {
+					match = (compareStart >= 0) && (compareEnd >= 0) 
+				}
+				else if (range.includeStart && !range.includeEnd) {
+					match = (compareStart >= 0) && (compareEnd > 0) 
+				}
+				else if (!range.includeStart && range.includeEnd) {
+					match = (compareStart > 0) && (compareEnd >= 0) 
+				}
+				else {
+					match = (compareStart == 0) && (compareEnd == 0)
+				}
+				if (match) {
+		    		//println(version + ' in ' + (range.includeStart ? '[' : '(') + range.start + ',' + range.end + (range.includeEnd ? ']' : ')'))
+					return true // logical or: it takes just one positive to be positive
+				}
+				//else println(version + ' not in ' + (range.includeStart ? '[' : '(') + range.start + ',' + range.end + (range.includeEnd ? ']' : ')'))
+	    	}
+	    	return false
+	    }
+		
+		Public.postfixes = {
+			'd': -3,
+			'dev': -3,
+			'a': -2,
+			'alpha': -2,
+			'b': -1,
+			'beta': -1
+		}
+	    
+	    return Public
+	}(Public)
 
 	return Public
 }()
