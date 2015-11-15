@@ -36,6 +36,7 @@ import com.threecrickets.scripturian.service.Shell;
 import com.threecrickets.sincerity.exception.ReenteringDocumentException;
 import com.threecrickets.sincerity.exception.ScripturianException;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.util.ScripturianUtil;
 
 /**
  * An implementation of Scripturian's {@link Shell} interface for Sincerity
@@ -92,12 +93,15 @@ public class ScripturianShell implements Shell
 		this.sincerity = sincerity;
 		this.arguments = arguments;
 
+		ClassLoader classLoader = sincerity.getClass().getClassLoader();
+		LanguageManager languageManager = new LanguageManager( classLoader );
+		ScripturianUtil.initializeLanguageManager( languageManager );
+
 		DocumentFileSource<Executable> source = new DocumentFileSource<Executable>( "sincerity/", sincerity.getHome(), "default", "js", 1000 );
 		librarySources.add( new DocumentFileSource<Executable>( "sincerity/libraries/scripturian/", sincerity.getHomeFile( "libraries", "scripturian" ), "default", "js", 1000 ) );
 
-		ClassLoader classLoader = sincerity.getClass().getClassLoader();
 		parsingContext = new ParsingContext();
-		parsingContext.setLanguageManager( new LanguageManager( classLoader ) );
+		parsingContext.setLanguageManager( languageManager );
 		parsingContext.setParserManager( new ParserManager( classLoader ) );
 		parsingContext.setDocumentSource( source );
 		parsingContext.setDefaultLanguageTag( "javascript" );

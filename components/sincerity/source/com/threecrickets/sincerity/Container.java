@@ -39,6 +39,7 @@ import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.ParserManager;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.ExtendedResolutionCacheManager;
+import com.threecrickets.sincerity.util.ScripturianUtil;
 
 /**
  * The second highest level instance for the Sincerity runtime, after the
@@ -269,26 +270,7 @@ public class Container implements IvyListener, TransferListener
 
 			languageManager = new LanguageManager( getBootstrap() );
 
-			String javaScriptEngine = System.getProperty( "sincerity.javascript" );
-			if( javaScriptEngine == null )
-				javaScriptEngine = System.getenv( "SINCERITY_JAVASCRIPT" );
-			if( javaScriptEngine == null )
-				javaScriptEngine = "Nashorn";
-
-			// Adapter preferences
-			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + "Jython", 1 );
-			languageManager.getAttributes().put( LanguageManager.ADAPTER_PRIORITY_ATTRIBUTE + javaScriptEngine, 1 );
-
-			try
-			{
-				// Prefer log4j chute for Velocity if log4j exists
-				Class.forName( "org.apache.log4j.Logger" );
-				languageManager.getAttributes().putIfAbsent( "velocity.runtime.log.logsystem.class", "org.apache.velocity.runtime.log.Log4JLogChute" );
-				languageManager.getAttributes().putIfAbsent( "velocity.runtime.log.logsystem.log4j.logger", "velocity" );
-			}
-			catch( ClassNotFoundException x )
-			{
-			}
+			ScripturianUtil.initializeLanguageManager( languageManager );
 		}
 		return languageManager;
 	}
