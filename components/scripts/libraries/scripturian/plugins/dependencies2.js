@@ -88,7 +88,7 @@ function test(command) {
 	// toString
 	sincerity.out.println(repository.toString())
 	sincerity.out.println(id.toString())
-	sincerity.out.println(id.isEqual(id2))
+	sincerity.out.println(id.compare(id2))
 	sincerity.out.println(id3.toString())
 	sincerity.out.println(specification.toString())
 	sincerity.out.println(specification.allowsModuleIdentifier(id))
@@ -153,7 +153,7 @@ function test(command) {
 	sincerity.out.println('Resolve:')
 
 	var modules = [
-		{group: 'com.github.sommeri', name: 'less4j'},
+		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
  		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
  		{group: 'com.fasterxml.jackson', name: 'jackson'},
  		{group: 'com.threecrickets.prudence', name: 'prudence'}
@@ -161,33 +161,43 @@ function test(command) {
 	
 	var repositories = [
 		{uri: 'file:/Depot/DevRepository/'}
+		//{uri: 'http://repository.threecrickets.com/maven'}
 	]
 	
 	var rules = [
- 		{rule: 'exclude', name: '*annotations*'},
-		{rule: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
-   		//{rule: 'rewriteGroupName'},
-  		{rule: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
+ 		{type: 'exclude', name: '*annotations*'},
+		{type: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
+   		//{type: 'rewrite'},
+  		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
   	]
 
 	var resolver = new Sincerity.Dependencies.Resolver({
 		modules: modules,
 		repositories: repositories,
-		rules: rules
+		rules: rules,
+		conflictPolicy: 'oldest'
 	})
 
 	resolver.resolve()
 	sincerity.out.println('Tree:')
-	for (var m in resolver.rootModules) {
-		resolver.rootModules[m].dump(sincerity.out, true)
+	for (var m in resolver.explicitModules) {
+		resolver.explicitModules[m].dump(sincerity.out, true, 1)
 	}
 	sincerity.out.println('Resolved: (' + resolver.resolvedModules.length + ')')
 	for (var m in resolver.resolvedModules) {
-		resolver.resolvedModules[m].dump(sincerity.out)
-	}
-	sincerity.out.println('Unresolved: (' + resolver.unresolvedModules.length + ')')
-	for (var m in resolver.unresolvedModules) {
-		resolver.unresolvedModules[m].dump(sincerity.out)
+		resolver.resolvedModules[m].dump(sincerity.out, false, 1)
 	}
 	sincerity.out.println('resolveCacheHits: ' + resolver.resolvedCacheHits.get())
+	sincerity.out.println('Unresolved: (' + resolver.unresolvedModules.length + ')')
+	for (var m in resolver.unresolvedModules) {
+		resolver.unresolvedModules[m].dump(sincerity.out, false, 1)
+	}
+	sincerity.out.println('Conflicts: (' + resolver.conflicts.length + ')')
+	for (var c in resolver.conflicts) {
+		var conflict = resolver.conflicts[c]
+		for (var m in conflict) {
+			var module = conflict[m]
+			module.dump(sincerity.out, false, 1)
+		}
+	}
 }

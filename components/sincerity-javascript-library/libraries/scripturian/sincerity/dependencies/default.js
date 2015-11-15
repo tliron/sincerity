@@ -33,12 +33,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	 * Creates a repository instance.
 	 * 
 	 * @param {Object} repositoryConfig
-	 * @param {String} [repositoryConfig.type=defaultType] The repository type
-	 * @param {String} [defaultType] Optional default type to fallback to if not specified in config
+	 * @param {String} [repositoryConfig.platform=defaultPlatform] The repository platform
+	 * @param {String} [defaultPlatform] Optional default platform to fallback to if not specified in config
 	 * @returns {Sincerity.Dependency.Repository}
 	 */
-	Public.createRepository = function(repositoryConfig, defaultType) {
-		var className = Sincerity.Objects.capitalize(repositoryConfig.type || defaultType)
+	Public.createRepository = function(repositoryConfig, defaultPlatform) {
+		var className = Sincerity.Objects.capitalize(repositoryConfig.platform || defaultPlatform)
 		var clazz = Public[className].Repository
 		return new clazz(repositoryConfig)
 	}
@@ -47,18 +47,18 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	 * Creates a module specification instance.
 	 * 
 	 * @param {Object} moduleSpecificationConfig
-	 * @param {String} [moduleSpecificationConfig=defaultType] The module specification type
-	 * @param {String} [defaultType] Optional default type to fallback to if not specified in config
+	 * @param {String} [moduleSpecificationConfig=defaultPlatform] The module specification platform
+	 * @param {String} [defaultPlatform] Optional default platform to fallback to if not specified in config
 	 * @returns {Sincerity.Dependency.ModuleSpecification}
 	 */
-	Public.createModuleSpecification = function(moduleSpecificationConfig, defaultType) {
-		var className = Sincerity.Objects.capitalize(moduleSpecificationConfig.type || defaultType)
+	Public.createModuleSpecification = function(moduleSpecificationConfig, defaultPlatform) {
+		var className = Sincerity.Objects.capitalize(moduleSpecificationConfig.platform || defaultPlatform)
 		var clazz = Public[className].ModuleSpecification
 		return new clazz(moduleSpecificationConfig)
 	}
 
 	/**
-	 * A module can have dependencies as well as dependents.
+	 * A module can have dependencies as well as sources.
 	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Module
@@ -69,34 +69,58 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    
 	    /** @ignore */
 	    Public._construct = function() {
+	    	this.explicit = false
 	    	this.identifier = null
+	    	this.repository = null
 	    	this.specification = null
 	    	this.dependencies = []
-	    	this.dependents = []
+	    	this.sources = []
 	    }
 	    
-	    Public.copyFrom = function(module) {
-	    	this.identifier = module.identifier
-	    	this.dependencies = module.dependencies
+	    /**
+	     * Copies identifier and dependencies from another module.
+	     * 
+	     * @param {Sincerity.Dependencies.Module} module
+	     */
+	    Public.copyResolutionFrom = function(module) {
+	    	this.identifier = module.identifier.clone()
+	    	this.dependencies = []
+	    	for (var d in module.dependencies) {
+	    		this.dependencies.push(module.dependencies[d])
+	    	}
 	    }
-	    
-	    Public.addDependent = function(module) {
+
+	    /**
+	     * Adds a new source if we don't have it already.
+	     * 
+	     * @param {Sincerity.Dependencies.Module} module
+	     */
+	    Public.mergeSource = function(module) {
 	    	var found = false
-	    	for (var d in this.dependents) {
-	    		var dependent = this.dependents[d]
-	    		if (module.identifier.isEqual(dependent.identifier)) {
+	    	for (var d in this.sources) {
+	    		var source = this.sources[d]
+	    		if (module.identifier.compare(source.identifier) === 0) {
 	    			found = true
 	    			break
 	    		}
 	    	}
 	    	if (!found) {
-	    		this.dependents.push(module)
+	    		this.sources.push(module)
 	    	}
 	    }
 
-	    Public.addDependents = function(module) {
-	    	for (var d in module.dependents) {
-	    		this.addDependent(module.dependents[d])
+	    /**
+	     * Merges all sources of another module.
+	     * 
+	     * @param {Sincerity.Dependencies.Module} module
+	     * @see Sincerity.Dependencies.Module#mergeSource
+	     */
+	    Public.mergeSources = function(module) {
+			if (module.explicit) {
+				this.explicit = true
+			}
+	    	for (var d in module.sources) {
+	    		this.mergeSource(module.sources[d])
 	    	}
 	    }
 
@@ -107,22 +131,22 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     */
 	    Public.toString = function() {
 	    	var r = '', prefix = ''
-	    		prefix += !this.dependents.length ? '*' : '+' // root?
+	    	prefix += this.explicit ? '*' : '+' // explicit?
 	    	prefix += Sincerity.Objects.exists(this.identifier) ? '!' : '?' // resolved?
 	    	if (Sincerity.Objects.exists(this.identifier)) {
-	    		r += 'identifier: ' + this.identifier.toString()
+	    		r += 'id=' + this.identifier.toString()
 	    	}
 	    	if (Sincerity.Objects.exists(this.specification)) {
 	    		if (r.length) { r += ', ' }
-	    		r += 'specification: ' + this.specification.toString()
+	    		r += 'spec=' + this.specification.toString()
 	    	}
 	    	if (this.dependencies.length) {
 	    		if (r.length) { r += ', ' }
-	    		r += 'dependencies: ' + this.dependencies.length
+	    		r += 'dependencies=' + this.dependencies.length
 	    	}
-	    	if (this.dependents.length) {
+	    	if (this.sources.length) {
 	    		if (r.length) { r += ', ' }
-	    		r += 'dependents: ' + this.dependents.length
+	    		r += 'sources=' + this.sources.length
 	    	}
 	    	if (prefix.length) {
 	    		r = prefix + ' ' + r
@@ -150,7 +174,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	/**
 	 * Base class for module identifiers.
 	 * <p>
-	 * These are implemented differently per repository type.
+	 * These are implemented differently per platform.
 	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.ModuleIdentifier
@@ -159,25 +183,23 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 		/** @exports Public as Sincerity.Dependencies.ModuleIdentifier */
 	    var Public = {}
 	    
-	    /**
-	     * Compare to another module identifier. Note that the
-	     * module identifiers should be of the same or of compatible types.
-	     * 
-	     * @param {Sincerity.Dependencies.ModuleIdentifier} moduleIdentifier The module identifier to compare with us 
-	     * @returns {Boolean} true if the identifiers are equal
-	     */
-	    Public.isEqual = function(moduleIdentifier) {
-	    	return false
-	    }
-
 		/**
-		 * Compares to another module identifiers.
+		 * Compare to another module identifier in terms of newness.
 		 * 
-	     * @param {Sincerity.Dependencies.ModuleIdentifier} moduleIdentifier The module identifier to compare with us
-		 * @returns {Number} -1 if moduleIdentifier is greater, 0 if equal, 1 if we are greater
+	     * @param {Sincerity.Dependencies.ModuleIdentifier} moduleIdentifier The module identifier to compare to us
+		 * @returns {Number} NaN if incompatible, -1 if moduleIdentifier is newer, 0 if equal, 1 if we are newer
 		 */
 		Public.compare = function(moduleIdentifier) {
-			return 0
+			return NaN
+		}
+
+		/**
+		 * Creates a copy of this instance.
+		 * 
+		 * @returns {Sincerity.Dependencies.ModuleIdentifier}
+		 */
+		Public.clone = function() {
+			return new Sincerity.Dependencies.ModuleIdentifier()
 		}
 
 	    /**
@@ -195,7 +217,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	/**
 	 * Base class for module specification.
 	 * <p>
-	 * These are implemented differently per repository type.
+	 * These are implemented differently per platform.
 	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.ModuleSpecification
@@ -243,7 +265,16 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	}
 	    	return allowedModuleIdentifiers
 	    }
-	    
+
+		/**
+		 * Creates a copy of this instance.
+		 * 
+		 * @returns {Sincerity.Dependencies.ModuleSpecification}
+		 */
+		Public.clone = function() {
+			return new Sincerity.Dependencies.ModuleSpecification()
+		}
+
 	    /**
 	     * Represent the instance as a string.
 	     * 
@@ -285,6 +316,15 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	return false
 	    }
 
+		/**
+		 * Creates a copy of this instance.
+		 * 
+		 * @returns {Sincerity.Dependencies.Repository}
+		 */
+		Public.clone = function() {
+			return new Sincerity.Dependencies.ModuleSpecification()
+		}
+
 	    /**
 	     * Represent the instance as a string.
 	     * 
@@ -306,7 +346,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
      * @param {Object[]} confis.modules Module specification configurations
      * @param {Object[]} config.repositories Repository configurations
      * @param {Object[]} config.rules Rule configurations
-     * @param {String} [config.defaultType='maven'] The default type
+     * @param {String} [config.defaultPlatform='maven'] The default platform to use if unspecified
 	 */
 	Public.Resolver = Sincerity.Classes.define(function(Module) {
 		/** @exports Public as Sincerity.Dependencies.Resolver */
@@ -314,44 +354,71 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    
 	    /** @ignore */
 	    Public._construct = function(config) {
-	    	this.defaultType = config.defaultType || 'maven'
-	    	this.rootModules = this.createModules(config.modules)
+	    	this.defaultPlatform = config.defaultPlatform || 'maven'
+	    	this.conflictPolicy = config.conflictPolicy || 'newest'
+	    	
+	    	this.explicitModules = this.createExplicitModules(config.modules)
 	    	this.repositories = this.createRepositories(config.repositories)
+	    	
 	    	this.rules = Sincerity.Objects.clone(config.rules)
 			for (var r in this.rules) {
 				var rule = this.rules[r]
-				rule.type = rule.type || this.defaultType
+				rule.platform = rule.platform || this.defaultPlatform
 			}
 
 	    	this.resolvedModules = []
 	    	this.resolvedModulesLock = Sincerity.JVM.newLock()
 	    	this.unresolvedModules = []
 	    	this.unresolvedModulesLock = Sincerity.JVM.newLock()
+	    	this.conflicts = []
 
 	    	this.resolvedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
 	    }
 	    
-	    Public.createModules = function(moduleSpecificationConfigs) {
+	    /**
+	     * Creates module instances based on module specification configs.
+	     * <p>
+	     * If the platform is not specified in the config, it will be defaultPlatform.
+	     * 
+	     * @param {Object[]} moduleSpecificationConfigs
+	     * @returns {Sincerity.Dependencies.Module[]}
+	     */
+	    Public.createExplicitModules = function(moduleSpecificationConfigs) {
 	    	var modules = []
 	    	for (var m in moduleSpecificationConfigs) {
 	    		var moduleSpecificationConfig = moduleSpecificationConfigs[m]
 	    		var module = new Module.Module()
-	    		module.specification = Module.createModuleSpecification(moduleSpecificationConfig, this.defaultType)
+	    		module.explicit = true
+	    		module.specification = Module.createModuleSpecification(moduleSpecificationConfig, this.defaultPlatform)
 	    		modules.push(module)
 	    	}
 	    	return modules
 	    }
 	    
+	    /**
+	     * Creates repository instances based on configs.
+	     * <p>
+	     * If the platform is not specified in the config, it will be defaultPlatform.
+	     * 
+	     * @param {Object[]} repositoryConfigs
+	     * @returns {Sincerity.Dependencies.Repository[]}
+	     */
 	    Public.createRepositories = function(repositoryConfigs) {
 	    	var repositories = []
 	    	for (var r in repositoryConfigs) {
 	    		var repositoryConfig = repositoryConfigs[r]
-	    		var repository = Module.createRepository(repositoryConfig, this.defaultType)
+	    		var repository = Module.createRepository(repositoryConfig, this.defaultPlatform)
 	    		repositories.push(repository)
 	    	}
 	    	return repositories
 	    }
 	    
+	    /**
+	     * Gets an instance of a module (from resolvedModules) if it has already been resolved.
+	     *
+	     * @param {Sincerity.Dependencies.ModuleSpecification}
+	     * @returns {Sincerity.Dependencies.Module[]} or null if not yet resolved
+	     */
 	    Public.getResolvedModule = function(moduleSpecification) {
 			return Sincerity.JVM.withLock(this.resolvedModulesLock, function() {
     			for (var m in this.resolvedModules) {
@@ -362,6 +429,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     					return module
     				}
     			}
+    			return null
 			}, this)
 	    }
 
@@ -370,8 +438,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 				var found = false
     			for (var m in this.resolvedModules) {
     				var resolvedModule = this.resolvedModules[m]
-    				if (module.identifier.isEqual(resolvedModule.identifier)) {
-    					resolvedModule.addDependents(module)
+    				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+    					// Merge
+    					resolvedModule.mergeSources(module)
     					found = true
     					break
     				}
@@ -382,13 +451,30 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			}, this)
 	    }
 
+	    Public.removeResolvedModule = function(module) {
+			Sincerity.JVM.withLock(this.resolvedModulesLock, function() {
+				var found = null
+    			for (var m in this.resolvedModules) {
+    				var resolvedModule = this.resolvedModules[m]
+    				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+    					found = m
+    					break
+    				}
+    			}
+				if (found !== null) {
+					this.resolvedModules.splice(found, 1)
+				}
+			}, this)
+	    }
+
 	    Public.addUnresolvedModule = function(module) {
 			Sincerity.JVM.withLock(this.unresolvedModulesLock, function() {
 				var found = false
     			for (var m in this.unresolvedModules) {
     				var unresolvedModule = this.unresolvedModules[m]
     				if (module.specification.isEqual(unresolvedModule.specification)) {
-    					unresolvedModule.addDependents(module)
+    					// Merge
+    					unresolvedModule.mergeSources(module)
     					found = true
     					break
     				}
@@ -408,13 +494,22 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     		}
 	    }
 
+	    /**
+	     * Goes over the explicitModules and resolves them recursively.
+	     * This is done using fork/join parallelism for better efficiency.
+	     * <p>
+	     * When finished, resolvedModules and unresolvedModules would be filled
+	     * appropriately. 
+	     * 
+	     * @see Sincerity.Dependencies.Resolver#resolveModule
+	     */
 	    Public.resolve = function() {
-			// Resolve roots
+			// Resolve explicit modules
 			var pool = new java.util.concurrent.ForkJoinPool(10)
 	    	try {
 				var tasks = []
-		    	for (var m in this.rootModules) {
-		    		var module = this.rootModules[m]
+		    	for (var m in this.explicitModules) {
+		    		var module = this.explicitModules[m]
 		    		var task = this.resolveModuleTask(module, this.repositories, this.rules, true)
 		    		tasks.push(pool.submit(task))
 		    	}
@@ -426,15 +521,84 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		pool.shutdown()
 	    	}
 	    	
+	    	// Sort resolved modules
 	    	this.resolvedModules.sort(function(module1, module2) {
 	    		return module1.identifier.toString().localeCompare(module2.identifier.toString())
 	    	})
+	    	
+	    	// Sort unresolved modules
 	    	this.unresolvedModules.sort(function(module1, module2) {
 	    		return module1.specification.toString().localeCompare(module2.specification.toString())
 	    	})
+	    	
+	    	// Find conflicts
+	    	var potentialConflicts = []
+	    	for (var m in this.resolvedModules) {
+	    		potentialConflicts.push(this.resolvedModules[m])
+	    	}
+	    	
+	    	var module
+	    	while (module = potentialConflicts.pop()) {
+	    		var conflicts = [module]
+		    	for (var m in potentialConflicts) {
+		    		var otherModule = potentialConflicts[m]
+		    		var comparison = module.identifier.compare(otherModule.identifier)
+		    		if ((comparison === -1) || (comparison === 1)) {
+		    			conflicts.push(otherModule)
+		    		}
+		    	}
+	    		if (conflicts.length > 1) {
+	    			this.conflicts.push(conflicts)
+	    		}
+	    	}
+	    	
+	    	// Sort conflicts
+	    	for (var c in this.conflicts) {
+	    		var conflicts = this.conflicts[c]
+	    		conflicts.sort(function(module1, module2) {
+	    			// Reverse newness order
+	    			return module2.identifier.compare(module1.identifier)
+	    		})
+	    	}
+	    	
+	    	// Resolve conflicts
+	    	// TODO: choose according "preferredModules", otherwise use a policy: 'newest' vs. 'oldest'?
+	    	for (var c in this.conflicts) {
+	    		var conflicts = []
+	    		for (var m in this.conflicts[c]) {
+	    			conflicts.push(this.conflicts[c][m])
+	    		}
+	    		
+	    		// Choose a module
+	    		var chosenModuleIndex
+	    		if (this.conflictPolicy == 'newest') {
+	    			chosenModuleIndex = 0
+	    		}
+	    		else if (this.conflictPolicy == 'oldest') {
+	    			chosenModuleIndex = conflicts.length - 1
+	    		}
+	    		var chosenModule = conflicts[chosenModuleIndex]
+	    		conflicts.splice(chosenModuleIndex, 1)
+	    		
+	    		// Merge all sources into chosen module, and remove non-chosen modules from resolvedModules
+	    		for (var m in conflicts) {
+	    			var module = conflicts[m]
+	    			chosenModule.mergeSources(module)
+	    			this.removeResolvedModule(module) // TODO: replace in tree
+	    		}
+	    	}
 	    }
 	    
 	    /**
+	     * Resolves a module, optionally resolving its dependencies recursively (using fork/join
+	     * parallelism).
+	     * <p>
+	     * "Resolving" means finding the best identifier available from all the repositories
+	     * that matches the specification. A successful resolution means that the module has
+	     * an identifier. An unresolved module has only a specification, but no identifier.
+	     * <p>
+	     * A cache of resolved modules is maintained in the resolver to avoid resolving
+	     * the same module twice.
 	     *
 	     * @param {Sincerity.Dependencies.Module} module
 	     * @param {Sincerity.Dependencies.Repository[]} repositories
@@ -472,30 +636,36 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     		if (Sincerity.Objects.exists(module.identifier)) {
     			// Already resolved
     		}
-    		else if (Sincerity.Objects.exists(module.specification)) {
-    			if (!exclude) {
-					// Check to see if we've already resolved it
-	    			var resolvedModule = this.getResolvedModule(module.specification)
-	    			if (resolvedModule) {
-						module.copyFrom(resolvedModule)
-	    			}
-	    			else {
-		    			// Resolve
-			    		for (var r in repositories) {
-				    		var repository = repositories[r]
-				    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification)
-				    		if (allowedModuleIdentifiers.length) {
-					    		allowedModuleIdentifiers.sort(function(moduleIdentifier1, moduleIdentifier2) {
-					    			// Reverse version order
-					    			return moduleIdentifier2.compare(moduleIdentifier1)
-					    		})
-					    		
-				    			var bestModule = repository.getModule(allowedModuleIdentifiers[0])
-				    			module.copyFrom(bestModule)
-				    			break
-				    		}
-				    	}
-	        		}
+    		else if (!exclude && Sincerity.Objects.exists(module.specification)) {
+				// Check to see if we've already resolved it
+    			var resolvedModule = this.getResolvedModule(module.specification)
+    			if (!resolvedModule) {
+	    			// Gather allowed module identifiers from all repositories
+    				var moduleIdentifiers = []
+		    		for (var r in repositories) {
+			    		var repository = repositories[r]
+			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification)
+			    		
+			    		// Note: the first repository to report an identifier will "win," the following repositories will have their reports discarded
+			    		moduleIdentifiers = Sincerity.Objects.concatUnique(moduleIdentifiers, allowedModuleIdentifiers, function(moduleIdentifier1, moduleIdentifier2) {
+			    			return moduleIdentifier1.compare(moduleIdentifier2) === 0
+			    		})
+			    	}
+
+    				// Pick the best module identifier
+		    		if (moduleIdentifiers.length) {
+		    			moduleIdentifiers.sort(function(moduleIdentifier1, moduleIdentifier2) {
+			    			// Reverse newness order
+			    			return moduleIdentifier2.compare(moduleIdentifier1)
+			    		})
+			    		
+			    		// Best module is first (newest)
+		    			resolvedModule = repository.getModule(moduleIdentifiers[0])
+		    		}
+    			}
+
+    			if (resolvedModule) {
+					module.copyResolutionFrom(resolvedModule)
     			}
     		}
 
@@ -521,6 +691,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 				}
 			}
 			else {
+				// Add dependencies as is (unresolved)
 		    	for (d in module.dependencies) {
 		    		this.addModule(module.dependencies[d])
 		    	}				

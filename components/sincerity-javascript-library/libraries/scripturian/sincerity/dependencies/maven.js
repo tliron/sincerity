@@ -55,11 +55,18 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    
 	    /** @ignore */
 	    Public._construct = function(group, name, version) {
-	    	if (arguments.length == 1) {
-	    		var parts = group.split(':')
-	    		this.group = Sincerity.Objects.trim(parts[0])
-		    	this.name = Sincerity.Objects.trim(parts[1])
-		    	this.version = Sincerity.Objects.trim(parts[2])
+	    	if (arguments.length === 1) {
+	    		if (Sincerity.Objects.isString(group)) {
+		    		var parts = group.split(':')
+		    		this.group = Sincerity.Objects.trim(parts[0])
+			    	this.name = Sincerity.Objects.trim(parts[1])
+			    	this.version = Sincerity.Objects.trim(parts[2])
+	    		}
+	    		else {
+			    	this.group = Sincerity.Objects.trim(group.group)
+			    	this.name = Sincerity.Objects.trim(group.name)
+			    	this.version = Sincerity.Objects.trim(group.version)
+	    		}
 	    	}
 	    	else {
 		    	this.group = Sincerity.Objects.trim(group)
@@ -71,12 +78,17 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	this.uri = null
 	    }
 
-	    Public.isEqual = function(moduleIdentifier) {
-	    	return (this.group == moduleIdentifier.group) && (this.name == moduleIdentifier.name) && (this.version == moduleIdentifier.version)
-	    }
-
 		Public.compare = function(moduleIdentifier) {
-			return Module.Versions.compare(this.version, moduleIdentifier.version) 
+			if ((this.group == moduleIdentifier.group) && (this.name == moduleIdentifier.name)) {
+				return Module.Versions.compare(this.version, moduleIdentifier.version)
+			}
+			else {
+				return NaN
+			}
+		}
+
+		Public.clone = function() {
+			return new Sincerity.Dependencies.Maven.ModuleIdentifier(this)
 		}
 
 	    Public.toString = function() {
@@ -110,7 +122,9 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    /** @ignore */
 	    Public._construct = function(group, name, version) {
 	    	this.options = []
-	    	this.addOption.apply(this, arguments)
+	    	if (arguments.length) {
+	    		this.addOption.apply(this, arguments)
+	    	}
 	    }
 
 	    Public.isEqual = function(moduleSpecification) {
@@ -171,6 +185,15 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	return allowed
 	    }
 
+		Public.clone = function() {
+			var moduleSpecification = new Sincerity.Dependencies.Maven.ModuleSpecification()
+	    	for (var o in this.options) {
+	    		var option = this.options[o]
+	    		moduleSpecification.addOption(option)
+	    	}
+			return moduleSpecification
+		}
+
 	    Public.toString = function() {
 	    	var r = 'maven:{'
 	    	for (var o in this.options) {
@@ -192,7 +215,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	     * @param {String} [version] The version
 	     */
 	    Public.addOption = function(group, name, version) {
-	    	if (arguments.length == 1) {
+	    	if (arguments.length === 1) {
 	    		var config = group
 	    		if (Sincerity.Objects.isString(config)) {
 		    		var parts = config.split(':')
@@ -252,6 +275,36 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 
 	    /**
+	     * Rewrites all options that match the group and/or name to a new group and/or name.
+	     * <p>
+	     * Parameters may include one or more '*' or '?' wildcards to match any content.
+		 * Escape '*' or '?' using a preceding '\'.
+		 * An empty pattern matches everything.
+	     * 
+	     * @param {String} [group]
+	     * @param {String} [name]
+	     * @param {String} [newGroup]
+	     * @param {String} [newName]
+	     * @returns {Boolean} true if any options were rewritten
+	     */
+	    Public.rewrite = function(group, name, newGroup, newName) {
+			var options = this.getOptions(group, name)
+			if (!options.length) {
+				return false
+			}
+			for (var o in options) {
+				var option = options[o]
+				if (Sincerity.Objects.exists(newGroup)) {
+					option.group = newGroup
+				}
+				if (Sincerity.Objects.exists(newName)) {
+					option.name = newName
+				}
+			}
+			return true
+	    }
+
+	    /**
 	     * Rewrites all options that match the group and/or name to a specific version.
 	     * <p>
 	     * Parameters may include one or more '*' or '?' wildcards to match any content.
@@ -272,36 +325,6 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			for (var o in options) {
 				var option = options[o]
 				option.version = newVersion
-			}
-			return true
-	    }
-	    
-	    /**
-	     * Rewrites all options that match the group and/or name to a new group and/or name.
-	     * <p>
-	     * Parameters may include one or more '*' or '?' wildcards to match any content.
-		 * Escape '*' or '?' using a preceding '\'.
-		 * An empty pattern matches everything.
-	     * 
-	     * @param {String} [group]
-	     * @param {String} [name]
-	     * @param {String} [newGroup]
-	     * @param {String} [newName]
-	     * @returns {Boolean} true if any options were rewritten
-	     */
-	    Public.rewriteGroupName = function(group, name, newGroup, newName) {
-			var options = this.getOptions(group, name)
-			if (!options.length) {
-				return false
-			}
-			for (var o in options) {
-				var option = options[o]
-				if (Sincerity.Objects.exists(newGroup)) {
-					option.group = newGroup
-				}
-				if (Sincerity.Objects.exists(newName)) {
-					option.name = newName
-				}
 			}
 			return true
 	    }
@@ -337,8 +360,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    /** @ignore */
 	    Public._construct = function(config) {
 	    	this.uri = config.uri
-	    	this.checkSignatures = true
-	    	this.allowMd5 = true
+	    	this.checkSignatures = Sincerity.Objects.ensure(config.checkSignatures, true)
+	    	this.allowMd5 = Sincerity.Objects.ensure(config.allowMd5, false)
 
 	    	// Remove trailing slash
 	    	if (Sincerity.Objects.endsWith(this.uri, '/')) {
@@ -364,11 +387,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     		}
     		var module = new Sincerity.Dependencies.Module()
     		module.identifier = moduleIdentifier
+    		module.repository = this
     		for (var d in pom.dependencyModuleSpecifications) {
     			var dependencyModuleSpecification = pom.dependencyModuleSpecifications[d]
     			var dependencyModule = new Sincerity.Dependencies.Module()
+    			dependencyModule.repository = this
     			dependencyModule.specification = dependencyModuleSpecification
-    			dependencyModule.addDependent(module)
+    			dependencyModule.mergeSource(module)
     			module.dependencies.push(dependencyModule)
     		}
     		return module
@@ -411,20 +436,24 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 
 	    Public.applyModuleRule = function(module, rule) {
-			if (rule.type == 'maven') {
-				if (rule.rule == 'exclude') {
+			if (rule.platform == 'maven') {
+				if (rule.type == 'exclude') {
 					var options = module.specification.getOptions(rule.group, rule.name)
 					if (options.length) {
 						return 'exclude'
 					}
 				}
-				else if (rule.rule == 'excludeDependencies') {
+				else if (rule.type == 'excludeDependencies') {
 					var options = module.specification.getOptions(rule.group, rule.name)
 					if (options.length) {
 						return 'excludeDependencies'
 					}
 				}
-				else if (rule.rule == 'rewriteVersion') {
+				else if (rule.type == 'rewrite') {
+					module.specification.rewrite(rule.group, rule.name, rule.newGroup, rule.newName)
+					return true
+				}
+				else if (rule.type == 'rewriteVersion') {
 					module.specification.rewriteVersion(rule.group, rule.name, rule.newVersion)
 					return true
 				}
@@ -432,8 +461,12 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			return null
 	    }
 
-	    Public.toString = function() {
-	    	return 'maven:' + this.uri
+		Public.clone = function() {
+			return new Sincerity.Dependencies.Maven.Repository(this)
+		}
+
+		Public.toString = function() {
+	    	return 'uri=maven:' + this.uri + ', checkSignatures=' + this.checkSignatures + ', allowMd5=' + this.allowMd5
 	    }
 	    
 	    /**
@@ -527,7 +560,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    	var text = Sincerity.JVM.fromBytes(bytes)
 		    	var xml = Sincerity.XML.from(text)
 		    	var pom = new Module.POM(xml)
-		    	if (moduleIdentifier.isEqual(pom.moduleIdentifier)) {
+		    	if (moduleIdentifier.compare(pom.moduleIdentifier) === 0) {
 		    		// Make sure this is a valid POM
 		    		return pom
 		    	}
@@ -702,6 +735,10 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		 * @returns {Number} -1 if version2 is greater, 0 if equal, 1 if version1 is greater
 		 */
 	    Public.compare = function(version1, version2) {
+	    	if (version1 == version2) { // optimization for trivial equality
+	    		return 0
+	    	}
+	    	
 			version1 = Public.parse(version1)
 			version2 = Public.parse(version2)
 			
@@ -742,8 +779,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		Public.parse = function(version) {
 			version = Sincerity.Objects.trim(version)
 			var dash = version.indexOf('-')
-			var main = dash == -1 ? version : version.substring(0, dash)
-			var postfix = dash == -1 ? '' : version.substring(dash + 1)
+			var main = dash === -1 ? version : version.substring(0, dash)
+			var postfix = dash === -1 ? '' : version.substring(dash + 1)
 					
 			var parts = main.length ? main.split('.') : []
 			for (var p in parts) {
@@ -751,8 +788,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			}
 			
 			var postfixFirstDigit = postfix.search(/\d/)
-			var postfixMain = postfixFirstDigit == -1 ? postfix : postfix.substring(0, postfixFirstDigit)
-			var postfixNumber = postfixFirstDigit == -1 ? 0 : parseInt(postfix.substring(postfixFirstDigit)) / 10
+			var postfixMain = postfixFirstDigit === -1 ? postfix : postfix.substring(0, postfixFirstDigit)
+			var postfixNumber = postfixFirstDigit === -1 ? 0 : parseInt(postfix.substring(postfixFirstDigit)) / 10
 			var extra = postfixMain.length ? Public.parsePostfix(postfixMain) : 0
 			extra += postfixNumber
 			
@@ -835,7 +872,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 					match = (compareStart > 0) && (compareEnd >= 0) 
 				}
 				else {
-					match = (compareStart == 0) && (compareEnd == 0)
+					match = (compareStart > 0) && (compareEnd > 0)
 				}
 				if (match) {
 		    		//println(version + ' in ' + (range.includeStart ? '[' : '(') + range.start + ',' + range.end + (range.includeEnd ? ']' : ')'))
