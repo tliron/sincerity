@@ -270,10 +270,12 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * Creates a JVM Lock.
 	 * 
 	 * @param {Boolean} [readWrite=false] True to create a read-write lock
+	 * @param {Boolean} [fair=false] True to create a fair lock
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantReadWriteLock.html">java.util.concurrent.locks.ReentrantReadWriteLock</a>}
 	 */
-	Public.newLock = function(readWrite) {
-		return readWrite ? new java.util.concurrent.locks.ReentrantReadWriteLock() : java.util.concurrent.locks.ReentrantLock()
+	Public.newLock = function(readWrite, fair) {
+		fair = Sincerity.Objects.ensure(fair, false)
+		return readWrite ? new java.util.concurrent.locks.ReentrantReadWriteLock(fair) : new java.util.concurrent.locks.ReentrantLock(fair)
 	}
 	
 	/**
