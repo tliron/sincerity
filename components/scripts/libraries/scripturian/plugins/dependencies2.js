@@ -117,7 +117,7 @@ function test(command) {
 	
 	// Fetch
 	sincerity.out.println('Fetch:')
-	repository.fetchModule(id, 'jsoup.jar')
+	repository.fetchModule(id, 'zzz')
 	
 	// POM
 	sincerity.out.println('POM:')
@@ -177,6 +177,9 @@ function test(command) {
 		rules: rules,
 		conflictPolicy: 'oldest'
 	})
+	
+	resolver.eventHandler.add(new Sincerity.Dependencies.ConsoleEventHandler(sincerity.out))
+	resolver.eventHandler.add(new Sincerity.Dependencies.LogEventHandler())
 
 	resolver.resolve()
 	sincerity.out.println('Tree:')
@@ -200,4 +203,7 @@ function test(command) {
 			module.dump(sincerity.out, false, 1)
 		}
 	}
+	
+	// Fetch
+	resolver.fetch('zzz')
 }

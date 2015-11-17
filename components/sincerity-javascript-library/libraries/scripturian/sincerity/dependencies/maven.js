@@ -388,12 +388,12 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     		var module = new Sincerity.Dependencies.Module()
     		module.identifier = moduleIdentifier
     		module.repository = this
-    		for (var d in pom.dependencyModuleSpecifications) {
-    			var dependencyModuleSpecification = pom.dependencyModuleSpecifications[d]
+    		for (var m in pom.dependencyModuleSpecifications) {
+    			var dependencyModuleSpecification = pom.dependencyModuleSpecifications[m]
     			var dependencyModule = new Sincerity.Dependencies.Module()
     			dependencyModule.repository = this
     			dependencyModule.specification = dependencyModuleSpecification
-    			dependencyModule.mergeSource(module)
+    			dependencyModule.addReason(module)
     			module.dependencies.push(dependencyModule)
     		}
     		return module
@@ -423,14 +423,22 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			allowedModuleIdentifiers = moduleSpecification.getAllowedModuleIdentifiers(allowedModuleIdentifiers)
 	    	return allowedModuleIdentifiers
 	    }
-
-	    Public.fetchModule = function(moduleIdentifier, file) {
+	    
+	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, eventHandler) {
 	    	var uri = this.getUri(moduleIdentifier, 'jar')
+	    	var file = this.getModuleFile(moduleIdentifier, directory)
 	    	var signature = this.getSignature(uri)
-	    	file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
-	    	Sincerity.IO.download(uri, file)
+	    	
+	    	if (overwrite || !file.exists()) {
+		    	file.parentFile.mkdirs()
+		    	eventHandler.handleEvent({message: 'Downloading: ' + uri + '...'})
+		    	Sincerity.IO.download(uri, file)
+	    	}
+	    	
+	    	if (eventHandler) eventHandler.handleEvent({message: 'Verifying: ' + file + '...'})
 	    	if (!this.isSignatureValid(file, signature)) {
 	    		file['delete']()
+		    	if (eventHandler) eventHandler.handleEvent({message: 'File does not match signature: ' + file})
 	    		throw ':('
 	    	}
 	    }
@@ -468,7 +476,17 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		Public.toString = function() {
 	    	return 'uri=maven:' + this.uri + ', checkSignatures=' + this.checkSignatures + ', allowMd5=' + this.allowMd5
 	    }
-	    
+
+	    Public.getModuleFile = function(moduleIdentifier, directory) {
+	    	directory = (Sincerity.Objects.isString(directory) ? new java.io.File(directory) : directory).canonicalFile
+	    	var file = directory
+	    	file = new java.io.File(file, moduleIdentifier.group)
+	    	file = new java.io.File(file, moduleIdentifier.name)
+	    	file = new java.io.File(file, moduleIdentifier.version)
+	    	file = new java.io.File(file, moduleIdentifier.name + '.jar')
+	    	return file
+	    }
+
 	    /**
 	     * The Maven repository URI structure.  
 	     */
@@ -548,7 +566,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	var digest = content instanceof java.io.File ? Sincerity.Cryptography.fileDigest(content, algorithm, 'hex') : Sincerity.Cryptography.bytesDigest(content, 1, algorithm, 'hex')
 			return digest.toLowerCase() == signature.content.toLowerCase()
 	    }
-	    
+
 	    Public.getPom = function(moduleIdentifier) {
 	    	var uri = this.getUri(moduleIdentifier, 'pom')
 	    	try {

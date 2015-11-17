@@ -58,7 +58,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}
 
 	/**
-	 * A module can have dependencies as well as sources.
+	 * A module can have dependencies as well as reasons.
 	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Module
@@ -74,53 +74,83 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.repository = null
 	    	this.specification = null
 	    	this.dependencies = []
-	    	this.sources = []
+	    	this.reasons = []
 	    }
 	    
 	    /**
-	     * Copies identifier and dependencies from another module.
+	     * Copies identifier, repository, and dependencies from another module.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
 	    Public.copyResolutionFrom = function(module) {
 	    	this.identifier = module.identifier.clone()
+	    	this.repository = module.repository
 	    	this.dependencies = []
-	    	for (var d in module.dependencies) {
-	    		this.dependencies.push(module.dependencies[d])
+	    	for (var m in module.dependencies) {
+	    		this.dependencies.push(module.dependencies[m])
 	    	}
 	    }
 
 	    /**
-	     * Adds a new source if we don't have it already.
+	     * Adds a new reason if we don't have it already.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
-	    Public.mergeSource = function(module) {
+	    Public.addReason = function(module) {
 	    	var found = false
-	    	for (var d in this.sources) {
-	    		var source = this.sources[d]
-	    		if (module.identifier.compare(source.identifier) === 0) {
+	    	for (var m in this.reasons) {
+	    		var reasonModule = this.reasons[m]
+	    		if (reasonModule.identifier.compare(module.identifier) === 0) {
 	    			found = true
 	    			break
 	    		}
 	    	}
 	    	if (!found) {
-	    		this.sources.push(module)
+	    		this.reasons.push(module)
 	    	}
 	    }
 
 	    /**
-	     * Merges all sources of another module.
+	     * Removes a reason if we have it.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
-	     * @see Sincerity.Dependencies.Module#mergeSource
 	     */
-	    Public.mergeSources = function(module) {
+	    Public.removeReason = function(module) {
+	    	for (var m in this.reasons) {
+	    		var reasonModule = this.reasons[m]
+	    		if (reasonModule.identifier.compare(module.identifier) === 0) {
+	    			this.reasons.splice(m, 1)
+	    			break
+	    		}
+	    	}
+	    }
+
+	    /**
+	     * Adds all reasons of another module, and makes us explicit if the other module is explicit.
+	     * 
+	     * @param {Sincerity.Dependencies.Module} module
+	     * @see Sincerity.Dependencies.Module#addReason
+	     */
+	    Public.merge = function(module) {
 			if (module.explicit) {
 				this.explicit = true
 			}
-	    	for (var d in module.sources) {
-	    		this.mergeSource(module.sources[d])
+	    	for (var m in module.reasons) {
+	    		this.addReason(module.reasons[m])
+	    	}
+	    }
+	    
+	    Public.replaceModule = function(oldModule, newModule, recursive) {
+	    	this.removeReason(oldModule)
+	    	for (var m in this.dependencies) {
+	    		var module = this.dependencies[m]
+	    		if (module.identifier && (module.identifier.compare(oldModule.identifier) === 0)) {
+	    			module = this.dependencies[d] = newModule
+	    			module.addReason(this)
+	    		}
+	    		if (recursive) {
+	    			module.replaceModule(oldModule, newModule, true)
+	    		}
 	    	}
 	    }
 
@@ -144,9 +174,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		if (r.length) { r += ', ' }
 	    		r += 'dependencies=' + this.dependencies.length
 	    	}
-	    	if (this.sources.length) {
+	    	if (this.reasons.length) {
 	    		if (r.length) { r += ', ' }
-	    		r += 'sources=' + this.sources.length
+	    		r += 'reasons=' + this.reasons.length
 	    	}
 	    	if (prefix.length) {
 	    		r = prefix + ' ' + r
@@ -161,9 +191,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	}
 	    	out.println(this.toString())
 	    	if (recursive) {
-		    	for (var d in this.dependencies) {
-		    		var dependency = this.dependencies[d]
-		    		dependency.dump(out, true, indent + 1)
+		    	for (var m in this.dependencies) {
+		    		var module = this.dependencies[m]
+		    		module.dump(out, true, indent + 1)
 		    	}
 	    	}
 	    }
@@ -309,7 +339,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	return []
 	    }
 
-	    Public.fetchModule = function(moduleIdentifier, file) {
+	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, eventHandler) {
 	    }
 	    
 	    Public.applyModuleRule = function(module, rule) {
@@ -373,6 +403,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.conflicts = []
 
 	    	this.resolvedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
+	    	
+	    	this.eventHandler = new Sincerity.Dependencies.EventHandlers()
 	    }
 	    
 	    /**
@@ -440,7 +472,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     				var resolvedModule = this.resolvedModules[m]
     				if (module.identifier.compare(resolvedModule.identifier) === 0) {
     					// Merge
-    					resolvedModule.mergeSources(module)
+    					resolvedModule.merge(module)
     					found = true
     					break
     				}
@@ -474,7 +506,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     				var unresolvedModule = this.unresolvedModules[m]
     				if (module.specification.isEqual(unresolvedModule.specification)) {
     					// Merge
-    					unresolvedModule.mergeSources(module)
+    					unresolvedModule.merge(module)
     					found = true
     					break
     				}
@@ -493,6 +525,17 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     			this.addUnresolvedModule(module)
     		}
 	    }
+	    
+	    Public.replaceModule = function(oldModule, newModule) {
+	    	for (var m in this.explicitModules) {
+	    		var module = this.explicitModules[m]
+	    		if (module.identifier && (module.identifier.compare(oldModule.identifier) === 0)) {
+	    			module = this.explicitModules[m] = newModule
+	    			module.explicit = true
+	    		}
+    			module.replaceModule(oldModule, newModule, true)
+	    	}
+	    }
 
 	    /**
 	     * Goes over the explicitModules and resolves them recursively.
@@ -504,6 +547,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @see Sincerity.Dependencies.Resolver#resolveModule
 	     */
 	    Public.resolve = function() {
+			this.eventHandler.handleEvent({message: 'Resolving...'})
+
 			// Resolve explicit modules
 			var pool = new java.util.concurrent.ForkJoinPool(10)
 	    	try {
@@ -562,7 +607,6 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	}
 	    	
 	    	// Resolve conflicts
-	    	// TODO: choose according "preferredModules", otherwise use a policy: 'newest' vs. 'oldest'?
 	    	for (var c in this.conflicts) {
 	    		var conflicts = []
 	    		for (var m in this.conflicts[c]) {
@@ -570,22 +614,40 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		}
 	    		
 	    		// Choose a module
-	    		var chosenModuleIndex
+	    		var chosenModuleIndex = null
 	    		if (this.conflictPolicy == 'newest') {
 	    			chosenModuleIndex = 0
 	    		}
 	    		else if (this.conflictPolicy == 'oldest') {
 	    			chosenModuleIndex = conflicts.length - 1
 	    		}
+	    		else {
+	    			// TODO
+	    			continue
+	    		}
+	    		
 	    		var chosenModule = conflicts[chosenModuleIndex]
 	    		conflicts.splice(chosenModuleIndex, 1)
-	    		
-	    		// Merge all sources into chosen module, and remove non-chosen modules from resolvedModules
+
+				this.eventHandler.handleEvent({message: 'Resolved conflict: ' + chosenModule.identifier.toString()})
+
+	    		// Merge all reasons into chosen module, and remove non-chosen modules from resolvedModules
 	    		for (var m in conflicts) {
 	    			var module = conflicts[m]
-	    			chosenModule.mergeSources(module)
-	    			this.removeResolvedModule(module) // TODO: replace in tree
+	    			chosenModule.merge(module)
+	    			this.removeResolvedModule(module)
+	    			this.replaceModule(module, chosenModule)
 	    		}
+	    	}
+	    }
+	    
+	    /**
+	     * Fetches the resolved modules.
+	     */
+	    Public.fetch = function(directory, overwrite) {
+	    	for (var m in this.resolvedModules) {
+	    		var module = this.resolvedModules[m]
+	    		module.repository.fetchModule(module.identifier, directory, overwrite, this.eventHandler)
 	    	}
 	    }
 	    
@@ -626,9 +688,11 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 					// TODO: unsupported rule warning
 				}
 				else if (command == 'exclude') {
+					this.eventHandler.handleEvent({message: 'Excluding: ' + module.specification.toString()})
 					exclude = true
 				}
 				else if (command == 'excludeDependencies') {
+					this.eventHandler.handleEvent({message: 'Excluding dependencies: ' + module.specification.toString()})
 					recursive = false
 				}
 			}
@@ -641,6 +705,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     			var resolvedModule = this.getResolvedModule(module.specification)
     			if (!resolvedModule) {
 	    			// Gather allowed module identifiers from all repositories
+					this.eventHandler.handleEvent({message: 'Resolving: ' + module.specification.toString() + '...'})
+					
     				var moduleIdentifiers = []
 		    		for (var r in repositories) {
 			    		var repository = repositories[r]
@@ -653,7 +719,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			    	}
 
     				// Pick the best module identifier
-		    		if (moduleIdentifiers.length) {
+		    		if (moduleIdentifiers.length > 0) {
 		    			moduleIdentifiers.sort(function(moduleIdentifier1, moduleIdentifier2) {
 			    			// Reverse newness order
 			    			return moduleIdentifier2.compare(moduleIdentifier1)
@@ -661,6 +727,11 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			    		
 			    		// Best module is first (newest)
 		    			resolvedModule = repository.getModule(moduleIdentifiers[0])
+
+						this.eventHandler.handleEvent({message: '-> ' + resolvedModule.identifier.toString()})
+		    		}
+		    		else {
+						this.eventHandler.handleEvent({message: ':('})
 		    		}
     			}
 
@@ -711,6 +782,110 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     		return Sincerity.JVM.task(function() {
     			resolver.resolveModule(module, repositories, rules, recursive)
     		}, 'recursiveAction')
+	    }
+
+	    return Public
+	}(Public))
+
+	/**
+	 * Handles events.
+	 * <p>
+	 * This class can also be used as a null event handler, because it does nothing.
+	 * 
+	 * @class
+	 * @name Sincerity.Dependencies.EventHandler
+	 */
+	Public.EventHandler = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.EventHandler */
+	    var Public = {}
+	    
+	    /**
+	     * @param {Object} event
+	     * @returns {Boolean} true if the event was swallowed by the handler
+	     */
+	    Public.handleEvent = function(event) {
+	    	return false
+	    }
+
+	    return Public
+	}(Public))
+
+	/**
+	 * A handler that delegates to other handlers.
+	 * 
+	 * @class
+	 * @name Sincerity.Dependencies.EventHandlers
+	 */
+	Public.EventHandlers = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.EventHandlers */
+	    var Public = {}
+
+	    /** @ignore */
+	    Public._inherit = Module.EventHandler
+
+	    /** @ignore */
+	    Public._construct = function() {
+	    	this.eventHandlers = Sincerity.JVM.newList(true)
+	    }
+	    
+	    Public.handleEvent = function(event) {
+	    	for (var i = this.eventHandlers.iterator(); i.hasNext(); ) {
+	    		var eventHandler = i.next()
+	    		if (eventHandler.handleEvent(event) === true) {
+	    			return true
+	    		}
+	    	}
+	    	return false
+	    }
+	    
+	    Public.add = function(eventHandler) {
+	    	this.eventHandlers.add(eventHandler)
+	    }
+
+	    return Public
+	}(Public))
+
+	/**
+	 * A handler that outputs events to the console.
+	 * 
+	 * @class
+	 * @name Sincerity.Dependencies.ConsoleEventHandler
+	 */
+	Public.ConsoleEventHandler = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.ConsoleEventHandler */
+	    var Public = {}
+
+	    /** @ignore */
+	    Public._inherit = Module.EventHandler
+
+	    /** @ignore */
+	    Public._construct = function(out) {
+	    	this.out = out
+	    }
+
+	    Public.handleEvent = function(event) {
+	    	this.out.println(event.message)
+	    	return false
+	    }
+
+	    return Public
+	}(Public))
+
+	/**
+	 * A handler that outputs events to a log.
+	 * 
+	 * @class
+	 * @name Sincerity.Dependencies.LogEventHandler
+	 */
+	Public.LogEventHandler = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.LogEventHandler */
+	    var Public = {}
+
+	    /** @ignore */
+	    Public._inherit = Module.EventHandler
+	    
+	    Public.handleEvent = function(event) {
+	    	return false
 	    }
 
 	    return Public
