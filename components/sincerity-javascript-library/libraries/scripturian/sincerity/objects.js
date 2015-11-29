@@ -520,6 +520,15 @@ Sincerity.Objects = Sincerity.Objects || function() {
 		
 		return null !== string.match(regexp)
 	}
+	
+	/**
+	 * Generate an almost certainly unique string (a UUID).
+	 * 
+	 * @returns {String} the unique string
+	 */
+	Public.uniqueString = function() {
+		return String(java.util.UUID.randomUUID().toString())	
+	}
 
 	//
 	// Objects (dicts, arrays, dates, functions)

@@ -327,21 +327,41 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 		/** @exports Public as Sincerity.Dependencies.Repository */
 	    var Public = {}
 	    
+	    /** @ignore */
+	    Public._construct = function(config) {
+	    	config = config || {}
+	    	var parallelism = config.parallelism || 5
+	    	this.executor = java.util.concurrent.Executors.newFixedThreadPool(parallelism)
+	    }
+	    
+	    Public.release = function() {
+	    	this.executor.shutdown()
+	    	//this.executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)
+	    }
+	    
 	    Public.hasModule = function(moduleIdentifier) {
 	    	return false
 	    }
 
-	    Public.getModule = function(moduleIdentifier) {
+	    Public.getModule = function(moduleIdentifier, resolver) {
 	    	return null
 	    }
 
-	    Public.getAllowedModuleIdentifiers = function(moduleSpecification) {
+	    Public.getAllowedModuleIdentifiers = function(moduleSpecification, resolver) {
 	    	return []
 	    }
 
-	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, eventHandler) {
+	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, resolver) {
 	    }
-	    
+
+	    Public.fetchModuleTask = function(moduleIdentifier, directory, overwrite, resolver) {
+    		var repository = this
+    		var task = Sincerity.JVM.task(function() {
+    			repository.fetchModule(moduleIdentifier, directory, overwrite, resolver)
+    		})
+    		return this.executor.submit(task)
+	    }
+
 	    Public.applyModuleRule = function(module, rule) {
 	    	return false
 	    }
@@ -405,6 +425,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.resolvedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
 	    	
 	    	this.eventHandler = new Sincerity.Dependencies.EventHandlers()
+	    }
+	    
+	    Public.release = function() {
+	    	for (var r in this.repositories) {
+	    		this.repositories[r].release()
+	    	}
 	    }
 	    
 	    /**
@@ -644,15 +670,27 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    /**
 	     * Fetches the resolved modules.
 	     */
-	    Public.fetch = function(directory, overwrite) {
+	    Public.fetch = function(directory, parallel, overwrite) {
+	    	var tasks = []
+	    	
 	    	for (var m in this.resolvedModules) {
 	    		var module = this.resolvedModules[m]
-	    		module.repository.fetchModule(module.identifier, directory, overwrite, this.eventHandler)
+	    		if (parallel) {
+	    			tasks.push(module.repository.fetchModuleTask(module.identifier, directory, overwrite, this))
+	    		}
+	    		else {
+	    			module.repository.fetchModule(module.identifier, directory, overwrite, this)
+	    		}
 	    	}
+	    	
+			// Block until tasks finish
+			for (var t in tasks) {
+				tasks[t].get()
+			}
 	    }
 	    
 	    /**
-	     * Resolves a module, optionally resolving its dependencies recursively (using fork/join
+	     * Resolves a module, optionally resolving its dependencies recursively (supporting fork/join
 	     * parallelism).
 	     * <p>
 	     * "Resolving" means finding the best identifier available from all the repositories
@@ -731,7 +769,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 						this.eventHandler.handleEvent({message: '-> ' + resolvedModule.identifier.toString()})
 		    		}
 		    		else {
-						this.eventHandler.handleEvent({message: ':('})
+						this.eventHandler.handleEvent({message: 'Unresolved: ' + module.specification.toString()})
 		    		}
     			}
 
@@ -745,18 +783,20 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			if (recursive) {
 				// Resolve dependencies recursively
 				var inForkJoin = Sincerity.JVM.inForkJoin(), tasks = []
+
 		    	for (d in module.dependencies) {
 		    		var dependency = module.dependencies[d]
 		    		if (inForkJoin) {
 		    			// Fork
-		    			tasks.push(this.resolveModuleTask(dependency, repositories, rules, true).fork())
+		    			tasks.push(this.resolveModuleTask(dependency, repositories, rules, true))
 		    		}
 		    		else {
 		    			// Do now
 		    			this.resolveModule(dependency, repositories, rules, true)
 		    		}
 		    	}
-				// Join
+
+				// Block until tasks finish
 				for (var t in tasks) {
 					tasks[t].join()
 				}
@@ -781,7 +821,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     		var resolver = this
     		return Sincerity.JVM.task(function() {
     			resolver.resolveModule(module, repositories, rules, recursive)
-    		}, 'recursiveAction')
+    		}, 'recursiveAction').fork()
 	    }
 
 	    return Public
@@ -806,7 +846,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public.handleEvent = function(event) {
 	    	return false
 	    }
-
+	    
 	    return Public
 	}(Public))
 
@@ -840,32 +880,6 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    
 	    Public.add = function(eventHandler) {
 	    	this.eventHandlers.add(eventHandler)
-	    }
-
-	    return Public
-	}(Public))
-
-	/**
-	 * A handler that outputs events to the console.
-	 * 
-	 * @class
-	 * @name Sincerity.Dependencies.ConsoleEventHandler
-	 */
-	Public.ConsoleEventHandler = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Dependencies.ConsoleEventHandler */
-	    var Public = {}
-
-	    /** @ignore */
-	    Public._inherit = Module.EventHandler
-
-	    /** @ignore */
-	    Public._construct = function(out) {
-	    	this.out = out
-	    }
-
-	    Public.handleEvent = function(event) {
-	    	this.out.println(event.message)
-	    	return false
 	    }
 
 	    return Public

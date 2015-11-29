@@ -17,6 +17,7 @@ document.require(
 	'/sincerity/objects/',
 	'/sincerity/io/',
 	'/sincerity/xml/',
+	'/sincerity/jvm/',
 	'/sincerity/cryptography/')
 
 var Sincerity = Sincerity || {}
@@ -367,6 +368,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	if (Sincerity.Objects.endsWith(this.uri, '/')) {
 	    		this.uri = this.uri.substring(0, this.uri.length - 1)
 	    	}
+	    	
+	    	arguments.callee.overridden.call(this, config)
 	    }
 	    
 	    Public.hasModule = function(moduleIdentifier) {
@@ -380,8 +383,8 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	}
 	    }
 
-	    Public.getModule = function(moduleIdentifier) {
-    		var pom = this.getPom(moduleIdentifier) // TODO: cache poms!
+	    Public.getModule = function(moduleIdentifier, resolver) {
+    		var pom = this.getPom(moduleIdentifier, resolver) // TODO: cache poms!
     		if (!Sincerity.Objects.exists(pom)) {
     			return null
     		}
@@ -399,7 +402,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
     		return module
 	    }
 
-	    Public.getAllowedModuleIdentifiers = function(moduleSpecification) {
+	    Public.getAllowedModuleIdentifiers = function(moduleSpecification, resolver) {
 	    	var allowedModuleIdentifiers = []
 	    	
 	    	for (var o in moduleSpecification.options) {
@@ -413,7 +416,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		}
 	    		}
 	    		else {
-	    			var metadata = this.getMetaData(option.group, option.name) // TODO: cache metadata!
+	    			var metadata = this.getMetaData(option.group, option.name, resolver) // TODO: cache metadata!
 	    			if (metadata) {
 	    				allowedModuleIdentifiers = Sincerity.Objects.concatUnique(allowedModuleIdentifiers, metadata.moduleIdentifiers)
 	    			}
@@ -424,22 +427,33 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    	return allowedModuleIdentifiers
 	    }
 	    
-	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, eventHandler) {
+	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, resolver) {
 	    	var uri = this.getUri(moduleIdentifier, 'jar')
 	    	var file = this.getModuleFile(moduleIdentifier, directory)
 	    	var signature = this.getSignature(uri)
 	    	
 	    	if (overwrite || !file.exists()) {
 		    	file.parentFile.mkdirs()
-		    	eventHandler.handleEvent({message: 'Downloading: ' + uri + '...'})
+		    	var id = Sincerity.Objects.uniqueString()
+		    	resolver.eventHandler.handleEvent({type: 'begin', id: id, progress: 0, message: 'Downloading: ' + uri})
 		    	Sincerity.IO.download(uri, file)
+		    	for (var i = 0; i <= 100; i += 10) {
+			    	resolver.eventHandler.handleEvent({type: 'update', id: id, progress: i / 100})
+		    		Sincerity.JVM.sleep(100) // :)
+		    	}
+		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Downloaded: ' + uri})
 	    	}
-	    	
-	    	if (eventHandler) eventHandler.handleEvent({message: 'Verifying: ' + file + '...'})
-	    	if (!this.isSignatureValid(file, signature)) {
+
+	    	var id = Sincerity.Objects.uniqueString()
+	    	resolver.eventHandler.handleEvent({type: 'begin', id: id, message: 'Verifying: ' + file})
+	    	Sincerity.JVM.sleep(300) // :)
+	    	if (this.isSignatureValid(file, signature)) {
+		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Verified: ' + file})
+	    	}
+	    	else {
+		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'File does not match signature: ' + file})
 	    		file['delete']()
-		    	if (eventHandler) eventHandler.handleEvent({message: 'File does not match signature: ' + file})
-	    		throw ':('
+	    		// throw ':('
 	    	}
 	    }
 
@@ -567,7 +581,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 			return digest.toLowerCase() == signature.content.toLowerCase()
 	    }
 
-	    Public.getPom = function(moduleIdentifier) {
+	    Public.getPom = function(moduleIdentifier, resolver) {
 	    	var uri = this.getUri(moduleIdentifier, 'pom')
 	    	try {
 		    	var signature = this.getSignature(uri)
@@ -583,11 +597,13 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		return pom
 		    	}
 	    	}
-	    	catch (x) { println(x) }
+	    	catch (x) {
+	    		resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get POM: ' + uri})
+	    	}
 	    	return null
 	    }
 	    
-	    Public.getMetaData = function(group, name) {
+	    Public.getMetaData = function(group, name, resolver) {
 	    	var uri = this.getMetaDataUri(group, name)
 	    	try {
 		    	var signature = this.getSignature(uri)
@@ -603,7 +619,9 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 		    		return metadata
 		    	}
 	    	}
-	    	catch (x) { println(x) }
+	    	catch (x) {
+	    		resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get metadata: ' + uri})
+	    	}
 	    	return null
 	    }
 

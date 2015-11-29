@@ -1,6 +1,7 @@
 
 document.require(
 	'/sincerity/dependencies/maven/',
+	'/sincerity/dependencies/console/',
 	'/sincerity/objects/')
 
 importClass(
@@ -23,6 +24,13 @@ function run(command) {
 	}
 }
 
+function ansi() {
+	for (var i in arguments) {
+		print('\x1b[') // ANSI CSI
+		print(arguments[i])
+	}
+}
+
 function test(command) {
 	command.parse = true
 
@@ -33,6 +41,15 @@ function test(command) {
 	var id2 = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var specification = new Sincerity.Dependencies.Maven.ModuleSpecification('org.jsoup', 'jsoup', '1.8.1')
 	var id3 = new Sincerity.Dependencies.Maven.ModuleIdentifier('com.github.sommeri:less4j:1.15.2')
+	
+	/*print('\n\n')
+	for (var i = 0; i < 10; i++) {
+	  ansi('2A', 'K')
+	  println('hi!' + i)
+	  ansi('K')
+	  println('hello...' + i)
+	  java.lang.Thread.sleep(100)
+	}*/
 	
 	// ForkJoin
 	sincerity.out.println('forkJoin:')
@@ -117,7 +134,7 @@ function test(command) {
 	
 	// Fetch
 	sincerity.out.println('Fetch:')
-	repository.fetchModule(id, 'zzz')
+	repository.fetchModule(id, 'zzz', false, {eventHandler: new Sincerity.Dependencies.Console.EventHandler(sincerity.out)})
 	
 	// POM
 	sincerity.out.println('POM:')
@@ -160,8 +177,8 @@ function test(command) {
  	]
 	
 	var repositories = [
-		{uri: 'file:/Depot/DevRepository/'}
-		//{uri: 'http://repository.threecrickets.com/maven'}
+		//{uri: 'file:/Depot/DevRepository/'}
+		{uri: 'http://repository.threecrickets.com/maven'}
 	]
 	
 	var rules = [
@@ -178,7 +195,7 @@ function test(command) {
 		conflictPolicy: 'oldest'
 	})
 	
-	resolver.eventHandler.add(new Sincerity.Dependencies.ConsoleEventHandler(sincerity.out))
+	resolver.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity.out))
 	resolver.eventHandler.add(new Sincerity.Dependencies.LogEventHandler())
 
 	resolver.resolve()
@@ -190,7 +207,7 @@ function test(command) {
 	for (var m in resolver.resolvedModules) {
 		resolver.resolvedModules[m].dump(sincerity.out, false, 1)
 	}
-	sincerity.out.println('resolveCacheHits: ' + resolver.resolvedCacheHits.get())
+	sincerity.out.println('resolvedCacheHits: ' + resolver.resolvedCacheHits.get())
 	sincerity.out.println('Unresolved: (' + resolver.unresolvedModules.length + ')')
 	for (var m in resolver.unresolvedModules) {
 		resolver.unresolvedModules[m].dump(sincerity.out, false, 1)
@@ -205,5 +222,7 @@ function test(command) {
 	}
 	
 	// Fetch
-	resolver.fetch('zzz')
+	resolver.fetch('zzz', true, true)
+	
+	resolver.release()
 }

@@ -94,8 +94,8 @@ var Sincerity = Sincerity || {}
  *     // This will be a public property
  *     this.pet = pet
  *     
- *     // Let's call the parent's constructor
- *     arguments.callee.overridden.call(this)
+ *     // Let's call the parent's constructor with an argument
+ *     arguments.callee.overridden.call(this, 123)
  *   }
  *   
  *   // Inheritance annotation
