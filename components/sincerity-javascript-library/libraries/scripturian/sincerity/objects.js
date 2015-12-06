@@ -343,6 +343,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param string The string
 	 * @returns {String}
+	 * @see String#trim
 	 */
 	Public.trim = function(string) {
 		return Public.exists(string) ? String(string).replace(trimRegExp, '') : ''
@@ -353,6 +354,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param string The string
 	 * @returns {String}
+	 * @see String#escapeSingleQuotes
 	 */
 	Public.escapeSingleQuotes = function(string) {
 		return Public.exists(string) ? String(string).replace(/\'/g, "\\\'") : ''
@@ -363,6 +365,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param string The string
 	 * @returns {String}
+	 * @see String#escapeDoubleQuotes
 	 */
 	Public.escapeDoubleQuotes = function(string) {
 		return Public.exists(string) ? String(string).replace(/\"/g, "\\\"") : ''
@@ -373,6 +376,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param string The string
 	 * @returns {String}
+	 * @see String#escapeNewLines
 	 */
 	Public.escapeNewlines = function(string) {
 		return Public.exists(string) ? String(string).replace(/\n/g, "\\n") : ''
@@ -383,6 +387,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param string The string
 	 * @returns {String}
+	 * @see String#escapeRegExp
 	 */
 	Public.escapeRegExp = function(string) {
 		// See: http://stackoverflow.com/a/6969486/849021
@@ -395,6 +400,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @param string The string
 	 * @param prefix The prefix
 	 * @returns {Boolean}
+	 * @see String#startsWith
 	 */
 	Public.startsWith = function(string, prefix) {
 		if (!Public.exists(string)) {
@@ -414,6 +420,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @param string The string
 	 * @param postfix The postfix
 	 * @returns {Boolean}
+	 * @see String#endsWith
 	 */
 	Public.endsWith = function(string, postfix) {
 		if (!Public.exists(string)) {
@@ -435,6 +442,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @param {String} a The string on the left
 	 * @param {String} b The string on the right
 	 * @returns {Number}
+	 * @see String#compare
 	 */
 	Public.compareStrings = function(a, b) {
 		return ((a == b) ? 0 : ((a > b) ? 1 : -1))
@@ -446,6 +454,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @param string The string
 	 * @param {Number} [times=0] The number of repetitions
 	 * @returns {String}
+	 * @see String#repeat
 	 */
 	Public.repeat = function(string, times) {
 		if (!times) {
@@ -465,8 +474,9 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * An empty pattern matches everything.
 	 * 
 	 * @param string The string
-	 * @param [pattern] The pattern
+	 * @param [pattern] The pattern (an empty pattern matches everything, like "*")
 	 * @returns {Boolean} true if the string matches the pattern
+	 * @see String#matchSimple
 	 */
 	Public.matchSimple = function(string, pattern) {
 		if (!Public.exists(pattern)) {
@@ -768,7 +778,7 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * 
 	 * @param array The array (or array-like object)
 	 * @param {Number} start The start index
-	 * @param {Number} end The end index
+	 * @param {Number} [end] The end index
 	 * @returns {Array}
 	 */
 	Public.slice = function(array, start, end) {
@@ -925,8 +935,8 @@ Sincerity.Objects = Sincerity.Objects || function() {
  * Removes whitespace from beginning and end of the string.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#trim
  * @returns {String}
+ * @see Sincerity.Objects#trim
  */ 
 String.prototype.trim = String.prototype.trim || function() {
 	return Sincerity.Objects.trim(this)
@@ -976,9 +986,9 @@ String.prototype.escapeRegExp = String.prototype.escapeRegExp || function() {
  * True if the string starts with the prefix.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#startsWith
  * @param {String} prefix
  * @returns {Boolean}
+ * @see Sincerity.Objects#startsWith
  */ 
 String.prototype.startsWith = String.prototype.startsWith || function(prefix) {
 	return Sincerity.Objects.startsWith(this, prefix)
@@ -988,9 +998,9 @@ String.prototype.startsWith = String.prototype.startsWith || function(prefix) {
  * True if the string ends with the postfix.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#endsWith
  * @param {String} postfix
  * @returns {Boolean}
+ * @see Sincerity.Objects#endsWith
  */ 
 String.prototype.endsWith = String.prototype.endsWith || function(postfix) {
 	return Sincerity.Objects.endsWith(this, postfix)
@@ -1000,9 +1010,9 @@ String.prototype.endsWith = String.prototype.endsWith || function(postfix) {
  * Returns 0 if string are equal, 1 if a > b, and -1 if a < b.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#compareStrings
  * @param {String} b
  * @returns {Number}
+ * @see Sincerity.Objects#compareStrings
  */ 
 String.prototype.compare = String.prototype.compare || function(b) {
 	return Sincerity.Objects.compare(this, b)
@@ -1012,8 +1022,8 @@ String.prototype.compare = String.prototype.compare || function(b) {
  * Makes sure the first character of the string is in upper case.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#capitalize
  * @returns {String}
+ * @see Sincerity.Objects#capitalize
  */ 
 String.prototype.capitalize = String.prototype.capitalize || function() {
 	return Sincerity.Objects.capitalize(this)
@@ -1023,9 +1033,9 @@ String.prototype.capitalize = String.prototype.capitalize || function() {
  * Repeats the string. When 'times' is 0, returns an empty string.
  * 
  * @methodOf String#
- * @see Sincerity.Objects#repeat
  * @param {Number} times
  * @returns {String}
+ * @see Sincerity.Objects#repeat
  */ 
 String.prototype.repeat = String.prototype.repeat || function(times) {
 	return Sincerity.Objects.repeat(this, times)
@@ -1040,9 +1050,9 @@ String.prototype.repeat = String.prototype.repeat || function(times) {
  * An empty pattern matches everything.
  *
  * @methodOf String#
- * @see Sincerity.Objects#matchSimple
  * @param [pattern] The pattern
  * @returns {Boolean} true if the string matches the pattern
+ * @see Sincerity.Objects#matchSimple
  */
 String.prototype.matchSimple = String.prototype.matchSimple || function(pattern) {
 	return Sincerity.Objects.matchSimple(this, pattern)

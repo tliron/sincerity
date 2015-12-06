@@ -356,9 +356,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 
 	    Public.fetchModuleTask = function(moduleIdentifier, directory, overwrite, resolver) {
     		var repository = this
-    		var task = Sincerity.JVM.task(function() {
+    		var task = function() {
     			repository.fetchModule(moduleIdentifier, directory, overwrite, resolver)
-    		})
+    		}.task()
     		return this.executor.submit(task)
 	    }
 
@@ -478,70 +478,62 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @returns {Sincerity.Dependencies.Module[]} or null if not yet resolved
 	     */
 	    Public.getResolvedModule = function(moduleSpecification) {
-			return Sincerity.JVM.withLock(this.resolvedModulesLock, function() {
-    			for (var m in this.resolvedModules) {
-    				var module = this.resolvedModules[m]
-    				if (moduleSpecification.isEqual(module.specification)) {
-    					//println('!!!! cache hit: ' + module.specification.toString())
-    					this.resolvedCacheHits.incrementAndGet()
-    					return module
-    				}
-    			}
-    			return null
-			}, this)
-	    }
-
-	    Public.addResolvedModule = function(module) {
-			Sincerity.JVM.withLock(this.resolvedModulesLock, function() {
-				var found = false
-    			for (var m in this.resolvedModules) {
-    				var resolvedModule = this.resolvedModules[m]
-    				if (module.identifier.compare(resolvedModule.identifier) === 0) {
-    					// Merge
-    					resolvedModule.merge(module)
-    					found = true
-    					break
-    				}
-    			}
-				if (!found) {
-					this.resolvedModules.push(module)
+			for (var m in this.resolvedModules) {
+				var module = this.resolvedModules[m]
+				if (moduleSpecification.isEqual(module.specification)) {
+					//println('!!!! cache hit: ' + module.specification.toString())
+					this.resolvedCacheHits.incrementAndGet()
+					return module
 				}
-			}, this)
-	    }
+			}
+			return null
+	    }.withLock('resolvedModulesLock')
+	    
+	    Public.addResolvedModule = function(module) {
+			var found = false
+			for (var m in this.resolvedModules) {
+				var resolvedModule = this.resolvedModules[m]
+				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+					// Merge
+					resolvedModule.merge(module)
+					found = true
+					break
+				}
+			}
+			if (!found) {
+				this.resolvedModules.push(module)
+			}
+	    }.withLock('resolvedModulesLock')
 
 	    Public.removeResolvedModule = function(module) {
-			Sincerity.JVM.withLock(this.resolvedModulesLock, function() {
-				var found = null
-    			for (var m in this.resolvedModules) {
-    				var resolvedModule = this.resolvedModules[m]
-    				if (module.identifier.compare(resolvedModule.identifier) === 0) {
-    					found = m
-    					break
-    				}
-    			}
-				if (found !== null) {
-					this.resolvedModules.splice(found, 1)
+			var found = null
+			for (var m in this.resolvedModules) {
+				var resolvedModule = this.resolvedModules[m]
+				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+					found = m
+					break
 				}
-			}, this)
-	    }
+			}
+			if (found !== null) {
+				this.resolvedModules.splice(found, 1)
+			}
+	    }.withLock('resolvedModulesLock')
 
 	    Public.addUnresolvedModule = function(module) {
-			Sincerity.JVM.withLock(this.unresolvedModulesLock, function() {
-				var found = false
-    			for (var m in this.unresolvedModules) {
-    				var unresolvedModule = this.unresolvedModules[m]
-    				if (module.specification.isEqual(unresolvedModule.specification)) {
-    					// Merge
-    					unresolvedModule.merge(module)
-    					found = true
-    					break
-    				}
-    			}
-				if (!found) {
-					this.unresolvedModules.push(module)
+			var found = false
+			for (var m in this.unresolvedModules) {
+				var unresolvedModule = this.unresolvedModules[m]
+				if (module.specification.isEqual(unresolvedModule.specification)) {
+					// Merge
+					unresolvedModule.merge(module)
+					found = true
+					break
 				}
-			}, this)
-	    }
+			}
+			if (!found) {
+				this.unresolvedModules.push(module)
+			}
+	    }.withLock('unresolvedModulesLock')
 	    
 	    Public.addModule = function(module) {
     		if (Sincerity.Objects.exists(module.identifier)) {
@@ -590,6 +582,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	}
 	    	finally {
 	    		pool.shutdown()
+	    		pool.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
 	    	}
 	    	
 	    	// Sort resolved modules
@@ -742,13 +735,15 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 				// Check to see if we've already resolved it
     			var resolvedModule = this.getResolvedModule(module.specification)
     			if (!resolvedModule) {
+    				var id = Sincerity.Objects.uniqueString()
+    				
 	    			// Gather allowed module identifiers from all repositories
-					this.eventHandler.handleEvent({message: 'Resolving: ' + module.specification.toString() + '...'})
+					this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Resolving: ' + module.specification.toString()})
 					
     				var moduleIdentifiers = []
 		    		for (var r in repositories) {
 			    		var repository = repositories[r]
-			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification)
+			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification, this)
 			    		
 			    		// Note: the first repository to report an identifier will "win," the following repositories will have their reports discarded
 			    		moduleIdentifiers = Sincerity.Objects.concatUnique(moduleIdentifiers, allowedModuleIdentifiers, function(moduleIdentifier1, moduleIdentifier2) {
@@ -766,10 +761,10 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			    		// Best module is first (newest)
 		    			resolvedModule = repository.getModule(moduleIdentifiers[0])
 
-						this.eventHandler.handleEvent({message: '-> ' + resolvedModule.identifier.toString()})
+						this.eventHandler.handleEvent({type: 'end', id: id, message: 'Resolved: ' + resolvedModule.identifier.toString()})
 		    		}
 		    		else {
-						this.eventHandler.handleEvent({message: 'Unresolved: ' + module.specification.toString()})
+						this.eventHandler.handleEvent({type: 'fail', id: id, message: 'Unresolved: ' + module.specification.toString()})
 		    		}
     			}
 
@@ -819,9 +814,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     */
 	    Public.resolveModuleTask = function(module, repositories, rules, recursive) {
     		var resolver = this
-    		return Sincerity.JVM.task(function() {
+    		return function() {
     			resolver.resolveModule(module, repositories, rules, recursive)
-    		}, 'recursiveAction').fork()
+    		}.task('recursiveAction').fork()
 	    }
 
 	    return Public

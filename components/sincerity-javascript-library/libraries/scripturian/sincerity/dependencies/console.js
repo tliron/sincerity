@@ -47,109 +47,121 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    	this.out = out
 	    	this.lock = Sincerity.JVM.newLock()
 	    	this.ongoingEvents = []
-	    	this.progressLength = 10
-	    	
-	    	//this.ongoing.push({message: 'testing...'})
+
+	    	this.endGraphics = '32'
+		    this.failGraphics = '33'
+	    	this.errorGraphics = '31'
+	    	this.ongoingGraphics = '34'
+
+	    	this.progressLength = 16
+	    	this.progressStart = '['
+		    this.progressEnd = '] '
+		    this.progressDone = '='
+		    this.progressTodo = ' '
 	    }
 
 	    Public.handleEvent = function(event) {
-			Sincerity.JVM.withLock(this.lock, function() {
-				var event = this.event
-				var handler = this.handler
-				var out = handler.out
-				var ongoingEvents = handler.ongoingEvents
-				var ongoingLength = ongoingEvents.length
-				var progressLength = handler.progressLength
-
-				var terminal = Packages.jline.TerminalFactory.create()
-				var terminalWidth = terminal.width
+			var terminal = Packages.jline.TerminalFactory.create()
+			try {
+				this.ansi = terminal.ansiSupported
+				this.terminalWidth = terminal.width
+			}
+			finally {
 				terminal.reset()
-
-				function print(event) {
-					var output = ''
-					if (Sincerity.Objects.exists(event.progress)) {
-						output += '['
-						for (var i = 0; i < progressLength; i++) {
-							output += ((event.progress * progressLength) > i) ? '=' : ' '
-								// TODO: spinner at end
-						}
-						output += '] '
-					}
-					if (Sincerity.Objects.exists(event.message)) {
-						output += event.message
-					}
-					
-					// We are making sure that we always advance one row only, even if we print a line longer than a row
-		    		var length = output.length
-		    		if (length >= terminalWidth) {
-		    			out.print(output.substring(0, terminalWidth))
+			}
+			
+			// Move up before the ongoing block we printed last time
+	    	if (this.ongoingEvents.length) {
+	    		this.controlSequence('' + this.ongoingEvents.length + 'A') // move cursor up
+	    	}
+	    	
+			if (event.type == 'begin') {
+		    	// Add ongoing event
+				if (event.id) {
+					this.ongoingEvents.push(event)
+				}
+			}
+			else if ((event.type == 'end') || (event.type == 'fail')) {
+				// Remove ongoing event
+		    	for (var o in this.ongoingEvents) {
+		    		var ongoingEvent = this.ongoingEvents[o]
+		    		if (event.id === ongoingEvent.id) {
+		    			this.ongoingEvents.splice(o, 1)
+		    			break
 		    		}
-		    		else {
-		    			out.print(output)
-		    			out.print(controlSequence('K'))
-		    			out.println()
+		    	}
+		    	// This line will take the place of the line we removed
+		    	this.controlSequence((event.type == 'fail' ? this.failGraphics : this.endGraphics) + 'm')
+		    	this.print(event)
+			}
+			else if (event.type == 'update') {
+				// Update ongoing event
+		    	for (var o in this.ongoingEvents) {
+		    		var ongoingEvent = this.ongoingEvents[o]
+		    		if (event.id === ongoingEvent.id) {
+		    			Sincerity.Objects.merge(ongoingEvent, event)
+		    			break
 		    		}
-				}
-				
-				// Move up before the ongoing block we printed last time
-		    	if (ongoingLength) {
-		    		out.print(controlSequence('' + ongoingLength + 'A'))
 		    	}
-		    	
-				if (event.type == 'begin') {
-			    	// Add ongoing event
-					if (event.id) {
-						ongoingEvents.push(event)
-					}
-				}
-				else if (event.type == 'end') {
-					// Remove ongoing event
-			    	for (var o in ongoingEvents) {
-			    		var ongoingEvent = ongoingEvents[o]
-			    		if (event.id === ongoingEvent.id) {
-			    			ongoingEvents.splice(o, 1)
-			    			break
-			    		}
-			    	}
-			    	// This line will take the place of the line we removed
-					print(event)
-				}
-				else if (event.type == 'update') {
-					// Update ongoing event
-			    	for (var o in ongoingEvents) {
-			    		var ongoingEvent = ongoingEvents[o]
-			    		if (event.id === ongoingEvent.id) {
-			    			Sincerity.Objects.merge(ongoingEvent, event)
-			    			break
-			    		}
-			    	}
-				}
-				else {
-					print(event)
-		    	}
-		    	
-		    	// Print ongoing block after everything else
-		    	for (var o in ongoingEvents) {
-		    		var ongoingEvent = ongoingEvents[o]
-					print(ongoingEvent)
-		    	}
-		    	out.print(controlSequence('J'))
-			}, {event: event, handler: this})
+			}
+			else if (event.type == 'error') {
+		    	this.controlSequence(this.errorGraphics + 'm')
+				this.print(event)
+			}
+			else {
+				this.print(event)
+	    	}
+	    	
+	    	// Print ongoing block after everything else
+	    	for (var o in this.ongoingEvents) {
+	    		var ongoingEvent = this.ongoingEvents[o]
+		    	this.controlSequence(this.ongoingGraphics + 'm')
+	    		this.print(ongoingEvent)
+	    	}
+	    	
+	    	this.controlSequence('0J') // erase to end of screen
 	    	
 	    	return false
-	    }
-	    
+	    }.withLock('lock')
+
+		Public.controlSequence = function() {
+			for (var i in arguments) {
+				this.out.print('\x1b[') // ANSI CSI (Control Sequence Introducer)
+				this.out.print(arguments[i])
+			}
+		}
+
+		Public.print = function(event) {
+			var output = ''
+				
+			if (Sincerity.Objects.exists(event.progress)) {
+				output += this.progressStart
+				for (var i = 0; i < this.progressLength; i++) {
+					output += ((event.progress * this.progressLength) > i) ? this.progressDone : this.progressTodo
+					// TODO: spinner at end
+				}
+				output += this.progressEnd
+			}
+			
+			if (Sincerity.Objects.exists(event.message)) {
+				output += event.message
+			}
+
+			// We are making sure that we always advance one row only, even if we print a line longer than a row
+    		var length = output.length
+    		if (length >= this.terminalWidth) {
+    			// Will automatically advance to the next line
+    			this.out.print(output.substring(0, this.terminalWidth))
+    		}
+    		else {
+    			this.out.print(output)
+    			this.controlSequence('0m', 'K') // reset graphics and erase to end of line
+    			this.out.println()
+    		}
+		}
+
 	    return Public
 	}(Public))
-
-	function controlSequence() {
-		var out = ''
-		for (var i in arguments) {
-			out += '\x1b[' // ANSI CSI (Control Sequence Introducer)
-			out += arguments[i]
-		}
-		return out
-	}
 
 	return Public
 }()

@@ -170,7 +170,7 @@ function test(command) {
 	sincerity.out.println('Resolve:')
 
 	var modules = [
-		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
+		{group: 'com.github.sommeri', name: 'less4j-', version: '(,1.15.2)'},
  		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
  		{group: 'com.fasterxml.jackson', name: 'jackson'},
  		{group: 'com.threecrickets.prudence', name: 'prudence'}

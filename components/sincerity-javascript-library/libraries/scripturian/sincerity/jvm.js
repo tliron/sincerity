@@ -18,7 +18,7 @@ var Sincerity = Sincerity || {}
 /**
  * Utilities to work with JVM types and classes.
  * <p>
- * Note: This library modifies the String prototype.
+ * Note: This library modifies the String and Function prototypes.
  *  
  * @namespace
  * 
@@ -272,6 +272,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {Boolean} [readWrite=false] True to create a read-write lock
 	 * @param {Boolean} [fair=false] True to create a fair lock
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantReadWriteLock.html">java.util.concurrent.locks.ReentrantReadWriteLock</a>}
+	 * @see Sincerity.JVM#withLock
 	 */
 	Public.newLock = function(readWrite, fair) {
 		fair = Sincerity.Objects.ensure(fair, false)
@@ -279,22 +280,30 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	}
 	
 	/**
-	 * Executes a closure within a lock.
+	 * Function decorator that adds lock synchronization.
 	 * 
-	 * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>} lock
-	 * @param {Function} fn
-	 * @param [self]
+	 * @param {Function} fn The function
+	 * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|String} lock The lock or the lock name as an attribute of 'this'
+	 * @returns {Function}
+	 * @see Sincerity.JVM#newLock
+	 * @see Function#withLock
 	 */
-	Public.withLock = function(lock, fn, self) {
-		lock.lock()
-		try {
-			return fn.apply(self)
-		}
-		finally {
-			lock.unlock()
+	Public.withLock = function(fn, lock) {
+		var lockName = Sincerity.Objects.isString(lock) ? lock : null
+		return function() {
+			if (null !== lockName) {
+				lock = this[lockName]
+			}
+			lock.lock()
+			try {
+				return fn.apply(this, arguments)
+			}
+			finally {
+				lock.unlock()
+			}
 		}
 	}
-	
+
 	/**
 	 * Returns a JVM charset.
 	 * 
@@ -348,6 +357,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * 
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the bytes are to be encoded
 	 * @see #getCharset
+	 * @see String#toByteArray
 	 */
 	Public.toByteArray = function(string, charset) {
 		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
@@ -485,6 +495,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {Function} fn The function to wrap
 	 * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
 	 * @returns A new JVM task instance
+	 * @see Function#task
 	 */
 	Public.task = function(fn, type) {
 		if (type == 'callable') {
@@ -623,4 +634,29 @@ Sincerity.JVM = Sincerity.JVM || function() {
  */ 
 String.prototype.toByteArray = String.prototype.toBytes || function(charset) {
 	return Sincerity.JVM.toByteArray(this, charset)
+}
+
+/**
+ * Wraps a JavaScript function in a new JVM task instance.
+ * <p>
+ * Supports java.util.concurrent.Callable, java.util.concurrent.RecursiveTask, and java.lang.Runnable.
+ * 
+ * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
+ * @returns A new JVM task instance
+ * @see Sincerity.JVM#task
+ */
+Function.prototype.task = Function.prototype.task || function(type) {
+	return Sincerity.JVM.task(this, type)
+}
+
+/**
+ * Function decorator that adds lock synchronization.
+ * 
+ * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|String} lock The lock or the lock name as an attribute of 'this'
+ * @returns {Function}
+ * @see Sincerity.JVM#newLock
+ * @see Sincerity.JVM#withLock
+ */
+Function.prototype.withLock = Function.prototype.withLock || function(lock) {
+	return Sincerity.JVM.withLock(this, lock)
 }
