@@ -49,9 +49,10 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    	this.ongoingEvents = []
 
 	    	this.endGraphics = '32'
-		    this.failGraphics = '33'
+		    this.failGraphics = '31'
 	    	this.errorGraphics = '31'
-	    	this.ongoingGraphics = '34'
+	    	this.ongoingGraphics = '33'
+	    	this.defaultGraphics = '34'
 
 	    	this.progressLength = 16
 	    	this.progressStart = '['
@@ -109,6 +110,7 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 				this.print(event)
 			}
 			else {
+		    	this.controlSequence(this.defaultGraphics + 'm')
 				this.print(event)
 	    	}
 	    	

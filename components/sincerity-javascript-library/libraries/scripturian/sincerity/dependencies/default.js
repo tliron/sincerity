@@ -357,7 +357,12 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public.fetchModuleTask = function(moduleIdentifier, directory, overwrite, resolver) {
     		var repository = this
     		var task = function() {
-    			repository.fetchModule(moduleIdentifier, directory, overwrite, resolver)
+    			try {
+    				repository.fetchModule(moduleIdentifier, directory, overwrite, resolver)
+    			}
+    			catch (x) {
+    				resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get fetch module: ' + moduleIdentifier.toString()})
+    			}
     		}.task()
     		return this.executor.submit(task)
 	    }
@@ -565,20 +570,20 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @see Sincerity.Dependencies.Resolver#resolveModule
 	     */
 	    Public.resolve = function() {
-			this.eventHandler.handleEvent({message: 'Resolving...'})
-
+	    	var id = Sincerity.Objects.uniqueString()
+			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Resolving all modules'})
 			// Resolve explicit modules
 			var pool = new java.util.concurrent.ForkJoinPool(10)
 	    	try {
-				var tasks = []
+	    		var tasks = []
 		    	for (var m in this.explicitModules) {
 		    		var module = this.explicitModules[m]
 		    		var task = this.resolveModuleTask(module, this.repositories, this.rules, true)
 		    		tasks.push(pool.submit(task))
 		    	}
-				for (var t in tasks) {
-					tasks[t].join()
-				}
+	    		for (var t in tasks) {
+	    			tasks[t].join()
+	    		}
 	    	}
 	    	finally {
 	    		pool.shutdown()
@@ -658,13 +663,18 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    			this.replaceModule(module, chosenModule)
 	    		}
 	    	}
+
+			this.eventHandler.handleEvent({type: 'end', id: id, message: 'Resolved all modules'})
 	    }
 	    
 	    /**
 	     * Fetches the resolved modules.
 	     */
 	    Public.fetch = function(directory, parallel, overwrite) {
-	    	var tasks = []
+	    	var id = Sincerity.Objects.uniqueString()
+			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Fetching all modules'})
+
+			var tasks = []
 	    	
 	    	for (var m in this.resolvedModules) {
 	    		var module = this.resolvedModules[m]
@@ -680,6 +690,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			for (var t in tasks) {
 				tasks[t].get()
 			}
+			
+			this.eventHandler.handleEvent({type: 'end', id: id, message: 'Fetched all modules'})
 	    }
 	    
 	    /**
@@ -777,24 +789,19 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 
 			if (recursive) {
 				// Resolve dependencies recursively
-				var inForkJoin = Sincerity.JVM.inForkJoin(), tasks = []
+				var inForkJoin = Sincerity.JVM.inForkJoin()
 
 		    	for (d in module.dependencies) {
 		    		var dependency = module.dependencies[d]
 		    		if (inForkJoin) {
 		    			// Fork
-		    			tasks.push(this.resolveModuleTask(dependency, repositories, rules, true))
+		    			this.resolveModuleTask(dependency, repositories, rules, true).fork()
 		    		}
 		    		else {
 		    			// Do now
 		    			this.resolveModule(dependency, repositories, rules, true)
 		    		}
 		    	}
-
-				// Block until tasks finish
-				for (var t in tasks) {
-					tasks[t].join()
-				}
 			}
 			else {
 				// Add dependencies as is (unresolved)
@@ -815,8 +822,13 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public.resolveModuleTask = function(module, repositories, rules, recursive) {
     		var resolver = this
     		return function() {
-    			resolver.resolveModule(module, repositories, rules, recursive)
-    		}.task('recursiveAction').fork()
+    			try {
+    				resolver.resolveModule(module, repositories, rules, recursive)
+    			}
+    			catch (x) {
+    				resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get resolve module: ' + module.toString()})
+    			}
+    		}.task('recursiveAction')
 	    }
 
 	    return Public
