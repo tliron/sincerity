@@ -24,45 +24,38 @@ function run(command) {
 	}
 }
 
-function ansi() {
-	for (var i in arguments) {
-		print('\x1b[') // ANSI CSI
-		print(arguments[i])
-	}
-}
-
 function test(command) {
 	command.parse = true
 
 	var sincerity = command.sincerity
 	
+	Sincerity.JVM.addShutdownHook(function() {
+		this.out.println('Goodbye...')
+	}, 'shutdown', sincerity)
+	
+	var f = function(msg) {
+		this.out.println('My ' + msg)
+	}.thread('hi', sincerity, 'thread2')
+	f.start()
+
 	var repository = new Sincerity.Dependencies.Maven.Repository({uri: 'file:/Depot/DevRepository/'})
 	var id = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var id2 = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var specification = new Sincerity.Dependencies.Maven.ModuleSpecification('org.jsoup', 'jsoup', '1.8.1')
 	var id3 = new Sincerity.Dependencies.Maven.ModuleIdentifier('com.github.sommeri:less4j:1.15.2')
 	
-	/*print('\n\n')
-	for (var i = 0; i < 10; i++) {
-	  ansi('2A', 'K')
-	  println('hi!' + i)
-	  ansi('K')
-	  println('hello...' + i)
-	  java.lang.Thread.sleep(100)
-	}*/
-	
 	// ForkJoin
 	sincerity.out.println('forkJoin:')
 	var pool = new java.util.concurrent.ForkJoinPool()
 
-	pool.invoke(Sincerity.JVM.task(function() {
+	pool.invoke(function() {
 		sincerity.out.println('In task!')
-	}, 'recursiveAction'))
+	}.task('recursiveAction'))
 	
 	function sumTask(arr, lo, hi) {
 		// Sums in chunks of 1000
 		// See: http://homes.cs.washington.edu/~djg/teachingMaterials/spac/grossmanSPAC_forkJoinFramework.html
-		return Sincerity.JVM.task(function() {
+		return function() {
 			if (hi - lo <= 1000) {
 				var sum = 0
 				for (var i = lo; i < hi; i++) {
@@ -79,7 +72,7 @@ function test(command) {
 				left = left.join().value
 				return {value: left + right}
 			}
-		}, 'recursiveTask')
+		}.task('recursiveTask')
 	}
 	
 	var arr = []
@@ -170,7 +163,7 @@ function test(command) {
 	sincerity.out.println('Resolve:')
 
 	var modules = [
-		{group: 'com.github.sommeri', name: 'less4j-', version: '(,1.15.2)'},
+		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
  		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
  		{group: 'com.fasterxml.jackson', name: 'jackson'},
  		{group: 'com.threecrickets.prudence', name: 'prudence'}
@@ -222,7 +215,7 @@ function test(command) {
 	}
 	
 	// Fetch
-	resolver.fetch('zzz', true, true)
+	resolver.fetch('zzz/libraries/jars', true)
 	
 	resolver.release()
 }

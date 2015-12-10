@@ -62,14 +62,20 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    }
 
 	    Public.handleEvent = function(event) {
-			var terminal = Packages.jline.TerminalFactory.create()
-			try {
-				this.ansi = terminal.ansiSupported
-				this.terminalWidth = terminal.width
-			}
-			finally {
-				terminal.reset()
-			}
+	    	try {
+				var terminal = Packages.jline.TerminalFactory.create()
+				try {
+					this.ansi = terminal.ansiSupported
+					this.terminalWidth = terminal.width
+				}
+				finally {
+					terminal.reset()
+				}
+	    	}
+	    	catch (x) {
+	    		println(x)
+	    		return
+	    	}
 			
 			// Move up before the ongoing block we printed last time
 	    	if (this.ongoingEvents.length) {

@@ -494,29 +494,58 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * 
 	 * @param {Function} fn The function to wrap
 	 * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
+	 * @param [self] The "this" scope
 	 * @returns A new JVM task instance
 	 * @see Function#task
 	 */
-	Public.task = function(fn, type) {
+	Public.task = function(fn, type, self/*, arguments */) {
+		var args = Array.prototype.slice.call(arguments, 3)
 		if (type == 'callable') {
 			return new java.util.concurrent.Callable({
-				call: fn
+				call: function() { return fn.apply(self, args) }
 			})
 		}
 		else if (type == 'recursiveTask') {
 			return new java.util.concurrent.RecursiveTask({
-				compute: fn
+				compute: function() { return fn.apply(self, args) }
 			})
 		}
 		else if (type == 'recursiveAction') {
 			return new java.util.concurrent.RecursiveAction({
-				compute: fn
+				compute: function() { fn.apply(self, args) }
 			})
 		}
 		else { // if (type == 'runnable') {
 			return new java.lang.Runnable({
-				run: fn
+				run: function() { fn.apply(self, args) }
 			})
+		}
+	}
+	
+	/**
+	 * Wraps a JavaScript function in a new JVM thread.
+	 * 
+	 * @param {Function} fn The function to wrap
+	 * @param {String} [name] The thread name
+	 * @param [self] The "this" scope
+	 * @returns A new JVM task instance
+	 * @see Function#thread
+	 */
+	Public.thread = function(fn, name, self/*, arguments */) {
+		var args = Array.prototype.slice.call(arguments, 3)
+		if (Sincerity.Objects.exists(name)) {
+			return new java.lang.Thread(new java.lang.Runnable({
+				run: function() {
+					fn.apply(self, args)
+				}
+			}), name)
+		}
+		else {
+			return new java.lang.Thread(new java.lang.Runnable({
+				run: function() {
+					fn.apply(self, args)
+				}
+			}))
 		}
 	}
 	
@@ -527,6 +556,32 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 */
 	Public.inForkJoin = function() {
 		return java.util.concurrent.ForkJoinTask.inForkJoinPool()		
+	}
+	
+	/**
+	 * Adds a JVM shutdown hook.
+	 * 
+	 * @param {Function} fn The function to call during shutdown
+	 * @param {String} [name] The thread name
+	 * @param [self] The "this" scope
+	 * @returns the token
+	 * @see Sincerity.JVM#removeShutdownHook
+	 * @see Function#addShutdownHook 
+	 */
+	Public.addShutdownHook = function(fn, name, self/*, arguments */) {
+		var token = Public.thread.apply(null, arguments)
+		java.lang.Runtime.runtime.addShutdownHook(token)
+		return token
+	}
+
+	/**
+	 * Removes a previously added shutdown hook.
+	 * 
+	 * @param token The token
+	 * @see Sincerity.JVM#addShutdownHook 
+	 */
+	Public.removeShutdownHook = function(token) {
+		java.lang.Runtime.runtime.removeShutdownHook(token)
 	}
 	
 	/**
@@ -642,11 +697,14 @@ String.prototype.toByteArray = String.prototype.toBytes || function(charset) {
  * Supports java.util.concurrent.Callable, java.util.concurrent.RecursiveTask, and java.lang.Runnable.
  * 
  * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
+ * @param [self] The "this" scope
  * @returns A new JVM task instance
  * @see Sincerity.JVM#task
  */
-Function.prototype.task = Function.prototype.task || function(type) {
-	return Sincerity.JVM.task(this, type)
+Function.prototype.task = Function.prototype.task || function(type, self/*, arguments */) {
+	var args = Array.prototype.slice.call(arguments, 0)
+	args.splice(0, 0, this)
+	return Sincerity.JVM.task.apply(null, args)
 }
 
 /**
@@ -659,4 +717,32 @@ Function.prototype.task = Function.prototype.task || function(type) {
  */
 Function.prototype.withLock = Function.prototype.withLock || function(lock) {
 	return Sincerity.JVM.withLock(this, lock)
+}
+
+/**
+ * Adds a JVM shutdown hook.
+ * 
+ * @param {String} [name] The thread name
+ * @param [self] The "this" scope
+ * @returns the token
+ * @see Sincerity.JVM#addShutdownHook 
+ */
+Function.prototype.addShutdownHook = Function.prototype.addShutdownHook || function(name, self/*, arguments */) {
+	var args = Array.prototype.slice.call(arguments, 0)
+	args.splice(0, 0, this)
+	return Sincerity.JVM.addShutdownHook.apply(null, args)
+}
+
+/**
+ * Wraps a JavaScript function in a new JVM thread.
+ * 
+ * @param {String} [name] The thread name
+ * @param [self] The "this" scope
+ * @returns A new JVM task instance
+ * @see Sincerity.JVM#thread
+ */
+Function.prototype.thread = Function.prototype.thread || function(name, self/*, arguments */) {
+	var args = Array.prototype.slice.call(arguments, 0)
+	args.splice(0, 0, this)
+	return Sincerity.JVM.thread.apply(null, args)
 }

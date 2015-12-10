@@ -58,7 +58,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}
 
 	/**
-	 * A module can have dependencies as well as reasons.
+	 * A module can have dependencies as well as supplicants.
 	 * 
 	 * @class
 	 * @name Sincerity.Dependencies.Module
@@ -74,7 +74,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.repository = null
 	    	this.specification = null
 	    	this.dependencies = []
-	    	this.reasons = []
+	    	this.supplicants = []
 	    }
 	    
 	    /**
@@ -92,41 +92,41 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 
 	    /**
-	     * Adds a new reason if we don't have it already.
+	     * Adds a new supplicant if we don't have it already.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
 	    Public.addReason = function(module) {
 	    	var found = false
-	    	for (var m in this.reasons) {
-	    		var reasonModule = this.reasons[m]
-	    		if (reasonModule.identifier.compare(module.identifier) === 0) {
+	    	for (var m in this.supplicants) {
+	    		var supplicantModule = this.supplicants[m]
+	    		if (supplicantModule.identifier.compare(module.identifier) === 0) {
 	    			found = true
 	    			break
 	    		}
 	    	}
 	    	if (!found) {
-	    		this.reasons.push(module)
+	    		this.supplicants.push(module)
 	    	}
 	    }
 
 	    /**
-	     * Removes a reason if we have it.
+	     * Removes a supplicant if we have it.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
 	    Public.removeReason = function(module) {
-	    	for (var m in this.reasons) {
-	    		var reasonModule = this.reasons[m]
-	    		if (reasonModule.identifier.compare(module.identifier) === 0) {
-	    			this.reasons.splice(m, 1)
+	    	for (var m in this.supplicants) {
+	    		var supplicantModule = this.supplicants[m]
+	    		if (supplicantModule.identifier.compare(module.identifier) === 0) {
+	    			this.supplicants.splice(m, 1)
 	    			break
 	    		}
 	    	}
 	    }
 
 	    /**
-	     * Adds all reasons of another module, and makes us explicit if the other module is explicit.
+	     * Adds all supplicants of another module, and makes us explicit if the other module is explicit.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     * @see Sincerity.Dependencies.Module#addReason
@@ -135,8 +135,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			if (module.explicit) {
 				this.explicit = true
 			}
-	    	for (var m in module.reasons) {
-	    		this.addReason(module.reasons[m])
+	    	for (var m in module.supplicants) {
+	    		this.addReason(module.supplicants[m])
 	    	}
 	    }
 	    
@@ -159,24 +159,26 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * 
 	     * @returns {String} A string representation
 	     */
-	    Public.toString = function() {
+	    Public.toString = function(long) {
 	    	var r = '', prefix = ''
-	    	prefix += this.explicit ? '*' : '+' // explicit?
-	    	prefix += Sincerity.Objects.exists(this.identifier) ? '!' : '?' // resolved?
 	    	if (Sincerity.Objects.exists(this.identifier)) {
 	    		r += 'id=' + this.identifier.toString()
 	    	}
-	    	if (Sincerity.Objects.exists(this.specification)) {
+	    	if ((long || !(Sincerity.Objects.exists(this.identifier))) && Sincerity.Objects.exists(this.specification)) {
 	    		if (r.length) { r += ', ' }
 	    		r += 'spec=' + this.specification.toString()
 	    	}
-	    	if (this.dependencies.length) {
-	    		if (r.length) { r += ', ' }
-	    		r += 'dependencies=' + this.dependencies.length
-	    	}
-	    	if (this.reasons.length) {
-	    		if (r.length) { r += ', ' }
-	    		r += 'reasons=' + this.reasons.length
+	    	if (long) {
+	    		prefix += this.explicit ? '*' : '+' // explicit?
+	    		prefix += Sincerity.Objects.exists(this.identifier) ? '!' : '?' // resolved?
+		    	if (this.dependencies.length) {
+		    		if (r.length) { r += ', ' }
+		    		r += 'dependencies=' + this.dependencies.length
+		    	}
+		    	if (this.supplicants.length) {
+		    		if (r.length) { r += ', ' }
+		    		r += 'supplicants=' + this.supplicants.length
+		    	}
 	    	}
 	    	if (prefix.length) {
 	    		r = prefix + ' ' + r
@@ -184,18 +186,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	return r
 	    }
 	    
-	    Public.dump = function(out, recursive, indent) {
-	    	indent = indent || 0
-	    	for (var i = indent; i > 0; i--) {
-	    		out.print(' ')
-	    	}
-	    	out.println(this.toString())
-	    	if (recursive) {
-		    	for (var m in this.dependencies) {
-		    		var module = this.dependencies[m]
-		    		module.dump(out, true, indent + 1)
-		    	}
-	    	}
+	    Public.dump = function(out, withDependencies, indent) {
+	    	Module.printTree(out, this, function(module) { return module.toString(!withDependencies) }, withDependencies ? function(module) { return module.dependencies } : null, indent)
 	    }
 
 	    return Public
@@ -335,8 +327,20 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 	    
 	    Public.release = function() {
+    		var token = Sincerity.JVM.addShutdownHook(function() {
+    			this.executor.shutdownNow()
+    		}, this)
 	    	this.executor.shutdown()
-	    	//this.executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)
+    		try {
+    			this.executor.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
+    		}
+    		catch (x) {
+    			this.executor.shutdownNow()
+    			java.lang.Thread.currentThread().interrupt()
+    		}
+    		finally {
+    			Sincerity.JVM.removeShutdownHook(token)
+    		}
 	    }
 	    
 	    Public.hasModule = function(moduleIdentifier) {
@@ -354,7 +358,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, resolver) {
 	    }
 
-	    Public.fetchModuleTask = function(moduleIdentifier, directory, overwrite, resolver) {
+	    Public.fetchModuleFuture = function(moduleIdentifier, directory, overwrite, resolver) {
     		var repository = this
     		var task = function() {
     			try {
@@ -572,22 +576,31 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public.resolve = function() {
 	    	var id = Sincerity.Objects.uniqueString()
 			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Resolving all modules'})
+			
 			// Resolve explicit modules
 			var pool = new java.util.concurrent.ForkJoinPool(10)
 	    	try {
-	    		var tasks = []
 		    	for (var m in this.explicitModules) {
 		    		var module = this.explicitModules[m]
 		    		var task = this.resolveModuleTask(module, this.repositories, this.rules, true)
-		    		tasks.push(pool.submit(task))
+		    		pool.submit(task)
 		    	}
-	    		for (var t in tasks) {
-	    			tasks[t].join()
-	    		}
 	    	}
 	    	finally {
 	    		pool.shutdown()
-	    		pool.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
+	    		var token = Sincerity.JVM.addShutdownHook(function() {
+	    			pool.shutdownNow()
+	    		})
+	    		try {
+	    			pool.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
+	    		}
+	    		catch (x) {
+	    			pool.shutdownNow()
+	    			java.lang.Thread.currentThread().interrupt()
+	    		}
+	    		finally {
+	    			Sincerity.JVM.removeShutdownHook(token)
+	    		}
 	    	}
 	    	
 	    	// Sort resolved modules
@@ -655,7 +668,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 
 				this.eventHandler.handleEvent({message: 'Resolved conflict: ' + chosenModule.identifier.toString()})
 
-	    		// Merge all reasons into chosen module, and remove non-chosen modules from resolvedModules
+	    		// Merge all supplicants into chosen module, and remove non-chosen modules from resolvedModules
 	    		for (var m in conflicts) {
 	    			var module = conflicts[m]
 	    			chosenModule.merge(module)
@@ -670,26 +683,40 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    /**
 	     * Fetches the resolved modules.
 	     */
-	    Public.fetch = function(directory, parallel, overwrite) {
+	    Public.fetch = function(directory, overwrite, parallel) {
+	    	parallel = Sincerity.Objects.ensure(parallel, true)
+	    	
 	    	var id = Sincerity.Objects.uniqueString()
 			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Fetching all modules'})
 
-			var tasks = []
+			var futures = []
 	    	
 	    	for (var m in this.resolvedModules) {
 	    		var module = this.resolvedModules[m]
 	    		if (parallel) {
-	    			tasks.push(module.repository.fetchModuleTask(module.identifier, directory, overwrite, this))
+	    			futures.push(module.repository.fetchModuleFuture(module.identifier, directory, overwrite, this))
 	    		}
 	    		else {
 	    			module.repository.fetchModule(module.identifier, directory, overwrite, this)
 	    		}
 	    	}
 	    	
-			// Block until tasks finish
-			for (var t in tasks) {
-				tasks[t].get()
+			// Block until futures finish
+    		var token = Sincerity.JVM.addShutdownHook(function() {
+    			this.release()
+    		}, this)
+			try {
+				for (var f in futures) {
+					futures[f].get(1, java.util.concurrent.TimeUnit.HOURS)
+				}
 			}
+    		catch (x) {
+    			this.release()
+    			java.lang.Thread.currentThread().interrupt()
+    		}
+    		finally {
+    			Sincerity.JVM.removeShutdownHook(token)
+    		}
 			
 			this.eventHandler.handleEvent({type: 'end', id: id, message: 'Fetched all modules'})
 	    }
@@ -735,7 +762,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 					exclude = true
 				}
 				else if (command == 'excludeDependencies') {
-					this.eventHandler.handleEvent({message: 'Excluding dependencies: ' + module.specification.toString()})
+					this.eventHandler.handleEvent({message: 'Excluding dependencies for: ' + module.specification.toString()})
 					recursive = false
 				}
 			}
@@ -912,6 +939,67 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    return Public
 	}(Public))
 
+    Public.printTree = function(out, item, getLineFn, getChildrenFn, indent, patterns, seal) {
+    	indent = indent || 0
+    	patterns = patterns || []
+
+    	// Indent
+    	for (var i = indent; i > 0; i--) {
+    		out.print(' ')
+    	}
+
+    	// Patterns
+    	var patternsLength = patterns.length
+    	if (patternsLength) {
+	    	for (var p in patterns) {
+	    		var pattern = patterns[p]
+	    		if (p == patternsLength - 1) {
+					// Last pattern depends on whether we are sealing
+					if (seal) {
+						pattern = patternsLength < 2 ? tree.L : tree._L
+					}
+					else {
+						pattern = patternsLength < 2 ? tree.T : tree._T
+					}
+	    		}
+				out.print(pattern)
+	    	}
+	    	out.print(tree.VV)
+	    	if (seal) {
+				// Erase the pattern after it was sealed
+				patterns[patternsLength - 1] = patternsLength < 2 ? '  ' : '    '
+	    	}
+    	}
+    	
+    	// Item
+    	out.println(getLineFn(item))
+    	
+    	// Recurse
+    	if (getChildrenFn) {
+    		var children = getChildrenFn(item)
+	    	var childrenLength = children ? children.length : 0
+	    	if (childrenLength) {
+	    		patterns.push(!patternsLength ? tree.I : tree._I)
+	    		for (var c in children) {
+		    		var child = children[c]
+		    		Public.printTree(out, child, getLineFn, getChildrenFn, indent, patterns, c == childrenLength - 1)
+	    		}
+	    		patterns.pop()
+	    	}
+    	}
+    }
+
+    var tree = {}
+	tree.L = ' \u2514'
+	tree._L = '  ' + tree.L;
+	tree.T = ' \u251C'
+	tree._T = '  ' + tree.T;
+	tree.I = ' \u2502'
+	tree._I = '  ' + tree.I;
+	tree.VV = '\u2500\u2500'
+	tree.LVV = tree.L + tree.VV;
+	tree.TVV = tree.T + tree.VV;
+	
 	return Public
 }()
 

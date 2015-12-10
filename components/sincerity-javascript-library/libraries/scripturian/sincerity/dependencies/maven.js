@@ -430,28 +430,40 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, resolver) {
 	    	var uri = this.getUri(moduleIdentifier, 'jar')
 	    	var file = this.getModuleFile(moduleIdentifier, directory)
+
+	    	var downloading = overwrite || !file.exists()
+
+	    	var id = Sincerity.Objects.uniqueString()
+	    	if (downloading) {
+	    		resolver.eventHandler.handleEvent({type: 'begin', id: id, message: 'Downloading: ' + uri, progress: 0})
+	    	}
+	    	else {
+	    		resolver.eventHandler.handleEvent({type: 'begin', id: id, message: 'Validating: ' + file})
+	    	}
+
 	    	var signature = this.getSignature(uri)
 	    	
-	    	if (overwrite || !file.exists()) {
+	    	if (downloading) {
 		    	file.parentFile.mkdirs()
-		    	var id = Sincerity.Objects.uniqueString()
-		    	resolver.eventHandler.handleEvent({type: 'begin', id: id, progress: 0, message: 'Downloading: ' + uri})
 		    	Sincerity.IO.download(uri, file)
 		    	for (var i = 0; i <= 100; i += 10) {
 			    	resolver.eventHandler.handleEvent({type: 'update', id: id, progress: i / 100})
 		    		Sincerity.JVM.sleep(100) // :)
 		    	}
-		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Downloaded: ' + uri})
+		    	resolver.eventHandler.handleEvent({type: 'update', id: id, message: 'Validating: ' + file})
 	    	}
 
-	    	var id = Sincerity.Objects.uniqueString()
-	    	resolver.eventHandler.handleEvent({type: 'begin', id: id, message: 'Verifying: ' + file})
 	    	Sincerity.JVM.sleep(300) // :)
 	    	if (this.isSignatureValid(file, signature)) {
-		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Verified: ' + file})
+		    	if (downloading) {
+		    		resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Downloaded: ' + file})
+		    	}
+		    	else {
+		    		resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'Validated: ' + file})
+		    	}
 	    	}
 	    	else {
-		    	resolver.eventHandler.handleEvent({type: 'end', id: id, message: 'File does not match signature: ' + file})
+		    	resolver.eventHandler.handleEvent({type: 'fail', id: id, message: 'File does not match signature: ' + file})
 	    		file['delete']()
 	    		// throw ':('
 	    	}
