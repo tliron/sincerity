@@ -28,7 +28,38 @@ var Sincerity = Sincerity || {}
 Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	/** @exports Public as Sincerity.Dependencies */
 	var Public = {}
+
+	Public.registerHooks = function(out) {
+		java.lang.Thread.defaultUncaughtExceptionHandler = function(thread, throwable) {
+			this.println('Uncaught exception: ' + throwable)
+		}.toUncaughtExceptionHandler(out)
 	
+		Sincerity.JVM.addShutdownHook(function() {
+	    	this.println('Shutting down... ')
+	    	
+	    	// Cleanly shutdown all pools
+			for (var p in pools) {
+				pools[p].shutdownNow()
+			}
+	    	
+	    	// Interrupt all non-daemon threads
+			for (var i = java.lang.Thread.allStackTraces.keySet().iterator(); i.hasNext(); ) {
+				var thread = i.next()
+				if (!thread.daemon) {
+					this.println(thread)
+					var trace = thread.stackTrace
+					for (var t in trace) {
+						//this.println('  ' + trace[t])
+					}
+					//thread.interrupt()
+				}
+			}
+			
+	    	this.println('done!')
+	    	java.lang.Runtime.runtime.halt(0)
+		}, 'Sincerity.Dependencies Shutdown Hook', out)
+	}
+
 	/**
 	 * Creates a repository instance.
 	 * 
@@ -71,7 +102,6 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public._construct = function() {
 	    	this.explicit = false
 	    	this.identifier = null
-	    	this.repository = null
 	    	this.specification = null
 	    	this.dependencies = []
 	    	this.supplicants = []
@@ -84,7 +114,6 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     */
 	    Public.copyResolutionFrom = function(module) {
 	    	this.identifier = module.identifier.clone()
-	    	this.repository = module.repository
 	    	this.dependencies = []
 	    	for (var m in module.dependencies) {
 	    		this.dependencies.push(module.dependencies[m])
@@ -145,7 +174,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	for (var m in this.dependencies) {
 	    		var module = this.dependencies[m]
 	    		if (module.identifier && (module.identifier.compare(oldModule.identifier) === 0)) {
-	    			module = this.dependencies[d] = newModule
+	    			module = this.dependencies[m] = newModule
 	    			module.addReason(this)
 	    		}
 	    		if (recursive) {
@@ -187,7 +216,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 	    
 	    Public.dump = function(out, withDependencies, indent) {
-	    	Module.printTree(out, this, function(module) { return module.toString(!withDependencies) }, withDependencies ? function(module) { return module.dependencies } : null, indent)
+	    	printTree(out, this, function(module) { return module.toString(!withDependencies) }, withDependencies ? function(module) { return module.dependencies } : null, indent)
 	    }
 
 	    return Public
@@ -322,25 +351,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    /** @ignore */
 	    Public._construct = function(config) {
 	    	config = config || {}
+	    	this.id = config.id || 0
 	    	var parallelism = config.parallelism || 5
-	    	this.executor = java.util.concurrent.Executors.newFixedThreadPool(parallelism)
-	    }
-	    
-	    Public.release = function() {
-    		var token = Sincerity.JVM.addShutdownHook(function() {
-    			this.executor.shutdownNow()
-    		}, this)
-	    	this.executor.shutdown()
-    		try {
-    			this.executor.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
-    		}
-    		catch (x) {
-    			this.executor.shutdownNow()
-    			java.lang.Thread.currentThread().interrupt()
-    		}
-    		finally {
-    			Sincerity.JVM.removeShutdownHook(token)
-    		}
+	    	this.executor = newExecutor(parallelism)
 	    }
 	    
 	    Public.hasModule = function(moduleIdentifier) {
@@ -359,19 +372,18 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 
 	    Public.fetchModuleFuture = function(moduleIdentifier, directory, overwrite, resolver) {
-    		var repository = this
     		var task = function() {
     			try {
-    				repository.fetchModule(moduleIdentifier, directory, overwrite, resolver)
+    				this.fetchModule(moduleIdentifier, directory, overwrite, resolver)
     			}
     			catch (x) {
-    				resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get fetch module: ' + moduleIdentifier.toString()})
+    				resolver.eventHandler.handleEvent({type: 'error', message: 'Fetch error for ' + moduleIdentifier.toString() + ': ' + x.message, exception: x})
     			}
-    		}.task()
+    		}.toTask(null, this)
     		return this.executor.submit(task)
 	    }
 
-	    Public.applyModuleRule = function(module, rule) {
+	    Public.applyModuleRule = function(module, rule, resolver) {
 	    	return false
 	    }
 
@@ -390,7 +402,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @returns {String} A string representation
 	     */
 	    Public.toString = function() {
-	    	return ''
+	    	return 'id=' + this.id
 	    }
 
 	    return Public
@@ -434,12 +446,15 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	this.resolvedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
 	    	
 	    	this.eventHandler = new Sincerity.Dependencies.EventHandlers()
+	    	
+	    	this.forkJoinPool = newForkJoinPool(10)
 	    }
 	    
-	    Public.release = function() {
-	    	for (var r in this.repositories) {
-	    		this.repositories[r].release()
+	    Public.fireEvent = function(event) {
+	    	if (Sincerity.Objects.isString(event)) {
+	    		event = {message: event}
 	    	}
+	    	this.eventHandler.handleEvent(event)
 	    }
 	    
 	    /**
@@ -474,6 +489,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	var repositories = []
 	    	for (var r in repositoryConfigs) {
 	    		var repositoryConfig = repositoryConfigs[r]
+	    		repositoryConfig.id = repositoryConfig.id || r
 	    		var repository = Module.createRepository(repositoryConfig, this.defaultPlatform)
 	    		repositories.push(repository)
 	    	}
@@ -575,33 +591,15 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     */
 	    Public.resolve = function() {
 	    	var id = Sincerity.Objects.uniqueString()
-			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Resolving all modules'})
+			this.fireEvent({type: 'begin', id: id, message: 'Resolving all modules'})
 			
 			// Resolve explicit modules
-			var pool = new java.util.concurrent.ForkJoinPool(10)
-	    	try {
-		    	for (var m in this.explicitModules) {
-		    		var module = this.explicitModules[m]
-		    		var task = this.resolveModuleTask(module, this.repositories, this.rules, true)
-		    		pool.submit(task)
-		    	}
+			var tasks = []
+	    	for (var m in this.explicitModules) {
+	    		var module = this.explicitModules[m]
+	    		tasks.push(this.resolveModuleTask(module, true))
 	    	}
-	    	finally {
-	    		pool.shutdown()
-	    		var token = Sincerity.JVM.addShutdownHook(function() {
-	    			pool.shutdownNow()
-	    		})
-	    		try {
-	    			pool.awaitTermination(1, java.util.concurrent.TimeUnit.HOURS)
-	    		}
-	    		catch (x) {
-	    			pool.shutdownNow()
-	    			java.lang.Thread.currentThread().interrupt()
-	    		}
-	    		finally {
-	    			Sincerity.JVM.removeShutdownHook(token)
-	    		}
-	    	}
+			this.forkJoinPool.invokeAll(Sincerity.JVM.toList(tasks))
 	    	
 	    	// Sort resolved modules
 	    	this.resolvedModules.sort(function(module1, module2) {
@@ -613,7 +611,195 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		return module1.specification.toString().localeCompare(module2.specification.toString())
 	    	})
 	    	
-	    	// Find conflicts
+	    	this.findConflicts()
+	    	this.resolveConflicts()
+
+			this.fireEvent({type: 'end', id: id, message: 'Resolved all modules'})
+	    }
+	    
+	    /**
+	     * Resolves a module, optionally resolving its dependencies recursively (supporting fork/join
+	     * parallelism).
+	     * <p>
+	     * "Resolving" means finding the best identifier available from all the repositories
+	     * that matches the specification. A successful resolution means that the module has
+	     * an identifier. An unresolved module has only a specification, but no identifier.
+	     * <p>
+	     * A cache of resolved modules is maintained in the resolver to avoid resolving
+	     * the same module twice.
+	     *
+	     * @param {Sincerity.Dependencies.Module} module
+	     * @param {Boolean} [recursive=false]
+	     */
+	    Public.resolveModule = function(module, recursive) {
+	    	var repositories = Sincerity.Objects.clone(this.repositories, false)
+	    	var exclude = false
+	    	
+	    	// Apply rules
+			for (var r in this.rules) {
+				var rule = this.rules[r]
+				var command = null
+				
+				// Try repositories
+				var repository
+				for (var rr in this.repositories) {
+					repository = this.repositories[rr]
+					command = repository.applyModuleRule(module, rule, this)
+    				if (command) {
+    					break
+    				}
+    			}
+				
+				if (null === command) {
+					this.fireEvent({type: 'error', message: 'Unsupported rule: ' + rule.type})
+					continue
+				}
+
+				if (true === command) {
+					continue
+				}
+
+				if (Sincerity.Objects.isString(command)) {
+					command = {type: command}
+				}
+
+				// Do command
+				if (command.type == 'excludeModule') {
+					this.fireEvent('Excluded ' + module.specification.toString())
+					exclude = true
+				}
+				else if (command.type == 'excludeDependencies') {
+					this.fireEvent('Excluded dependencies for ' + module.specification.toString())
+					recursive = false
+				}
+				else if (command.type == 'setRepositories') {
+					repositories = []
+					for (var i in command.repositories) {
+						var id = command.repositories[i]
+						var found = false
+						for (var rr in this.repositories) {
+							var repository = this.repositories[rr]
+							if (repository.id == id) {
+								repositories.push(repository)
+								found = true
+								break
+							}
+						}
+						if (!found) {
+							this.fireEvent({type: 'error', message: 'Unknown repository: ' + id})
+						}
+					}
+					var ids = []
+					for (var rr in repositories) {
+						var repository = repositories[rr]
+						ids.push(repository.id)
+					}
+					this.fireEvent('Forced ' + module.specification.toString() + ' to resolve in ' + ids.join(', ') + (ids.length > 1 ? ' repositories' : ' repository'))
+				}
+				else {
+					this.fireEvent({type: 'error', message: 'Unsupported command: ' + command.type})
+				}
+			}
+
+    		if (Sincerity.Objects.exists(module.identifier)) {
+    			// Already resolved
+    		}
+    		else if (!exclude && Sincerity.Objects.exists(module.specification)) {
+				// Check to see if we've already resolved it
+    			var resolvedModule = this.getResolvedModule(module.specification)
+    			if (!resolvedModule) {
+    				var id = Sincerity.Objects.uniqueString()
+    				
+	    			// Gather allowed module identifiers from all repositories
+					this.fireEvent({type: 'begin', id: id, message: 'Resolving ' + module.specification.toString()})
+					
+    				var moduleIdentifiers = []
+		    		for (var r in repositories) {
+			    		var repository = repositories[r]
+			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification, this)
+			    		
+			    		// Note: the first repository to report an identifier will "win," the following repositories will have their reports discarded
+			    		moduleIdentifiers = Sincerity.Objects.concatUnique(moduleIdentifiers, allowedModuleIdentifiers, function(moduleIdentifier1, moduleIdentifier2) {
+			    			return moduleIdentifier1.compare(moduleIdentifier2) === 0
+			    		})
+			    	}
+
+    				// Pick the best module identifier
+		    		if (moduleIdentifiers.length) {
+		    			moduleIdentifiers.sort(function(moduleIdentifier1, moduleIdentifier2) {
+			    			// Reverse newness order
+			    			return moduleIdentifier2.compare(moduleIdentifier1)
+			    		})
+			    		
+			    		// Best module is first (newest)
+			    		var resolvedModuleIdentifier = moduleIdentifiers[0]
+		    			resolvedModule = resolvedModuleIdentifier.repository.getModule(resolvedModuleIdentifier, this)
+
+		    			if (resolvedModule) {
+		    				this.fireEvent({type: 'end', id: id, message: 'Resolved ' + resolvedModule.identifier.toString() + ' in ' + resolvedModule.identifier.repository.id + ' repository'})
+		    			}
+		    			else {
+							this.fireEvent({type: 'fail', id: id, message: 'Could not get module ' + resolvedModuleIdentifier.toString() + ' from ' + resolvedModuleIdentifier.repository.id + ' repository'})
+		    			}
+		    		}
+		    		else {
+						this.fireEvent({type: 'fail', id: id, message: 'Could not resolve ' + module.specification.toString()})
+		    		}
+    			}
+
+    			if (resolvedModule) {
+					module.copyResolutionFrom(resolvedModule)
+    			}
+    		}
+
+			this.addModule(module)
+
+			if (recursive) {
+				// Resolve dependencies recursively
+				var pool = java.util.concurrent.ForkJoinTask.pool
+				var tasks = []
+		    	for (d in module.dependencies) {
+		    		var dependency = module.dependencies[d]
+		    		if (null !== pool) {
+		    			// Fork
+		    			tasks.push(this.resolveModuleTask(dependency, true))
+		    		}
+		    		else {
+		    			// Do now
+		    			this.resolveModule(dependency, true)
+		    		}
+		    	}
+	    		if (tasks.length) {
+	    			pool.invokeAll(Sincerity.JVM.toList(tasks))
+	    		}
+			}
+			else {
+				// Add dependencies as is (unresolved)
+		    	for (d in module.dependencies) {
+		    		this.addModule(module.dependencies[d])
+		    	}				
+			}
+	    }
+
+	    /**
+	     *
+	     * @param {Sincerity.Dependencies.Module} module
+	     * @param {Boolean} [recursive=false]
+	     * @returns {java.util.concurrent.RecursiveAction}
+	     */
+	    Public.resolveModuleTask = function(module, recursive) {
+    		return function() {
+    			try {
+    				this.resolveModule(module, recursive)
+    			}
+    			catch (x) {
+    				this.fireEvent({type: 'error', message: 'Resolve error for ' + module.specification.toString() + ': ' + x.message, exception: x})
+    			}
+    			return null
+    		}.toTask('callable', this)
+	    }
+
+	    Public.findConflicts = function() {
 	    	var potentialConflicts = []
 	    	for (var m in this.resolvedModules) {
 	    		potentialConflicts.push(this.resolvedModules[m])
@@ -634,7 +820,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		}
 	    	}
 	    	
-	    	// Sort conflicts
+	    	// Sort
 	    	for (var c in this.conflicts) {
 	    		var conflicts = this.conflicts[c]
 	    		conflicts.sort(function(module1, module2) {
@@ -642,8 +828,9 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    			return module2.identifier.compare(module1.identifier)
 	    		})
 	    	}
-	    	
-	    	// Resolve conflicts
+	    }
+	    
+	    Public.resolveConflicts = function() {
 	    	for (var c in this.conflicts) {
 	    		var conflicts = []
 	    		for (var m in this.conflicts[c]) {
@@ -659,14 +846,14 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    			chosenModuleIndex = conflicts.length - 1
 	    		}
 	    		else {
-	    			// TODO
+					this.fireEvent({type: 'error', message: 'Unsupported conflict policy: ' + this.conflictPolicy})
 	    			continue
 	    		}
 	    		
 	    		var chosenModule = conflicts[chosenModuleIndex]
 	    		conflicts.splice(chosenModuleIndex, 1)
 
-				this.eventHandler.handleEvent({message: 'Resolved conflict: ' + chosenModule.identifier.toString()})
+				this.fireEvent('Resolved conflict to ' + chosenModule.identifier.toString() + ' in ' + chosenModule.identifier.repository.id + ' repository')
 
 	    		// Merge all supplicants into chosen module, and remove non-chosen modules from resolvedModules
 	    		for (var m in conflicts) {
@@ -676,10 +863,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    			this.replaceModule(module, chosenModule)
 	    		}
 	    	}
-
-			this.eventHandler.handleEvent({type: 'end', id: id, message: 'Resolved all modules'})
 	    }
-	    
+
 	    /**
 	     * Fetches the resolved modules.
 	     */
@@ -687,177 +872,36 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	parallel = Sincerity.Objects.ensure(parallel, true)
 	    	
 	    	var id = Sincerity.Objects.uniqueString()
-			this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Fetching all modules'})
+			this.fireEvent({type: 'begin', id: id, message: 'Fetching all modules'})
 
 			var futures = []
 	    	
 	    	for (var m in this.resolvedModules) {
 	    		var module = this.resolvedModules[m]
 	    		if (parallel) {
-	    			futures.push(module.repository.fetchModuleFuture(module.identifier, directory, overwrite, this))
+	    			futures.push(module.identifier.repository.fetchModuleFuture(module.identifier, directory, overwrite, this))
 	    		}
 	    		else {
-	    			module.repository.fetchModule(module.identifier, directory, overwrite, this)
+	    			module.identifier.repository.fetchModule(module.identifier, directory, overwrite, this)
 	    		}
 	    	}
 	    	
 			// Block until futures finish
-    		var token = Sincerity.JVM.addShutdownHook(function() {
-    			this.release()
-    		}, this)
-			try {
+			//try {
 				for (var f in futures) {
 					futures[f].get(1, java.util.concurrent.TimeUnit.HOURS)
 				}
-			}
+			/*}
     		catch (x) {
     			this.release()
-    			java.lang.Thread.currentThread().interrupt()
-    		}
-    		finally {
-    			Sincerity.JVM.removeShutdownHook(token)
-    		}
+    			if (Sincerity.JVM.isException(x, java.lang.InterruptedException)) {
+    				java.lang.Thread.currentThread().interrupt()
+    			}
+    		}*/
 			
-			this.eventHandler.handleEvent({type: 'end', id: id, message: 'Fetched all modules'})
+			this.fireEvent({type: 'end', id: id, message: 'Fetched all modules'})
 	    }
 	    
-	    /**
-	     * Resolves a module, optionally resolving its dependencies recursively (supporting fork/join
-	     * parallelism).
-	     * <p>
-	     * "Resolving" means finding the best identifier available from all the repositories
-	     * that matches the specification. A successful resolution means that the module has
-	     * an identifier. An unresolved module has only a specification, but no identifier.
-	     * <p>
-	     * A cache of resolved modules is maintained in the resolver to avoid resolving
-	     * the same module twice.
-	     *
-	     * @param {Sincerity.Dependencies.Module} module
-	     * @param {Sincerity.Dependencies.Repository[]} repositories
-	     * @param {Object[]} rules
-	     * @param {Boolean} [recursive=false]
-	     */
-	    Public.resolveModule = function(module, repositories, rules, recursive) {
-	    	var exclude = false
-	    	
-	    	// Apply rules
-			for (var r in rules) {
-				var rule = rules[r]
-				var command = null
-				
-				// Try repositories
-				for (var rr in repositories) {
-					var repository = repositories[rr]
-					command = repository.applyModuleRule(module, rule)
-    				if (command) {
-    					break
-    				}
-    			}
-
-				if (null === command) {
-					// TODO: unsupported rule warning
-				}
-				else if (command == 'exclude') {
-					this.eventHandler.handleEvent({message: 'Excluding: ' + module.specification.toString()})
-					exclude = true
-				}
-				else if (command == 'excludeDependencies') {
-					this.eventHandler.handleEvent({message: 'Excluding dependencies for: ' + module.specification.toString()})
-					recursive = false
-				}
-			}
-
-    		if (Sincerity.Objects.exists(module.identifier)) {
-    			// Already resolved
-    		}
-    		else if (!exclude && Sincerity.Objects.exists(module.specification)) {
-				// Check to see if we've already resolved it
-    			var resolvedModule = this.getResolvedModule(module.specification)
-    			if (!resolvedModule) {
-    				var id = Sincerity.Objects.uniqueString()
-    				
-	    			// Gather allowed module identifiers from all repositories
-					this.eventHandler.handleEvent({type: 'begin', id: id, message: 'Resolving: ' + module.specification.toString()})
-					
-    				var moduleIdentifiers = []
-		    		for (var r in repositories) {
-			    		var repository = repositories[r]
-			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification, this)
-			    		
-			    		// Note: the first repository to report an identifier will "win," the following repositories will have their reports discarded
-			    		moduleIdentifiers = Sincerity.Objects.concatUnique(moduleIdentifiers, allowedModuleIdentifiers, function(moduleIdentifier1, moduleIdentifier2) {
-			    			return moduleIdentifier1.compare(moduleIdentifier2) === 0
-			    		})
-			    	}
-
-    				// Pick the best module identifier
-		    		if (moduleIdentifiers.length > 0) {
-		    			moduleIdentifiers.sort(function(moduleIdentifier1, moduleIdentifier2) {
-			    			// Reverse newness order
-			    			return moduleIdentifier2.compare(moduleIdentifier1)
-			    		})
-			    		
-			    		// Best module is first (newest)
-		    			resolvedModule = repository.getModule(moduleIdentifiers[0])
-
-						this.eventHandler.handleEvent({type: 'end', id: id, message: 'Resolved: ' + resolvedModule.identifier.toString()})
-		    		}
-		    		else {
-						this.eventHandler.handleEvent({type: 'fail', id: id, message: 'Unresolved: ' + module.specification.toString()})
-		    		}
-    			}
-
-    			if (resolvedModule) {
-					module.copyResolutionFrom(resolvedModule)
-    			}
-    		}
-
-			this.addModule(module)
-
-			if (recursive) {
-				// Resolve dependencies recursively
-				var inForkJoin = Sincerity.JVM.inForkJoin()
-
-		    	for (d in module.dependencies) {
-		    		var dependency = module.dependencies[d]
-		    		if (inForkJoin) {
-		    			// Fork
-		    			this.resolveModuleTask(dependency, repositories, rules, true).fork()
-		    		}
-		    		else {
-		    			// Do now
-		    			this.resolveModule(dependency, repositories, rules, true)
-		    		}
-		    	}
-			}
-			else {
-				// Add dependencies as is (unresolved)
-		    	for (d in module.dependencies) {
-		    		this.addModule(module.dependencies[d])
-		    	}				
-			}
-	    }
-
-	    /**
-	     *
-	     * @param {Sincerity.Dependencies.Module} module
-	     * @param {Sincerity.Dependencies.Repository[]} repositories
-	     * @param {Object[]} rules
-	     * @param {Boolean} [recursive=false]
-	     * @returns {java.util.concurrent.RecursiveAction}
-	     */
-	    Public.resolveModuleTask = function(module, repositories, rules, recursive) {
-    		var resolver = this
-    		return function() {
-    			try {
-    				resolver.resolveModule(module, repositories, rules, recursive)
-    			}
-    			catch (x) {
-    				resolver.eventHandler.handleEvent({type: 'error', message: 'Could not get resolve module: ' + module.toString()})
-    			}
-    		}.task('recursiveAction')
-	    }
-
 	    return Public
 	}(Public))
 
@@ -939,7 +983,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    return Public
 	}(Public))
 
-    Public.printTree = function(out, item, getLineFn, getChildrenFn, indent, patterns, seal) {
+    function printTree(out, item, getLineFn, getChildrenFn, indent, patterns, seal) {
     	indent = indent || 0
     	patterns = patterns || []
 
@@ -982,12 +1026,38 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		patterns.push(!patternsLength ? tree.I : tree._I)
 	    		for (var c in children) {
 		    		var child = children[c]
-		    		Public.printTree(out, child, getLineFn, getChildrenFn, indent, patterns, c == childrenLength - 1)
+		    		printTree(out, child, getLineFn, getChildrenFn, indent, patterns, c == childrenLength - 1)
 	    		}
 	    		patterns.pop()
 	    	}
     	}
     }
+	
+	function newForkJoinPool(parallelism) {
+		var pool = new java.util.concurrent.ForkJoinPool(parallelism, new java.util.concurrent.ForkJoinPool.ForkJoinWorkerThreadFactory({
+			newThread: function(pool) {
+				var thread = java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool)
+    			thread.daemon = true
+    			return thread
+			}
+		}), null, false)
+		pools.push(pool)
+		return pool
+	}
+	
+	function newExecutor(parallelism) {
+    	var pool = java.util.concurrent.Executors.newFixedThreadPool(parallelism, new java.util.concurrent.ThreadFactory({
+    		newThread: function(runnable) {
+    			var thread = java.util.concurrent.Executors.defaultThreadFactory().newThread(runnable)
+    			thread.daemon = true
+    			return thread
+    		}
+    	}))
+		pools.push(pool)
+		return pool
+	}
+	
+	var pools = []
 
     var tree = {}
 	tree.L = ' \u2514'

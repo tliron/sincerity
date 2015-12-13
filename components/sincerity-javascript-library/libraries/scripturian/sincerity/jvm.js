@@ -49,10 +49,14 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * 
 	 * @returns {String} The stack trace (multi-line, human-readable)
 	 */
-	Public.getStackTrace = function(exception) {
+	Public.getStackTrace = function(x) {
+		x = x.javaException || x
+		if (!Sincerity.Objects.exists(x.printStackTrace)) {
+			return ''
+		}
 		var string = new java.io.StringWriter()
 		var writer = new java.io.PrintWriter(string)
-		exception.printStackTrace(writer)
+		x.printStackTrace(writer)
 		writer.close()
 		return String(string)
 	}
@@ -496,9 +500,9 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
 	 * @param [self] The "this" scope
 	 * @returns A new JVM task instance
-	 * @see Function#task
+	 * @see Function#asTask
 	 */
-	Public.task = function(fn, type, self/*, arguments */) {
+	Public.toTask = function(fn, type, self/*, arguments */) {
 		var args = Array.prototype.slice.call(arguments, 3)
 		if (type == 'callable') {
 			return new java.util.concurrent.Callable({
@@ -529,9 +533,9 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @param {String} [name] The thread name
 	 * @param [self] The "this" scope
 	 * @returns A new JVM task instance
-	 * @see Function#thread
+	 * @see Function#asThread
 	 */
-	Public.thread = function(fn, name, self/*, arguments */) {
+	Public.toThread = function(fn, name, self/*, arguments */) {
 		var args = Array.prototype.slice.call(arguments, 3)
 		if (Sincerity.Objects.exists(name)) {
 			return new java.lang.Thread(new java.lang.Runnable({
@@ -548,14 +552,21 @@ Sincerity.JVM = Sincerity.JVM || function() {
 			}))
 		}
 	}
-	
+
 	/**
-	 * Checks if we are in a fork/join pool thread.
+	 * Wraps a JavaScript function in a JVM uncaught exception handler.
 	 * 
-	 * @returns {Boolean} true if in fork/join pool thread
+	 * @param {Function} fn The function to call, accepts Thread, Throwable
+	 * @param [self] The "this" scope
+	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Thread.UncaughtExceptionHandler.html">java.lang.Thread.UncaughtExceptionHandler</a>}
+	 * @see Function#asUncaughtExceptionHandler
 	 */
-	Public.inForkJoin = function() {
-		return java.util.concurrent.ForkJoinTask.inForkJoinPool()		
+	Public.toUncaughtExceptionHandler = function(fn, self) {
+		return new java.lang.Thread.UncaughtExceptionHandler({
+			uncaughtException: function(thread, throwable) {
+				fn.call(self, thread, throwable)
+			}
+		})
 	}
 	
 	/**
@@ -569,7 +580,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @see Function#addShutdownHook 
 	 */
 	Public.addShutdownHook = function(fn, name, self/*, arguments */) {
-		var token = Public.thread.apply(null, arguments)
+		var token = Public.toThread.apply(null, arguments)
 		java.lang.Runtime.runtime.addShutdownHook(token)
 		return token
 	}
@@ -692,22 +703,6 @@ String.prototype.toByteArray = String.prototype.toBytes || function(charset) {
 }
 
 /**
- * Wraps a JavaScript function in a new JVM task instance.
- * <p>
- * Supports java.util.concurrent.Callable, java.util.concurrent.RecursiveTask, and java.lang.Runnable.
- * 
- * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
- * @param [self] The "this" scope
- * @returns A new JVM task instance
- * @see Sincerity.JVM#task
- */
-Function.prototype.task = Function.prototype.task || function(type, self/*, arguments */) {
-	var args = Array.prototype.slice.call(arguments, 0)
-	args.splice(0, 0, this)
-	return Sincerity.JVM.task.apply(null, args)
-}
-
-/**
  * Function decorator that adds lock synchronization.
  * 
  * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/concurrent/locks/ReentrantLock.html">java.util.concurrent.locks.ReentrantLock</a>|String} lock The lock or the lock name as an attribute of 'this'
@@ -717,6 +712,49 @@ Function.prototype.task = Function.prototype.task || function(type, self/*, argu
  */
 Function.prototype.withLock = Function.prototype.withLock || function(lock) {
 	return Sincerity.JVM.withLock(this, lock)
+}
+
+/**
+ * Wraps a JavaScript function in a new JVM task instance.
+ * <p>
+ * Supports java.util.concurrent.Callable, java.util.concurrent.RecursiveTask, and java.lang.Runnable.
+ * 
+ * @param {String} [type='runnable'] Either 'callable', 'recursiveTask', 'recursiveAction', or 'runnable'
+ * @param [self] The "this" scope
+ * @returns A new JVM task instance
+ * @see Sincerity.JVM#asTask
+ */
+Function.prototype.toTask = Function.prototype.toTask || function(type, self/*, arguments */) {
+	var args = Array.prototype.slice.call(arguments, 0)
+	args.splice(0, 0, this)
+	return Sincerity.JVM.toTask.apply(null, args)
+}
+
+/**
+ * Wraps a JavaScript function in a new JVM thread.
+ * 
+ * @param {String} [name] The thread name
+ * @param [self] The "this" scope
+ * @returns A new JVM task instance
+ * @see Sincerity.JVM#asThread
+ */
+Function.prototype.toThread = Function.prototype.toThread || function(name, self/*, arguments */) {
+	var args = Array.prototype.slice.call(arguments, 0)
+	args.splice(0, 0, this)
+	return Sincerity.JVM.toThread.apply(null, args)
+}
+
+/**
+ * Wraps a JavaScript function in a JVM uncaught exception handler.
+ * <p>
+ * The function accepts Thread, Throwable.
+ * 
+ * @param [self] The "this" scope
+ * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/lang/Thread.UncaughtExceptionHandler.html">java.lang.Thread.UncaughtExceptionHandler</a>}
+ * @see Sincerity.JVM#asUncaughtExceptionHandler
+ */
+Function.prototype.toUncaughtExceptionHandler = Function.prototype.toUncaughtExceptionHandler || function(self) {
+	return Sincerity.JVM.toUncaughtExceptionHandler.call(null, this, self)
 }
 
 /**
@@ -731,18 +769,4 @@ Function.prototype.addShutdownHook = Function.prototype.addShutdownHook || funct
 	var args = Array.prototype.slice.call(arguments, 0)
 	args.splice(0, 0, this)
 	return Sincerity.JVM.addShutdownHook.apply(null, args)
-}
-
-/**
- * Wraps a JavaScript function in a new JVM thread.
- * 
- * @param {String} [name] The thread name
- * @param [self] The "this" scope
- * @returns A new JVM task instance
- * @see Sincerity.JVM#thread
- */
-Function.prototype.thread = Function.prototype.thread || function(name, self/*, arguments */) {
-	var args = Array.prototype.slice.call(arguments, 0)
-	args.splice(0, 0, this)
-	return Sincerity.JVM.thread.apply(null, args)
 }

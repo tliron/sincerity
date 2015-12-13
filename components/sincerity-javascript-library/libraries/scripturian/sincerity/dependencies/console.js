@@ -13,6 +13,7 @@
 
 document.require(
 	'/sincerity/dependencies/',
+	'/sincerity/objects/',
 	'/sincerity/jvm/')
 
 var Sincerity = Sincerity || {}
@@ -64,17 +65,11 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    Public.handleEvent = function(event) {
 	    	try {
 				var terminal = Packages.jline.TerminalFactory.create()
-				try {
-					this.ansi = terminal.ansiSupported
-					this.terminalWidth = terminal.width
-				}
-				finally {
-					terminal.reset()
-				}
+				this.ansi = terminal.ansiSupported
+				this.terminalWidth = terminal.width
+				terminal.reset()
 	    	}
 	    	catch (x) {
-	    		println(x)
-	    		return
 	    	}
 			
 			// Move up before the ongoing block we printed last time
@@ -133,6 +128,9 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    }.withLock('lock')
 
 		Public.controlSequence = function() {
+	    	if (!this.ansi) {
+	    		return
+	    	}
 			for (var i in arguments) {
 				this.out.print('\x1b[') // ANSI CSI (Control Sequence Introducer)
 				this.out.print(arguments[i])
@@ -165,6 +163,20 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
     			this.out.print(output)
     			this.controlSequence('0m', 'K') // reset graphics and erase to end of line
     			this.out.println()
+    		}
+    		
+    		if (Sincerity.Objects.exists(event.exception)) {
+    			try {
+    				var stackTrace = Sincerity.JVM.getStackTrace(event.exception)
+    				if (!stackTrace && Sincerity.Objects.exists(event.exception.stack)) {
+    					stackTrace = event.exception.stack
+    				}
+        			if (stackTrace) {
+        		    	this.controlSequence(this.errorGraphics + 'm')
+        				this.out.println(stackTrace)
+        			}
+    			}
+    			catch (x) {}
     		}
 		}
 

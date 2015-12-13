@@ -29,14 +29,12 @@ function test(command) {
 
 	var sincerity = command.sincerity
 	
-	Sincerity.JVM.addShutdownHook(function() {
-		this.out.println('Goodbye...')
-	}, 'shutdown', sincerity)
+	Sincerity.Dependencies.registerHooks(sincerity.out)
 	
-	var f = function(msg) {
+	/*var f = function(msg) {
 		this.out.println('My ' + msg)
-	}.thread('hi', sincerity, 'thread2')
-	f.start()
+	}.toThread('hi', sincerity, 'thread2')
+	f.start()*/
 
 	var repository = new Sincerity.Dependencies.Maven.Repository({uri: 'file:/Depot/DevRepository/'})
 	var id = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
@@ -46,11 +44,11 @@ function test(command) {
 	
 	// ForkJoin
 	sincerity.out.println('forkJoin:')
-	var pool = new java.util.concurrent.ForkJoinPool()
+	/*var pool = new java.util.concurrent.ForkJoinPool()
 
 	pool.invoke(function() {
 		sincerity.out.println('In task!')
-	}.task('recursiveAction'))
+	}.toTask('recursiveAction'))
 	
 	function sumTask(arr, lo, hi) {
 		// Sums in chunks of 1000
@@ -72,7 +70,7 @@ function test(command) {
 				left = left.join().value
 				return {value: left + right}
 			}
-		}.task('recursiveTask')
+		}.toTask('recursiveTask')
 	}
 	
 	var arr = []
@@ -82,6 +80,8 @@ function test(command) {
 	
 	sincerity.out.println(pool.invoke(sumTask(arr, 0, arr.length)).value)
 	sincerity.out.println()
+	
+	pool.shutdownNow()*/
 	
 	// matchSimple
 	sincerity.out.println('matchSimple:')
@@ -127,7 +127,7 @@ function test(command) {
 	
 	// Fetch
 	sincerity.out.println('Fetch:')
-	repository.fetchModule(id, 'zzz', false, {eventHandler: new Sincerity.Dependencies.Console.EventHandler(sincerity.out)})
+	repository.fetchModule(id, 'zzz', false)
 	
 	// POM
 	sincerity.out.println('POM:')
@@ -162,30 +162,36 @@ function test(command) {
 	// Resolve
 	sincerity.out.println('Resolve:')
 
+	// TODO: force a repository by ID?
 	var modules = [
 		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
  		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
  		{group: 'com.fasterxml.jackson', name: 'jackson'},
- 		{group: 'com.threecrickets.prudence', name: 'prudence'}
+ 		{group: 'com.threecrickets.prudence', name: 'prudence'},
+ 		{group: 'jsslutils', name: 'jsslutils'} // only in restlet
  	]
 	
 	var repositories = [
-		//{uri: 'file:/Depot/DevRepository/'}
-		{uri: 'http://repository.threecrickets.com/maven'}
+		{id: '3c', uri: 'file:/Depot/DevRepository/'},
+		//{id: '3c', uri: 'http://repository.threecrickets.com/maven'},
+		{id: 'restlet', uri: 'http://maven.restlet.com'},
+		{id: 'central', uri: 'https://repo1.maven.org/maven2/'}
 	]
 	
 	var rules = [
  		{type: 'exclude', name: '*annotations*'},
 		{type: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
    		//{type: 'rewrite'},
-  		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'}
+  		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'},
+  		//{type: 'repositories', name: 'less4j', repositories: ['3c']},
+  		{type: 'repositories', group: 'jsslutils', repositories: ['restlet']}
   	]
 
 	var resolver = new Sincerity.Dependencies.Resolver({
 		modules: modules,
 		repositories: repositories,
 		rules: rules,
-		conflictPolicy: 'oldest'
+		conflictPolicy: 'newest' //'oldest'
 	})
 	
 	resolver.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity.out))
@@ -216,6 +222,4 @@ function test(command) {
 	
 	// Fetch
 	resolver.fetch('zzz/libraries/jars', true)
-	
-	resolver.release()
 }
