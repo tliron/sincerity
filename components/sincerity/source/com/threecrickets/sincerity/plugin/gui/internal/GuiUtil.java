@@ -36,15 +36,16 @@ import org.apache.ivy.plugins.resolver.IBiblioResolver;
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
-import com.threecrickets.sincerity.ResolvedDependency;
+import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
+import com.threecrickets.sincerity.packaging.Package;
 
 /**
  * Generaly Swing utilities for Sincerity.
@@ -170,7 +171,7 @@ public class GuiUtil
 		expandAll( tree, new TreePath( (TreeNode) tree.getModel().getRoot() ), expand );
 	}
 
-	public static String toHtml( ResolvedDependency resolvedDependency, boolean bold, boolean br )
+	public static String toHtml( IvyResolvedDependency resolvedDependency, boolean bold, boolean br )
 	{
 		ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
 		String organisation = id.getOrganisation();
@@ -202,8 +203,8 @@ public class GuiUtil
 		return s.toString();
 	}
 
-	public static EnhancedNode createDependencyNode( ResolvedDependency resolvedDependency, Dependencies dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses, boolean includeArtifacts,
-		boolean includePackageContents ) throws SincerityException
+	public static EnhancedNode createDependencyNode( IvyResolvedDependency resolvedDependency, Dependencies<IvyResolvedDependency> dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses,
+		boolean includeArtifacts, boolean includePackageContents ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( resolvedDependency, toHtml( resolvedDependency, isMain, false ), DEPENDENCY_ICON );
 
@@ -216,13 +217,13 @@ public class GuiUtil
 				node.add( createArtifactNode( artifact, dependencies, includePackageContents ) );
 
 		if( includeChildren )
-			for( ResolvedDependency child : resolvedDependency.children )
+			for( IvyResolvedDependency child : resolvedDependency.children )
 				node.add( createDependencyNode( child, dependencies, isMain, true, includeLicenses, includeArtifacts, includePackageContents ) );
 
 		return node;
 	}
 
-	public static EnhancedNode createLicenseNode( License license, Dependencies dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
+	public static EnhancedNode createLicenseNode( License license, Dependencies<IvyResolvedDependency> dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
 		throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
@@ -239,11 +240,11 @@ public class GuiUtil
 		EnhancedNode node = new EnhancedNode( license, s.toString(), LICENSE_ICON );
 
 		if( includeDependencies )
-			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
+			for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
 				node.add( createDependencyNode( resolvedDependency, dependencies, false, false, false, includeArtifacts, includePackageContents ) );
 		else if( includeArtifacts )
 		{
-			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
+			for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
 				for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
 					node.add( createArtifactNode( artifact, dependencies, includePackageContents ) );
 		}
@@ -251,7 +252,7 @@ public class GuiUtil
 		return node;
 	}
 
-	public static EnhancedNode createArtifactNode( Artifact artifact, Dependencies dependencies, boolean includePackageContents ) throws SincerityException
+	public static EnhancedNode createArtifactNode( Artifact artifact, Dependencies<?> dependencies, boolean includePackageContents ) throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
 
@@ -295,7 +296,7 @@ public class GuiUtil
 
 		if( includePackageContents && pack != null )
 		{
-			for( com.threecrickets.sincerity.Artifact packedArtifact : pack )
+			for( com.threecrickets.sincerity.packaging.Artifact packedArtifact : pack )
 				addFileNode( dependencies.getContainer().getRelativeFile( packedArtifact.getFile() ), FILE_ICON, node );
 		}
 

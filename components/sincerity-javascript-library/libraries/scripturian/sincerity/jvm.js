@@ -295,7 +295,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	Public.withLock = function(fn, lock) {
 		var lockName = Sincerity.Objects.isString(lock) ? lock : null
 		return function() {
-			if (null !== lockName) {
+			if (Sincerity.Objects.exists(lockName)) {
 				lock = this[lockName]
 			}
 			lock.lock()
@@ -317,6 +317,16 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	Public.getCharset = function(name) {
 		return Sincerity.Objects.exists(name) ? java.nio.charset.Charset.forName(name) : java.nio.charset.Charset.defaultCharset()
 	}
+	
+    /**
+     * Converts to Charset instances if necessary.
+     *
+     * @param [charset] Leave empty to get default charset (most likely UTF-8)
+	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>}
+     */
+	Public.asCharset = function(charset) {
+		return Public.instanceOf(charset, java.nio.charset.Charset) ? charset : (Sincerity.Objects.exists(charset) ? Public.getCharset(String(charset)) : Public.getCharset())
+	}
 
 	/**
 	 * Converts a JVM byte array into a JavaScript string.
@@ -327,8 +337,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @see #getCharset
 	 */
 	Public.fromBytes = function(bytes, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
-		return null !== charset ? String(new java.lang.String(bytes, charset)) : String(new java.lang.String(bytes))
+		charset = Public.asCharset(charset)
+		return Sincerity.Objects.exists(charset) ? String(new java.lang.String(bytes, charset)) : String(new java.lang.String(bytes))
 	}
 	
 	/**
@@ -340,7 +350,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @see #getCharset
 	 */
 	Public.linesFromBytes = function(bytes, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
+		charset = Public.asCharset(charset)
 				
 		var input = new java.io.ByteArrayInputStream(bytes)
 		input = Objects.exists(charset) ? new java.io.InputStreamReader(input, charset) : new java.io.InputStreamReader(input)
@@ -364,8 +374,8 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @see String#toByteArray
 	 */
 	Public.toByteArray = function(string, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Public.getCharset(charset) : null
-		return null !== charset ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
+		charset = Public.asCharset(charset)
+		return Sincerity.Objects.exists(charset) ? new java.lang.String(string).getBytes(charset) : new java.lang.String(string).bytes
 	}
 	
 	/**
@@ -404,7 +414,7 @@ Sincerity.JVM = Sincerity.JVM || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/util/Properties.html">java.util.Properties</a>}
 	 */
 	Public.loadProperties = function(file) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Public.asFile(file).canonicalFile
 		var properties = new java.util.Properties()
 		var reader = new java.io.BufferedReader(new java.io.FileReader(file))
 		try {

@@ -64,7 +64,7 @@ public class ShortcutsPlugin implements Plugin1
 		if( "shortcuts".equals( commandName ) )
 		{
 			Sincerity sincerity = command.getSincerity();
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 			Shortcuts shortcuts = container.getShortcuts();
 			PrintWriter out = sincerity.getOut();
 			for( String shortcut : shortcuts )

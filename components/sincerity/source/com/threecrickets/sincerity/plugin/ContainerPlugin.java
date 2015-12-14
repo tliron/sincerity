@@ -133,15 +133,15 @@ public class ContainerPlugin implements Plugin1
 
 			File containerRoot = new File( arguments[0] );
 
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 
 			command.remove();
 			sincerity.createContainer( containerRoot, container.getRoot(), force );
 		}
 		else if( "clean".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			dependencies.uninstall();
 

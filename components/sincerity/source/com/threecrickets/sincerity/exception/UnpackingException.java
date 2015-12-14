@@ -11,7 +11,7 @@
 
 package com.threecrickets.sincerity.exception;
 
-import com.threecrickets.sincerity.Artifact;
+import com.threecrickets.sincerity.packaging.Artifact;
 
 /**
  * Signifies that an {@link Artifact} could not extracted from its archive.

@@ -27,6 +27,7 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.ivy.IvyRepositories;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
 import com.threecrickets.sincerity.util.TreeUtil;
@@ -85,8 +86,8 @@ public class RepositoriesPlugin implements Plugin1
 
 		if( "repositories".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Repositories repositories = container.getRepositories();
+			Container<?, IvyRepositories> container = sincerity.getContainer();
+			IvyRepositories repositories = container.getRepositories();
 
 			printRepositories( out, "Private", repositories.getResolvers( "private" ) );
 			printRepositories( out, "Public", repositories.getResolvers( "public" ) );
@@ -110,7 +111,7 @@ public class RepositoriesPlugin implements Plugin1
 			String name = arguments[1];
 			String type = arguments[2];
 
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 			Repositories repositories = container.getRepositories();
 
 			if( "maven".equals( type ) || "ibiblio".equals( type ) )

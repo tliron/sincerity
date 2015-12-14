@@ -200,11 +200,11 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * @returns Sincerity.Localization.DateTimeFormat
 	 */
 	Public.getDateTimeFormat = function(dateStyle, timeStyle, locale) {
-		if (locale) {
+		if (Sincerity.Objects.exists(locale)) {
 			return new Public.DateTimeFormat(java.text.DateFormat.getDateTimeInstance(dateTimeFormatStyles[dateStyle], dateTimeFormatStyles[timeStyle], Sincerity.JVM.toLocale(locale)))
 		}
 		else {
-			if (dateStyle) {
+			if (Sincerity.Objects.exists(dateStyle)) {
 				return new Public.DateTimeFormat(java.text.DateFormat.getDateTimeInstance(dateTimeFormatStyles[dateStyle], dateTimeFormatStyles[timeStyle]))
 			}
 			else {
@@ -219,11 +219,11 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * @returns Sincerity.Localization.DateTimeFormat
 	 */
 	Public.getDateFormat = function(style, locale) {
-		if (locale) {
+		if (Sincerity.Objects.exists(locale)) {
 			return new Public.DateTimeFormat(java.text.DateFormat.getDateInstance(dateTimeFormatStyles[style], Sincerity.JVM.toLocale(locale)))
 		}
 		else {
-			if (style) {
+			if (Sincerity.Objects.exists(style)) {
 				return new Public.DateTimeFormat(java.text.DateFormat.getDateInstance(dateTimeFormatStyles[style]))
 			}
 			else {
@@ -238,11 +238,11 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * @returns Sincerity.Localization.DateTimeFormat
 	 */
 	Public.getTimeFormat = function(style, locale) {
-		if (locale) {
+		if (Sincerity.Objects.exists(locale)) {
 			return new Public.DateTimeFormat(java.text.DateFormat.getTimeInstance(dateTimeFormatStyles[style], Sincerity.JVM.toLocale(locale)))
 		}
 		else {
-			if (style) {
+			if (Sincerity.Objects.exists(style)) {
 				return new Public.DateTimeFormat(java.text.DateFormat.getTimeInstance(dateTimeFormatStyles[style]))
 			}
 			else {
@@ -267,8 +267,8 @@ Sincerity.Localization = Sincerity.Localization || function() {
 	 * @returns Sincerity.Localization.CurrencyFormat
 	 */
 	Public.getCurrencyFormatForLocale = function(locale, template) {
-		var currency = java.util.Currency.getInstance(locale ? Sincerity.JVM.toLocale(locale) : java.util.Locale.getDefault())
-		return currency ? new Public.CurrencyFormat(currency, template, locale) : null
+		var currency = java.util.Currency.getInstance(Sincerity.Objects.exists(locale) ? Sincerity.JVM.toLocale(locale) : java.util.Locale.getDefault())
+		return Sincerity.Objects.exists(currency) ? new Public.CurrencyFormat(currency, template, locale) : null
 	}
 
 	/**

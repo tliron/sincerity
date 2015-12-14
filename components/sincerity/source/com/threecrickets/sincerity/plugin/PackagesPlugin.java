@@ -16,11 +16,12 @@ import java.util.Set;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Packages;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.packaging.ManagedArtifacts;
+import com.threecrickets.sincerity.packaging.Packages;
 
 /**
  * The packages plugin supports the following commands:
@@ -78,10 +79,11 @@ public class PackagesPlugin implements Plugin1
 
 			command.remove();
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 			Packages packages = dependencies.getPackages();
-			packages.install( filter, overwrite, verify );
+			ManagedArtifacts managedArtifacts = dependencies.getManagedArtifacts();
+			packages.install( managedArtifacts, filter, overwrite, verify );
 		}
 		else
 			throw new UnknownCommandException( command );

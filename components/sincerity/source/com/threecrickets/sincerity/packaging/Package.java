@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity;
+package com.threecrickets.sincerity.packaging;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,19 +114,19 @@ public class Package extends AbstractList<Artifact>
 	 * 
 	 * @param manifestUrl
 	 *        The manifest URL
-	 * @param container
-	 *        The container
+	 * @param packagingContext
+	 *        The packaging context
 	 * @return The package or null if not a package manifest
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public static Package parsePackage( URL manifestUrl, Container container ) throws SincerityException
+	public static Package parsePackage( URL manifestUrl, PackagingContext packagingContext ) throws SincerityException
 	{
 		String installer = null;
 		String uninstaller = null;
 		ArrayList<Artifact> artifacts = new ArrayList<Artifact>();
 
-		File root = container.getRoot();
+		File root = packagingContext.getRoot();
 		Jar jar = null;
 
 		try
@@ -153,7 +153,7 @@ public class Package extends AbstractList<Artifact>
 				if( packageFoldersAttribute != null )
 				{
 					if( jar == null )
-						jar = new Jar( manifestUrl, container, "Package folders " + packageFoldersAttribute );
+						jar = new Jar( manifestUrl, packagingContext, "Package folders " + packageFoldersAttribute );
 					if( volatiles == null )
 						volatiles = new Volatiles( manifest );
 
@@ -171,7 +171,7 @@ public class Package extends AbstractList<Artifact>
 							if( name.startsWith( prefix ) && name.length() > prefixLength )
 							{
 								URL url = new URL( urlContext, name );
-								artifacts.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, volatiles.contains( name ), container ) );
+								artifacts.add( new Artifact( new File( root, name.substring( prefixLength ) ), url, volatiles.contains( name ), packagingContext ) );
 							}
 						}
 					}
@@ -182,7 +182,7 @@ public class Package extends AbstractList<Artifact>
 				if( packageFilesAttribute != null )
 				{
 					if( jar == null )
-						jar = new Jar( manifestUrl, container, "Package files " + packageFilesAttribute );
+						jar = new Jar( manifestUrl, packagingContext, "Package files " + packageFilesAttribute );
 					if( volatiles == null )
 						volatiles = new Volatiles( manifest );
 
@@ -194,7 +194,7 @@ public class Package extends AbstractList<Artifact>
 							if( packageFile.equals( entry.getName() ) )
 							{
 								URL url = new URL( "jar:" + jar.url + "!/" + packageFile );
-								artifacts.add( new Artifact( new File( root, packageFile ), url, volatiles.contains( packageFile ), container ) );
+								artifacts.add( new Artifact( new File( root, packageFile ), url, volatiles.contains( packageFile ), packagingContext ) );
 								found = true;
 								break;
 							}
@@ -209,18 +209,17 @@ public class Package extends AbstractList<Artifact>
 				if( packageResourcesAttribute != null )
 				{
 					if( jar == null )
-						jar = new Jar( manifestUrl, container, "Package resources " + packageResourcesAttribute );
+						jar = new Jar( manifestUrl, packagingContext, "Package resources " + packageResourcesAttribute );
 					if( volatiles == null )
 						volatiles = new Volatiles( manifest );
 
-					ClassLoader classLoader = container.getBootstrap();
 					for( String name : packageResourcesAttribute.toString().split( "," ) )
 					{
-						URL url = classLoader.getResource( name );
+						URL url = packagingContext.getClassLoader().getResource( name );
 						if( url == null )
 							throw new UnpackingException( "Could not find packaged resource " + name + " from " + jar.file );
 
-						artifacts.add( new Artifact( new File( root, name ), url, volatiles.contains( name ), container ) );
+						artifacts.add( new Artifact( new File( root, name ), url, volatiles.contains( name ), packagingContext ) );
 					}
 				}
 			}
@@ -443,7 +442,7 @@ public class Package extends AbstractList<Artifact>
 	 */
 	private static class Jar
 	{
-		public Jar( URL manifestUrl, Container container, String errorMessage ) throws UnpackingException
+		public Jar( URL manifestUrl, PackagingContext packagingContext, String errorMessage ) throws UnpackingException
 		{
 			if( !"jar".equals( manifestUrl.getProtocol() ) )
 				throw new UnpackingException( errorMessage + " is not in a jar file: " + manifestUrl );
@@ -461,7 +460,7 @@ public class Package extends AbstractList<Artifact>
 			url = connection.getJarFileURL();
 			try
 			{
-				file = container.getRelativeFile( new File( url.toURI() ) );
+				file = packagingContext.getRelativeFile( new File( url.toURI() ) );
 			}
 			catch( URISyntaxException x )
 			{

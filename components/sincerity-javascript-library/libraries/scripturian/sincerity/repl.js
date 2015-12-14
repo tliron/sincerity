@@ -120,7 +120,7 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 			}
 		}
 
-		this.terminal.reset()
+		this.terminal.restore()
 		this.finalize()
 	}
 

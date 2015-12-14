@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity;
+package com.threecrickets.sincerity.packaging;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,16 +38,16 @@ public class Artifact implements Comparable<Artifact>
 	 *        The origin URL
 	 * @param isVolatile
 	 *        True if volatile
-	 * @param container
-	 *        The container
+	 * @param packagingContext
+	 *        The packagingContext
 	 */
-	public Artifact( File file, URL originUrl, boolean isVolatile, Container container )
+	public Artifact( File file, URL originUrl, boolean isVolatile, PackagingContext packagingContext )
 	{
 		this.file = file;
 		this.originUrl = originUrl;
 		this.isVolatile = isVolatile;
-		this.container = container;
-		path = container.getRelativePath( file );
+		this.packagingContext = packagingContext;
+		path = packagingContext.getRelativePath( file );
 	}
 
 	//
@@ -66,7 +66,7 @@ public class Artifact implements Comparable<Artifact>
 
 	/**
 	 * The artifact's intended location in the filesystem relative to the
-	 * container root.
+	 * packagingContext root.
 	 * 
 	 * @return The path
 	 */
@@ -162,8 +162,8 @@ public class Artifact implements Comparable<Artifact>
 		// Don't reinstall volatile artifacts that were already installed
 		if( isVolatile && managedArtifacts.wasInstalled( this ) )
 		{
-			if( container.getSincerity().getVerbosity() >= 2 )
-				container.getSincerity().getOut().println( "Volatile artifact already unpacked once, so not overwriting: " + path );
+			if( packagingContext.getVerbosity() >= 2 )
+				packagingContext.getOut().println( "Volatile artifact already unpacked once, so not overwriting: " + path );
 			return managedArtifacts.getOriginalDigest( this );
 		}
 
@@ -185,35 +185,35 @@ public class Artifact implements Comparable<Artifact>
 					// the user
 					if( overwrite )
 					{
-						if( container.getSincerity().getVerbosity() >= 1 )
-							container.getSincerity().getOut().println( "Unpacking over changed artifact: " + path );
+						if( packagingContext.getVerbosity() >= 1 )
+							packagingContext.getOut().println( "Unpacking over changed artifact: " + path );
 
 						// TODO: backup changed-by-user artifacts in cache!
 					}
 					else
 					{
-						if( container.getSincerity().getVerbosity() >= 1 )
-							container.getSincerity().getOut().println( "Artifact has been changed, so not overwriting: " + path );
+						if( packagingContext.getVerbosity() >= 1 )
+							packagingContext.getOut().println( "Artifact has been changed, so not overwriting: " + path );
 						return originalDigest;
 					}
 				}
 				else
 				{
-					if( container.getSincerity().getVerbosity() >= 1 )
-						container.getSincerity().getOut().println( "Unpacking new version of artifact: " + path );
+					if( packagingContext.getVerbosity() >= 1 )
+						packagingContext.getOut().println( "Unpacking new version of artifact: " + path );
 				}
 			}
 			else
 			{
-				if( container.getSincerity().getVerbosity() >= 2 )
-					container.getSincerity().getOut().println( "Artifact already unpacked: " + path );
+				if( packagingContext.getVerbosity() >= 2 )
+					packagingContext.getOut().println( "Artifact already unpacked: " + path );
 				return currentDigest;
 			}
 		}
 		else
 		{
-			if( container.getSincerity().getVerbosity() >= 2 )
-				container.getSincerity().getOut().println( "Unpacking artifact: " + path );
+			if( packagingContext.getVerbosity() >= 2 )
+				packagingContext.getOut().println( "Unpacking artifact: " + path );
 		}
 
 		// Unpack
@@ -281,7 +281,7 @@ public class Artifact implements Comparable<Artifact>
 
 	private final boolean isVolatile;
 
-	private final Container container;
+	private final PackagingContext packagingContext;
 
 	private final String path;
 

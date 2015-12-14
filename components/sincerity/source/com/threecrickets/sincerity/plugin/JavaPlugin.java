@@ -68,7 +68,7 @@ public class JavaPlugin implements Plugin1
 
 		if( "compile".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 
 			String[] arguments = command.getArguments();
 			File javaDir;

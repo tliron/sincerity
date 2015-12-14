@@ -60,18 +60,18 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 		    this.progressEnd = '] '
 		    this.progressDone = '='
 		    this.progressTodo = ' '
-	    }
 
-	    Public.handleEvent = function(event) {
 	    	try {
 				var terminal = Packages.jline.TerminalFactory.create()
 				this.ansi = terminal.ansiSupported
 				this.terminalWidth = terminal.width
-				terminal.reset()
+				terminal.restore()
 	    	}
 	    	catch (x) {
 	    	}
-			
+	    }
+
+	    Public.handleEvent = function(event) {
 			// Move up before the ongoing block we printed last time
 	    	if (this.ongoingEvents.length) {
 	    		this.controlSequence('' + this.ongoingEvents.length + 'A') // move cursor up
@@ -165,6 +165,7 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
     			this.out.println()
     		}
     		
+    		// Exception stack trace
     		if (Sincerity.Objects.exists(event.exception)) {
     			try {
     				var stackTrace = Sincerity.JVM.getStackTrace(event.exception)

@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity;
+package com.threecrickets.sincerity.packaging;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,8 +27,7 @@ import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.StringUtil;
 
 /**
- * This class manages a database of artifacts for a a {@link Dependencies}
- * instance.
+ * This class manages a database of artifacts.
  * <p>
  * The database is normally stored in "/configuration/sincerity/artifacts.conf".
  * 
@@ -46,13 +45,13 @@ public class ManagedArtifacts
 	 * @param file
 	 *        The database file (usually
 	 *        "/configuration/sincerity/artifacts.conf")
-	 * @param container
-	 *        The container
+	 * @param packagingContext
+	 *        The packaging context
 	 */
-	public ManagedArtifacts( File file, Container container )
+	public ManagedArtifacts( File file, PackagingContext packagingContext )
 	{
 		this.file = file;
-		this.container = container;
+		this.packagingContext = packagingContext;
 	}
 
 	//
@@ -218,12 +217,12 @@ public class ManagedArtifacts
 				i.remove();
 				changed = true;
 
-				File file = new File( container.getRoot(), path );
+				File file = new File( packagingContext.getRoot(), path );
 
 				if( !file.exists() )
 				{
-					if( container.getSincerity().getVerbosity() >= 3 )
-						container.getSincerity().getOut().println( "Artifact doesn't exist, nothing to delete: " + file );
+					if( packagingContext.getVerbosity() >= 3 )
+						packagingContext.getOut().println( "Artifact doesn't exist, nothing to delete: " + file );
 					continue;
 				}
 
@@ -234,8 +233,8 @@ public class ManagedArtifacts
 					{
 						if( !IoUtil.isSameContent( file, entry.originalDigest ) )
 						{
-							if( container.getSincerity().getVerbosity() >= 2 )
-								container.getSincerity().getOut().println( "Not deleting unnecessary artifact because it has been changed: " + file );
+							if( packagingContext.getVerbosity() >= 2 )
+								packagingContext.getOut().println( "Not deleting unnecessary artifact because it has been changed: " + file );
 							continue;
 						}
 					}
@@ -246,8 +245,8 @@ public class ManagedArtifacts
 				}
 
 				// Delete artifact
-				if( container.getSincerity().getVerbosity() >= 2 )
-					container.getSincerity().getOut().println( "Deleting unnecessary artifact: " + file );
+				if( packagingContext.getVerbosity() >= 2 )
+					packagingContext.getOut().println( "Deleting unnecessary artifact: " + file );
 				if( !file.delete() )
 					throw new SincerityException( "Could not delete unnecessary artifact: " + file );
 				try
@@ -269,7 +268,7 @@ public class ManagedArtifacts
 
 	private final File file;
 
-	private final Container container;
+	private final PackagingContext packagingContext;
 
 	private boolean changed;
 

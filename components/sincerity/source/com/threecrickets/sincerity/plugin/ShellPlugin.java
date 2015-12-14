@@ -109,7 +109,7 @@ public class ShellPlugin implements Plugin1
 
 			sincerity.getOut().println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
 
-			Container container = null;
+			Container<?, ?> container = null;
 			try
 			{
 				container = sincerity.getContainer();

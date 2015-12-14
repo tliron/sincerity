@@ -106,7 +106,7 @@ public class DelegatePlugin implements Plugin1
 			ScripturianShell shell;
 			try
 			{
-				Container container = sincerity.getContainer();
+				Container<?, ?> container = sincerity.getContainer();
 				shell = new ScripturianShell( container, true, arguments );
 			}
 			catch( NoContainerException x )
@@ -132,7 +132,7 @@ public class DelegatePlugin implements Plugin1
 					arguments = newArguments;
 				}
 
-				Container container = sincerity.getContainer();
+				Container<?, ?> container = sincerity.getContainer();
 
 				File executable = container.getExecutablesFile( arguments[0] );
 				if( executable.exists() )
@@ -178,7 +178,7 @@ public class DelegatePlugin implements Plugin1
 		}
 		else if( "languages".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 			ScripturianShell shell = new ScripturianShell( container, true );
 			for( LanguageAdapter languageAdapter : shell.getLanguageManager().getAdapters() )
 			{

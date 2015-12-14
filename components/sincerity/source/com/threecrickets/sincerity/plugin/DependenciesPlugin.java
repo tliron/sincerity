@@ -30,6 +30,7 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
 import com.threecrickets.sincerity.plugin.gui.AddDependenciesButton;
 import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
 import com.threecrickets.sincerity.plugin.gui.Frame;
@@ -112,8 +113,8 @@ public class DependenciesPlugin implements Plugin1
 
 		if( "dependencies".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 			printTree( dependencies, out );
 		}
 		else if( "licenses".equals( commandName ) )
@@ -122,15 +123,15 @@ public class DependenciesPlugin implements Plugin1
 			Set<String> switches = command.getSwitches();
 			boolean verbose = switches.contains( "verbose" );
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
+			Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
 
 			printLicenses( dependencies, out, verbose );
 		}
 		else if( "reset".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			dependencies.reset();
 
@@ -167,8 +168,8 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			if( !dependencies.add( group, name, version, force, !only ) )
 				if( sincerity.getVerbosity() >= 2 )
@@ -188,8 +189,8 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			if( !dependencies.revise( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
@@ -205,8 +206,8 @@ public class DependenciesPlugin implements Plugin1
 			String group = arguments[0];
 			String name = arguments[1];
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			if( !dependencies.remove( group, name ) )
 				if( sincerity.getVerbosity() >= 2 )
@@ -222,8 +223,8 @@ public class DependenciesPlugin implements Plugin1
 			String group = arguments[0];
 			String name = arguments[1];
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			if( !dependencies.exclude( group, name ) )
 				if( sincerity.getVerbosity() >= 2 )
@@ -243,8 +244,8 @@ public class DependenciesPlugin implements Plugin1
 			if( "latest".equals( version ) )
 				version = "latest.integration";
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			if( !dependencies.override( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
@@ -252,8 +253,8 @@ public class DependenciesPlugin implements Plugin1
 		}
 		else if( "freeze".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 			dependencies.freeze();
 		}
 		else
@@ -264,7 +265,8 @@ public class DependenciesPlugin implements Plugin1
 	{
 		Sincerity sincerity = command.getSincerity();
 		Frame frame = sincerity.getFrame();
-		Dependencies dependencies = sincerity.getContainer().getDependencies();
+		Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
+		Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
 		frame.getTabs().add( "Dependencies", new DependenciesPane( dependencies ) );
 		frame.getTabs().add( "Licenses", new LicensesPane( dependencies ) );
 		frame.getToolbar().add( new AddDependenciesButton( sincerity ) );
@@ -274,7 +276,7 @@ public class DependenciesPlugin implements Plugin1
 	// Operations
 	//
 
-	public void printTree( Dependencies dependencies, Writer writer ) throws SincerityException
+	public void printTree( Dependencies<?> dependencies, Writer writer ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		ArrayList<String> patterns = new ArrayList<String>();
@@ -282,10 +284,10 @@ public class DependenciesPlugin implements Plugin1
 			printTree( printWriter, resolvedDependency, patterns, false );
 	}
 
-	public void printLicenses( Dependencies depenencies, Writer writer, boolean verbose ) throws SincerityException
+	public void printLicenses( Dependencies<IvyResolvedDependency> depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAll() )
+		for( IvyResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAll() )
 		{
 			License[] licenses = resolvedDependency.descriptor.getLicenses();
 			int length = licenses.length;

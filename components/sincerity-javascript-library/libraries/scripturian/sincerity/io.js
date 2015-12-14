@@ -29,6 +29,26 @@ Sincerity.IO = Sincerity.IO || function() {
     var Public = {}
     
     /**
+     * Converts to URI instances if necessary.
+     *
+     * @param uri
+     * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/net/URI.html">java.net.URI</a>}
+     */
+    Public.asUri = function(uri) {
+    	return Sincerity.JVM.instanceOf(uri, java.net.URI) ? uri : new java.net.URI(String(uri))
+    }
+
+    /**
+     * Converts to file instances if necessary.
+     *
+     * @param file
+	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>}
+     */
+    Public.asFile = function(file) {
+    	return Sincerity.JVM.instanceOf(file, java.io.File) ? file : new java.io.File(String(file))
+    }
+
+    /**
      * Copies bytes from one JVM channel to another, using an in-memory buffer.
      * 
      * @param {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/channels/ReadableByteChannel.html">java.nio.channels.ReadableByteChannel</a>} inChannel
@@ -52,7 +72,7 @@ Sincerity.IO = Sincerity.IO || function() {
 	 * @returns {byte[]}
      */
     Public.loadBytes = function(uri) {
-    	uri = Sincerity.Objects.isString(uri) ? new java.net.URI(uri) : uri
+    	uri = Public.asUri(uri)
 		var fromChannel = java.nio.channels.Channels.newChannel(uri.toURL().openStream())
 		try {
 			var buffer = new java.io.ByteArrayOutputStream(bufferSize)
@@ -76,7 +96,8 @@ Sincerity.IO = Sincerity.IO || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/CharBuffer.html">java.nio.CharBuffer</a>}
      */
 	Public.loadText = function(uri, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
+    	uri = Public.asUri(uri)
+		charset = Sincerity.JVM.asCharset(charset)
 		var bytes = Public.loadBytes(uri)
 		return Sincerity.JVM.fromBytes(bytes, charset)
 	}
@@ -88,8 +109,8 @@ Sincerity.IO = Sincerity.IO || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 */
 	Public.download = function(uri, file) {
-		uri = Sincerity.Objects.isString(uri) ? new java.net.URI(uri) : uri
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+    	uri = Public.asUri(uri)
+		file = Public.asFile(file).canonicalFile
 		com.threecrickets.sincerity.util.IoUtil.copy(uri.toURL(), file)
 	}
 	

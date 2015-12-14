@@ -35,6 +35,7 @@ import org.apache.ivy.core.module.descriptor.License;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.exception.SincerityException;
+import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
 import com.threecrickets.sincerity.plugin.ContainerPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
@@ -56,7 +57,7 @@ public class LicensesPane extends JPanel implements Refreshable, ItemListener
 	// Construction
 	//
 
-	public LicensesPane( Dependencies dependencies ) throws SincerityException
+	public LicensesPane( Dependencies<IvyResolvedDependency> dependencies ) throws SincerityException
 	{
 		super( new BorderLayout() );
 
@@ -152,7 +153,7 @@ public class LicensesPane extends JPanel implements Refreshable, ItemListener
 
 	private static final long serialVersionUID = 1L;
 
-	private final Dependencies dependencies;
+	private final Dependencies<IvyResolvedDependency> dependencies;
 
 	private final JTree tree;
 

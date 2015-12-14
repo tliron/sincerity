@@ -13,29 +13,100 @@ function getInterfaceVersion() {
 }
 
 function getCommands() {
-	return ['install2']
+	return ['install2', 'test2']
 }
 
 function run(command) {
 	switch (String(command.name)) {
-		case 'install2':
-			test(command)
+	case 'install2':
+		install2(command)
+		break
+		case 'test2':
+			test2(command)
 			break
 	}
 }
 
-function test(command) {
+function install2(command) {
 	command.parse = true
 
 	var sincerity = command.sincerity
 	
 	Sincerity.Dependencies.registerHooks(sincerity.out)
 	
+	var local = false
+	
+	var modules = [
+		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
+ 		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
+ 		{group: 'com.fasterxml.jackson', name: 'jackson'},
+ 		{group: 'com.threecrickets.prudence', name: 'prudence'},
+ 		{group: 'jsslutils', name: 'jsslutils'} // only in restlet
+ 	]
+	
+	var repositories = [
+		local ? {id: '3c', uri: 'file:/Depot/DevRepository/'} : {id: '3c', uri: 'http://repository.threecrickets.com/maven'},
+		{id: 'restlet', uri: 'http://maven.restlet.com', all: false},
+		{id: 'central', uri: 'https://repo1.maven.org/maven2/'}
+	]
+	
+	var rules = [
+ 		{type: 'exclude', name: '*annotations*'},
+		{type: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
+   		//{type: 'rewrite'},
+  		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'},
+  		//{type: 'repositories', name: 'less4j', repositories: ['3c']},
+  		{type: 'repositories', group: 'jsslutils', repositories: ['restlet']}
+  	]
+
+	var manager = new Sincerity.Dependencies.Manager({
+		modules: modules,
+		repositories: repositories,
+		rules: rules,
+		conflictPolicy: 'newest' //'oldest'
+	})
+	
+	manager.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity.out))
+	manager.eventHandler.add(new Sincerity.Dependencies.LogEventHandler())
+
+	manager.identify()
+	manager.install('zzz/libraries/jars', true)
+	
+	sincerity.out.println('Cache hits: ' + manager.identifiedCacheHits.get())
+	sincerity.out.println('Identified: (' + manager.identifiedModules.length + ')')
+	for (var m in manager.identifiedModules) {
+		manager.identifiedModules[m].dump(sincerity.out, false, 1)
+	}
+	sincerity.out.println('Unidentified: (' + manager.unidentifiedModules.length + ')')
+	for (var m in manager.unidentifiedModules) {
+		manager.unidentifiedModules[m].dump(sincerity.out, false, 1)
+	}
+	sincerity.out.println('Conflicts: (' + manager.conflicts.length + ')')
+	for (var c in manager.conflicts) {
+		var conflict = manager.conflicts[c]
+		for (var m in conflict) {
+			var module = conflict[m]
+			module.dump(sincerity.out, false, 1)
+		}
+	}
+	sincerity.out.println('Tree:')
+	for (var m in manager.explicitModules) {
+		manager.explicitModules[m].dump(sincerity.out, true, 1)
+	}
+}
+
+function test2(command) {
+	command.parse = true
+
+	var sincerity = command.sincerity
+
+	Sincerity.Dependencies.registerHooks(sincerity.out)
+
 	/*var f = function(msg) {
 		this.out.println('My ' + msg)
 	}.toThread('hi', sincerity, 'thread2')
 	f.start()*/
-
+	
 	var repository = new Sincerity.Dependencies.Maven.Repository({uri: 'file:/Depot/DevRepository/'})
 	var id = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
 	var id2 = new Sincerity.Dependencies.Maven.ModuleIdentifier('org.jsoup', 'jsoup', '1.8.1')
@@ -44,8 +115,8 @@ function test(command) {
 	
 	// ForkJoin
 	sincerity.out.println('forkJoin:')
-	/*var pool = new java.util.concurrent.ForkJoinPool()
-
+	var pool = new java.util.concurrent.ForkJoinPool()
+	
 	pool.invoke(function() {
 		sincerity.out.println('In task!')
 	}.toTask('recursiveAction'))
@@ -81,20 +152,20 @@ function test(command) {
 	sincerity.out.println(pool.invoke(sumTask(arr, 0, arr.length)).value)
 	sincerity.out.println()
 	
-	pool.shutdownNow()*/
+	pool.shutdownNow()
 	
-	// matchSimple
-	sincerity.out.println('matchSimple:')
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple())
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple(''))
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*'))
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('This*'))
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*the ? text*'))
-	sincerity.out.println('true=' + 'This is the ? text'.matchSimple('*the \\? text*'))
-	sincerity.out.println('true=' + 'This is the ! text'.matchSimple('*the ? text*'))
-	sincerity.out.println('false=' + 'This is the ! text'.matchSimple('*the \\? text*'))
+	// glob
+	sincerity.out.println('Glob:')
+	sincerity.out.println('true=' + 'This is the ? text'.glob())
+	sincerity.out.println('true=' + 'This is the ? text'.glob(''))
+	sincerity.out.println('true=' + 'This is the ? text'.glob('*'))
+	sincerity.out.println('true=' + 'This is the ? text'.glob('This*'))
+	sincerity.out.println('true=' + 'This is the ? text'.glob('*the ? text*'))
+	sincerity.out.println('true=' + 'This is the ? text'.glob('*the \\? text*'))
+	sincerity.out.println('true=' + 'This is the ! text'.glob('*the ? text*'))
+	sincerity.out.println('false=' + 'This is the ! text'.glob('*the \\? text*'))
 	sincerity.out.println()
-
+	
 	// toString
 	sincerity.out.println(repository.toString())
 	sincerity.out.println(id.toString())
@@ -103,7 +174,7 @@ function test(command) {
 	sincerity.out.println(specification.toString())
 	sincerity.out.println(specification.allowsModuleIdentifier(id))
 	sincerity.out.println()
-
+	
 	// Versions
 	sincerity.out.println('Versions:')
 	sincerity.out.println('0=' +  Sincerity.Dependencies.Maven.Versions.compare('', ''))
@@ -118,16 +189,16 @@ function test(command) {
 	sincerity.out.println('1=' +  Sincerity.Dependencies.Maven.Versions.compare('2.2-2', '2.2-1'))
 	sincerity.out.println('0=' +  Sincerity.Dependencies.Maven.Versions.compare('2.2-', '2.2'))
 	sincerity.out.println()
-
+	
 	// URI
 	sincerity.out.println('URI:')
 	var uri = repository.getUri(id, 'pom')
 	sincerity.out.println(uri)
 	sincerity.out.println()
 	
-	// Fetch
-	sincerity.out.println('Fetch:')
-	repository.fetchModule(id, 'zzz', false)
+	// Install
+	sincerity.out.println('Install:')
+	repository.installModule(id, 'zzz/libraries/jars', false)
 	
 	// POM
 	sincerity.out.println('POM:')
@@ -158,68 +229,4 @@ function test(command) {
 		sincerity.out.println(signature.type + ':' + signature.content)
 	}
 	sincerity.out.println()
-	
-	// Resolve
-	sincerity.out.println('Resolve:')
-
-	// TODO: force a repository by ID?
-	var modules = [
-		{group: 'com.github.sommeri', name: 'less4j', version: '(,1.15.2)'},
- 		{group: 'org.jsoup', name: 'jsoup', version: '1.8.1'},
- 		{group: 'com.fasterxml.jackson', name: 'jackson'},
- 		{group: 'com.threecrickets.prudence', name: 'prudence'},
- 		{group: 'jsslutils', name: 'jsslutils'} // only in restlet
- 	]
-	
-	var repositories = [
-		{id: '3c', uri: 'file:/Depot/DevRepository/'},
-		//{id: '3c', uri: 'http://repository.threecrickets.com/maven'},
-		{id: 'restlet', uri: 'http://maven.restlet.com'},
-		{id: 'central', uri: 'https://repo1.maven.org/maven2/'}
-	]
-	
-	var rules = [
- 		{type: 'exclude', name: '*annotations*'},
-		{type: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
-   		//{type: 'rewrite'},
-  		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'},
-  		//{type: 'repositories', name: 'less4j', repositories: ['3c']},
-  		{type: 'repositories', group: 'jsslutils', repositories: ['restlet']}
-  	]
-
-	var resolver = new Sincerity.Dependencies.Resolver({
-		modules: modules,
-		repositories: repositories,
-		rules: rules,
-		conflictPolicy: 'newest' //'oldest'
-	})
-	
-	resolver.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity.out))
-	resolver.eventHandler.add(new Sincerity.Dependencies.LogEventHandler())
-
-	resolver.resolve()
-	sincerity.out.println('Tree:')
-	for (var m in resolver.explicitModules) {
-		resolver.explicitModules[m].dump(sincerity.out, true, 1)
-	}
-	sincerity.out.println('Resolved: (' + resolver.resolvedModules.length + ')')
-	for (var m in resolver.resolvedModules) {
-		resolver.resolvedModules[m].dump(sincerity.out, false, 1)
-	}
-	sincerity.out.println('resolvedCacheHits: ' + resolver.resolvedCacheHits.get())
-	sincerity.out.println('Unresolved: (' + resolver.unresolvedModules.length + ')')
-	for (var m in resolver.unresolvedModules) {
-		resolver.unresolvedModules[m].dump(sincerity.out, false, 1)
-	}
-	sincerity.out.println('Conflicts: (' + resolver.conflicts.length + ')')
-	for (var c in resolver.conflicts) {
-		var conflict = resolver.conflicts[c]
-		for (var m in conflict) {
-			var module = conflict[m]
-			module.dump(sincerity.out, false, 1)
-		}
-	}
-	
-	// Fetch
-	resolver.fetch('zzz/libraries/jars', true)
 }

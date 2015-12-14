@@ -46,7 +46,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			for (var i = java.lang.Thread.allStackTraces.keySet().iterator(); i.hasNext(); ) {
 				var thread = i.next()
 				if (!thread.daemon) {
-					this.println(thread)
+					//this.println(thread)
 					var trace = thread.stackTrace
 					for (var t in trace) {
 						//this.println('  ' + trace[t])
@@ -125,7 +125,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
-	    Public.addReason = function(module) {
+	    Public.addSupplicant = function(module) {
 	    	var found = false
 	    	for (var m in this.supplicants) {
 	    		var supplicantModule = this.supplicants[m]
@@ -144,7 +144,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
 	     */
-	    Public.removeReason = function(module) {
+	    Public.removeSupplicant = function(module) {
 	    	for (var m in this.supplicants) {
 	    		var supplicantModule = this.supplicants[m]
 	    		if (supplicantModule.identifier.compare(module.identifier) === 0) {
@@ -158,24 +158,24 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * Adds all supplicants of another module, and makes us explicit if the other module is explicit.
 	     * 
 	     * @param {Sincerity.Dependencies.Module} module
-	     * @see Sincerity.Dependencies.Module#addReason
+	     * @see Sincerity.Dependencies.Module#addSupplicant
 	     */
 	    Public.merge = function(module) {
 			if (module.explicit) {
 				this.explicit = true
 			}
 	    	for (var m in module.supplicants) {
-	    		this.addReason(module.supplicants[m])
+	    		this.addSupplicant(module.supplicants[m])
 	    	}
 	    }
 	    
 	    Public.replaceModule = function(oldModule, newModule, recursive) {
-	    	this.removeReason(oldModule)
+	    	this.removeSupplicant(oldModule)
 	    	for (var m in this.dependencies) {
 	    		var module = this.dependencies[m]
 	    		if (module.identifier && (module.identifier.compare(oldModule.identifier) === 0)) {
 	    			module = this.dependencies[m] = newModule
-	    			module.addReason(this)
+	    			module.addSupplicant(this)
 	    		}
 	    		if (recursive) {
 	    			module.replaceModule(oldModule, newModule, true)
@@ -199,7 +199,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	}
 	    	if (long) {
 	    		prefix += this.explicit ? '*' : '+' // explicit?
-	    		prefix += Sincerity.Objects.exists(this.identifier) ? '!' : '?' // resolved?
+	    		prefix += Sincerity.Objects.exists(this.identifier) ? '!' : '?' // identified?
 		    	if (this.dependencies.length) {
 		    		if (r.length) { r += ', ' }
 		    		r += 'dependencies=' + this.dependencies.length
@@ -352,6 +352,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    Public._construct = function(config) {
 	    	config = config || {}
 	    	this.id = config.id || 0
+	    	this.all = Sincerity.Objects.ensure(config.all, true)
 	    	var parallelism = config.parallelism || 5
 	    	this.executor = newExecutor(parallelism)
 	    }
@@ -360,30 +361,30 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    	return false
 	    }
 
-	    Public.getModule = function(moduleIdentifier, resolver) {
+	    Public.getModule = function(moduleIdentifier, notifier) {
 	    	return null
 	    }
 
-	    Public.getAllowedModuleIdentifiers = function(moduleSpecification, resolver) {
+	    Public.getAllowedModuleIdentifiers = function(moduleSpecification, notifier) {
 	    	return []
 	    }
 
-	    Public.fetchModule = function(moduleIdentifier, directory, overwrite, resolver) {
+	    Public.installModule = function(moduleIdentifier, directory, overwrite, notifier) {
 	    }
 
-	    Public.fetchModuleFuture = function(moduleIdentifier, directory, overwrite, resolver) {
+	    Public.installModuleFuture = function(moduleIdentifier, directory, overwrite, notifier) {
     		var task = function() {
     			try {
-    				this.fetchModule(moduleIdentifier, directory, overwrite, resolver)
+    				this.installModule(moduleIdentifier, directory, overwrite, notifier)
     			}
     			catch (x) {
-    				resolver.eventHandler.handleEvent({type: 'error', message: 'Fetch error for ' + moduleIdentifier.toString() + ': ' + x.message, exception: x})
+    				notifier.notify({type: 'error', message: 'Install error for ' + moduleIdentifier.toString() + ': ' + x.message, exception: x})
     			}
     		}.toTask(null, this)
     		return this.executor.submit(task)
 	    }
 
-	    Public.applyModuleRule = function(module, rule, resolver) {
+	    Public.applyModuleRule = function(module, rule, notifier) {
 	    	return false
 	    }
 
@@ -409,18 +410,18 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	}(Public))
 	
 	/**
-	 * Handles resolving and fetching of dependency tree.
+	 * Handles identifying and installing dependencies.
 	 * 
 	 * @class
-	 * @name Sincerity.Dependencies.Resolver
+	 * @name Sincerity.Dependencies.Manager
 	 * 
      * @param {Object[]} confis.modules Module specification configurations
      * @param {Object[]} config.repositories Repository configurations
      * @param {Object[]} config.rules Rule configurations
      * @param {String} [config.defaultPlatform='maven'] The default platform to use if unspecified
 	 */
-	Public.Resolver = Sincerity.Classes.define(function(Module) {
-		/** @exports Public as Sincerity.Dependencies.Resolver */
+	Public.Manager = Sincerity.Classes.define(function(Module) {
+		/** @exports Public as Sincerity.Dependencies.Manager */
 	    var Public = {}
 	    
 	    /** @ignore */
@@ -437,20 +438,20 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 				rule.platform = rule.platform || this.defaultPlatform
 			}
 
-	    	this.resolvedModules = []
-	    	this.resolvedModulesLock = Sincerity.JVM.newLock()
-	    	this.unresolvedModules = []
-	    	this.unresolvedModulesLock = Sincerity.JVM.newLock()
+	    	this.identifiedModules = []
+	    	this.identifiedModulesLock = Sincerity.JVM.newLock()
+	    	this.unidentifiedModules = []
+	    	this.unidentifiedModulesLock = Sincerity.JVM.newLock()
 	    	this.conflicts = []
 
-	    	this.resolvedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
+	    	this.identifiedCacheHits = new java.util.concurrent.atomic.AtomicInteger()
 	    	
 	    	this.eventHandler = new Sincerity.Dependencies.EventHandlers()
 	    	
 	    	this.forkJoinPool = newForkJoinPool(10)
 	    }
 	    
-	    Public.fireEvent = function(event) {
+	    Public.notify = function(event) {
 	    	if (Sincerity.Objects.isString(event)) {
 	    		event = {message: event}
 	    	}
@@ -497,75 +498,75 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 	    
 	    /**
-	     * Gets an instance of a module (from resolvedModules) if it has already been resolved.
+	     * Gets an instance of a module (from identifiedModules) if it has already been identified.
 	     *
 	     * @param {Sincerity.Dependencies.ModuleSpecification}
-	     * @returns {Sincerity.Dependencies.Module[]} or null if not yet resolved
+	     * @returns {Sincerity.Dependencies.Module[]} or null if not yet identified
 	     */
-	    Public.getResolvedModule = function(moduleSpecification) {
-			for (var m in this.resolvedModules) {
-				var module = this.resolvedModules[m]
+	    Public.getIdentifiedModule = function(moduleSpecification) {
+			for (var m in this.identifiedModules) {
+				var module = this.identifiedModules[m]
 				if (moduleSpecification.isEqual(module.specification)) {
 					//println('!!!! cache hit: ' + module.specification.toString())
-					this.resolvedCacheHits.incrementAndGet()
+					this.identifiedCacheHits.incrementAndGet()
 					return module
 				}
 			}
 			return null
-	    }.withLock('resolvedModulesLock')
+	    }.withLock('identifiedModulesLock')
 	    
-	    Public.addResolvedModule = function(module) {
+	    Public.addIdentifiedModule = function(module) {
 			var found = false
-			for (var m in this.resolvedModules) {
-				var resolvedModule = this.resolvedModules[m]
-				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+			for (var m in this.identifiedModules) {
+				var identifiedModule = this.identifiedModules[m]
+				if (module.identifier.compare(identifiedModule.identifier) === 0) {
 					// Merge
-					resolvedModule.merge(module)
+					identifiedModule.merge(module)
 					found = true
 					break
 				}
 			}
 			if (!found) {
-				this.resolvedModules.push(module)
+				this.identifiedModules.push(module)
 			}
-	    }.withLock('resolvedModulesLock')
+	    }.withLock('identifiedModulesLock')
 
-	    Public.removeResolvedModule = function(module) {
+	    Public.removeIdentifiedModule = function(module) {
 			var found = null
-			for (var m in this.resolvedModules) {
-				var resolvedModule = this.resolvedModules[m]
-				if (module.identifier.compare(resolvedModule.identifier) === 0) {
+			for (var m in this.identifiedModules) {
+				var identifiedModule = this.identifiedModules[m]
+				if (module.identifier.compare(identifiedModule.identifier) === 0) {
 					found = m
 					break
 				}
 			}
 			if (found !== null) {
-				this.resolvedModules.splice(found, 1)
+				this.identifiedModules.splice(found, 1)
 			}
-	    }.withLock('resolvedModulesLock')
+	    }.withLock('identifiedModulesLock')
 
-	    Public.addUnresolvedModule = function(module) {
+	    Public.addUnidentifiedModule = function(module) {
 			var found = false
-			for (var m in this.unresolvedModules) {
-				var unresolvedModule = this.unresolvedModules[m]
-				if (module.specification.isEqual(unresolvedModule.specification)) {
+			for (var m in this.unidentifiedModules) {
+				var unidentifiedModule = this.unidentifiedModules[m]
+				if (module.specification.isEqual(unidentifiedModule.specification)) {
 					// Merge
-					unresolvedModule.merge(module)
+					unidentifiedModule.merge(module)
 					found = true
 					break
 				}
 			}
 			if (!found) {
-				this.unresolvedModules.push(module)
+				this.unidentifiedModules.push(module)
 			}
-	    }.withLock('unresolvedModulesLock')
+	    }.withLock('unidentifiedModulesLock')
 	    
 	    Public.addModule = function(module) {
     		if (Sincerity.Objects.exists(module.identifier)) {
-    			this.addResolvedModule(module)
+    			this.addIdentifiedModule(module)
     		}
     		else {
-    			this.addUnresolvedModule(module)
+    			this.addUnidentifiedModule(module)
     		}
 	    }
 	    
@@ -581,141 +582,88 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    }
 
 	    /**
-	     * Goes over the explicitModules and resolves them recursively.
+	     * Goes over explicitModules and identifies them recursively.
 	     * This is done using fork/join parallelism for better efficiency.
 	     * <p>
-	     * When finished, resolvedModules and unresolvedModules would be filled
+	     * When finished, identifiedModules and unidentifiedModules would be filled
 	     * appropriately. 
 	     * 
-	     * @see Sincerity.Dependencies.Resolver#resolveModule
+	     * @see Sincerity.Dependencies.Manager#identifyModule
 	     */
-	    Public.resolve = function() {
+	    Public.identify = function() {
 	    	var id = Sincerity.Objects.uniqueString()
-			this.fireEvent({type: 'begin', id: id, message: 'Resolving all modules'})
+			this.notify({type: 'begin', id: id, message: 'Identifying'})
 			
-			// Resolve explicit modules
+			// Identify explicit modules
 			var tasks = []
 	    	for (var m in this.explicitModules) {
 	    		var module = this.explicitModules[m]
-	    		tasks.push(this.resolveModuleTask(module, true))
+	    		tasks.push(this.identifyModuleTask(module, true))
 	    	}
 			this.forkJoinPool.invokeAll(Sincerity.JVM.toList(tasks))
 	    	
-	    	// Sort resolved modules
-	    	this.resolvedModules.sort(function(module1, module2) {
+	    	// Sort identified modules
+	    	this.identifiedModules.sort(function(module1, module2) {
 	    		return module1.identifier.toString().localeCompare(module2.identifier.toString())
 	    	})
 	    	
-	    	// Sort unresolved modules
-	    	this.unresolvedModules.sort(function(module1, module2) {
+	    	// Sort unidentified modules
+	    	this.unidentifiedModules.sort(function(module1, module2) {
 	    		return module1.specification.toString().localeCompare(module2.specification.toString())
 	    	})
 	    	
-	    	this.findConflicts()
+	    	var count = this.identifiedModules.length
+
 	    	this.resolveConflicts()
 
-			this.fireEvent({type: 'end', id: id, message: 'Resolved all modules'})
+	    	this.notify({type: 'end', id: id, message: 'Made ' + count + ' identifications'})
 	    }
 	    
 	    /**
-	     * Resolves a module, optionally resolving its dependencies recursively (supporting fork/join
+	     * Identifies a module, optionally identifying its dependencies recursively (supporting fork/join
 	     * parallelism).
 	     * <p>
-	     * "Resolving" means finding the best identifier available from all the repositories
-	     * that matches the specification. A successful resolution means that the module has
-	     * an identifier. An unresolved module has only a specification, but no identifier.
+	     * "Identification" means finding the best identifier available from all the candidates in all
+	     * the repositories that match the specification. A successful identification results in the the
+	     * module has an identifier. An unidentified module has only a specification, but no identifier.
 	     * <p>
-	     * A cache of resolved modules is maintained in the resolver to avoid resolving
+	     * A cache of identified modules is maintained in the manager to avoid identifying
 	     * the same module twice.
 	     *
 	     * @param {Sincerity.Dependencies.Module} module
 	     * @param {Boolean} [recursive=false]
 	     */
-	    Public.resolveModule = function(module, recursive) {
-	    	var repositories = Sincerity.Objects.clone(this.repositories, false)
-	    	var exclude = false
+	    Public.identifyModule = function(module, recursive) {
+	    	var context = {
+	    		repositories: [],
+	    		exclude: false,
+	    		recursive: recursive
+	    	}
 	    	
-	    	// Apply rules
-			for (var r in this.rules) {
-				var rule = this.rules[r]
-				var command = null
-				
-				// Try repositories
-				var repository
-				for (var rr in this.repositories) {
-					repository = this.repositories[rr]
-					command = repository.applyModuleRule(module, rule, this)
-    				if (command) {
-    					break
-    				}
-    			}
-				
-				if (null === command) {
-					this.fireEvent({type: 'error', message: 'Unsupported rule: ' + rule.type})
-					continue
-				}
-
-				if (true === command) {
-					continue
-				}
-
-				if (Sincerity.Objects.isString(command)) {
-					command = {type: command}
-				}
-
-				// Do command
-				if (command.type == 'excludeModule') {
-					this.fireEvent('Excluded ' + module.specification.toString())
-					exclude = true
-				}
-				else if (command.type == 'excludeDependencies') {
-					this.fireEvent('Excluded dependencies for ' + module.specification.toString())
-					recursive = false
-				}
-				else if (command.type == 'setRepositories') {
-					repositories = []
-					for (var i in command.repositories) {
-						var id = command.repositories[i]
-						var found = false
-						for (var rr in this.repositories) {
-							var repository = this.repositories[rr]
-							if (repository.id == id) {
-								repositories.push(repository)
-								found = true
-								break
-							}
-						}
-						if (!found) {
-							this.fireEvent({type: 'error', message: 'Unknown repository: ' + id})
-						}
-					}
-					var ids = []
-					for (var rr in repositories) {
-						var repository = repositories[rr]
-						ids.push(repository.id)
-					}
-					this.fireEvent('Forced ' + module.specification.toString() + ' to resolve in ' + ids.join(', ') + (ids.length > 1 ? ' repositories' : ' repository'))
-				}
-				else {
-					this.fireEvent({type: 'error', message: 'Unsupported command: ' + command.type})
-				}
-			}
+	    	for (var r in this.repositories) {
+	    		var repository = this.repositories[r]
+	    		if (repository.all) {
+	    			context.repositories.push(repository)
+	    		}
+	    	}
+	    	
+	    	this.applyRules(module, context)
 
     		if (Sincerity.Objects.exists(module.identifier)) {
-    			// Already resolved
+    			// Already identified
     		}
-    		else if (!exclude && Sincerity.Objects.exists(module.specification)) {
-				// Check to see if we've already resolved it
-    			var resolvedModule = this.getResolvedModule(module.specification)
-    			if (!resolvedModule) {
+    		else if (!context.exclude && Sincerity.Objects.exists(module.specification)) {
+				// Check to see if we've already identified it
+    			var identifiedModule = this.getIdentifiedModule(module.specification)
+    			if (!identifiedModule) {
     				var id = Sincerity.Objects.uniqueString()
     				
 	    			// Gather allowed module identifiers from all repositories
-					this.fireEvent({type: 'begin', id: id, message: 'Resolving ' + module.specification.toString()})
+					this.notify({type: 'begin', id: id, message: 'Identifying ' + module.specification.toString()})
 					
     				var moduleIdentifiers = []
-		    		for (var r in repositories) {
-			    		var repository = repositories[r]
+		    		for (var r in context.repositories) {
+			    		var repository = context.repositories[r]
 			    		var allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers(module.specification, this)
 			    		
 			    		// Note: the first repository to report an identifier will "win," the following repositories will have their reports discarded
@@ -732,41 +680,43 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 			    		})
 			    		
 			    		// Best module is first (newest)
-			    		var resolvedModuleIdentifier = moduleIdentifiers[0]
-		    			resolvedModule = resolvedModuleIdentifier.repository.getModule(resolvedModuleIdentifier, this)
+			    		var identifiedModuleIdentifier = moduleIdentifiers[0]
+		    			identifiedModule = identifiedModuleIdentifier.repository.getModule(identifiedModuleIdentifier, this)
 
-		    			if (resolvedModule) {
-		    				this.fireEvent({type: 'end', id: id, message: 'Resolved ' + resolvedModule.identifier.toString() + ' in ' + resolvedModule.identifier.repository.id + ' repository'})
+		    			if (identifiedModule) {
+		    				this.notify({type: 'end', id: id, message: 'Identified ' + identifiedModule.identifier.toString() + ' in ' + identifiedModule.identifier.repository.id + ' repository'})
 		    			}
 		    			else {
-							this.fireEvent({type: 'fail', id: id, message: 'Could not get module ' + resolvedModuleIdentifier.toString() + ' from ' + resolvedModuleIdentifier.repository.id + ' repository'})
+							this.notify({type: 'fail', id: id, message: 'Could not get module ' + identifiedModuleIdentifier.toString() + ' from ' + identifiedModuleIdentifier.repository.id + ' repository'})
 		    			}
 		    		}
 		    		else {
-						this.fireEvent({type: 'fail', id: id, message: 'Could not resolve ' + module.specification.toString()})
+						this.notify({type: 'fail', id: id, message: 'Could not identify ' + module.specification.toString()})
 		    		}
     			}
 
-    			if (resolvedModule) {
-					module.copyResolutionFrom(resolvedModule)
+    			if (identifiedModule) {
+					module.copyResolutionFrom(identifiedModule)
     			}
     		}
 
-			this.addModule(module)
+	    	if (!context.exclude) {
+	    		this.addModule(module)
+	    	}
 
-			if (recursive) {
-				// Resolve dependencies recursively
+			if (context.recursive) {
+				// Identify dependencies recursively
 				var pool = java.util.concurrent.ForkJoinTask.pool
 				var tasks = []
 		    	for (d in module.dependencies) {
 		    		var dependency = module.dependencies[d]
 		    		if (null !== pool) {
 		    			// Fork
-		    			tasks.push(this.resolveModuleTask(dependency, true))
+		    			tasks.push(this.identifyModuleTask(dependency, true))
 		    		}
 		    		else {
 		    			// Do now
-		    			this.resolveModule(dependency, true)
+		    			this.identifyModule(dependency, true)
 		    		}
 		    	}
 	    		if (tasks.length) {
@@ -774,7 +724,7 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		}
 			}
 			else {
-				// Add dependencies as is (unresolved)
+				// Add dependencies as is (unidentified)
 		    	for (d in module.dependencies) {
 		    		this.addModule(module.dependencies[d])
 		    	}				
@@ -787,13 +737,13 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	     * @param {Boolean} [recursive=false]
 	     * @returns {java.util.concurrent.RecursiveAction}
 	     */
-	    Public.resolveModuleTask = function(module, recursive) {
+	    Public.identifyModuleTask = function(module, recursive) {
     		return function() {
     			try {
-    				this.resolveModule(module, recursive)
+    				this.identifyModule(module, recursive)
     			}
     			catch (x) {
-    				this.fireEvent({type: 'error', message: 'Resolve error for ' + module.specification.toString() + ': ' + x.message, exception: x})
+    				this.notify({type: 'error', message: 'Identification error for ' + module.specification.toString() + ': ' + x.message, exception: x})
     			}
     			return null
     		}.toTask('callable', this)
@@ -801,8 +751,8 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 
 	    Public.findConflicts = function() {
 	    	var potentialConflicts = []
-	    	for (var m in this.resolvedModules) {
-	    		potentialConflicts.push(this.resolvedModules[m])
+	    	for (var m in this.identifiedModules) {
+	    		potentialConflicts.push(this.identifiedModules[m])
 	    	}
 	    	
 	    	var module
@@ -829,8 +779,10 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    		})
 	    	}
 	    }
-	    
+
 	    Public.resolveConflicts = function() {
+	    	this.findConflicts()
+
 	    	for (var c in this.conflicts) {
 	    		var conflicts = []
 	    		for (var m in this.conflicts[c]) {
@@ -846,43 +798,43 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
 	    			chosenModuleIndex = conflicts.length - 1
 	    		}
 	    		else {
-					this.fireEvent({type: 'error', message: 'Unsupported conflict policy: ' + this.conflictPolicy})
+					this.notify({type: 'error', message: 'Unsupported conflict policy: ' + this.conflictPolicy})
 	    			continue
 	    		}
 	    		
 	    		var chosenModule = conflicts[chosenModuleIndex]
 	    		conflicts.splice(chosenModuleIndex, 1)
 
-				this.fireEvent('Resolved conflict to ' + chosenModule.identifier.toString() + ' in ' + chosenModule.identifier.repository.id + ' repository')
+				this.notify('Resolved ' + (conflicts.length + 1) + '-way conflict to ' + chosenModule.identifier.toString() + ' in ' + chosenModule.identifier.repository.id + ' repository')
 
-	    		// Merge all supplicants into chosen module, and remove non-chosen modules from resolvedModules
+	    		// Merge all supplicants into chosen module, and remove non-chosen modules from identifiedModules
 	    		for (var m in conflicts) {
 	    			var module = conflicts[m]
 	    			chosenModule.merge(module)
-	    			this.removeResolvedModule(module)
+	    			this.removeIdentifiedModule(module)
 	    			this.replaceModule(module, chosenModule)
 	    		}
 	    	}
 	    }
 
 	    /**
-	     * Fetches the resolved modules.
+	     * Installs the identified modules.
 	     */
-	    Public.fetch = function(directory, overwrite, parallel) {
+	    Public.install = function(directory, overwrite, parallel) {
 	    	parallel = Sincerity.Objects.ensure(parallel, true)
 	    	
 	    	var id = Sincerity.Objects.uniqueString()
-			this.fireEvent({type: 'begin', id: id, message: 'Fetching all modules'})
+			this.notify({type: 'begin', id: id, message: 'Installing'})
 
 			var futures = []
 	    	
-	    	for (var m in this.resolvedModules) {
-	    		var module = this.resolvedModules[m]
+	    	for (var m in this.identifiedModules) {
+	    		var module = this.identifiedModules[m]
 	    		if (parallel) {
-	    			futures.push(module.identifier.repository.fetchModuleFuture(module.identifier, directory, overwrite, this))
+	    			futures.push(module.identifier.repository.installModuleFuture(module.identifier, directory, overwrite, this))
 	    		}
 	    		else {
-	    			module.identifier.repository.fetchModule(module.identifier, directory, overwrite, this)
+	    			module.identifier.repository.installModule(module.identifier, directory, overwrite, this)
 	    		}
 	    	}
 	    	
@@ -899,9 +851,76 @@ Sincerity.Dependencies = Sincerity.Dependencies || function() {
     			}
     		}*/
 			
-			this.fireEvent({type: 'end', id: id, message: 'Fetched all modules'})
+			this.notify({type: 'end', id: id, message: 'Installed ' + futures.length + ' modules'})
 	    }
-	    
+
+	    Public.applyRules = function(module, context) {
+			for (var r in this.rules) {
+				var rule = this.rules[r]
+				var command = null
+				
+				// Try repositories
+				var repository
+				for (var rr in this.repositories) {
+					repository = this.repositories[rr]
+					command = repository.applyModuleRule(module, rule, this)
+    				if (command) {
+    					break
+    				}
+    			}
+				
+				if (null === command) {
+					this.notify({type: 'error', message: 'Unsupported rule: ' + rule.type})
+					continue
+				}
+
+				if (true === command) {
+					continue
+				}
+
+				if (Sincerity.Objects.isString(command)) {
+					command = {type: command}
+				}
+
+				// Do command
+				if (command.type == 'excludeModule') {
+					this.notify('Excluded ' + module.specification.toString())
+					context.exclude = true
+				}
+				else if (command.type == 'excludeDependencies') {
+					this.notify('Excluded dependencies for ' + module.specification.toString())
+					context.recursive = false
+				}
+				else if (command.type == 'setRepositories') {
+					context.repositories = []
+					for (var i in command.repositories) {
+						var id = command.repositories[i]
+						var found = false
+						for (var rr in this.repositories) {
+							var repository = this.repositories[rr]
+							if (repository.id == id) {
+								context.repositories.push(repository)
+								found = true
+								break
+							}
+						}
+						if (!found) {
+							this.notify({type: 'error', message: 'Unknown repository: ' + id})
+						}
+					}
+					var ids = []
+					for (var rr in context.repositories) {
+						var repository = context.repositories[rr]
+						ids.push(repository.id)
+					}
+					this.notify('Forced ' + module.specification.toString() + ' to identify in ' + ids.join(', ') + (ids.length > 1 ? ' repositories' : ' repository'))
+				}
+				else {
+					this.notify({type: 'error', message: 'Unsupported command: ' + command.type})
+				}
+			}
+	    }
+
 	    return Public
 	}(Public))
 

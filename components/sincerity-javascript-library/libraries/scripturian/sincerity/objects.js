@@ -476,9 +476,9 @@ Sincerity.Objects = Sincerity.Objects || function() {
 	 * @param string The string
 	 * @param [pattern] The pattern (an empty pattern matches everything, like "*")
 	 * @returns {Boolean} true if the string matches the pattern
-	 * @see String#matchSimple
+	 * @see String#glob
 	 */
-	Public.matchSimple = function(string, pattern) {
+	Public.glob = function(string, pattern) {
 		if (!Public.exists(pattern)) {
 			// Match everything
 			return true
@@ -1052,8 +1052,8 @@ String.prototype.repeat = String.prototype.repeat || function(times) {
  * @methodOf String#
  * @param [pattern] The pattern
  * @returns {Boolean} true if the string matches the pattern
- * @see Sincerity.Objects#matchSimple
+ * @see Sincerity.Objects#glob
  */
-String.prototype.matchSimple = String.prototype.matchSimple || function(pattern) {
-	return Sincerity.Objects.matchSimple(this, pattern)
+String.prototype.glob = String.prototype.glob || function(pattern) {
+	return Sincerity.Objects.glob(this, pattern)
 }

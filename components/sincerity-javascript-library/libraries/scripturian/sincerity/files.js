@@ -12,6 +12,7 @@
 //
 
 document.require(
+	'/sincerity/io/',
 	'/sincerity/jvm/',
 	'/sincerity/objects/')
 
@@ -49,7 +50,7 @@ Sincerity.Files = Sincerity.Files || function() {
     	}
     	
     	var file = arguments[0]
-		file = Sincerity.Objects.isString(file) ? new java.io.File(file) : file
+		file = Sincerity.IO.asFile(file)
 		for (var a = 1; a < length; a++) {
 			file = add(file, arguments[a])
 		}
@@ -85,7 +86,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the delete succeeded
 	 */
 	Public.remove = function(file, recursive) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.IO.asFile(file).canonicalFile
 
 		if (!file.exists()) {
 			return true
@@ -112,8 +113,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the copy succeeded
 	 */
 	Public.copy = function(fromFile, toFile) {
-		fromFile = (Sincerity.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
-		toFile = (Sincerity.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
+		fromFile = Sincerity.IO.asFile(fromFile).canonicalFile
+		toFile = Sincerity.IO.asFile(toFile).canonicalFile
 
 		if (!fromFile.exists()) {
 			return false
@@ -169,8 +170,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 *          note that false could mean that parts of the move succeeded
 	 */
 	Public.move = function(fromFile, toFile, recursive) {
-		fromFile = (Sincerity.Objects.isString(fromFile) ? new java.io.File(fromFile) : fromFile).canonicalFile
-		toFile = (Sincerity.Objects.isString(toFile) ? new java.io.File(toFile) : toFile).canonicalFile
+		fromFile = Sincerity.IO.asFile(fromFile).canonicalFile
+		toFile = Sincerity.IO.asFile(toFile).canonicalFile
 
 		if (!fromFile.exists()) {
 			return false
@@ -194,7 +195,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 */
 	Public.erase = function(file) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.IO.asFile(file).canonicalFile
 		new java.io.FileWriter(file).close()		
 	}
 	
@@ -206,7 +207,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/File.html">java.io.File</a>} file The file or its path
 	 */
 	Public.makeExecutable = function(file) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.IO.asFile(file).canonicalFile
+		
 		if (file.exists()) {
 			if (undefined !== file.executable) { // JVM6+ only
 				file.executable = true
@@ -240,7 +242,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/PrintWriter.html">java.io.PrintWriter</a>}
 	 */
 	Public.openForTextWriting = function(file, gzip) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.IO.asFile(file).canonicalFile
 
 		var stream = new java.io.FileOutputStream(file)
 		if (gzip) {
@@ -262,7 +264,7 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/io/Reader.html">java.io.Reader</a>}
 	 */
 	Public.openForTextReading = function(file, gzip) {
-		file = (Sincerity.Objects.isString(file) ? new java.io.File(file) : file).canonicalFile
+		file = Sincerity.IO.asFile(file).canonicalFile
 
 		var stream = new java.io.FileInputStream(file)
 		if (gzip) {
@@ -292,7 +294,9 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @returns {<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/CharBuffer.html">java.nio.CharBuffer</a>}
 	 */
 	Public.loadText = function(file, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
+		file = Sincerity.IO.asFile(file).canonicalFile
+		charset = Sincerity.JVM.asCharset(charset)
+		
 		var input = new java.io.FileInputStream(file)
 		var channel = input.channel
 		try {
@@ -313,7 +317,9 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
 	 */
 	Public.grep = function(inputFile, outputFile, pattern, charset) {
-		charset = Sincerity.Objects.isString(charset) ? Sincerity.JVM.getCharset(charset) : (Sincerity.Objects.exists(charset) ? charset : Sincerity.JVM.getCharset())
+		inputFile = Sincerity.IO.asFile(inputFile).canonicalFile
+		outputFile = Sincerity.IO.asFile(outputFile).canonicalFile
+		charset = Sincerity.JVM.asCharset(charset)
 
 		var buffer = Public.loadText(inputFile, charset)
 
@@ -344,6 +350,8 @@ Sincerity.Files = Sincerity.Files || function() {
 	 * @param {String|<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/nio/charset/Charset.html">java.nio.charset.Charset</a>} [charset=default encoding (most likely UTF-8)] The charset in which the file is encoded
 	 */
 	Public.tail = function(file, position, forward, count, charset) {
+		file = Sincerity.IO.asFile(file).canonicalFile
+		
 		var randomAccessFile = new java.io.RandomAccessFile(file, 'r')
 		var position = Sincerity.Objects.exists(position) ? position : randomAccessFile.length() - 1
 		var start, end

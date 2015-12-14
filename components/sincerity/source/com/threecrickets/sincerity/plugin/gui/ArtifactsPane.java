@@ -56,7 +56,7 @@ public class ArtifactsPane extends JPanel implements Refreshable, ItemListener
 	// Construction
 	//
 
-	public ArtifactsPane( Dependencies dependencies ) throws SincerityException
+	public ArtifactsPane( Dependencies<?> dependencies ) throws SincerityException
 	{
 		super( new BorderLayout() );
 
@@ -168,7 +168,7 @@ public class ArtifactsPane extends JPanel implements Refreshable, ItemListener
 
 	private static final long serialVersionUID = 1L;
 
-	private final Dependencies dependencies;
+	private final Dependencies<?> dependencies;
 
 	private final JTree tree;
 

@@ -19,16 +19,18 @@ import java.util.Set;
 
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 
-import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.Package;
 import com.threecrickets.sincerity.Plugin1;
-import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.ivy.IvyDependencies;
+import com.threecrickets.sincerity.ivy.IvyResolvedDependencies;
+import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
+import com.threecrickets.sincerity.packaging.Artifact;
+import com.threecrickets.sincerity.packaging.Package;
 import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
 import com.threecrickets.sincerity.util.TreeUtil;
 
@@ -92,8 +94,8 @@ public class ArtifactsPlugin implements Plugin1
 			boolean packages = switches.contains( "packages" );
 			boolean verbose = switches.contains( "verbose" );
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
+			Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
 
 			printArtifacts( dependencies, out, packages, verbose );
 		}
@@ -104,8 +106,8 @@ public class ArtifactsPlugin implements Plugin1
 			boolean overwrite = switches.contains( "overwrite" );
 			boolean verify = switches.contains( "verify" );
 
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			dependencies.install( overwrite, verify );
 
@@ -118,8 +120,8 @@ public class ArtifactsPlugin implements Plugin1
 		}
 		else if( "uninstall".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			dependencies.uninstall();
 
@@ -128,8 +130,8 @@ public class ArtifactsPlugin implements Plugin1
 		}
 		else if( "prune".equals( commandName ) )
 		{
-			Container container = sincerity.getContainer();
-			Dependencies dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			dependencies.prune();
 
@@ -150,11 +152,11 @@ public class ArtifactsPlugin implements Plugin1
 	// Operations
 	//
 
-	public void printArtifacts( Dependencies dependencies, Writer writer, boolean withPackages, boolean verbose ) throws SincerityException
+	public void printArtifacts( Dependencies<IvyResolvedDependency> dependencies, Writer writer, boolean withPackages, boolean verbose ) throws SincerityException
 	{
-		Container container = dependencies.getContainer();
+		Container<IvyResolvedDependency, ?> container = dependencies.getContainer();
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
+		for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
 		{
 			printWriter.println( resolvedDependency );
 			org.apache.ivy.core.module.descriptor.Artifact[] artifacts = resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION );

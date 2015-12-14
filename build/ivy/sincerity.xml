@@ -23,7 +23,7 @@
 		<!-- For compilation only -->
 		<dependency org="org.apache.logging.log4j" name="log4j-api" rev="2.0+" conf="compile->default" />
 		<dependency org="org.apache.logging.log4j" name="log4j-core" rev="2.0+" conf="compile->default" />
-		<dependency org="org.mongodb" name="mongodb-driver" rev="3.0+"  conf="compile->default" />
+		<dependency org="org.mongodb" name="mongodb-driver" rev="3.1+"  conf="compile->default" />
 		<dependency org="org.apache.ant" name="ant" rev="1.8+" conf="compile->default" /> <!-- Note: When invoking Ant through the Maven Ant plugin we cannot use the includeAntRuntime attributes in the javac task -->
 		<!-- <dependency org="jdk.nashorn" name="nashorn-backport" rev="latest.integration" conf="compile->default" /> -->
 	</dependencies>

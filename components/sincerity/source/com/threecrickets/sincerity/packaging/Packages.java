@@ -9,7 +9,7 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.sincerity;
+package com.threecrickets.sincerity.packaging;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +22,7 @@ import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
 
 /**
- * Manages the packages defined in the classpath of a {@link Dependencies}
- * instance.
+ * Manages the packages defined in a classpath.
  * <p>
  * This class works by scanning the entire classpath for packages defined in the
  * JVM resources manifests, and parsing them. See {@link Package} for more
@@ -47,21 +46,20 @@ public class Packages extends ArrayList<Package>
 	/**
 	 * Initializes all packages in the container's classpath.
 	 * 
-	 * @param container
-	 *        The container
+	 * @param packagingContext
+	 *        The packaging context
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public Packages( Container container ) throws SincerityException
+	public Packages( PackagingContext packagingContext ) throws SincerityException
 	{
-		this.container = container;
 		try
 		{
-			Enumeration<URL> manifestUrls = container.getBootstrap().getResources( MANIFEST );
+			Enumeration<URL> manifestUrls = packagingContext.getClassLoader().getResources( MANIFEST );
 			while( manifestUrls.hasMoreElements() )
 			{
 				URL manifestUrl = manifestUrls.nextElement();
-				Package pack = Package.parsePackage( manifestUrl, container );
+				Package pack = Package.parsePackage( manifestUrl, packagingContext );
 				if( pack != null )
 					add( pack );
 			}
@@ -114,6 +112,8 @@ public class Packages extends ArrayList<Package>
 	/**
 	 * Unpacks all artifacts and runs package installers.
 	 * 
+	 * @param managedArtifacts
+	 *        The managed artifacts
 	 * @param filter
 	 *        Filter artifacts (currently unused)
 	 * @param overwrite
@@ -124,11 +124,11 @@ public class Packages extends ArrayList<Package>
 	 *         In case of an error
 	 * @see Package#unpack(String, ManagedArtifacts, boolean, boolean)
 	 */
-	public void install( String filter, boolean overwrite, boolean verify ) throws SincerityException
+	public void install( ManagedArtifacts managedArtifacts, String filter, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		for( Package pack : this )
 		{
-			pack.unpack( filter, container.getDependencies().getManagedArtifacts(), overwrite, verify );
+			pack.unpack( filter, managedArtifacts, overwrite, verify );
 			pack.install();
 		}
 	}
@@ -151,6 +151,4 @@ public class Packages extends ArrayList<Package>
 	// Private
 
 	private static final long serialVersionUID = 1L;
-
-	private final Container container;
 }

@@ -34,6 +34,7 @@ import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.RebootException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
+import com.threecrickets.sincerity.ivy.IvyContainer;
 import com.threecrickets.sincerity.plugin.gui.Frame;
 import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.NativeUtil;
@@ -452,12 +453,17 @@ public class Sincerity implements Runnable
 	 * The current container.
 	 * <p>
 	 * Creates a new instance if not previously accessed.
-	 * 
+	 *
+	 * @param <RD>
+	 *        The resolved dependency class
+	 * @param <R>
+	 *        The repositories class
 	 * @return The container
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public Container getContainer() throws SincerityException
+	@SuppressWarnings("unchecked")
+	public <RD extends ResolvedDependency, R extends Repositories> Container<RD, R> getContainer() throws SincerityException
 	{
 		if( container == null )
 		{
@@ -479,13 +485,13 @@ public class Sincerity implements Runnable
 				}
 			}
 
-			container = new Container( this, containerRoot, debugLevel );
+			container = new IvyContainer( this, containerRoot, debugLevel );
 
 			if( getVerbosity() >= 2 )
 				getOut().println( "Using Sincerity container at: " + containerRoot );
 		}
 
-		return container;
+		return (Container<RD, R>) container;
 	}
 
 	/**
@@ -761,7 +767,7 @@ public class Sincerity implements Runnable
 
 	private File containerRoot;
 
-	private Container container;
+	private Container<?, ?> container;
 
 	private Plugins plugins;
 
