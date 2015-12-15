@@ -11,6 +11,10 @@
 
 package com.threecrickets.sincerity;
 
+import java.util.Collection;
+
+import org.apache.ivy.plugins.resolver.DependencyResolver;
+
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**
@@ -30,6 +34,19 @@ public abstract class Repositories
 	//
 
 	public static final String REPOSITORY_SECTION_SEPARATOR = ":";
+
+	//
+	// Attributes
+	//
+
+	/**
+	 * The repositories in a section.
+	 * 
+	 * @param section
+	 *        The section name
+	 * @return The repositories or null
+	 */
+	public abstract Collection<Repository> getRepositories( String section );
 
 	//
 	// Operations

@@ -11,31 +11,20 @@
 
 package com.threecrickets.sincerity;
 
-import java.util.Collection;
+import java.io.File;
 
 /**
- * A descriptor for a single node in the resolved dependency tree. See
- * {@link ResolvedDependencies}.
- * 
  * @author Tal Liron
  */
-public abstract class ResolvedDependency
+public abstract class Artifact
 {
-	//
-	// Attributes
-	//
-
-	public abstract String getGroup();
-
 	public abstract String getName();
 
-	public abstract String getVersion();
+	public abstract String getExtension();
 
-	public abstract Collection<ResolvedDependency> getChildren();
+	public abstract String getType();
 
-	public abstract Collection<License> getLicenses();
-
-	public abstract Collection<Artifact> getArtifacts();
+	public abstract File getLocation();
 	
-	public abstract boolean isEvicted();
+	public abstract Integer getSize();
 }

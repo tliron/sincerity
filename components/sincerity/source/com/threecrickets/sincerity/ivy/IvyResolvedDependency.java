@@ -12,10 +12,14 @@
 package com.threecrickets.sincerity.ivy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
+import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
 import org.apache.ivy.core.module.descriptor.ModuleDescriptor;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 
+import com.threecrickets.sincerity.Artifact;
+import com.threecrickets.sincerity.License;
 import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.ResolvedDependency;
 
@@ -28,23 +32,58 @@ import com.threecrickets.sincerity.ResolvedDependency;
 public class IvyResolvedDependency extends ResolvedDependency
 {
 	//
-	// Attributes
+	// ResolvedDependency
 	//
 
-	/**
-	 * The Ivy module descriptor.
-	 */
-	public final ModuleDescriptor descriptor;
+	@Override
+	public String getGroup()
+	{
+		return descriptor.getModuleRevisionId().getOrganisation();
+	}
 
-	/**
-	 * The Ivy eviction information.
-	 */
-	public final String evicted;
+	@Override
+	public String getName()
+	{
+		return descriptor.getModuleRevisionId().getName();
+	}
 
-	/**
-	 * Our children.
-	 */
-	public final ArrayList<IvyResolvedDependency> children = new ArrayList<IvyResolvedDependency>();
+	@Override
+	public String getVersion()
+	{
+		return descriptor.getModuleRevisionId().getRevision();
+	}
+
+	@Override
+	public Collection<ResolvedDependency> getChildren()
+	{
+		return children;
+	}
+
+	@Override
+	public Collection<License> getLicenses()
+	{
+		org.apache.ivy.core.module.descriptor.License ivyLicenses[] = descriptor.getLicenses();
+		ArrayList<License> licenses = new ArrayList<License>( ivyLicenses.length );
+		for( org.apache.ivy.core.module.descriptor.License ivyLicense : ivyLicenses )
+			licenses.add( new IvyLicense( ivyLicense ) );
+		return licenses;
+	}
+
+	@Override
+	public Collection<Artifact> getArtifacts()
+	{
+		org.apache.ivy.core.module.descriptor.Artifact ivyArtifacts[] = descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION );
+		ArrayList<Artifact> artifacts = new ArrayList<Artifact>( ivyArtifacts.length );
+		for( org.apache.ivy.core.module.descriptor.Artifact ivyArtifact : ivyArtifacts )
+			artifacts.add( new IvyArtifact( ivyArtifact ) );
+		return artifacts;
+	}
+
+	@Override
+	public boolean isEvicted()
+	{
+		return evicted != null;
+	}
 
 	//
 	// Object
@@ -94,6 +133,11 @@ public class IvyResolvedDependency extends ResolvedDependency
 	}
 
 	/**
+	 * The Ivy module descriptor.
+	 */
+	protected final ModuleDescriptor descriptor;
+
+	/**
 	 * True if we have no parents.
 	 */
 	protected boolean isRoot = true;
@@ -121,4 +165,14 @@ public class IvyResolvedDependency extends ResolvedDependency
 
 		public final String revision;
 	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private final ArrayList<ResolvedDependency> children = new ArrayList<ResolvedDependency>();
+
+	/**
+	 * The Ivy eviction information.
+	 */
+	private final String evicted;
 }

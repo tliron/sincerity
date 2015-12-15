@@ -32,8 +32,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.ResolvedDependencies;
+import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
 import com.threecrickets.sincerity.plugin.ContainerPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
 import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
@@ -54,7 +54,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 	// Construction
 	//
 
-	public DependenciesPane( Dependencies<IvyResolvedDependency> dependencies ) throws SincerityException
+	public DependenciesPane( Dependencies<?> dependencies ) throws SincerityException
 	{
 		super( new BorderLayout() );
 
@@ -110,7 +110,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 		{
 			SortedNode root = new SortedNode();
 
-			for( IvyResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
+			for( ResolvedDependency resolvedDependency : includeSub && !asTree ? dependencies.getResolvedDependencies().getAll() : dependencies.getResolvedDependencies() )
 				root.add( GuiUtil.createDependencyNode( resolvedDependency, dependencies, true, asTree && includeSub, showLicenses, showArtifacts, showPackageContents ) );
 
 			TreeUI ui = tree.getUI();
@@ -162,7 +162,7 @@ public class DependenciesPane extends JPanel implements Refreshable, ItemListene
 
 	private static final long serialVersionUID = 1L;
 
-	private final Dependencies<IvyResolvedDependency> dependencies;
+	private final Dependencies<?> dependencies;
 
 	private final JTree tree;
 

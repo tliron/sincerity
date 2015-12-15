@@ -26,25 +26,19 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.apache.ivy.core.module.descriptor.Artifact;
-import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.License;
-import org.apache.ivy.core.module.id.ModuleRevisionId;
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-import org.apache.ivy.plugins.resolver.IBiblioResolver;
-
 import com.threecrickets.bootstrap.Bootstrap;
+import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.License;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
-import com.threecrickets.sincerity.ResolvedDependencies;
+import com.threecrickets.sincerity.Repository;
+import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
-import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 import com.threecrickets.sincerity.packaging.Package;
 
 /**
@@ -171,59 +165,58 @@ public class GuiUtil
 		expandAll( tree, new TreePath( (TreeNode) tree.getModel().getRoot() ), expand );
 	}
 
-	public static String toHtml( IvyResolvedDependency resolvedDependency, boolean bold, boolean br )
+	public static String toHtml( ResolvedDependency resolvedDependency, boolean bold, boolean br )
 	{
-		ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
-		String organisation = id.getOrganisation();
-		String name = id.getName();
-		String revision = id.getRevision();
+		String group = resolvedDependency.getGroup();
+		String name = resolvedDependency.getName();
+		String version = resolvedDependency.getVersion();
 
 		StringBuilder s = new StringBuilder();
 		s.append( "<html>" );
-		if( resolvedDependency.evicted != null )
+		if( resolvedDependency.isEvicted() )
 			s.append( "<i>" );
 		if( bold )
 			s.append( "<b>" );
-		s.append( organisation );
-		if( !name.equals( organisation ) )
+		s.append( group );
+		if( !name.equals( group ) )
 		{
 			s.append( ':' );
 			s.append( name );
 		}
 		if( bold )
 			s.append( "</b>" );
-		if( !"latest.integration".equals( revision ) )
+		if( !"latest.integration".equals( version ) )
 		{
 			s.append( br ? "<br/>v" : " v" );
-			s.append( revision );
+			s.append( version );
 		}
-		if( resolvedDependency.evicted != null )
+		if( resolvedDependency.isEvicted() )
 			s.append( "</i>" );
 		s.append( "</html>" );
 		return s.toString();
 	}
 
-	public static EnhancedNode createDependencyNode( IvyResolvedDependency resolvedDependency, Dependencies<IvyResolvedDependency> dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses,
-		boolean includeArtifacts, boolean includePackageContents ) throws SincerityException
+	public static EnhancedNode createDependencyNode( ResolvedDependency resolvedDependency, Dependencies<?> dependencies, boolean isMain, boolean includeChildren, boolean includeLicenses, boolean includeArtifacts,
+		boolean includePackageContents ) throws SincerityException
 	{
 		EnhancedNode node = new EnhancedNode( resolvedDependency, toHtml( resolvedDependency, isMain, false ), DEPENDENCY_ICON );
 
 		if( includeLicenses )
-			for( License license : resolvedDependency.descriptor.getLicenses() )
+			for( License license : resolvedDependency.getLicenses() )
 				node.add( createLicenseNode( license, dependencies, false, false, false, false ) );
 
 		if( includeArtifacts )
-			for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+			for( Artifact artifact : resolvedDependency.getArtifacts() )
 				node.add( createArtifactNode( artifact, dependencies, includePackageContents ) );
 
 		if( includeChildren )
-			for( IvyResolvedDependency child : resolvedDependency.children )
+			for( ResolvedDependency child : resolvedDependency.getChildren() )
 				node.add( createDependencyNode( child, dependencies, isMain, true, includeLicenses, includeArtifacts, includePackageContents ) );
 
 		return node;
 	}
 
-	public static EnhancedNode createLicenseNode( License license, Dependencies<IvyResolvedDependency> dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
+	public static EnhancedNode createLicenseNode( License license, Dependencies<?> dependencies, boolean isMain, boolean includeDependencies, boolean includeArtifacts, boolean includePackageContents )
 		throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
@@ -240,12 +233,12 @@ public class GuiUtil
 		EnhancedNode node = new EnhancedNode( license, s.toString(), LICENSE_ICON );
 
 		if( includeDependencies )
-			for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
+			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
 				node.add( createDependencyNode( resolvedDependency, dependencies, false, false, false, includeArtifacts, includePackageContents ) );
 		else if( includeArtifacts )
 		{
-			for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
-				for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
+			for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getByLicense( license ) )
+				for( Artifact artifact : resolvedDependency.getArtifacts() )
 					node.add( createArtifactNode( artifact, dependencies, includePackageContents ) );
 		}
 
@@ -256,17 +249,17 @@ public class GuiUtil
 	{
 		StringBuilder s = new StringBuilder();
 
-		String location = artifact.getId().getAttribute( "location" );
-		boolean installed = location != null && new File( location ).exists();
+		File location = artifact.getLocation();
+		boolean installed = location != null && location.exists();
 
 		s.append( "<html>" );
 		if( !installed )
 			s.append( "<i>" );
 
-		String size = artifact.getId().getAttribute( "size" );
+		Integer size = artifact.getSize();
 		if( location != null )
 		{
-			location = dependencies.getContainer().getRelativePath( location );
+			location = dependencies.getContainer().getRelativeFile( location );
 			s.append( location );
 		}
 		else
@@ -274,7 +267,7 @@ public class GuiUtil
 			// Could not find a location for it?
 			s.append( artifact.getName() );
 			s.append( '.' );
-			s.append( artifact.getExt() );
+			s.append( artifact.getExtension() );
 			s.append( '?' );
 		}
 		s.append( " (" );
@@ -291,7 +284,7 @@ public class GuiUtil
 			s.append( "</i>" );
 		s.append( "</html>" );
 
-		Package pack = location != null ? dependencies.getPackages().getPackage( new File( location ) ) : null;
+		Package pack = location != null ? dependencies.getPackages().getPackage( location ) : null;
 		EnhancedNode node = new EnhancedNode( artifact, s.toString(), pack != null ? PACKAGE_ICON : FILE_ICON );
 
 		if( includePackageContents && pack != null )
@@ -349,12 +342,12 @@ public class GuiUtil
 		return new EnhancedNode( program, program, COMMAND_ICON );
 	}
 
-	public static EnhancedNode createRepositoryNode( DependencyResolver resolver ) throws SincerityException
+	public static EnhancedNode createRepositoryNode( Repository repository ) throws SincerityException
 	{
 		StringBuilder s = new StringBuilder();
 		s.append( "<html><b>" );
 
-		String name = resolver.getName();
+		String name = repository.getName();
 		String[] split = name.split( Repositories.REPOSITORY_SECTION_SEPARATOR, 2 );
 		if( split.length == 2 )
 			s.append( split[1] );
@@ -362,19 +355,13 @@ public class GuiUtil
 			s.append( name );
 		s.append( "</b>" );
 
-		if( resolver instanceof IBiblioResolver )
-		{
-			s.append( ": maven:" );
-			s.append( ( (IBiblioResolver) resolver ).getRoot() );
-		}
-		else if( resolver instanceof PyPiResolver )
-		{
-			s.append( ": pypi:" );
-			s.append( ( (PyPiResolver) resolver ).getRoot() );
-		}
+		s.append( ": " );
+		s.append( repository.getType() );
+		s.append( ":" );
+		s.append( repository.getRoot() );
 
 		s.append( "</html>" );
-		return new EnhancedNode( resolver, s.toString(), FILE_ICON );
+		return new EnhancedNode( repository, s.toString(), FILE_ICON );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

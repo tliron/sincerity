@@ -54,6 +54,7 @@ import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.ResolvedDependencies;
+import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.packaging.Artifact;
 import com.threecrickets.sincerity.packaging.ManagedArtifacts;
@@ -71,80 +72,6 @@ import com.threecrickets.sincerity.util.XmlUtil;
  */
 public class IvyDependencies extends Dependencies<IvyResolvedDependency>
 {
-	//
-	// Construction
-	//
-
-	/**
-	 * Parses the Ivy module descriptor, and loads the managed artifacts
-	 * database.
-	 * 
-	 * @param ivyFile
-	 *        The Ivy module descriptor file (usually
-	 *        "/configuration/sincerity/dependencies.conf")
-	 * @param artifactsFile
-	 *        The managed artifacts database file (usually
-	 *        "/configuration/sincerity/artifacts.conf")
-	 * @param container
-	 *        The container
-	 * @throws SincerityException
-	 *         In case of an error
-	 */
-	public IvyDependencies( File ivyFile, File artifactsFile, IvyContainer container ) throws SincerityException
-	{
-		super( artifactsFile, container );
-		this.ivyFile = ivyFile;
-		ivy = container.getIvy();
-
-		// Module
-		if( ivyFile.exists() )
-		{
-			ivy.pushContext();
-			try
-			{
-				URL ivyUrl = ivyFile.toURI().toURL();
-				URLResource resource = new URLResource( ivyUrl );
-				ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser( resource );
-				moduleDescriptor = (DefaultModuleDescriptor) parser.parseDescriptor( ivy.getSettings(), ivyUrl, true );
-			}
-			catch( MalformedURLException x )
-			{
-				throw new RuntimeException( x );
-			}
-			catch( ParseException x )
-			{
-				throw new SincerityException( "Could not parse dependencies configuration: " + ivyFile, x );
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not read dependencies configuration: " + ivyFile, x );
-			}
-			finally
-			{
-				ivy.popContext();
-			}
-		}
-		else
-		{
-			ivy.pushContext();
-			try
-			{
-				moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( ModuleRevisionId.newInstance( "threecrickets", "sincerity-container", "working" ) );
-			}
-			finally
-			{
-				ivy.popContext();
-			}
-		}
-
-		// Default resolve options
-		defaultResolveOptions = new ResolveOptions();
-		defaultResolveOptions.setResolveMode( ResolveOptions.RESOLVEMODE_DYNAMIC );
-		defaultResolveOptions.setConfs( CONFIGURATIONS );
-		defaultResolveOptions.setCheckIfChanged( true );
-		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() >= 1 ? LogOptions.LOG_DEFAULT : LogOptions.LOG_QUIET );
-	}
-
 	//
 	// Attributes
 	//
@@ -533,6 +460,79 @@ public class IvyDependencies extends Dependencies<IvyResolvedDependency>
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	/**
+	 * Parses the Ivy module descriptor, and loads the managed artifacts
+	 * database.
+	 * 
+	 * @param ivyFile
+	 *        The Ivy module descriptor file (usually
+	 *        "/configuration/sincerity/dependencies.conf")
+	 * @param artifactsFile
+	 *        The managed artifacts database file (usually
+	 *        "/configuration/sincerity/artifacts.conf")
+	 * @param container
+	 *        The container
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	protected IvyDependencies( File ivyFile, File artifactsFile, IvyContainer container ) throws SincerityException
+	{
+		super( artifactsFile, container );
+		this.ivyFile = ivyFile;
+		ivy = container.getIvy();
+
+		// Module
+		if( ivyFile.exists() )
+		{
+			ivy.pushContext();
+			try
+			{
+				URL ivyUrl = ivyFile.toURI().toURL();
+				URLResource resource = new URLResource( ivyUrl );
+				ModuleDescriptorParser parser = ModuleDescriptorParserRegistry.getInstance().getParser( resource );
+				moduleDescriptor = (DefaultModuleDescriptor) parser.parseDescriptor( ivy.getSettings(), ivyUrl, true );
+			}
+			catch( MalformedURLException x )
+			{
+				throw new RuntimeException( x );
+			}
+			catch( ParseException x )
+			{
+				throw new SincerityException( "Could not parse dependencies configuration: " + ivyFile, x );
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not read dependencies configuration: " + ivyFile, x );
+			}
+			finally
+			{
+				ivy.popContext();
+			}
+		}
+		else
+		{
+			ivy.pushContext();
+			try
+			{
+				moduleDescriptor = DefaultModuleDescriptor.newDefaultInstance( ModuleRevisionId.newInstance( "threecrickets", "sincerity-container", "working" ) );
+			}
+			finally
+			{
+				ivy.popContext();
+			}
+		}
+
+		// Default resolve options
+		defaultResolveOptions = new ResolveOptions();
+		defaultResolveOptions.setResolveMode( ResolveOptions.RESOLVEMODE_DYNAMIC );
+		defaultResolveOptions.setConfs( CONFIGURATIONS );
+		defaultResolveOptions.setCheckIfChanged( true );
+		defaultResolveOptions.setLog( container.getSincerity().getVerbosity() >= 1 ? LogOptions.LOG_DEFAULT : LogOptions.LOG_QUIET );
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
 	private static final String[] CONFIGURATIONS = new String[]
@@ -596,7 +596,7 @@ public class IvyDependencies extends Dependencies<IvyResolvedDependency>
 	private void freeze( IvyResolvedDependency resolvedDependency ) throws SincerityException
 	{
 		Container<?, ?> container = getContainer();
-		if( resolvedDependency.evicted != null )
+		if( resolvedDependency.isEvicted() )
 		{
 			if( container.getSincerity().getVerbosity() >= 2 )
 				container.getSincerity().getOut().println( "Not freezing: " + resolvedDependency );
@@ -617,11 +617,8 @@ public class IvyDependencies extends Dependencies<IvyResolvedDependency>
 			override( id.getOrganisation(), id.getName(), id.getRevision() );
 		}
 
-		for( Iterator<IvyResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
-		{
-			IvyResolvedDependency child = i.next();
-			freeze( child );
-		}
+		for( ResolvedDependency child : resolvedDependency.getChildren() )
+			freeze( (IvyResolvedDependency) child );
 	}
 
 	/**

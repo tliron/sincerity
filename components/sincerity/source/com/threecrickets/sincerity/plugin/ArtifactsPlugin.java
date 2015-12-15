@@ -17,19 +17,15 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-
+import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
+import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.ivy.IvyDependencies;
-import com.threecrickets.sincerity.ivy.IvyResolvedDependencies;
-import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
-import com.threecrickets.sincerity.packaging.Artifact;
 import com.threecrickets.sincerity.packaging.Package;
 import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
 import com.threecrickets.sincerity.util.TreeUtil;
@@ -94,8 +90,8 @@ public class ArtifactsPlugin implements Plugin1
 			boolean packages = switches.contains( "packages" );
 			boolean verbose = switches.contains( "verbose" );
 
-			Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
-			Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			printArtifacts( dependencies, out, packages, verbose );
 		}
@@ -152,23 +148,22 @@ public class ArtifactsPlugin implements Plugin1
 	// Operations
 	//
 
-	public void printArtifacts( Dependencies<IvyResolvedDependency> dependencies, Writer writer, boolean withPackages, boolean verbose ) throws SincerityException
+	public void printArtifacts( Dependencies<?> dependencies, Writer writer, boolean withPackages, boolean verbose ) throws SincerityException
 	{
-		Container<IvyResolvedDependency, ?> container = dependencies.getContainer();
+		Container<?, ?> container = dependencies.getContainer();
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( IvyResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
+		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
 		{
 			printWriter.println( resolvedDependency );
-			org.apache.ivy.core.module.descriptor.Artifact[] artifacts = resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION );
-			for( int length = artifacts.length, i = 0; i < length; i++ )
+			for( Iterator<Artifact> i = resolvedDependency.getArtifacts().iterator(); i.hasNext(); )
 			{
-				org.apache.ivy.core.module.descriptor.Artifact artifact = artifacts[i];
-				printWriter.print( i == length - 1 ? TreeUtil.LVV : TreeUtil.TVV );
+				Artifact artifact = i.next();
+				printWriter.print( i.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
 
-				String location = artifact.getId().getAttribute( "location" );
+				File location = artifact.getLocation();
 				if( location != null )
-					location = container.getRelativePath( location );
-				boolean installed = location != null && new File( location ).exists();
+					location = container.getRelativeFile( location );
+				boolean installed = location != null && location.exists();
 
 				if( !installed )
 					printWriter.print( '(' );
@@ -178,7 +173,7 @@ public class ArtifactsPlugin implements Plugin1
 				if( verbose )
 				{
 					printWriter.print( ": " );
-					String size = artifact.getId().getAttribute( "size" );
+					Integer size = artifact.getSize();
 					if( location != null )
 						printWriter.print( location );
 					else
@@ -186,7 +181,7 @@ public class ArtifactsPlugin implements Plugin1
 						// Could not find a location for it?
 						printWriter.print( artifact.getName() );
 						printWriter.print( '.' );
-						printWriter.print( artifact.getExt() );
+						printWriter.print( artifact.getExtension() );
 						printWriter.print( '?' );
 					}
 					if( size != null )
@@ -204,12 +199,12 @@ public class ArtifactsPlugin implements Plugin1
 
 				if( withPackages )
 				{
-					Package pack = location != null ? dependencies.getPackages().getPackage( new File( location ) ) : null;
+					Package pack = location != null ? dependencies.getPackages().getPackage( location ) : null;
 					if( pack != null )
 					{
-						for( Iterator<Artifact> ii = pack.iterator(); ii.hasNext(); )
+						for( Iterator<com.threecrickets.sincerity.packaging.Artifact> ii = pack.iterator(); ii.hasNext(); )
 						{
-							Artifact packedArtifact = ii.next();
+							com.threecrickets.sincerity.packaging.Artifact packedArtifact = ii.next();
 							printWriter.print( "    " );
 							printWriter.print( ii.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
 							printWriter.println( container.getRelativeFile( packedArtifact.getFile() ) );

@@ -14,9 +14,6 @@ package com.threecrickets.sincerity;
 import java.util.AbstractList;
 import java.util.List;
 
-import org.apache.ivy.core.module.descriptor.Artifact;
-import org.apache.ivy.core.module.descriptor.License;
-
 import com.threecrickets.sincerity.exception.SincerityException;
 
 /**

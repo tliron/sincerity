@@ -33,8 +33,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.plaf.TreeUI;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.apache.ivy.core.module.descriptor.Artifact;
-
+import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.plugin.ArtifactsPlugin;

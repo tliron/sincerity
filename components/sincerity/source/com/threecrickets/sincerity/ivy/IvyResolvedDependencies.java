@@ -22,18 +22,19 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.ivy.Ivy;
-import org.apache.ivy.core.module.descriptor.Artifact;
 import org.apache.ivy.core.module.descriptor.Configuration;
 import org.apache.ivy.core.module.descriptor.DefaultArtifact;
 import org.apache.ivy.core.module.descriptor.DefaultModuleDescriptor;
-import org.apache.ivy.core.module.descriptor.License;
 import org.apache.ivy.core.module.id.ModuleRevisionId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.threecrickets.sincerity.Artifact;
+import com.threecrickets.sincerity.License;
 import com.threecrickets.sincerity.ResolvedDependencies;
+import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.IvyResolvedDependency.Caller;
 
@@ -45,10 +46,110 @@ import com.threecrickets.sincerity.ivy.IvyResolvedDependency.Caller;
 public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDependency>
 {
 	//
-	// Construction
+	// ResolvedDependencies
 	//
 
-	public IvyResolvedDependencies( IvyDependencies dependencies ) throws SincerityException
+	@Override
+	public List<IvyResolvedDependency> getAll()
+	{
+		if( allDependencies == null )
+		{
+			allDependencies = new ArrayList<IvyResolvedDependency>();
+			for( IvyResolvedDependency resolvedDependency : this )
+				addAllDependencies( resolvedDependency, allDependencies );
+		}
+		return allDependencies;
+	}
+
+	@Override
+	public List<Artifact> getArtifacts()
+	{
+		if( artifacts == null )
+		{
+			artifacts = new ArrayList<Artifact>();
+			for( IvyResolvedDependency resolvedDependency : getAll() )
+				for( Artifact artifact : resolvedDependency.getArtifacts() )
+					artifacts.add( artifact );
+		}
+		return artifacts;
+	}
+
+	@Override
+	public List<License> getLicenses()
+	{
+		if( licenses == null )
+		{
+			licenses = new ArrayList<License>();
+			for( IvyResolvedDependency resolvedDependency : getAll() )
+			{
+				for( License license : resolvedDependency.getLicenses() )
+				{
+					boolean exists = false;
+					for( License l : licenses )
+					{
+						if( l.getUrl().equals( license.getUrl() ) )
+						{
+							exists = true;
+							break;
+						}
+					}
+					if( !exists )
+						licenses.add( license );
+				}
+			}
+		}
+		return licenses;
+	}
+
+	@Override
+	public List<IvyResolvedDependency> getByLicense( License license )
+	{
+		ArrayList<IvyResolvedDependency> dependencies = new ArrayList<IvyResolvedDependency>();
+		for( IvyResolvedDependency resolvedDependency : getAll() )
+		{
+			for( License l : resolvedDependency.getLicenses() )
+			{
+				if( l.getUrl().equals( license.getUrl() ) )
+				{
+					dependencies.add( resolvedDependency );
+					break;
+				}
+			}
+		}
+		return dependencies;
+	}
+
+	@Override
+	public String getVersion( String group, String name ) throws SincerityException
+	{
+		for( IvyResolvedDependency resolvedDependency : getAll() )
+		{
+			if( group.equals( resolvedDependency.getGroup() ) && name.equals( resolvedDependency.getName() ) )
+				return resolvedDependency.getVersion();
+		}
+		return null;
+	}
+
+	//
+	// AbstractList
+	//
+
+	@Override
+	public int size()
+	{
+		return roots.size();
+	}
+
+	@Override
+	public IvyResolvedDependency get( int index )
+	{
+		return roots.get( index );
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	protected IvyResolvedDependencies( IvyDependencies dependencies ) throws SincerityException
 	{
 		super( dependencies );
 
@@ -121,7 +222,7 @@ public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDep
 								String licenseName = license.getAttribute( "name" );
 								String url = license.getAttribute( "url" );
 
-								License theLicense = new License( licenseName, url );
+								org.apache.ivy.core.module.descriptor.License theLicense = new org.apache.ivy.core.module.descriptor.License( licenseName, url );
 								moduleDescriptor.addLicense( theLicense );
 							}
 
@@ -177,7 +278,7 @@ public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDep
 					ModuleRevisionId parentId = parentNode.descriptor.getModuleRevisionId();
 					if( caller.organisation.equals( parentId.getOrganisation() ) && caller.name.equals( parentId.getName() ) && caller.revision.equals( parentId.getRevision() ) )
 					{
-						parentNode.children.add( resolvedDependency );
+						parentNode.getChildren().add( resolvedDependency );
 						resolvedDependency.isRoot = false;
 						break;
 					}
@@ -193,108 +294,6 @@ public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDep
 		}
 	}
 
-	//
-	// ResolvedDependencies
-	//
-
-	@Override
-	public List<IvyResolvedDependency> getAll()
-	{
-		if( allDependencies == null )
-		{
-			allDependencies = new ArrayList<IvyResolvedDependency>();
-			for( IvyResolvedDependency resolvedDependency : this )
-				addAllDependencies( resolvedDependency, allDependencies );
-		}
-		return allDependencies;
-	}
-
-	@Override
-	public List<Artifact> getArtifacts()
-	{
-		if( artifacts == null )
-		{
-			artifacts = new ArrayList<Artifact>();
-			for( IvyResolvedDependency resolvedDependency : getAll() )
-				for( Artifact artifact : resolvedDependency.descriptor.getArtifacts( DefaultModuleDescriptor.DEFAULT_CONFIGURATION ) )
-					artifacts.add( artifact );
-		}
-		return artifacts;
-	}
-
-	@Override
-	public List<License> getLicenses()
-	{
-		if( licenses == null )
-		{
-			licenses = new ArrayList<License>();
-			for( IvyResolvedDependency resolvedDependency : getAll() )
-			{
-				for( License license : resolvedDependency.descriptor.getLicenses() )
-				{
-					boolean exists = false;
-					for( License l : licenses )
-					{
-						if( l.getUrl().equals( license.getUrl() ) )
-						{
-							exists = true;
-							break;
-						}
-					}
-					if( !exists )
-						licenses.add( license );
-				}
-			}
-		}
-		return licenses;
-	}
-
-	@Override
-	public List<IvyResolvedDependency> getByLicense( License license )
-	{
-		ArrayList<IvyResolvedDependency> dependencies = new ArrayList<IvyResolvedDependency>();
-		for( IvyResolvedDependency resolvedDependency : getAll() )
-		{
-			for( License l : resolvedDependency.descriptor.getLicenses() )
-			{
-				if( l.getUrl().equals( license.getUrl() ) )
-				{
-					dependencies.add( resolvedDependency );
-					break;
-				}
-			}
-		}
-		return dependencies;
-	}
-
-	@Override
-	public String getVersion( String group, String name ) throws SincerityException
-	{
-		for( IvyResolvedDependency resolvedDependency : getAll() )
-		{
-			ModuleRevisionId id = resolvedDependency.descriptor.getModuleRevisionId();
-			if( group.equals( id.getOrganisation() ) && name.equals( id.getName() ) )
-				return id.getRevision();
-		}
-		return null;
-	}
-
-	//
-	// AbstractList
-	//
-
-	@Override
-	public int size()
-	{
-		return roots.size();
-	}
-
-	@Override
-	public IvyResolvedDependency get( int index )
-	{
-		return roots.get( index );
-	}
-
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
@@ -308,7 +307,7 @@ public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDep
 	 */
 	private static void addAllDependencies( IvyResolvedDependency resolvedDependency, ArrayList<IvyResolvedDependency> dependencies )
 	{
-		if( resolvedDependency.evicted != null )
+		if( resolvedDependency.isEvicted() )
 			return;
 
 		boolean exists = false;
@@ -325,8 +324,8 @@ public class IvyResolvedDependencies extends ResolvedDependencies<IvyResolvedDep
 		if( !exists )
 			dependencies.add( resolvedDependency );
 
-		for( IvyResolvedDependency child : resolvedDependency.children )
-			addAllDependencies( child, dependencies );
+		for( ResolvedDependency child : resolvedDependency.getChildren() )
+			addAllDependencies( (IvyResolvedDependency) child, dependencies );
 	}
 
 	private final List<IvyResolvedDependency> roots = new ArrayList<IvyResolvedDependency>();

@@ -19,12 +19,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-
 import com.threecrickets.sincerity.Container;
+import com.threecrickets.sincerity.Repositories;
+import com.threecrickets.sincerity.Repository;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
-import com.threecrickets.sincerity.ivy.IvyRepositories;
 import com.threecrickets.sincerity.plugin.RepositoriesPlugin;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedNode;
 import com.threecrickets.sincerity.plugin.gui.internal.EnhancedTreeCellRenderer;
@@ -79,12 +78,12 @@ public class RepositoriesPane extends JPanel implements Refreshable
 			EnhancedNode publicRoot = new EnhancedNode( null, "Public", GuiUtil.FOLDER_ICON );
 			EnhancedNode privateRoot = new EnhancedNode( null, "Private", GuiUtil.FOLDER_ICON );
 
-			Container<?, IvyRepositories> container = sincerity.getContainer();
-			IvyRepositories repositories = container.getRepositories();
-			for( DependencyResolver resolver : repositories.getResolvers( "public" ) )
-				publicRoot.add( GuiUtil.createRepositoryNode( resolver ) );
-			for( DependencyResolver resolver : repositories.getResolvers( "private" ) )
-				privateRoot.add( GuiUtil.createRepositoryNode( resolver ) );
+			Container<?, ?> container = sincerity.getContainer();
+			Repositories repositories = container.getRepositories();
+			for( Repository repository : repositories.getRepositories( "public" ) )
+				publicRoot.add( GuiUtil.createRepositoryNode( repository ) );
+			for( Repository repository : repositories.getRepositories( "private" ) )
+				privateRoot.add( GuiUtil.createRepositoryNode( repository ) );
 
 			if( publicRoot.getChildCount() > 0 )
 				root.add( publicRoot );

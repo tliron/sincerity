@@ -15,20 +15,16 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.ivy.plugins.resolver.DependencyResolver;
-import org.apache.ivy.plugins.resolver.IBiblioResolver;
-
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Repositories;
+import com.threecrickets.sincerity.Repository;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.ivy.IvyRepositories;
-import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
 import com.threecrickets.sincerity.util.TreeUtil;
 
@@ -86,11 +82,11 @@ public class RepositoriesPlugin implements Plugin1
 
 		if( "repositories".equals( commandName ) )
 		{
-			Container<?, IvyRepositories> container = sincerity.getContainer();
-			IvyRepositories repositories = container.getRepositories();
+			Container<?, ?> container = sincerity.getContainer();
+			Repositories repositories = container.getRepositories();
 
-			printRepositories( out, "Private", repositories.getResolvers( "private" ) );
-			printRepositories( out, "Public", repositories.getResolvers( "public" ) );
+			printRepositories( out, "Private", repositories.getRepositories( "private" ) );
+			printRepositories( out, "Public", repositories.getRepositories( "public" ) );
 		}
 		else if( "attach".equals( commandName ) )
 		{
@@ -169,39 +165,33 @@ public class RepositoriesPlugin implements Plugin1
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static void printRepositories( PrintWriter writer, String section, Collection<DependencyResolver> resolvers )
+	private static void printRepositories( PrintWriter writer, String section, Collection<Repository> repositories )
 	{
-		if( resolvers.isEmpty() )
+		if( repositories.isEmpty() )
 			return;
 
 		writer.println( section );
-		for( Iterator<DependencyResolver> i = resolvers.iterator(); i.hasNext(); )
+		for( Iterator<Repository> i = repositories.iterator(); i.hasNext(); )
 		{
-			DependencyResolver resolver = i.next();
+			Repository repository = i.next();
 			writer.print( i.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
-			printRepository( writer, resolver );
+			printRepository( writer, repository );
 			writer.println();
 		}
 	}
 
-	private static void printRepository( PrintWriter writer, DependencyResolver resolver )
+	private static void printRepository( PrintWriter writer, Repository repository )
 	{
-		String name = resolver.getName();
+		String name = repository.getName();
 		String[] split = name.split( Repositories.REPOSITORY_SECTION_SEPARATOR, 2 );
 		if( split.length == 2 )
 			writer.print( split[1] );
 		else
 			writer.print( name );
 
-		if( resolver instanceof IBiblioResolver )
-		{
-			writer.print( ": maven:" );
-			writer.print( ( (IBiblioResolver) resolver ).getRoot() );
-		}
-		else if( resolver instanceof PyPiResolver )
-		{
-			writer.print( ": pypi:" );
-			writer.print( ( (PyPiResolver) resolver ).getRoot() );
-		}
+		writer.print( ": " );
+		writer.print( repository.getType() );
+		writer.print( ":" );
+		writer.print( repository.getRoot() );
 	}
 }

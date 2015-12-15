@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,6 +39,7 @@ import org.xml.sax.SAXException;
 
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Repositories;
+import com.threecrickets.sincerity.Repository;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.ivy.pypi.PyPiResolver;
 import com.threecrickets.sincerity.util.XmlUtil;
@@ -53,80 +55,19 @@ import com.threecrickets.sincerity.util.XmlUtil;
 public class IvyRepositories extends Repositories
 {
 	//
-	// Construction
-	//
-
-	/**
-	 * Parses the Ivy settings file. Note that only the "resolvers" section will
-	 * be taken into account.
-	 * 
-	 * @param ivyFile
-	 *        The Ivy settings file (usually
-	 *        "/configuration/sincerity/repositories.conf")
-	 * @param ivy
-	 *        The Ivy instance
-	 * @throws SincerityException
-	 *         In case of an error
-	 */
-	public IvyRepositories( File ivyFile, Ivy ivy ) throws SincerityException
-	{
-		this.ivyFile = ivyFile;
-		this.ivy = ivy;
-
-		if( ivyFile.exists() )
-		{
-			try
-			{
-				new XmlSettingsParser( ivy.getSettings() ).parse( ivyFile.toURI().toURL() );
-			}
-			catch( MalformedURLException x )
-			{
-				throw new RuntimeException( x );
-			}
-			catch( ParseException x )
-			{
-				throw new SincerityException( "Could not parse repositories configuration", x );
-			}
-			catch( IOException x )
-			{
-				throw new SincerityException( "Could not read repositories configuration", x );
-			}
-		}
-
-		// Add resolvers to chains
-		for( Object r : ivy.getSettings().getResolvers() )
-		{
-			DependencyResolver resolver = (DependencyResolver) r;
-			String name = resolver.getName();
-			String[] names = name.split( REPOSITORY_SECTION_SEPARATOR, 2 );
-			if( names.length > 1 )
-				addResolver( names[0], resolver, false );
-		}
-	}
-
-	//
-	// Attributes
-	//
-
-	/**
-	 * The resolvers in a section.
-	 * 
-	 * @param section
-	 *        The section name
-	 * @return The resolvers or null
-	 */
-	@SuppressWarnings("unchecked")
-	public Collection<DependencyResolver> getResolvers( String section )
-	{
-		DependencyResolver chain = ivy.getSettings().getResolver( section );
-		if( chain instanceof ChainResolver )
-			return ( (ChainResolver) chain ).getResolvers();
-		return null;
-	}
-
-	//
 	// Repositories
 	//
+
+	@Override
+	public Collection<Repository> getRepositories( String section )
+	{
+		ArrayList<Repository> repositories = new ArrayList<Repository>();
+		DependencyResolver chain = ivy.getSettings().getResolver( section );
+		if( chain instanceof ChainResolver )
+			for( Object dependencyResolver : ( (ChainResolver) chain ).getResolvers() )
+				repositories.add( new IvyRepository( (DependencyResolver) dependencyResolver ) );
+		return repositories;
+	}
 
 	@Override
 	public boolean addMaven( String section, String name, String url ) throws SincerityException
@@ -261,6 +202,57 @@ public class IvyRepositories extends Repositories
 		}
 
 		return removed;
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Protected
+
+	/**
+	 * Parses the Ivy settings file. Note that only the "resolvers" section will
+	 * be taken into account.
+	 * 
+	 * @param ivyFile
+	 *        The Ivy settings file (usually
+	 *        "/configuration/sincerity/repositories.conf")
+	 * @param ivy
+	 *        The Ivy instance
+	 * @throws SincerityException
+	 *         In case of an error
+	 */
+	protected IvyRepositories( File ivyFile, Ivy ivy ) throws SincerityException
+	{
+		this.ivyFile = ivyFile;
+		this.ivy = ivy;
+
+		if( ivyFile.exists() )
+		{
+			try
+			{
+				new XmlSettingsParser( ivy.getSettings() ).parse( ivyFile.toURI().toURL() );
+			}
+			catch( MalformedURLException x )
+			{
+				throw new RuntimeException( x );
+			}
+			catch( ParseException x )
+			{
+				throw new SincerityException( "Could not parse repositories configuration", x );
+			}
+			catch( IOException x )
+			{
+				throw new SincerityException( "Could not read repositories configuration", x );
+			}
+		}
+
+		// Add resolvers to chains
+		for( Object r : ivy.getSettings().getResolvers() )
+		{
+			DependencyResolver resolver = (DependencyResolver) r;
+			String name = resolver.getName();
+			String[] names = name.split( REPOSITORY_SECTION_SEPARATOR, 2 );
+			if( names.length > 1 )
+				addResolver( names[0], resolver, false );
+		}
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

@@ -14,14 +14,14 @@ package com.threecrickets.sincerity.plugin;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.apache.ivy.core.module.descriptor.License;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.License;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.ResolvedDependencies;
 import com.threecrickets.sincerity.ResolvedDependency;
@@ -30,7 +30,6 @@ import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.ivy.IvyResolvedDependency;
 import com.threecrickets.sincerity.plugin.gui.AddDependenciesButton;
 import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
 import com.threecrickets.sincerity.plugin.gui.Frame;
@@ -123,8 +122,8 @@ public class DependenciesPlugin implements Plugin1
 			Set<String> switches = command.getSwitches();
 			boolean verbose = switches.contains( "verbose" );
 
-			Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
-			Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
+			Container<?, ?> container = sincerity.getContainer();
+			Dependencies<?> dependencies = container.getDependencies();
 
 			printLicenses( dependencies, out, verbose );
 		}
@@ -265,8 +264,8 @@ public class DependenciesPlugin implements Plugin1
 	{
 		Sincerity sincerity = command.getSincerity();
 		Frame frame = sincerity.getFrame();
-		Container<IvyResolvedDependency, ?> container = sincerity.getContainer();
-		Dependencies<IvyResolvedDependency> dependencies = container.getDependencies();
+		Container<?, ?> container = sincerity.getContainer();
+		Dependencies<?> dependencies = container.getDependencies();
 		frame.getTabs().add( "Dependencies", new DependenciesPane( dependencies ) );
 		frame.getTabs().add( "Licenses", new LicensesPane( dependencies ) );
 		frame.getToolbar().add( new AddDependenciesButton( sincerity ) );
@@ -284,20 +283,19 @@ public class DependenciesPlugin implements Plugin1
 			printTree( printWriter, resolvedDependency, patterns, false );
 	}
 
-	public void printLicenses( Dependencies<IvyResolvedDependency> depenencies, Writer writer, boolean verbose ) throws SincerityException
+	public void printLicenses( Dependencies<?> depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( IvyResolvedDependency resolvedDependency : depenencies.getResolvedDependencies().getAll() )
+		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies() )
 		{
-			License[] licenses = resolvedDependency.descriptor.getLicenses();
-			int length = licenses.length;
-			if( length == 0 )
+			Collection<License> licenses = resolvedDependency.getLicenses();
+			if( licenses.isEmpty() )
 				continue;
 			printWriter.println( resolvedDependency );
-			for( int i = 0; i < length; i++ )
+			for( Iterator<License> i = licenses.iterator(); i.hasNext(); )
 			{
-				License license = licenses[i];
-				printWriter.print( i == length - 1 ? TreeUtil.LVV : TreeUtil.TVV );
+				License license = i.next();
+				printWriter.print( i.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );
 				printWriter.print( license.getName() );
 				if( verbose )
 				{
@@ -340,11 +338,11 @@ public class DependenciesPlugin implements Plugin1
 
 		writer.println( resolvedDependency );
 
-		if( !resolvedDependency.children.isEmpty() )
+		if( !resolvedDependency.getChildren().isEmpty() )
 		{
 			patterns.add( size == 0 ? TreeUtil.I : TreeUtil._I );
 
-			for( Iterator<ResolvedDependency> i = resolvedDependency.children.iterator(); i.hasNext(); )
+			for( Iterator<ResolvedDependency> i = resolvedDependency.getChildren().iterator(); i.hasNext(); )
 			{
 				ResolvedDependency child = i.next();
 				printTree( writer, child, patterns, !i.hasNext() );
