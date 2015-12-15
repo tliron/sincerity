@@ -23,6 +23,9 @@ import org.apache.ivy.util.DefaultMessageLogger;
 import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.scripturian.LanguageManager;
 import com.threecrickets.scripturian.ParserManager;
+import com.threecrickets.sincerity.dependencies.Dependencies;
+import com.threecrickets.sincerity.dependencies.Module;
+import com.threecrickets.sincerity.dependencies.Repositories;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.packaging.PackagingContext;
 import com.threecrickets.sincerity.util.RootDirectory;
@@ -40,13 +43,13 @@ import com.threecrickets.sincerity.util.ScripturianUtil;
  * Because the set of plugins in a container depends on its classpath, this is
  * also where you can access them, via {@link #getPlugins()}.
  * 
- * @param <RD>
+ * @param <M>
  *        The resolved dependency class
  * @param <R>
  *        The repositories class
  * @author Tal Liron
  */
-public abstract class Container<RD extends ResolvedDependency, R extends Repositories> extends RootDirectory
+public abstract class Container<M extends Module, R extends Repositories> extends RootDirectory
 {
 	//
 	// Constants
@@ -103,18 +106,18 @@ public abstract class Container<RD extends ResolvedDependency, R extends Reposit
 	}
 
 	/**
+	 * The specified and resolved dependencies.
+	 * 
+	 * @return The dependencies
+	 */
+	public abstract Dependencies<M> getDependencies();
+
+	/**
 	 * The specified repositories.
 	 * 
 	 * @return The repositories
 	 */
 	public abstract R getRepositories();
-
-	/**
-	 * The specified and resolved dependencies.
-	 * 
-	 * @return The dependencies
-	 */
-	public abstract Dependencies<RD> getDependencies();
 
 	/**
 	 * The shortcuts.

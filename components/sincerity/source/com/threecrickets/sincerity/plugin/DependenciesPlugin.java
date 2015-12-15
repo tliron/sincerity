@@ -20,20 +20,20 @@ import java.util.Set;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
-import com.threecrickets.sincerity.Dependencies;
-import com.threecrickets.sincerity.License;
 import com.threecrickets.sincerity.Plugin1;
-import com.threecrickets.sincerity.ResolvedDependencies;
-import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.dependencies.Dependencies;
+import com.threecrickets.sincerity.dependencies.License;
+import com.threecrickets.sincerity.dependencies.Module;
+import com.threecrickets.sincerity.dependencies.Modules;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.AddDependenciesButton;
-import com.threecrickets.sincerity.plugin.gui.DependenciesPane;
-import com.threecrickets.sincerity.plugin.gui.Frame;
-import com.threecrickets.sincerity.plugin.gui.LicensesPane;
+import com.threecrickets.sincerity.plugin.swing.AddDependenciesButton;
+import com.threecrickets.sincerity.plugin.swing.DependenciesPane;
+import com.threecrickets.sincerity.plugin.swing.Frame;
+import com.threecrickets.sincerity.plugin.swing.LicensesPane;
 import com.threecrickets.sincerity.util.TreeUtil;
 
 /**
@@ -74,7 +74,7 @@ import com.threecrickets.sincerity.util.TreeUtil;
  * 
  * @author Tal Liron
  * @see Dependencies
- * @see ResolvedDependencies
+ * @see Modules
  * @see DependenciesPane
  * @see LicensesPane
  * @see AddDependenciesButton
@@ -170,7 +170,7 @@ public class DependenciesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			if( !dependencies.add( group, name, version, force, !only ) )
+			if( !dependencies.addExplicitDependency( group, name, version, force, !only ) )
 				if( sincerity.getVerbosity() >= 2 )
 					err.println( "Dependency already in container: " + group + ":" + name + " v" + version );
 		}
@@ -191,7 +191,7 @@ public class DependenciesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			if( !dependencies.revise( group, name, version ) )
+			if( !dependencies.reviseExplicitDependency( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
 					err.println( "Dependency not revised: " + group + ":" + name + " v" + version );
 		}
@@ -208,7 +208,7 @@ public class DependenciesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			if( !dependencies.remove( group, name ) )
+			if( !dependencies.removeExplicitDependency( group, name ) )
 				if( sincerity.getVerbosity() >= 2 )
 					err.println( "Dependency was not in container: " + group + ":" + name );
 		}
@@ -225,7 +225,7 @@ public class DependenciesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			if( !dependencies.exclude( group, name ) )
+			if( !dependencies.excludeDependency( group, name ) )
 				if( sincerity.getVerbosity() >= 2 )
 					err.println( "Exclusion already in container: " + group + ":" + name );
 		}
@@ -246,7 +246,7 @@ public class DependenciesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			if( !dependencies.override( group, name, version ) )
+			if( !dependencies.overrideDependency( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
 					err.println( "Dependency not overridden: " + group + ":" + name + " v" + version );
 		}
@@ -254,7 +254,7 @@ public class DependenciesPlugin implements Plugin1
 		{
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
-			dependencies.freeze();
+			dependencies.freezeVersions();
 		}
 		else
 			throw new UnknownCommandException( command );
@@ -279,19 +279,19 @@ public class DependenciesPlugin implements Plugin1
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
 		ArrayList<String> patterns = new ArrayList<String>();
-		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies() )
-			printTree( printWriter, resolvedDependency, patterns, false );
+		for( Module module : dependencies.getModules() )
+			printTree( printWriter, module, patterns, false );
 	}
 
 	public void printLicenses( Dependencies<?> depenencies, Writer writer, boolean verbose ) throws SincerityException
 	{
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : depenencies.getResolvedDependencies() )
+		for( Module module : depenencies.getModules() )
 		{
-			Collection<License> licenses = resolvedDependency.getLicenses();
+			Collection<License> licenses = module.getLicenses();
 			if( licenses.isEmpty() )
 				continue;
-			printWriter.println( resolvedDependency );
+			printWriter.println( module );
 			for( Iterator<License> i = licenses.iterator(); i.hasNext(); )
 			{
 				License license = i.next();
@@ -310,7 +310,7 @@ public class DependenciesPlugin implements Plugin1
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private static void printTree( PrintWriter writer, ResolvedDependency resolvedDependency, ArrayList<String> patterns, boolean seal )
+	private static void printTree( PrintWriter writer, Module module, ArrayList<String> patterns, boolean seal )
 	{
 		int size = patterns.size();
 
@@ -336,15 +336,15 @@ public class DependenciesPlugin implements Plugin1
 				patterns.set( size - 1, size < 2 ? "  " : "    " );
 		}
 
-		writer.println( resolvedDependency );
+		writer.println( module );
 
-		if( !resolvedDependency.getChildren().isEmpty() )
+		if( !module.getChildren().isEmpty() )
 		{
 			patterns.add( size == 0 ? TreeUtil.I : TreeUtil._I );
 
-			for( Iterator<ResolvedDependency> i = resolvedDependency.getChildren().iterator(); i.hasNext(); )
+			for( Iterator<Module> i = module.getChildren().iterator(); i.hasNext(); )
 			{
-				ResolvedDependency child = i.next();
+				Module child = i.next();
 				printTree( writer, child, patterns, !i.hasNext() );
 			}
 

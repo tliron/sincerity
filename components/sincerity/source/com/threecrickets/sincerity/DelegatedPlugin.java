@@ -46,7 +46,7 @@ public class DelegatedPlugin implements Plugin1
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public DelegatedPlugin( File pluginFile, Container container, ScripturianShell shell ) throws SincerityException
+	public DelegatedPlugin( File pluginFile, Container<?, ?> container, ScripturianShell shell ) throws SincerityException
 	{
 		defaultName = IoUtil.separateExtensionFromFilename( pluginFile.getName() )[0];
 		executable = shell.makeEnterable( "/" + container.getRelativePath( pluginFile ), ENTERING_KEY );

@@ -11,7 +11,7 @@
 
 package com.threecrickets.sincerity.exception;
 
-import com.threecrickets.sincerity.Dependencies;
+import com.threecrickets.sincerity.dependencies.Dependencies;
 
 /**
  * Signifies that dependencies could not be installed.

@@ -122,9 +122,9 @@ public class Packages extends ArrayList<Package>
 	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
-	 * @see Package#unpack(String, ManagedArtifacts, boolean, boolean)
+	 * @see Package#unpack(String, ArtifactManager, boolean, boolean)
 	 */
-	public void install( ManagedArtifacts managedArtifacts, String filter, boolean overwrite, boolean verify ) throws SincerityException
+	public void install( ArtifactManager managedArtifacts, String filter, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		for( Package pack : this )
 		{

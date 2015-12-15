@@ -29,17 +29,25 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.threecrickets.bootstrap.Bootstrap;
+import com.threecrickets.sincerity.dependencies.Module;
+import com.threecrickets.sincerity.dependencies.Repositories;
+import com.threecrickets.sincerity.dependencies.ivy.IvyContainer;
 import com.threecrickets.sincerity.exception.AmbiguousCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.RebootException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.ivy.IvyContainer;
-import com.threecrickets.sincerity.plugin.gui.Frame;
+import com.threecrickets.sincerity.plugin.swing.Frame;
 import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.NativeUtil;
 import com.threecrickets.sincerity.util.Pipe;
 import com.threecrickets.sincerity.util.StringUtil;
+
+import jline.DefaultTerminal2;
+import jline.Terminal;
+import jline.Terminal2;
+import jline.TerminalFactory;
+import jline.internal.Configuration;
 
 /**
  * This is the highest level instance for the Sincerity runtime.
@@ -333,7 +341,22 @@ public class Sincerity implements Runnable
 		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( OUT_ATTRIBUTE );
 		if( out == null )
 		{
-			out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+			try
+			{
+				// Using JLine
+				Terminal terminal = TerminalFactory.get();
+				if( !( terminal instanceof Terminal2 ) )
+					terminal = new DefaultTerminal2( terminal );
+				String encoding = terminal.getOutputEncoding();
+				if( encoding == null )
+					encoding = Configuration.getEncoding();
+				out = new PrintWriter( new OutputStreamWriter( terminal.wrapOutIfNeeded( System.out ), encoding ), true );
+			}
+			catch( IOException x )
+			{
+				out = new PrintWriter( new OutputStreamWriter( System.out ), true );
+			}
+
 			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( OUT_ATTRIBUTE, out );
 			if( existing != null )
 				out = existing;
@@ -389,6 +412,39 @@ public class Sincerity implements Runnable
 		if( !( err instanceof PrintWriter ) )
 			err = new PrintWriter( err, true );
 		Bootstrap.getAttributes().put( ERR_ATTRIBUTE, err );
+	}
+
+	/**
+	 * Whether the terminal supports ANSI codes.
+	 * 
+	 * @return Whether the terminal supports ANSI codes
+	 */
+	public boolean isTerminalAnsi()
+	{
+		Terminal terminal = TerminalFactory.get();
+		return terminal.isAnsiSupported();
+	}
+
+	/**
+	 * The terminal width.
+	 * 
+	 * @return The terminal width
+	 */
+	public int getTerminalWidth()
+	{
+		Terminal terminal = TerminalFactory.get();
+		return terminal.getWidth();
+	}
+
+	/**
+	 * The terminal height
+	 * 
+	 * @return The terminal height
+	 */
+	public int getTerminalHeight()
+	{
+		Terminal terminal = TerminalFactory.get();
+		return terminal.getHeight();
 	}
 
 	/**
@@ -463,7 +519,7 @@ public class Sincerity implements Runnable
 	 *         In case of an error
 	 */
 	@SuppressWarnings("unchecked")
-	public <RD extends ResolvedDependency, R extends Repositories> Container<RD, R> getContainer() throws SincerityException
+	public <RD extends Module, R extends Repositories> Container<RD, R> getContainer() throws SincerityException
 	{
 		if( container == null )
 		{

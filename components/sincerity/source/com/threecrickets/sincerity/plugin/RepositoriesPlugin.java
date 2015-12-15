@@ -18,14 +18,14 @@ import java.util.Iterator;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
-import com.threecrickets.sincerity.Repositories;
-import com.threecrickets.sincerity.Repository;
 import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.dependencies.Repositories;
+import com.threecrickets.sincerity.dependencies.Repository;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.RepositoriesPane;
+import com.threecrickets.sincerity.plugin.swing.RepositoriesPane;
 import com.threecrickets.sincerity.util.TreeUtil;
 
 /**
@@ -85,8 +85,8 @@ public class RepositoriesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Repositories repositories = container.getRepositories();
 
-			printRepositories( out, "Private", repositories.getRepositories( "private" ) );
-			printRepositories( out, "Public", repositories.getRepositories( "public" ) );
+			printRepositories( out, "Private", repositories.get( "private" ) );
+			printRepositories( out, "Public", repositories.get( "public" ) );
 		}
 		else if( "attach".equals( commandName ) )
 		{
@@ -145,7 +145,7 @@ public class RepositoriesPlugin implements Plugin1
 			String section = arguments[0];
 			String name = arguments[1];
 
-			Container container = sincerity.getContainer();
+			Container<?, ?> container = sincerity.getContainer();
 			Repositories repositories = container.getRepositories();
 
 			if( !repositories.remove( section, name ) )
@@ -192,6 +192,6 @@ public class RepositoriesPlugin implements Plugin1
 		writer.print( ": " );
 		writer.print( repository.getType() );
 		writer.print( ":" );
-		writer.print( repository.getRoot() );
+		writer.print( repository.getLocation() );
 	}
 }

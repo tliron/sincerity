@@ -4,10 +4,6 @@ document.require(
 	'/sincerity/dependencies/console/',
 	'/sincerity/objects/')
 
-importClass(
-	com.threecrickets.sincerity.plugin.console.CommandCompleter,
-	com.threecrickets.sincerity.util.ClassUtil)
-
 function getInterfaceVersion() {
 	return 1
 }
@@ -66,7 +62,7 @@ function install2(command) {
 		conflictPolicy: 'newest' //'oldest'
 	})
 	
-	manager.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity.out))
+	manager.eventHandler.add(new Sincerity.Dependencies.Console.EventHandler(sincerity))
 	manager.eventHandler.add(new Sincerity.Dependencies.LogEventHandler())
 
 	manager.identify()

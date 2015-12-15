@@ -19,19 +19,17 @@ import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.console.CommandCompleter;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.console.CommandCompleter;
-import com.threecrickets.sincerity.plugin.gui.Console;
-import com.threecrickets.sincerity.plugin.gui.Frame;
-import com.threecrickets.sincerity.plugin.gui.Splash;
-import com.threecrickets.sincerity.plugin.gui.internal.GuiUtil;
+import com.threecrickets.sincerity.plugin.swing.Console;
+import com.threecrickets.sincerity.plugin.swing.Frame;
+import com.threecrickets.sincerity.plugin.swing.Splash;
+import com.threecrickets.sincerity.plugin.swing.SwingUtil;
 import com.threecrickets.sincerity.util.ClassUtil;
 import com.threecrickets.sincerity.util.IoUtil;
 
-import jline.Terminal;
-import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.UserInterruptException;
 import jline.console.history.FileHistory;
@@ -119,69 +117,71 @@ public class ShellPlugin implements Plugin1
 			{
 			}
 
-			Terminal terminal = TerminalFactory.create();
+			ConsoleReader console = null;
 			try
 			{
-				try
-				{
-					ConsoleReader console = new ConsoleReader();
-					console.addCompleter( new CommandCompleter() );
-					console.setHandleUserInterrupt( true );
-					console.setCopyPasteDetection( true );
-					console.setExpandEvents( false );
-					console.setPrompt( "> " );
+				console = new ConsoleReader();
+				console.addCompleter( new CommandCompleter() );
+				console.setHandleUserInterrupt( true );
+				console.setCopyPasteDetection( true );
+				console.setExpandEvents( false );
+				console.setPrompt( "> " );
 
-					FileHistory history = null;
-					if( container != null )
+				FileHistory history = null;
+				if( container != null )
+				{
+					history = new FileHistory( container.getCacheFile( "shell", "console.history" ) );
+					console.setHistory( history );
+				}
+
+				while( true )
+				{
+					String line = console.readLine();
+
+					try
 					{
-						history = new FileHistory( container.getCacheFile( "shell", "console.history" ) );
-						console.setHistory( history );
+						if( history != null )
+							history.flush();
+					}
+					catch( IOException x )
+					{
 					}
 
-					while( true )
+					if( "exit".equals( line ) )
+						break;
+					else if( "reset".equals( line ) )
 					{
-						String line = console.readLine();
-
 						try
 						{
-							history.flush();
-						}
-						catch( IOException x )
-						{
-						}
-
-						if( "exit".equals( line ) )
-							break;
-						else if( "reset".equals( line ) )
-						{
-							try
+							if( history != null )
 							{
 								history.purge();
 								console.println( "History reset!" );
 							}
-							catch( IOException x )
-							{
-							}
 						}
-
-						ClassUtil.main( sincerity, Sincerity.class.getCanonicalName(), line.split( " " ) );
+						catch( IOException x )
+						{
+						}
 					}
+
+					ClassUtil.main( sincerity, Sincerity.class.getCanonicalName(), line.split( " " ) );
 				}
-				catch( UserInterruptException x )
-				{
-				}
-				catch( IOException x )
-				{
-					sincerity.getErr().println( "Console error" );
-					if( sincerity.getVerbosity() >= 2 )
-						x.printStackTrace( sincerity.getErr() );
-				}
+			}
+			catch( UserInterruptException x )
+			{
+			}
+			catch( IOException x )
+			{
+				sincerity.getErr().println( "Console error" );
+				if( sincerity.getVerbosity() >= 2 )
+					x.printStackTrace( sincerity.getErr() );
 			}
 			finally
 			{
 				try
 				{
-					terminal.reset();
+					if( console != null )
+						console.getTerminal().reset();
 				}
 				catch( Exception x )
 				{
@@ -202,7 +202,7 @@ public class ShellPlugin implements Plugin1
 			String ui = command.getProperties().get( "ui" );
 			if( ui == null )
 				ui = "native";
-			GuiUtil.initLookAndFeel( ui );
+			SwingUtil.initLookAndFeel( ui );
 
 			new Splash( new Runnable()
 			{
@@ -232,7 +232,7 @@ public class ShellPlugin implements Plugin1
 					}
 					catch( SincerityException x )
 					{
-						GuiUtil.error( x );
+						SwingUtil.error( x );
 					}
 				}
 			} );

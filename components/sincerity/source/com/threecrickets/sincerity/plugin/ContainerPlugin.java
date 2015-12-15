@@ -17,14 +17,14 @@ import java.util.Set;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
-import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.dependencies.Dependencies;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.NoContainerException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.CreateContainerButton;
+import com.threecrickets.sincerity.plugin.swing.CreateContainerButton;
 import com.threecrickets.sincerity.util.IoUtil;
 
 /**
@@ -143,7 +143,7 @@ public class ContainerPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			dependencies.uninstall();
+			dependencies.uninstallPackages();
 
 			File cache = container.getFile( "cache" );
 			if( cache.isDirectory() )

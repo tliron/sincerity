@@ -14,6 +14,7 @@
 document.require(
 	'/sincerity/classes/',
 	'/sincerity/json/',
+	'/sincerity/jvm/',
 	'/sincerity/objects/')
 
 var Sincerity = Sincerity || {}
@@ -64,64 +65,66 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 	Public.run = function() {
 		var jline = Packages.jline
 		importClass(
-			jline.TerminalFactory,
 			jline.console.ConsoleReader,
 			jline.console.UserInterruptException)
 		
-		this.terminal = TerminalFactory.create()
 		this.console = new ConsoleReader()
-
-		this.console.handleUserInterrupt = true
-		this.console.copyPasteDetection = true
-		this.console.expandEvents = false
-		if (Sincerity.Objects.exists(this.history)) {
-			this.console.history = this.history
-		}
-
-		this.out = this.console
-		
-		this.initialize()
-
-		this.isExiting = false
-		while (!this.isExiting) {
-			try {
-				var line = String(this.console.readLine())
-				if (Sincerity.Objects.exists(this.history)) {
+		try {
+			this.console.handleUserInterrupt = true
+			this.console.copyPasteDetection = true
+			this.console.expandEvents = false
+			if (Sincerity.Objects.exists(this.history)) {
+				this.console.history = this.history
+			}
+	
+			this.out = this.console
+			
+			this.initialize()
+	
+			this.isExiting = false
+			while (!this.isExiting) {
+				try {
+					var line = String(this.console.readLine())
+					if (Sincerity.Objects.exists(this.history)) {
+						try {
+							this.history.flush()
+						}
+						catch (x) {}
+					}
+					line = this.toJavaScript(line)
+					
+					var r = this.evaluate(line)
+					
+					var type = null
 					try {
-						this.history.flush()
+						type = typeof r
 					}
 					catch (x) {}
+	
+					if (type == 'function') {
+						// Call all functions (they are commands)
+						r()
+					}
+					else {
+						this.show(r)
+					}
 				}
-				line = this.toJavaScript(line)
-				
-				var r = this.evaluate(line)
-				
-				var type = null
-				try {
-					type = typeof r
-				}
-				catch (x) {}
-
-				if (type == 'function') {
-					// Call all functions (they are commands)
-					r()
-				}
-				else {
-					this.show(r)
-				}
-			}
-			catch (x) {
-				if ((x instanceof UserInterruptException) || (x.javaException instanceof UserInterruptException)) {
-					this.exit()
-				}
-				else {
-					this.onError(x)
+				catch (x) {
+					if (Sincerity.JVM.isException(x, UserInterruptException)) {
+						this.exit()
+					}
+					else {
+						this.onError(x)
+					}
 				}
 			}
 		}
-
-		this.terminal.restore()
-		this.finalize()
+		finally {
+			if (Sincerity.Objects.exists(this.console)) {
+				this.console.terminal.restore()
+			}
+			this.finalize()
+		}
 	}
 
     Public.exit = function() {

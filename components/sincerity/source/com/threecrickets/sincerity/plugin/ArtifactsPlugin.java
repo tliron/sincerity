@@ -17,17 +17,17 @@ import java.io.Writer;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.threecrickets.sincerity.Artifact;
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
-import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
-import com.threecrickets.sincerity.ResolvedDependency;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.dependencies.Artifact;
+import com.threecrickets.sincerity.dependencies.Dependencies;
+import com.threecrickets.sincerity.dependencies.Module;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
 import com.threecrickets.sincerity.packaging.Package;
-import com.threecrickets.sincerity.plugin.gui.ArtifactsPane;
+import com.threecrickets.sincerity.plugin.swing.ArtifactsPane;
 import com.threecrickets.sincerity.util.TreeUtil;
 
 /**
@@ -119,7 +119,7 @@ public class ArtifactsPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 
-			dependencies.uninstall();
+			dependencies.uninstallPackages();
 
 			command.remove();
 			command.getSincerity().reboot();
@@ -152,10 +152,10 @@ public class ArtifactsPlugin implements Plugin1
 	{
 		Container<?, ?> container = dependencies.getContainer();
 		PrintWriter printWriter = writer instanceof PrintWriter ? (PrintWriter) writer : new PrintWriter( writer, true );
-		for( ResolvedDependency resolvedDependency : dependencies.getResolvedDependencies().getAll() )
+		for( Module module : dependencies.getModules().getAll() )
 		{
-			printWriter.println( resolvedDependency );
-			for( Iterator<Artifact> i = resolvedDependency.getArtifacts().iterator(); i.hasNext(); )
+			printWriter.println( module );
+			for( Iterator<Artifact> i = module.getArtifacts().iterator(); i.hasNext(); )
 			{
 				Artifact artifact = i.next();
 				printWriter.print( i.hasNext() ? TreeUtil.TVV : TreeUtil.LVV );

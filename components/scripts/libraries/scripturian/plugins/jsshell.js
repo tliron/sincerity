@@ -5,7 +5,7 @@ document.require(
 	'/sincerity/objects/')
 
 importClass(
-	com.threecrickets.sincerity.plugin.console.CommandCompleter,
+	com.threecrickets.sincerity.console.CommandCompleter,
 	com.threecrickets.sincerity.util.ClassUtil)
 
 function getInterfaceVersion() {
@@ -67,6 +67,7 @@ function jsconsole(command) {
 	    	catch (x) {
 	    		arguments.callee.overridden.call(this)
 	    	}
+	    	this.showStackTrace = sincerity.verbosity > 1
 	    }
 	
 	    Public.initialize = function() {
@@ -81,7 +82,7 @@ function jsconsole(command) {
 	    Public.toJavaScript = function(line) {
 	    	if (line[0] == ':') {
 	    		line = Sincerity.Objects.trim(line.substring(1))
-	    		return 'sincerity(\'' + Sincerity.Objects.escapeSingleQuotes(line) + '\')'
+	    		return 'doSincerity(\'' + Sincerity.Objects.escapeSingleQuotes(line) + '\')'
 	    	}
 	    	return line
 	    }
@@ -93,7 +94,7 @@ function jsconsole(command) {
 		return Public
 	}())
 
-	function sincerity(c) {
+	function doSincerity(c) {
 		c = Sincerity.Objects.trim(c)
 		ClassUtil.main(sincerity, 'com.threecrickets.sincerity.Sincerity', c.split(' '))
 	}

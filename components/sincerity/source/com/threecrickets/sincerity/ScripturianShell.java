@@ -66,7 +66,7 @@ public class ScripturianShell implements Shell
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public ScripturianShell( Container container, boolean prepare, String... arguments ) throws SincerityException
+	public ScripturianShell( Container<?, ?> container, boolean prepare, String... arguments ) throws SincerityException
 	{
 		this.sincerity = container.getSincerity();
 		this.arguments = arguments;

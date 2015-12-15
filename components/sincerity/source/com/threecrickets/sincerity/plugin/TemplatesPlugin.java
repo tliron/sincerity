@@ -22,7 +22,7 @@ import com.threecrickets.sincerity.Template;
 import com.threecrickets.sincerity.exception.BadArgumentsCommandException;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.TemplatesPane;
+import com.threecrickets.sincerity.plugin.swing.TemplatesPane;
 import com.threecrickets.sincerity.util.IoUtil;
 
 /**

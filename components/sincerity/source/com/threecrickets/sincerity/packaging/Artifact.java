@@ -157,7 +157,7 @@ public class Artifact implements Comparable<Artifact>
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public byte[] unpack( ManagedArtifacts managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
+	public byte[] unpack( ArtifactManager managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		// Don't reinstall volatile artifacts that were already installed
 		if( isVolatile && managedArtifacts.wasInstalled( this ) )

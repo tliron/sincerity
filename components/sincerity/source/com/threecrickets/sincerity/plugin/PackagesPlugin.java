@@ -15,12 +15,12 @@ import java.util.Set;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
-import com.threecrickets.sincerity.Dependencies;
 import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
+import com.threecrickets.sincerity.dependencies.Dependencies;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.packaging.ManagedArtifacts;
+import com.threecrickets.sincerity.packaging.ArtifactManager;
 import com.threecrickets.sincerity.packaging.Packages;
 
 /**
@@ -82,7 +82,7 @@ public class PackagesPlugin implements Plugin1
 			Container<?, ?> container = sincerity.getContainer();
 			Dependencies<?> dependencies = container.getDependencies();
 			Packages packages = dependencies.getPackages();
-			ManagedArtifacts managedArtifacts = dependencies.getManagedArtifacts();
+			ArtifactManager managedArtifacts = dependencies.getArtifactManager();
 			packages.install( managedArtifacts, filter, overwrite, verify );
 		}
 		else

@@ -44,8 +44,10 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    Public._inherit = Sincerity.Dependencies.EventHandler
 
 	    /** @ignore */
-	    Public._construct = function(out) {
-	    	this.out = out
+	    Public._construct = function(sincerity) {
+	    	this.sincerity = sincerity
+	    	this.out = sincerity.out
+	    	this.ansi = sincerity.terminalAnsi
 	    	this.lock = Sincerity.JVM.newLock()
 	    	this.ongoingEvents = []
 
@@ -60,15 +62,6 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 		    this.progressEnd = '] '
 		    this.progressDone = '='
 		    this.progressTodo = ' '
-
-	    	try {
-				var terminal = Packages.jline.TerminalFactory.create()
-				this.ansi = terminal.ansiSupported
-				this.terminalWidth = terminal.width
-				terminal.restore()
-	    	}
-	    	catch (x) {
-	    	}
 	    }
 
 	    Public.handleEvent = function(event) {
@@ -155,9 +148,10 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 
 			// We are making sure that we always advance one row only, even if we print a line longer than a row
     		var length = output.length
-    		if (length >= this.terminalWidth) {
+    		var terminalWidth = this.sincerity.terminalWidth
+    		if (length >= terminalWidth) {
     			// Will automatically advance to the next line
-    			this.out.print(output.substring(0, this.terminalWidth))
+    			this.out.print(output.substring(0, terminalWidth))
     		}
     		else {
     			this.out.print(output)

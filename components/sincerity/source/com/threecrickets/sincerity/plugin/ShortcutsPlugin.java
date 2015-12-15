@@ -20,7 +20,7 @@ import com.threecrickets.sincerity.Shortcuts;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.ShortcutsPane;
+import com.threecrickets.sincerity.plugin.swing.ShortcutsPane;
 
 /**
  * The shorcuts plugin supports the following commands:

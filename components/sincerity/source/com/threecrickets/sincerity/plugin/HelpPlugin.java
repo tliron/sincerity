@@ -19,7 +19,7 @@ import com.threecrickets.sincerity.Plugin1;
 import com.threecrickets.sincerity.Sincerity;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnknownCommandException;
-import com.threecrickets.sincerity.plugin.gui.CommandsPane;
+import com.threecrickets.sincerity.plugin.swing.CommandsPane;
 
 /**
  * The help plugin supports the following commands:

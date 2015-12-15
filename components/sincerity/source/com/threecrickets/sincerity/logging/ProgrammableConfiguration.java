@@ -106,8 +106,8 @@ public class ProgrammableConfiguration extends AbstractConfiguration
 
 			if( ( sincerity != null ) && sincerity.getVerbosity() >= 2 )
 			{
-				sincerity.getOut().println(
-					"  \"" + logger.getName() + "\" (" + logger.getLevel() + ( logger.isAdditive() ? ") +" : ") " ) + ( logger.getParent() == null ? "" : "> \"" + logger.getParent().getName() + "\"" ) );
+				sincerity.getOut()
+					.println( "  \"" + logger.getName() + "\" (" + logger.getLevel() + ( logger.isAdditive() ? ") +" : ") " ) + ( logger.getParent() == null ? "" : "> \"" + logger.getParent().getName() + "\"" ) );
 
 				for( Appender appender : logger.getAppenders().values() )
 					sincerity.getOut().println( "    -> \"" + appender.getName() + "\"" );

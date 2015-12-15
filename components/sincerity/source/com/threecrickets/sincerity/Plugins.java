@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import com.threecrickets.sincerity.dependencies.Dependencies;
 import com.threecrickets.sincerity.exception.ReenteringDocumentException;
 import com.threecrickets.sincerity.exception.SincerityException;
 
@@ -47,7 +48,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public Plugins( Container container ) throws SincerityException
+	public Plugins( Container<?, ?> container ) throws SincerityException
 	{
 		this( container.getSincerity(), container );
 	}
@@ -73,7 +74,7 @@ public class Plugins extends AbstractMap<String, Plugin1>
 	 * @throws SincerityException
 	 *         In case of an error
 	 */
-	public Plugins( Sincerity sincerity, Container container ) throws SincerityException
+	public Plugins( Sincerity sincerity, Container<?, ?> container ) throws SincerityException
 	{
 		super();
 

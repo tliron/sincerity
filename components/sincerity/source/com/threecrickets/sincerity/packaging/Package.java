@@ -332,9 +332,9 @@ public class Package extends AbstractList<Artifact>
 	 *        Whether to verify the unpacking
 	 * @throws SincerityException
 	 *         In case of an error
-	 * @see Artifact#unpack(ManagedArtifacts, boolean, boolean)
+	 * @see Artifact#unpack(ArtifactManager, boolean, boolean)
 	 */
-	public void unpack( String filter, ManagedArtifacts managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
+	public void unpack( String filter, ArtifactManager managedArtifacts, boolean overwrite, boolean verify ) throws SincerityException
 	{
 		for( Artifact artifact : this )
 		{
