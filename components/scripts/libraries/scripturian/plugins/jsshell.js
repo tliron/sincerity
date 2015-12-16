@@ -29,15 +29,6 @@ function jsconsole(command) {
 
 	var sincerity = command.sincerity
 	
-	// Welcome
-	sincerity.out.println('Sincerity jsconsole ' + sincerity.version.get('version'))
-	var adapter = executable.context.adapter.attributes
-	sincerity.out.println('JavaScript engine: ' + adapter.get('name') + ' ' + adapter.get('version'))
-	try {
-		sincerity.out.println('Container: ' + sincerity.container.root)
-	}
-	catch (x) {}
-
 	// Logging
 	try {
 		sincerity.run(['logging:logging'])
@@ -73,10 +64,23 @@ function jsconsole(command) {
 	    Public.initialize = function() {
 	    	arguments.callee.overridden.call(this)
 	    	this.console.addCompleter(new CommandCompleter(':'))
+
+	    	// Welcome
+	    	this.controlSequence(this.defaultGraphics + 'm')
+	    	this.out.println('Sincerity jsconsole ' + sincerity.version.get('version'))
+	    	var adapter = executable.context.adapter.attributes
+	    	this.out.println('JavaScript engine: ' + adapter.get('name') + ' ' + adapter.get('version'))
+	    	try {
+	    		this.out.println('Container: ' + sincerity.container.root)
+	    	}
+	    	catch (x) {}
+	    	this.controlSequence('0m')
 	    }
 	    
 	    Public.finalize = function() {
-	    	sincerity.out.println('Bye!')
+	    	this.controlSequence(this.defaultGraphics + 'm')
+	    	this.out.println('Bye!')
+	    	this.controlSequence('0m')
 	    }
 	
 	    Public.toJavaScript = function(line) {

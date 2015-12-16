@@ -14,6 +14,7 @@ package com.threecrickets.sincerity.plugin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import com.threecrickets.sincerity.Command;
 import com.threecrickets.sincerity.Container;
@@ -51,6 +52,15 @@ import jline.console.history.FileHistory;
  */
 public class ShellPlugin implements Plugin1
 {
+	//
+	// Constants
+	//
+
+	/**
+	 * ANSI CSI (Control Sequence Introducer).
+	 */
+	public static final String CSI = "\033[";
+
 	//
 	// Plugin
 	//
@@ -105,27 +115,38 @@ public class ShellPlugin implements Plugin1
 				}
 			}
 
-			sincerity.getOut().println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
-
-			Container<?, ?> container = null;
-			try
-			{
-				container = sincerity.getContainer();
-				sincerity.getOut().println( "Container: " + container.getRoot() );
-			}
-			catch( NoContainerException x )
-			{
-			}
-
 			ConsoleReader console = null;
+			boolean ansi = false;
+			PrintWriter out = sincerity.getOut();
 			try
 			{
 				console = new ConsoleReader();
+
+				ansi = console.getTerminal().isAnsiSupported();
+				out = new PrintWriter( console.getOutput(), true );
+				console.setPrompt( ansi ? CSI + "32m" + ">" + CSI + "0m" + " " : "> " );
+
 				console.addCompleter( new CommandCompleter() );
 				console.setHandleUserInterrupt( true );
 				console.setCopyPasteDetection( true );
 				console.setExpandEvents( false );
-				console.setPrompt( "> " );
+
+				if( ansi )
+					out.print( CSI + "34m" );
+				out.println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
+
+				Container<?, ?> container = null;
+				try
+				{
+					container = sincerity.getContainer();
+					out.println( "Container: " + container.getRoot() );
+				}
+				catch( NoContainerException x )
+				{
+				}
+
+				if( ansi )
+					out.print( CSI + "0m" );
 
 				FileHistory history = null;
 				if( container != null )
@@ -137,6 +158,8 @@ public class ShellPlugin implements Plugin1
 				while( true )
 				{
 					String line = console.readLine();
+					if( line == null )
+						break;
 
 					try
 					{
@@ -156,7 +179,11 @@ public class ShellPlugin implements Plugin1
 							if( history != null )
 							{
 								history.purge();
-								console.println( "History reset!" );
+								if( ansi )
+									out.print( CSI + "34m" );
+								out.println( "History reset!" );
+								if( ansi )
+									out.print( CSI + "0m" );
 							}
 						}
 						catch( IOException x )
@@ -172,12 +199,23 @@ public class ShellPlugin implements Plugin1
 			}
 			catch( IOException x )
 			{
-				sincerity.getErr().println( "Console error" );
+				if( ansi )
+					out.print( CSI + "31m" );
+				out.println( "Console error" );
 				if( sincerity.getVerbosity() >= 2 )
-					x.printStackTrace( sincerity.getErr() );
+					x.printStackTrace( out );
+				if( ansi )
+					out.print( CSI + "0m" );
 			}
 			finally
 			{
+				if( ansi )
+					out.print( CSI + "34m" );
+				out.println( "Bye!" );
+				if( ansi )
+					out.print( CSI + "0m" );
+				out.flush();
+
 				try
 				{
 					if( console != null )
@@ -185,9 +223,13 @@ public class ShellPlugin implements Plugin1
 				}
 				catch( Exception x )
 				{
-					sincerity.getErr().println( "Could not reset terminal" );
+					if( ansi )
+						out.print( CSI + "31m" );
+					out.println( "Could not reset terminal" );
 					if( sincerity.getVerbosity() >= 2 )
-						x.printStackTrace( sincerity.getErr() );
+						x.printStackTrace( out );
+					if( ansi )
+						out.print( CSI + "0m" );
 				}
 			}
 		}

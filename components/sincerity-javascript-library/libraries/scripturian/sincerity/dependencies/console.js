@@ -125,7 +125,7 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 	    		return
 	    	}
 			for (var i in arguments) {
-				this.out.print('\x1b[') // ANSI CSI (Control Sequence Introducer)
+				this.out.print(CSI)
 				this.out.print(arguments[i])
 			}
 		}
@@ -177,6 +177,8 @@ Sincerity.Dependencies.Console = Sincerity.Dependencies.Console || function() {
 
 	    return Public
 	}(Public))
+
+    var CSI = '\x1b[' // ANSI CSI (Control Sequence Introducer)
 
 	return Public
 }()
