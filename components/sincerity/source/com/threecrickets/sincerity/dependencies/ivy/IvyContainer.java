@@ -92,7 +92,7 @@ public class IvyContainer extends Container<IvyModule, IvyRepositories> implemen
 		}
 
 		// Resolution cache manager
-		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( new File( ivy.getSettings().getDefaultResolutionCacheBasedir(), "cache/sincerity" ), getSincerityFile( "resolution" ) ) );
+		ivy.getSettings().setResolutionCacheManager( new ExtendedResolutionCacheManager( new File( ivy.getSettings().getDefaultResolutionCacheBasedir(), "cache/ivy" ), getSincerityFile( "resolution" ) ) );
 
 		configure();
 

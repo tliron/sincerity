@@ -231,7 +231,7 @@ public class ArtifactManager
 				{
 					try
 					{
-						if( !IoUtil.isSameContent( file, entry.originalDigest ) )
+						if( !IoUtil.isSameContent( file, entry.originalDigest, "SHA-1" ) )
 						{
 							if( packagingContext.getVerbosity() >= 2 )
 								packagingContext.getOut().println( "Not deleting unnecessary artifact because it has been changed: " + file );

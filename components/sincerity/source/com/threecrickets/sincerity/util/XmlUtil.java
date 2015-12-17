@@ -15,7 +15,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.util.Iterator;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -27,6 +32,9 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * XML utilities.
@@ -46,6 +54,132 @@ public abstract class XmlUtil
 	//
 	// Static operations
 	//
+
+	/**
+	 * Parses an XML document.
+	 * 
+	 * @param xml
+	 *        The XML document
+	 * @return The parsed document
+	 * @throws ParserConfigurationException
+	 *         In case of a SAX configuration error
+	 * @throws SAXException
+	 *         In case of an XML parsing error
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static Document parse( String xml ) throws ParserConfigurationException, SAXException, IOException
+	{
+		InputSource source = new InputSource( new StringReader( xml ) );
+		// Note: builders are *not* thread-safe!
+		DocumentBuilder builder = BUILDER_FACTORY.newDocumentBuilder();
+		return builder.parse( source );
+	}
+
+	/**
+	 * Gets the first child element with a specific tag.
+	 * 
+	 * @param element
+	 *        The parent element
+	 * @param tag
+	 *        The child tag
+	 * @return The child element or null if not found
+	 */
+	public static Element getFirstElement( Element element, String tag )
+	{
+		NodeList children = element.getElementsByTagName( tag );
+		if( children.getLength() == 0 )
+			return null;
+		return (Element) children.item( 0 );
+	}
+
+	/**
+	 * Gets the text of the first child element with a specific tag.
+	 * 
+	 * @param element
+	 *        The parent element
+	 * @param tag
+	 *        The child tag
+	 * @return The text of the first child element or null if not found
+	 */
+	public static String getFirstElementText( Element element, String tag )
+	{
+		return getFirstElementText( element, tag, null );
+	}
+
+	/**
+	 * Gets the text of the first child element with a specific tag.
+	 * 
+	 * @param element
+	 *        The parent element
+	 * @param tag
+	 *        The child tag
+	 * @param defaultValue
+	 *        The default value
+	 * @return The text of the first child element or the default value if not
+	 *         found
+	 */
+	public static String getFirstElementText( Element element, String tag, String defaultValue )
+	{
+		Element child = getFirstElement( element, tag );
+		return child != null ? child.getTextContent() : defaultValue;
+	}
+
+	/**
+	 * Iterable wrapper around child elements.
+	 */
+	public static class Elements implements Iterable<Element>
+	{
+		public Elements( Element element )
+		{
+			this( element, "*" );
+		}
+
+		public Elements( Element element, String tag )
+		{
+			nodeList = element.getElementsByTagName( tag );
+		}
+
+		public Iterator<Element> iterator()
+		{
+			return new ElementsIterator( nodeList );
+		}
+
+		private final NodeList nodeList;
+	}
+
+	/**
+	 * Iterator wrapper around a {@link NodeList} of {@link Element} instances.
+	 */
+	public static class ElementsIterator implements Iterator<Element>
+	{
+		public ElementsIterator( NodeList nodeList )
+		{
+			this.nodeList = nodeList;
+			length = nodeList.getLength();
+		}
+
+		public boolean hasNext()
+		{
+			return index < length;
+		}
+
+		public Element next()
+		{
+			return (Element) nodeList.item( index++ );
+		}
+
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private final NodeList nodeList;
+
+		private final int length;
+
+		private int index = 0;
+	}
 
 	/**
 	 * Saves a DOM to a human-readable XML file (4-space indentation, UTF-8).
@@ -99,6 +233,8 @@ public abstract class XmlUtil
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
+
+	public static final DocumentBuilderFactory BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
 	private XmlUtil()
 	{

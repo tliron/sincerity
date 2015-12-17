@@ -520,7 +520,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 	    }
 
 	    Public.getModuleFile = function(moduleIdentifier, directory) {
-	    	directory = (Sincerity.Objects.isString(directory) ? new java.io.File(directory) : directory).canonicalFile
+	    	directory = Sincerity.IO.asFile(directory).canonicalFile
 	    	var file = directory
 	    	file = new java.io.File(file, moduleIdentifier.group)
 	    	file = new java.io.File(file, moduleIdentifier.name)
@@ -1012,6 +1012,7 @@ Sincerity.Dependencies.Maven = Sincerity.Dependencies.Maven || function() {
 				var compareEnd = range.end ? Public.compare(range.end, version) : 1
 				//println(version + (compareStart == 0 ? '=' : (compareStart > 0 ? '>' : '<')) + range.start)
 				//println(version + (compareEnd == 0 ? '=' : (compareEnd > 0 ? '<' : '>')) + range.end)
+				var match
 				if (range.includeStart && range.includeEnd) {
 					match = (compareStart >= 0) && (compareEnd >= 0) 
 				}

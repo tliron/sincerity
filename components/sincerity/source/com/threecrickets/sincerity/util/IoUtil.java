@@ -15,6 +15,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,10 +25,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -48,6 +54,9 @@ import org.apache.commons.vfs.provider.tar.TarFileProvider;
 import org.apache.commons.vfs.provider.tar.Tbz2FileProvider;
 import org.apache.commons.vfs.provider.tar.TgzFileProvider;
 import org.apache.commons.vfs.provider.zip.ZipFileProvider;
+
+import com.threecrickets.jvm.json.Json;
+import com.threecrickets.jvm.json.JsonSyntaxError;
 
 /**
  * File utilities.
@@ -244,11 +253,11 @@ public abstract class IoUtil
 	 */
 	public static void copy( URL url, File file ) throws IOException
 	{
-		InputStream in = new BufferedInputStream( url.openStream() );
+		InputStream in = new BufferedInputStream( url.openStream(), BUFFER_SIZE );
 		try
 		{
 			file.getParentFile().mkdirs();
-			OutputStream out = new BufferedOutputStream( new FileOutputStream( file ) );
+			OutputStream out = new BufferedOutputStream( new FileOutputStream( file ), BUFFER_SIZE );
 			try
 			{
 				copy( in, out );
@@ -351,16 +360,18 @@ public abstract class IoUtil
 	 *        The file
 	 * @param digest
 	 *        The digest
+	 * @param algorithm
+	 *        The algorithm
 	 * @return True if the digests are equal
 	 * @throws IOException
 	 *         In case of an I/O error
 	 * @see #getDigest(InputStream)
 	 */
-	public static boolean isSameContent( File file, byte[] digest ) throws IOException
+	public static boolean isSameContent( File file, byte[] digest, String algorithm ) throws IOException
 	{
 		try
 		{
-			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
+			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ), BUFFER_SIZE ), algorithm );
 			return Arrays.equals( fileDigest, digest );
 		}
 		catch( FileNotFoundException x )
@@ -376,11 +387,13 @@ public abstract class IoUtil
 	 * 
 	 * @param stream
 	 *        The stream
+	 * @param algorithm
+	 *        The algorithm
 	 * @return The digest
 	 * @throws IOException
 	 *         In case of an I/O error
 	 */
-	public static byte[] getDigest( InputStream stream ) throws IOException
+	public static byte[] getDigest( InputStream stream, String algorithm ) throws IOException
 	{
 		try
 		{
@@ -409,13 +422,15 @@ public abstract class IoUtil
 	 * 
 	 * @param file
 	 *        The file
+	 * @param algorithm
+	 *        The algorithm
 	 * @return The digest
 	 * @throws IOException
 	 *         In case of an I/O error
 	 */
-	public static byte[] getDigest( File file ) throws IOException
+	public static byte[] getDigest( File file, String algorithm ) throws IOException
 	{
-		return getDigest( new BufferedInputStream( new FileInputStream( file ) ) );
+		return getDigest( new BufferedInputStream( new FileInputStream( file ), BUFFER_SIZE ), algorithm );
 	}
 
 	/**
@@ -423,13 +438,15 @@ public abstract class IoUtil
 	 * 
 	 * @param url
 	 *        The URL
+	 * @param algorithm
+	 *        The algorithm
 	 * @return The digest
 	 * @throws IOException
 	 *         In case of an I/O error
 	 */
-	public static byte[] getDigest( URL url ) throws IOException
+	public static byte[] getDigest( URL url, String algorithm ) throws IOException
 	{
-		return getDigest( new BufferedInputStream( url.openStream() ) );
+		return getDigest( new BufferedInputStream( url.openStream(), BUFFER_SIZE ), algorithm );
 	}
 
 	/**
@@ -443,6 +460,82 @@ public abstract class IoUtil
 	public static String[] separateExtensionFromFilename( String filename )
 	{
 		return filename.split( "\\.(?=[^\\.]+$)", 2 );
+	}
+
+	/**
+	 * Reads all bytes from a URL.
+	 * 
+	 * @param url
+	 *        The URL
+	 * @return The bytes
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static byte[] readBytes( URL url ) throws IOException
+	{
+		ReadableByteChannel fromChannel = Channels.newChannel( url.openStream() );
+		try
+		{
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream( BUFFER_SIZE );
+			WritableByteChannel toChannel = Channels.newChannel( buffer );
+			copy( fromChannel, toChannel );
+			return buffer.toByteArray();
+		}
+		finally
+		{
+			fromChannel.close();
+		}
+	}
+
+	/**
+	 * Reads all text from a URL using UTF-8.
+	 * 
+	 * @param url
+	 *        The URL
+	 * @return THe content
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static String readText( URL url ) throws IOException
+	{
+		return new String( readBytes( url ), StandardCharsets.UTF_8 );
+	}
+
+	/**
+	 * Reads all text from a file using UTF-8.
+	 * <p>
+	 * Note that this method returns null if the file doesn't exist.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The file's content
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static String readText( File file ) throws IOException
+	{
+		FileInputStream input = new FileInputStream( file );
+		try
+		{
+			FileChannel channel = input.getChannel();
+			try
+			{
+				MappedByteBuffer buffer = channel.map( FileChannel.MapMode.READ_ONLY, 0, channel.size() );
+				return StandardCharsets.UTF_8.decode( buffer ).toString();
+			}
+			finally
+			{
+				channel.close();
+			}
+		}
+		catch( FileNotFoundException x )
+		{
+			return null;
+		}
+		finally
+		{
+			input.close();
+		}
 	}
 
 	/**
@@ -481,7 +574,7 @@ public abstract class IoUtil
 	public static List<String> readLines( InputStream stream ) throws IOException
 	{
 		ArrayList<String> lines = new ArrayList<String>();
-		BufferedReader reader = new BufferedReader( new InputStreamReader( stream, "UTF-8" ) );
+		BufferedReader reader = new BufferedReader( new InputStreamReader( stream, StandardCharsets.UTF_8 ), BUFFER_SIZE );
 		try
 		{
 			String line;
@@ -506,6 +599,26 @@ public abstract class IoUtil
 	}
 
 	/**
+	 * Decodes a JSON UTF-8 file into JVM primitives and collection/map
+	 * instances.
+	 * <p>
+	 * Note that this method returns null if the file doesn't exist.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The decoded JSON
+	 * @throws IOException
+	 *         In case of an I/O error
+	 * @throws JsonSyntaxError
+	 *         In case of a JSON syntax error
+	 */
+	public static Object readJson( File file ) throws IOException, JsonSyntaxError
+	{
+		String content = readText( file );
+		return content != null ? Json.from( content ) : null;
+	}
+
+	/**
 	 * Writes lines to a file using UTF-8, overwriting its current contents if
 	 * it has any.
 	 * <p>
@@ -525,7 +638,7 @@ public abstract class IoUtil
 		// http://tripoverit.blogspot.com/2007/04/javas-utf-8-and-unicode-writing-is.html
 
 		FileOutputStream stream = new FileOutputStream( file );
-		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( stream, "UTF-8" ) );
+		BufferedWriter writer = new BufferedWriter( new OutputStreamWriter( stream, StandardCharsets.UTF_8 ), BUFFER_SIZE );
 		try
 		{
 			for( String line : lines )
@@ -547,6 +660,33 @@ public abstract class IoUtil
 			catch( IOException x )
 			{
 			}
+		}
+	}
+
+	/**
+	 * Writes JVM primitives and collection/map instances to a JSON UTF-8 file.
+	 * 
+	 * @param file
+	 *        The file
+	 * @param object
+	 *        The object (JVM primitives and collection instances)
+	 * @param expand
+	 *        Whether to expand the JSON with newlines, indents, and spaces
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static void writeJson( File file, Object object, boolean expand ) throws IOException
+	{
+		String content = Json.to( object, expand ).toString();
+		FileOutputStream stream = new FileOutputStream( file );
+		PrintWriter writer = new PrintWriter( new BufferedWriter( new OutputStreamWriter( stream, StandardCharsets.UTF_8 ), BUFFER_SIZE ) );
+		try
+		{
+			writer.write( content );
+		}
+		finally
+		{
+			writer.close();
 		}
 	}
 

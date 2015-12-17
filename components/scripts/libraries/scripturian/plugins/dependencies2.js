@@ -15,8 +15,8 @@ function getCommands() {
 function run(command) {
 	switch (String(command.name)) {
 	case 'install2':
-		install2(command)
-		break
+			install2(command)
+			break
 		case 'test2':
 			test2(command)
 			break

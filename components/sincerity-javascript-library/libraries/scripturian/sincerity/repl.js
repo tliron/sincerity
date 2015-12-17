@@ -152,7 +152,7 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 	Public.onError = function(x) {
 		this.controlSequence(this.errorGraphics + 'm')
 		if (Sincerity.JVM.isException(x, java.lang.Throwable)) {
-			this.out.println('JVM error:')
+			this.out.println('JVM error')
 			if (this.showStackTrace) {
 				x.printStackTrace(out)
 			}
@@ -161,7 +161,7 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 			}
 		}
 		else if (Sincerity.Objects.exists(x.nashornException)) {
-			this.out.println('JavaScript error:')
+			this.out.println('JavaScript error')
 			if (this.showStackTrace) {
 				x.nashornException.printStackTrace(out)
 			}
@@ -170,7 +170,7 @@ Sincerity.REPL = Sincerity.REPL || Sincerity.Classes.define(function() {
 			}
 		}
 		else {
-			this.out.println("Error:")
+			this.out.println('JavaScript error')
 			this.out.println(String(x))
 		}
 		this.controlSequence('0m')

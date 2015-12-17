@@ -53,15 +53,6 @@ import jline.console.history.FileHistory;
 public class ShellPlugin implements Plugin1
 {
 	//
-	// Constants
-	//
-
-	/**
-	 * ANSI CSI (Control Sequence Introducer).
-	 */
-	public static final String CSI = "\033[";
-
-	//
 	// Plugin
 	//
 
@@ -115,38 +106,35 @@ public class ShellPlugin implements Plugin1
 				}
 			}
 
-			ConsoleReader console = null;
-			boolean ansi = false;
-			PrintWriter out = sincerity.getOut();
+			JLineConsole console;
 			try
 			{
-				console = new ConsoleReader();
+				console = new JLineConsole();
+			}
+			catch( IOException x )
+			{
+				sincerity.getErr().println( "Could not access terminal" );
+				if( sincerity.getVerbosity() >= 2 )
+					x.printStackTrace( sincerity.getErr() );
+				return;
+			}
 
-				ansi = console.getTerminal().isAnsiSupported();
-				out = new PrintWriter( console.getOutput(), true );
-				console.setPrompt( ansi ? CSI + "32m" + ">" + CSI + "0m" + " " : "> " );
-
-				console.addCompleter( new CommandCompleter() );
-				console.setHandleUserInterrupt( true );
-				console.setCopyPasteDetection( true );
-				console.setExpandEvents( false );
-
-				if( ansi )
-					out.print( CSI + "34m" );
-				out.println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
+			try
+			{
+				console.controlSequence( "34m" );
+				console.out.println( "Sincerity console " + sincerity.getVersion().get( "version" ) );
 
 				Container<?, ?> container = null;
 				try
 				{
 					container = sincerity.getContainer();
-					out.println( "Container: " + container.getRoot() );
+					console.out.println( "Container: " + container.getRoot() );
 				}
 				catch( NoContainerException x )
 				{
 				}
 
-				if( ansi )
-					out.print( CSI + "0m" );
+				console.controlSequence( "0m" );
 
 				FileHistory history = null;
 				if( container != null )
@@ -161,33 +149,33 @@ public class ShellPlugin implements Plugin1
 					if( line == null )
 						break;
 
-					try
+					if( history != null )
 					{
-						if( history != null )
+						try
+						{
 							history.flush();
-					}
-					catch( IOException x )
-					{
+						}
+						catch( IOException x )
+						{
+						}
 					}
 
 					if( "exit".equals( line ) )
 						break;
 					else if( "reset".equals( line ) )
 					{
-						try
+						if( history != null )
 						{
-							if( history != null )
+							try
 							{
 								history.purge();
-								if( ansi )
-									out.print( CSI + "34m" );
-								out.println( "History reset!" );
-								if( ansi )
-									out.print( CSI + "0m" );
+								console.controlSequence( "34m" );
+								console.out.println( "History reset!" );
+								console.controlSequence( "0m" );
 							}
-						}
-						catch( IOException x )
-						{
+							catch( IOException x )
+							{
+							}
 						}
 					}
 
@@ -199,22 +187,18 @@ public class ShellPlugin implements Plugin1
 			}
 			catch( IOException x )
 			{
-				if( ansi )
-					out.print( CSI + "31m" );
-				out.println( "Console error" );
+				console.controlSequence( "31m" );
+				console.out.println( "Console error" );
 				if( sincerity.getVerbosity() >= 2 )
-					x.printStackTrace( out );
-				if( ansi )
-					out.print( CSI + "0m" );
+					x.printStackTrace( console.out );
+				console.controlSequence( "0m" );
 			}
 			finally
 			{
-				if( ansi )
-					out.print( CSI + "34m" );
-				out.println( "Bye!" );
-				if( ansi )
-					out.print( CSI + "0m" );
-				out.flush();
+				console.controlSequence( "34m" );
+				console.out.println( "Bye!" );
+				console.controlSequence( "0m" );
+				console.out.flush();
 
 				try
 				{
@@ -223,17 +207,16 @@ public class ShellPlugin implements Plugin1
 				}
 				catch( Exception x )
 				{
-					if( ansi )
-						out.print( CSI + "31m" );
-					out.println( "Could not reset terminal" );
+					console.controlSequence( "31m" );
+					console.out.println( "Could not reset terminal" );
 					if( sincerity.getVerbosity() >= 2 )
-						x.printStackTrace( out );
-					if( ansi )
-						out.print( CSI + "0m" );
+						x.printStackTrace( console.out );
+					console.controlSequence( "0m" );
 				}
 			}
 		}
 		else if( "gui".equals( commandName ) )
+
 		{
 			// Don't show GUI while console is up
 			if( Console.getCurrent() != null )
@@ -286,5 +269,58 @@ public class ShellPlugin implements Plugin1
 
 	public void gui( Command command ) throws SincerityException
 	{
+	}
+
+	// //////////////////////////////////////////////////////////////////////////
+	// Private
+
+	private static class JLineConsole extends ConsoleReader
+	{
+		//
+		// Construction
+		//
+
+		public JLineConsole() throws IOException
+		{
+			super();
+			ansi = getTerminal().isAnsiSupported();
+			out = new PrintWriter( getOutput(), true );
+			setPrompt( ansi ? CSI + "32m" + ">" + CSI + "0m" + " " : "> " );
+			addCompleter( new CommandCompleter() );
+			setHandleUserInterrupt( true );
+			setCopyPasteDetection( true );
+			setExpandEvents( false );
+		}
+
+		//
+		// Attributes
+		//
+
+		public final PrintWriter out;
+
+		//
+		// Operations
+		//
+
+		public void controlSequence( CharSequence... args )
+		{
+			if( !ansi )
+				return;
+			for( CharSequence c : args )
+			{
+				out.print( CSI );
+				out.print( c );
+			}
+		}
+
+		// //////////////////////////////////////////////////////////////////////////
+		// Private
+
+		/**
+		 * ANSI CSI (Control Sequence Introducer).
+		 */
+		private static final String CSI = "\033[";
+
+		private final boolean ansi;
 	}
 }

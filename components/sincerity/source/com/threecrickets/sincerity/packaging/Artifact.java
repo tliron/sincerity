@@ -87,7 +87,7 @@ public class Artifact implements Comparable<Artifact>
 		try
 		{
 			if( ( fileDigest == null ) && file.exists() )
-				fileDigest = IoUtil.getDigest( file );
+				fileDigest = IoUtil.getDigest( file, "SHA-1" );
 			return fileDigest;
 		}
 		catch( IOException x )
@@ -120,7 +120,7 @@ public class Artifact implements Comparable<Artifact>
 		try
 		{
 			if( ( originDigest == null ) && ( originUrl != null ) )
-				originDigest = IoUtil.getDigest( originUrl );
+				originDigest = IoUtil.getDigest( originUrl, "SHA-1" );
 			return originDigest;
 		}
 		catch( IOException x )
