@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import com.threecrickets.creel.ModuleIdentifier;
 import com.threecrickets.creel.ModuleSpecification;
@@ -33,13 +34,13 @@ public class MavenModuleSpecification extends ModuleSpecification
 	// Static operations
 	//
 
-	public static MavenModuleSpecification cast( ModuleSpecification moduleSpecification )
+	public static MavenModuleSpecification cast( Object object )
 	{
-		if( moduleSpecification == null )
+		if( object == null )
 			throw new NullPointerException();
-		if( !( moduleSpecification instanceof MavenModuleSpecification ) )
+		if( !( object instanceof MavenModuleSpecification ) )
 			throw new IncompatiblePlatformException();
-		return (MavenModuleSpecification) moduleSpecification;
+		return (MavenModuleSpecification) object;
 	}
 
 	//
@@ -90,33 +91,13 @@ public class MavenModuleSpecification extends ModuleSpecification
 	//
 
 	@Override
-	public boolean equals( ModuleSpecification moduleSpecification )
-	{
-		if( !( moduleSpecification instanceof MavenModuleSpecification ) )
-			return false;
-		MavenModuleSpecification mavenModuleSpecification = (MavenModuleSpecification) moduleSpecification;
-
-		if( options.size() != mavenModuleSpecification.options.size() )
-			return false;
-
-		for( Iterator<SpecificationOption> i1 = options.iterator(), i2 = mavenModuleSpecification.options.iterator(); i1.hasNext(); )
-		{
-			SpecificationOption o1 = i1.next(), o2 = i2.next();
-			if( !o1.equals( o2 ) )
-				return false;
-		}
-
-		return true;
-	}
-
-	@Override
 	public boolean allowsModuleIdentifier( ModuleIdentifier moduleIdentifier )
 	{
 		MavenModuleIdentifier mavenModuleIdentifier = MavenModuleIdentifier.cast( moduleIdentifier );
 
 		boolean allowed = false;
 
-		for( SpecificationOption option : options )
+		for( SpecificationOption option : getOptions() )
 		{
 			if( !option.matches( mavenModuleIdentifier ) )
 				continue;
@@ -126,7 +107,7 @@ public class MavenModuleSpecification extends ModuleSpecification
 				// option, *unless* it's an exclusion
 				continue;
 
-			allowed = option.getParsedVersionSpecfication( strict ).allows( mavenModuleIdentifier.getParsedVersion() );
+			allowed = option.getParsedVersionSpecfication( isStrict() ).allows( mavenModuleIdentifier.getParsedVersion() );
 
 			if( option.isExclude() && allowed )
 				return false; // exclusions take precedence
@@ -142,7 +123,7 @@ public class MavenModuleSpecification extends ModuleSpecification
 	@Override
 	public MavenModuleSpecification clone()
 	{
-		return new MavenModuleSpecification( options, strict );
+		return new MavenModuleSpecification( getOptions(), isStrict() );
 	}
 
 	//
@@ -150,10 +131,35 @@ public class MavenModuleSpecification extends ModuleSpecification
 	//
 
 	@Override
+	public boolean equals( Object object )
+	{
+		if( !super.equals( object ) )
+			return false;
+		MavenModuleSpecification mavenModuleSpecification = (MavenModuleSpecification) object;
+
+		for( Iterator<SpecificationOption> i1 = getOptions().iterator(), i2 = mavenModuleSpecification.getOptions().iterator(); i1.hasNext() || i2.hasNext(); )
+		{
+			if( i1.hasNext() != i2.hasNext() )
+				return false;
+			SpecificationOption o1 = i1.next(), o2 = i2.next();
+			if( !o1.equals( o2 ) )
+				return false;
+		}
+
+		return true;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash( super.hashCode(), getOptions(), isStrict() );
+	}
+
+	@Override
 	public String toString()
 	{
 		String r = "maven:{";
-		for( Iterator<SpecificationOption> i = options.iterator(); i.hasNext(); )
+		for( Iterator<SpecificationOption> i = getOptions().iterator(); i.hasNext(); )
 		{
 			SpecificationOption option = i.next();
 			r += option;

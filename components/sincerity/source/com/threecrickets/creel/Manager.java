@@ -4,18 +4,26 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ForkJoinPool;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 import com.threecrickets.creel.event.EventHandlers;
 import com.threecrickets.creel.event.Notifier;
 import com.threecrickets.creel.internal.ConfigHelper;
+import com.threecrickets.creel.internal.Conflicts;
+import com.threecrickets.creel.internal.DaemonThreadFactory;
 import com.threecrickets.creel.internal.IdentificationContext;
+import com.threecrickets.creel.internal.Jobs;
+import com.threecrickets.creel.internal.Modules;
 
 /**
  * Handles identifying and installing modules.
@@ -120,22 +128,22 @@ public class Manager extends Notifier
 
 	public Iterable<Module> getIdentifiedModules()
 	{
-		return Collections.unmodifiableCollection( identifiedModules );
+		return identifiedModules;
 	}
 
 	public Iterable<Module> getUnidentifiedModules()
 	{
-		return Collections.unmodifiableCollection( unidentifiedModules );
+		return unidentifiedModules;
 	}
 
-	public Iterable<Collection<Module>> getConflicts()
+	public Iterable<Conflict> getConflicts()
 	{
-		return Collections.unmodifiableCollection( conflicts );
+		return conflicts;
 	}
 
-	public ForkJoinPool getForkJoinPool()
+	public ExecutorService getExecutor()
 	{
-		return forkJoinPool;
+		return executor;
 	}
 
 	public int getIdentifiedCacheHits()
@@ -143,100 +151,12 @@ public class Manager extends Notifier
 		return identifiedCacheHits.get();
 	}
 
-	/**
-	 * Gets an instance of a module (from identifiedModules) if it has already
-	 * been identified.
-	 * 
-	 * @param moduleIdentifier
-	 * @return
-	 */
-	public Module getIdentifiedModule( ModuleSpecification moduleSpecification )
-	{
-		identifiedModulesLock.lock();
-		try
-		{
-			for( Module identifiedModule : identifiedModules )
-				if( moduleSpecification.equals( identifiedModule.getSpecification() ) )
-					return identifiedModule;
-		}
-		finally
-		{
-			identifiedModulesLock.unlock();
-		}
-		return null;
-	}
-
-	public void addIdentifiedModule( Module module )
-	{
-		ModuleIdentifier moduleIdentifier = module.getIdentifier();
-		identifiedModulesLock.lock();
-		try
-		{
-			boolean found = false;
-			for( Module identifiedModule : identifiedModules )
-				if( moduleIdentifier.compareTo( identifiedModule.getIdentifier() ) == 0 )
-				{
-					identifiedModule.merge( module );
-					found = true;
-					break;
-				}
-			if( !found )
-				identifiedModules.add( module );
-		}
-		finally
-		{
-			identifiedModulesLock.unlock();
-		}
-	}
-
-	public void removeIdentifiedModule( Module module )
-	{
-		ModuleIdentifier moduleIdentifier = module.getIdentifier();
-		identifiedModulesLock.lock();
-		try
-		{
-			for( Module identifiedModule : identifiedModules )
-				if( moduleIdentifier.compareTo( identifiedModule.getIdentifier() ) == 0 )
-				{
-					identifiedModules.remove( moduleIdentifier );
-					break;
-				}
-		}
-		finally
-		{
-			identifiedModulesLock.unlock();
-		}
-	}
-
-	public void addUnidentifiedModule( Module module )
-	{
-		ModuleIdentifier moduleIdentifier = module.getIdentifier();
-		unidentifiedModulesLock.lock();
-		try
-		{
-			boolean found = false;
-			for( Module unidentifiedModule : unidentifiedModules )
-				if( moduleIdentifier.compareTo( unidentifiedModule.getIdentifier() ) == 0 )
-				{
-					unidentifiedModule.merge( module );
-					found = true;
-					break;
-				}
-			if( !found )
-				unidentifiedModules.add( module );
-		}
-		finally
-		{
-			unidentifiedModulesLock.unlock();
-		}
-	}
-
 	public void addModule( Module module )
 	{
 		if( module.getIdentifier() != null )
-			addIdentifiedModule( module );
+			identifiedModules.addByIdentifier( module );
 		else
-			addUnidentifiedModule( module );
+			unidentifiedModules.addBySpecification( module );
 	}
 
 	public void replaceModule( Module oldModule, Module newModule )
@@ -244,7 +164,7 @@ public class Manager extends Notifier
 		for( ListIterator<Module> i = explicitModules.listIterator(); i.hasNext(); )
 		{
 			Module explicitModule = i.next();
-			if( ( explicitModule.getIdentifier() != null ) && ( explicitModule.getIdentifier().compareTo( oldModule.getIdentifier() ) == 0 ) )
+			if( ( explicitModule.getIdentifier() != null ) && ( explicitModule.getIdentifier().equals( oldModule.getIdentifier() ) ) )
 			{
 				explicitModule = newModule;
 				i.set( explicitModule );
@@ -265,16 +185,23 @@ public class Manager extends Notifier
 	 * When finished, identifiedModules and unidentifiedModules would be filled
 	 * appropriately.
 	 */
-	public void identify()
+	public synchronized void identify()
 	{
 		String id = begin( "Identifying" );
 
-		Collection<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
-		for( Module explicitModule : explicitModules )
-			tasks.add( identifyModuleTask( explicitModule, true ) );
-		forkJoinPool.invokeAll( tasks );
+		identifyModuleJobs.clear();
+		Phaser phaser = new Phaser( 1 );
+		for( Module explicitModule : getExplicitModules() )
+			identifyModuleFuture( explicitModule, true, phaser );
+		phaser.arriveAndAwaitAdvance();
 
-		int count = 10;
+		int count = identifiedModules.size();
+
+		resolveConflicts();
+
+		identifiedModules.sortByIdentifiers();
+		unidentifiedModules.sortBySpecifications();
+
 		end( id, "Made " + count + " identifications" );
 	}
 
@@ -292,98 +219,148 @@ public class Manager extends Notifier
 	 * 
 	 * @param module
 	 * @param recursive
+	 * @param phaser
 	 */
-	public void identifyModule( Module module, boolean recursive )
+	public void identifyModule( final Module module, final boolean recursive, final Phaser phaser )
 	{
-		IdentificationContext context = new IdentificationContext();
-		for( Repository repository : repositories )
-			if( repository.isAll() )
-				context.getRepositories().add( repository );
+		IdentificationContext context = new IdentificationContext( getRepositories(), recursive );
 
 		applyRules( module, context );
+
+		boolean inJob = false;
 
 		if( module.getIdentifier() != null )
 		{
 			// Already identified
 		}
-		else if( !context.isExclude() && module.getSpecification() != null )
+		if( unidentifiedModules.get( module.getSpecification() ) != null )
+		{
+			// Already failed to identify
+		}
+		else if( !context.isExclude() )
 		{
 			// Check to see if we've already identified it
-			Module identifiedModule = getIdentifiedModule( module.getSpecification() );
+			Module identifiedModule = identifiedModules.get( module.getSpecification() );
 			if( identifiedModule == null )
 			{
-				// Gather allowed module identifiers from all repositories
-				String id = begin( "Identifying " + module.getSpecification() );
-
-				Collection<ModuleIdentifier> moduleIdentifiers = new ArrayList<ModuleIdentifier>();
-				for( Repository repository : context.getRepositories() )
+				inJob = identifyModuleJobs.begin( module.getSpecification(), executor, phaser, identifyModuleTask( module, recursive, phaser ) );
+				if( !inJob )
 				{
-					Iterable<ModuleIdentifier> allowedModuleIdentifiers = repository.getAllowedModuleIdentifiers( module.getSpecification(), this );
-
-					// Note: the first repository to report an identifier will
-					// "win," the following repositories will have their reports
-					// discarded
-					/*
-					 * moduleIdentifiers =
-					 * Sincerity.Objects.concatUnique(moduleIdentifiers,
-					 * allowedModuleIdentifiers, function(moduleIdentifier1,
-					 * moduleIdentifier2) { return
-					 * moduleIdentifier1.compare(moduleIdentifier2) == 0; }
-					 */
+					info( "Already identifying " + module.getSpecification() );
+					return;
 				}
 
-				// Pick the best module identifier
-				if( !moduleIdentifiers.isEmpty() )
-				{
-					/*
-					 * moduleIdentifiers.sort(function(moduleIdentifier1,
-					 * moduleIdentifier2) { // Reverse newness order return
-					 * moduleIdentifier2.compare(moduleIdentifier1); })
-					 */
+				String id = begin( "Identifying " + module.getSpecification() );
 
-					// Best module is first (newest)
-					ModuleIdentifier identifiedModuleIdentifier = moduleIdentifiers.iterator().next();
-					identifiedModule = identifiedModuleIdentifier.getRepository().getModule( identifiedModuleIdentifier, this );
+				// Gather allowed module identifiers from all repositories
+				Set<ModuleIdentifier> uniqueModuleIdentifiers = new LinkedHashSet<ModuleIdentifier>();
+				for( Repository repository : context.getRepositories() )
+					for( ModuleIdentifier allowedModuleIdentifier : repository.getAllowedModuleIdentifiers( module.getSpecification(), this ) )
+						uniqueModuleIdentifiers.add( allowedModuleIdentifier );
+
+				// Pick the best module identifier
+				if( !uniqueModuleIdentifiers.isEmpty() )
+				{
+					LinkedList<ModuleIdentifier> moduleIdentifiers = new LinkedList<ModuleIdentifier>( uniqueModuleIdentifiers );
+					Collections.sort( moduleIdentifiers );
+
+					// Best module is last (newest)
+					ModuleIdentifier moduleIdentifier = moduleIdentifiers.getLast();
+					identifiedModule = moduleIdentifier.getRepository().getModule( moduleIdentifier, this );
 
 					if( identifiedModule != null )
 						end( id, "Identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
 					else
-						fail( id, "Could not get module " + identifiedModuleIdentifier + " from " + identifiedModuleIdentifier.getRepository().getId() + " repository" );
+						fail( id, "Could not get module " + moduleIdentifier + " from " + moduleIdentifier.getRepository().getId() + " repository" );
 				}
 				else
 					fail( id, "Could not identify " + module.getSpecification() );
 			}
+			else
+			{
+				info( "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
+				identifiedCacheHits.incrementAndGet();
+			}
 
 			if( identifiedModule != null )
-				module.merge( identifiedModule );
+				module.copyResolutionFrom( identifiedModule );
+		}
+
+		if( !context.isExclude() )
+			addModule( module );
+
+		if( inJob )
+			identifyModuleJobs.end( module.getSpecification() );
+
+		if( context.isRecursive() )
+		{
+			// Identify dependencies recursively
+			if( phaser != null )
+			{
+				// Future
+				for( Module dependency : module.getDependencies() )
+					identifyModuleFuture( dependency, true, phaser );
+			}
+			else
+			{
+				// Do now
+				for( Module dependency : module.getDependencies() )
+					identifyModule( dependency, true, null );
+			}
+		}
+		else
+		{
+			// Add dependencies as is (unidentified)
+			for( Module dependency : module.getDependencies() )
+				addModule( dependency );
 		}
 	}
 
-	public Callable<Void> identifyModuleTask( final Module module, final boolean recursive )
+	public Runnable identifyModuleTask( final Module module, final boolean recursive, final Phaser phaser )
 	{
-		return new Callable<Void>()
+		return new Runnable()
 		{
-			public Void call()
+			public void run()
 			{
 				try
 				{
-					identifyModule( module, recursive );
+					identifyModule( module, recursive, phaser );
 				}
-				catch( Exception x )
+				catch( Throwable x )
 				{
 					error( "Identification error for " + module.getSpecification() + ": " + x.getMessage(), x );
 				}
-				return null;
+				phaser.arriveAndDeregister();
 			}
 		};
 	}
 
+	public Future<?> identifyModuleFuture( final Module module, final boolean recursive, final Phaser phaser )
+	{
+		phaser.register();
+		return executor.submit( identifyModuleTask( module, recursive, phaser ) );
+	}
+
 	public void findConflicts()
 	{
+		conflicts.find( getIdentifiedModules() );
 	}
 
 	public void resolveConflicts()
 	{
+		findConflicts();
+		conflicts.resolve( conflictPolicy, this );
+		for( Conflict conflict : conflicts )
+			for( Module reject : conflict.getRejects() )
+			{
+				identifiedModules.remove( reject.getIdentifier() );
+				replaceModule( reject, conflict.getChosen() );
+			}
+	}
+
+	public void install( String directory, boolean overwrite, boolean parallel )
+	{
+		install( new File( directory ), overwrite, parallel );
 	}
 
 	public void install( File directory, boolean overwrite, boolean parallel )
@@ -407,17 +384,15 @@ public class Manager extends Notifier
 
 	private final Collection<Rule> rules = new ArrayList<Rule>();
 
-	private final Collection<Module> identifiedModules = new ArrayList<Module>();;
+	private final Modules identifiedModules = new Modules();
 
-	private final ReentrantLock identifiedModulesLock = new ReentrantLock();
+	private final Modules unidentifiedModules = new Modules();
 
-	private final Collection<Module> unidentifiedModules = new ArrayList<Module>();;
-
-	private final ReentrantLock unidentifiedModulesLock = new ReentrantLock();
-
-	private final Collection<Collection<Module>> conflicts = new ArrayList<Collection<Module>>();;
+	private final Conflicts conflicts = new Conflicts();
 
 	private final AtomicInteger identifiedCacheHits = new AtomicInteger();
 
-	private final ForkJoinPool forkJoinPool = new ForkJoinPool( 10 );
+	private final Jobs identifyModuleJobs = new Jobs();
+
+	private final ExecutorService executor = Executors.newFixedThreadPool( 10, DaemonThreadFactory.INSTANCE );
 }

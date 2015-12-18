@@ -2,9 +2,11 @@ package com.threecrickets.creel.maven.internal;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,12 +25,16 @@ public class MetaData
 	// Construction
 	//
 
-	public MetaData( URL url ) throws IOException
+	public MetaData( URL url, Signature signature ) throws IOException
 	{
 		Document document;
 		try
 		{
-			document = XmlUtil.parse( IoUtil.readText( url ) );
+			byte[] bytes = IoUtil.readBytes( url );
+			if( ( signature != null ) && !signature.validate( bytes ) )
+				throw new InvalidSignatureException();
+			String text = new String( bytes, StandardCharsets.UTF_8 );
+			document = XmlUtil.parse( text );
 		}
 		catch( ParserConfigurationException x )
 		{
@@ -40,7 +46,7 @@ public class MetaData
 		}
 
 		// <metadata>
-		Element metadata = XmlUtil.getFirstElement( document.getDocumentElement(), "metadata" );
+		Element metadata = XmlUtil.getElement( document, "metadata" );
 		if( metadata == null )
 			throw new RuntimeException( "Invalid metadata: no <metadata>" );
 
@@ -57,16 +63,11 @@ public class MetaData
 
 		release = XmlUtil.getFirstElementText( versioning, "release" );
 
-		// <versions>
-		Element versions = XmlUtil.getFirstElement( versioning, "versions" );
-		if( versions != null )
+		// <versions>, <version>
+		for( Element version : new XmlUtil.Elements( XmlUtil.getFirstElement( versioning, "versions" ), "version" ) )
 		{
-			// <version>
-			for( Element version : new XmlUtil.Elements( versioning, "version" ) )
-			{
-				String versionString = version.getTextContent();
-				this.versions.add( versionString );
-			}
+			String versionString = version.getTextContent();
+			this.versions.add( versionString );
 		}
 	}
 
@@ -89,16 +90,22 @@ public class MetaData
 		return release;
 	}
 
-	public Collection<String> getVersions()
+	public Iterable<String> getVersions()
 	{
 		return Collections.unmodifiableCollection( versions );
 	}
 
+	public MavenModuleIdentifier getReleaseModuleIdentifier( MavenRepository repository )
+	{
+		return new MavenModuleIdentifier( repository, getGroupId(), getArtifactId(), getRelease() );
+	}
+
 	public Iterable<MavenModuleIdentifier> getModuleIdentifiers( MavenRepository repository )
 	{
-		Collection<MavenModuleIdentifier> moduleIdentifiers = new ArrayList<MavenModuleIdentifier>();
-		for( String version : versions )
-			moduleIdentifiers.add( new MavenModuleIdentifier( repository, groupId, artifactId, version ) );
+		List<MavenModuleIdentifier> moduleIdentifiers = new ArrayList<MavenModuleIdentifier>();
+		for( String version : getVersions() )
+			moduleIdentifiers.add( new MavenModuleIdentifier( repository, getGroupId(), getArtifactId(), version ) );
+		Collections.sort( moduleIdentifiers );
 		return Collections.unmodifiableCollection( moduleIdentifiers );
 	}
 

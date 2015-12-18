@@ -3,6 +3,7 @@ package com.threecrickets.creel.maven.internal;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.StringUtil;
@@ -43,23 +44,50 @@ public class Signature
 		}
 
 		this.algorithm = algorithm;
-		digestHex = content.toUpperCase();
+		digest = StringUtil.fromHex( content );
+	}
+
+	//
+	// Attributes
+	//
+
+	public String getAlgorithm()
+	{
+		return algorithm;
+	}
+
+	public byte[] getDigest()
+	{
+		return digest;
 	}
 
 	//
 	// Operations
 	//
 
+	public boolean validate( byte[] content ) throws IOException
+	{
+		return validateDigest( IoUtil.getDigest( content, algorithm ) );
+	}
+
 	public boolean validate( File file ) throws IOException
 	{
-		return validate( file.toURI().toURL() );
+		return validateDigest( IoUtil.getDigest( file, algorithm ) );
 	}
 
 	public boolean validate( URL url ) throws IOException
 	{
-		byte[] digest = IoUtil.getDigest( url, algorithm );
-		String digestHex = StringUtil.toHex( digest );
-		return this.digestHex.equals( digestHex );
+		return validateDigest( IoUtil.getDigest( url, algorithm ) );
+	}
+
+	public boolean validateDigest( String digestHex ) throws IOException
+	{
+		return validateDigest( StringUtil.fromHex( digestHex ) );
+	}
+
+	public boolean validateDigest( byte[] digest ) throws IOException
+	{
+		return Arrays.equals( this.digest, digest );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -67,5 +95,5 @@ public class Signature
 
 	private final String algorithm;
 
-	private final String digestHex;
+	private final byte[] digest;
 }

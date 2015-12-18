@@ -8,6 +8,18 @@ import com.threecrickets.creel.Repository;
 public class IdentificationContext
 {
 	//
+	// Construction
+	//
+
+	public IdentificationContext( Iterable<Repository> repositories, boolean recursive )
+	{
+		for( Repository repository : repositories )
+			if( repository.isAll() )
+				this.repositories.add( repository );
+		this.recursive = recursive;
+	}
+
+	//
 	// Attributes
 	//
 

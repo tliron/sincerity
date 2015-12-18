@@ -1,5 +1,6 @@
 package com.threecrickets.creel.maven.internal;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.threecrickets.creel.maven.MavenModuleIdentifier;
@@ -50,14 +51,14 @@ public class SpecificationOption
 	public Pattern getGroupPattern()
 	{
 		if( groupPattern == null )
-			groupPattern = GlobUtil.toPattern( group );
+			groupPattern = GlobUtil.toPattern( getGroup() );
 		return groupPattern;
 	}
 
 	public Pattern getNamePattern()
 	{
 		if( namePattern == null )
-			namePattern = GlobUtil.toPattern( name );
+			namePattern = GlobUtil.toPattern( getName() );
 		return namePattern;
 	}
 
@@ -75,7 +76,7 @@ public class SpecificationOption
 	{
 		if( parsedVersionSpecification == null )
 		{
-			String version = exclude ? this.version.substring( 1 ) : this.version;
+			String version = isExclude() ? getVersion().substring( 1 ) : getVersion();
 			parsedVersionSpecification = new VersionSpecification( version, strict );
 		}
 		return parsedVersionSpecification;
@@ -84,13 +85,8 @@ public class SpecificationOption
 	public MavenModuleIdentifier toModuleIdentifier( boolean strict, MavenRepository repository )
 	{
 		if( getParsedVersionSpecfication( strict ).isTrivial() )
-			return new MavenModuleIdentifier( repository, group, name, version );
+			return new MavenModuleIdentifier( repository, getGroup(), getName(), getVersion() );
 		return null;
-	}
-
-	public boolean equals( SpecificationOption option )
-	{
-		return group.equals( option.group ) && name.equals( option.name ) && version.equals( option.version );
 	}
 
 	//
@@ -98,9 +94,24 @@ public class SpecificationOption
 	//
 
 	@Override
+	public boolean equals( Object object )
+	{
+		if( ( object == null ) || ( getClass() != object.getClass() ) )
+			return false;
+		SpecificationOption option = (SpecificationOption) object;
+		return getGroup().equals( option.getGroup() ) && getName().equals( option.getName() ) && getVersion().equals( option.getVersion() );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash( getGroup(), getName(), getVersion() );
+	}
+
+	@Override
 	public String toString()
 	{
-		return group + ":" + name + ":" + version;
+		return getGroup() + ":" + getName() + ":" + getVersion();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

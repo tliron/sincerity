@@ -27,12 +27,14 @@ public class Version implements Comparable<Version>
 	static
 	{
 		HashMap<String, Double> postfixes = new HashMap<String, Double>();
-		postfixes.put( "d", -3.0 );
-		postfixes.put( "dev", -3.0 );
-		postfixes.put( "a", -2.0 );
+		postfixes.put( "dev", -4.0 );
+		postfixes.put( "d", -4.0 );
+		postfixes.put( "milestone", -3.0 );
+		postfixes.put( "m", -3.0 );
 		postfixes.put( "alpha", -2.0 );
-		postfixes.put( "b", -1.0 );
+		postfixes.put( "a", -2.0 );
 		postfixes.put( "beta", -1.0 );
+		postfixes.put( "b", -1.0 );
 		POSTFIXES = Collections.unmodifiableMap( postfixes );
 	}
 
@@ -47,13 +49,40 @@ public class Version implements Comparable<Version>
 
 		// TODO: regexp match to see if it's parseable
 
-		// Main and postfix separated by a dash
+		// Main and postfix are usually separated by a dash
+		String main, postfix;
 		int dash = version.indexOf( '-' );
-		String main = dash == -1 ? version : version.substring( 0, dash );
-		String postfix = dash == -1 ? null : version.substring( dash + 1 );
+		if( dash != -1 )
+		{
+			main = version.substring( 0, dash );
+			postfix = version.substring( dash + 1 );
+		}
+		else
+		{
+			// ...but sometimes the postfix just starts with a letter
+			int letter = -1;
+			for( int i = 0, length = version.length(); i < length; i++ )
+			{
+				if( Character.isLetter( version.charAt( i ) ) )
+				{
+					letter = i;
+					break;
+				}
+			}
+			if( letter != -1 )
+			{
+				main = version.substring( 0, letter );
+				postfix = version.substring( letter );
+			}
+			else
+			{
+				main = version;
+				postfix = null;
+			}
+		}
 
 		// The main parts are separated by dots
-		String[] parts = main.split( "." );
+		String[] parts = main.split( "\\." );
 		int partsLength = parts.length;
 		this.parts = new int[partsLength];
 		for( int i = 0; i < partsLength; i++ )
@@ -87,32 +116,41 @@ public class Version implements Comparable<Version>
 		if( version == null )
 			throw new NullPointerException();
 
-		// Non-parseable versions will revert to a lexigraphic comparison
-		if( ( parts.length == 0 ) || ( version.parts.length == 0 ) )
-			return text.compareTo( version.text );
-
 		int length1 = parts.length;
 		int length2 = version.parts.length;
-		int length = Math.max( length1, length2 );
+
+		// Non-parseable versions will revert to a lexigraphic comparison
+		if( ( length1 == 0 ) || ( length2 == 0 ) )
+			return text.compareTo( version.text );
+
+		int length = length1 > length2 ? length1 : length2;
 		for( int p = 0; p < length; p++ )
 		{
-			Integer part1 = p <= length1 - 1 ? parts[p] : null;
-			Integer part2 = p <= length2 - 1 ? version.parts[p] : null;
-			if( ( part1 == null ) && ( part2 == null ) )
-				return 0;
-			if( part1 == null )
-				return -1;
-			if( part2 == null )
-				return 1;
-			if( part1 != part2 )
-				return part1 - part2 > 0 ? 1 : -1;
-			// Equal, so continue
+			int part1 = ( p < length1 ) ? parts[p] : 0;
+			int part2 = ( p < length2 ) ? version.parts[p] : 0;
+			if( part1 == part2 )
+				continue;
+			return part2 > part1 ? -1 : 1;
 		}
 
 		if( extra != version.extra )
-			return version.extra - version.extra > 0.0 ? 1 : -1;
+			return version.extra > extra ? -1 : 1;
 
 		return 0;
+	}
+
+	public int compareToPrint( Version version )
+	{
+		int compare = compareTo( version );
+		char sign;
+		if( compare < 0 )
+			sign = '<';
+		else if( compare > 0 )
+			sign = '>';
+		else
+			sign = '=';
+		System.out.println( this + " " + sign + " " + version );
+		return compare;
 	}
 
 	//
@@ -122,6 +160,23 @@ public class Version implements Comparable<Version>
 	@Override
 	public String toString()
 	{
+		int length = parts.length;
+		if( length > 0 )
+		{
+			StringBuilder r = new StringBuilder();
+			for( int i = 0; i < length; i++ )
+			{
+				r.append( parts[i] );
+				if( i < length - 1 )
+					r.append( '.' );
+			}
+			if( extra != 0.0 )
+			{
+				r.append( '+' );
+				r.append( extra );
+			}
+			return r.toString();
+		}
 		return text;
 	}
 

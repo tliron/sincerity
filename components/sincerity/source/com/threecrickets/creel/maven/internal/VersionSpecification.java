@@ -2,6 +2,7 @@ package com.threecrickets.creel.maven.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,9 +86,13 @@ public class VersionSpecification
 			return text.equals( version.toString() );
 
 		for( VersionRange range : ranges )
+		{
+			// System.out.println(range + " " + version + " > " + range.allows(
+			// version ));
 			if( range.allows( version ) )
 				// Logical or: it takes just one positive to be positive
 				return true;
+		}
 
 		return false;
 	}
@@ -99,7 +104,17 @@ public class VersionSpecification
 	@Override
 	public String toString()
 	{
-		return text;
+		if( trivial )
+			return text;
+		StringBuilder r = new StringBuilder();
+		for( Iterator<VersionRange> i = ranges.iterator(); i.hasNext(); )
+		{
+			VersionRange range = i.next();
+			r.append( range );
+			if( i.hasNext() )
+				r.append( ',' );
+		}
+		return r.toString();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

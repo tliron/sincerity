@@ -11,7 +11,7 @@ public class Event
 	// Construction
 	//
 
-	public Event( Type type, String id, String message, Double progress, Throwable exception )
+	public Event( Type type, String id, CharSequence message, Double progress, Throwable exception )
 	{
 		this.type = type;
 		this.id = id;
@@ -34,7 +34,7 @@ public class Event
 		return id;
 	}
 
-	public String getMessage()
+	public CharSequence getMessage()
 	{
 		return message;
 	}
@@ -64,7 +64,7 @@ public class Event
 
 	private final String id;
 
-	private String message;
+	private CharSequence message;
 
 	private Double progress;
 

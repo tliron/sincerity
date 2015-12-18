@@ -30,8 +30,6 @@ function creel(command) {
 	
 	var manager = new Manager()
 	manager.eventHandler.add(new ConsoleEventHandler(sincerity.out, sincerity.terminalAnsi))
-	manager.info('Hi!')
-	manager.error(':(')
 
 	var local = true
 
@@ -49,8 +47,18 @@ function creel(command) {
    		{id: 'central', url: 'https://repo1.maven.org/maven2/'}
    	]
 
+	var rules = [
+  		{type: 'exclude', name: '*annotations*'},
+ 		{type: 'excludeDependencies', group: 'org.apache.commons', name: 'commons-beanutils'},
+		//{type: 'rewrite'},
+   		{type: 'rewriteVersion', group: 'com.beust', name: '*c?mmand*', newVersion: '1.35+'},
+   		//{type: 'repositories', name: 'less4j', repositories: ['3c']},
+   		{type: 'repositories', group: 'jsslutils', repositories: ['restlet']}
+   	]
+
 	manager.setExplicitModules(modules)
 	manager.setRepositories(repositories)
 	
 	manager.identify()
+	manager.install('zzz/jars', true, true)
 }

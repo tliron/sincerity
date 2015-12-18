@@ -43,36 +43,41 @@ public class Notifier
 		return UUID.randomUUID().toString();
 	}
 
-	public void fireEvent( Type type, String id, String message, Double progress, Throwable exception )
+	public void fireEvent( Type type, String id, CharSequence message, Double progress, Throwable exception )
 	{
 		eventHandler.handleEvent( new Event( type, id, message, progress, exception ) );
 	}
 
-	public void info( String message )
+	public void info( CharSequence message )
 	{
 		fireEvent( Event.Type.INFO, null, message, null, null );
 	}
 
-	public String begin( String message )
+	public void debug( CharSequence message )
+	{
+		// TODO
+	}
+
+	public String begin( CharSequence message )
 	{
 		String id = newId();
 		fireEvent( Event.Type.BEGIN, id, message, null, null );
 		return id;
 	}
 
-	public String begin( String message, double progress )
+	public String begin( CharSequence message, double progress )
 	{
 		String id = newId();
 		fireEvent( Event.Type.BEGIN, id, message, progress, null );
 		return id;
 	}
 
-	public void update( String id, String message, double progress )
+	public void update( String id, CharSequence message, double progress )
 	{
 		fireEvent( Event.Type.UPDATE, id, message, progress, null );
 	}
 
-	public void update( String id, String message )
+	public void update( String id, CharSequence message )
 	{
 		fireEvent( Event.Type.UPDATE, id, message, null, null );
 	}
@@ -82,22 +87,22 @@ public class Notifier
 		fireEvent( Event.Type.UPDATE, id, null, progress, null );
 	}
 
-	public void end( String id, String message )
+	public void end( String id, CharSequence message )
 	{
 		fireEvent( Event.Type.END, id, message, null, null );
 	}
 
-	public void fail( String id, String message )
+	public void fail( String id, CharSequence message )
 	{
 		fireEvent( Event.Type.FAIL, id, message, null, null );
 	}
 
-	public void error( String message )
+	public void error( CharSequence message )
 	{
 		fireEvent( Event.Type.ERROR, null, message, null, null );
 	}
 
-	public void error( String message, Throwable exception )
+	public void error( CharSequence message, Throwable exception )
 	{
 		fireEvent( Event.Type.ERROR, null, message, null, exception );
 	}

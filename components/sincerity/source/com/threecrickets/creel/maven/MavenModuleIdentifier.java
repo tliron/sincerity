@@ -1,5 +1,7 @@
 package com.threecrickets.creel.maven;
 
+import java.util.Objects;
+
 import com.threecrickets.creel.ModuleIdentifier;
 import com.threecrickets.creel.exception.IncompatibleIdentifierException;
 import com.threecrickets.creel.exception.IncompatiblePlatformException;
@@ -11,13 +13,13 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 	// Static operations
 	//
 
-	public static MavenModuleIdentifier cast( ModuleIdentifier moduleIdentifier )
+	public static MavenModuleIdentifier cast( Object object )
 	{
-		if( moduleIdentifier == null )
+		if( object == null )
 			throw new NullPointerException();
-		if( !( moduleIdentifier instanceof MavenModuleIdentifier ) )
+		if( !( object instanceof MavenModuleIdentifier ) )
 			throw new IncompatiblePlatformException();
-		return (MavenModuleIdentifier) moduleIdentifier;
+		return (MavenModuleIdentifier) object;
 	}
 
 	//
@@ -54,7 +56,7 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 	public Version getParsedVersion()
 	{
 		if( parsedVersion == null )
-			parsedVersion = new Version( version );
+			parsedVersion = new Version( getVersion() );
 		return parsedVersion;
 	}
 
@@ -65,7 +67,7 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 	public int compareTo( ModuleIdentifier moduleIdentifier )
 	{
 		MavenModuleIdentifier mavenModuleIdentifier = cast( moduleIdentifier );
-		if( group.equals( mavenModuleIdentifier.group ) && name.equals( mavenModuleIdentifier.name ) )
+		if( getGroup().equals( mavenModuleIdentifier.getGroup() ) && getName().equals( mavenModuleIdentifier.getName() ) )
 			return getParsedVersion().compareTo( mavenModuleIdentifier.getParsedVersion() );
 		throw new IncompatibleIdentifierException();
 	}
@@ -77,7 +79,7 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 	@Override
 	public MavenModuleIdentifier clone()
 	{
-		return new MavenModuleIdentifier( (MavenRepository) getRepository(), group, name, version );
+		return new MavenModuleIdentifier( (MavenRepository) getRepository(), getGroup(), getName(), getVersion() );
 	}
 
 	//
@@ -85,9 +87,24 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 	//
 
 	@Override
+	public boolean equals( Object object )
+	{
+		if( !super.equals( object ) )
+			return false;
+		MavenModuleIdentifier mavenModuleIdentifier = (MavenModuleIdentifier) object;
+		return getGroup().equals( mavenModuleIdentifier.getGroup() ) && getName().equals( mavenModuleIdentifier.getName() ) && getVersion().equals( mavenModuleIdentifier.getVersion() );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash( super.hashCode(), getGroup(), getName(), getVersion() );
+	}
+
+	@Override
 	public String toString()
 	{
-		return "maven:" + group + ":" + name + ":" + version;
+		return "maven:" + getGroup() + ":" + getName() + ":" + getVersion();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

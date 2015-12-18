@@ -2,10 +2,10 @@ package com.threecrickets.creel.maven.internal;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,12 +26,16 @@ public class POM
 	// Construction
 	//
 
-	public POM( URL url ) throws IOException
+	public POM( URL url, Signature signature ) throws IOException
 	{
 		Document document;
 		try
 		{
-			document = XmlUtil.parse( IoUtil.readText( url ) );
+			byte[] bytes = IoUtil.readBytes( url );
+			if( ( signature != null ) && !signature.validate( bytes ) )
+				throw new InvalidSignatureException();
+			String text = new String( bytes, StandardCharsets.UTF_8 );
+			document = XmlUtil.parse( text );
 		}
 		catch( ParserConfigurationException x )
 		{
@@ -43,28 +47,19 @@ public class POM
 		}
 
 		// <project>
-		Element project = XmlUtil.getFirstElement( document.getDocumentElement(), "project" );
+		Element project = XmlUtil.getElement( document, "project" );
 		if( project == null )
 			throw new RuntimeException( "Invalid POM: no <project>" );
 
 		// <properties>
-		Element properties = XmlUtil.getFirstElement( project, "properties" );
-		if( properties != null )
-		{
-			for( Element property : new XmlUtil.Elements( properties ) )
-			{
-				String name = property.getTagName();
-				String value = property.getTextContent();
-				this.properties.put( name, value );
-			}
-		}
+		properties = new Properties( XmlUtil.getFirstElement( project, "properties" ) );
 
 		// <parent>
 		Element parent = XmlUtil.getFirstElement( project, "parent" );
 		if( parent != null )
 		{
-			parentGroupId = XmlUtil.getFirstElementText( parent, "groupId" );
-			parentVersion = XmlUtil.getFirstElementText( parent, "version" );
+			parentGroupId = properties.interpolate( XmlUtil.getFirstElementText( parent, "groupId" ), "project.groupId" );
+			parentVersion = properties.interpolate( XmlUtil.getFirstElementText( parent, "version" ), "project.version" );
 		}
 		else
 		{
@@ -72,18 +67,15 @@ public class POM
 			parentVersion = null;
 		}
 
-		groupId = XmlUtil.getFirstElementText( project, "groupId" );
-		artifactId = XmlUtil.getFirstElementText( project, "artifactId" );
-		version = XmlUtil.getFirstElementText( project, "version" );
-		name = XmlUtil.getFirstElementText( project, "name" );
-		description = XmlUtil.getFirstElementText( project, "description" );
+		groupId = properties.interpolate( XmlUtil.getFirstElementText( project, "groupId" ), "project.groupId" );
+		artifactId = properties.interpolate( XmlUtil.getFirstElementText( project, "artifactId" ), "project.artifactId" );
+		version = properties.interpolate( XmlUtil.getFirstElementText( project, "version" ), "project.version" );
+		name = properties.interpolate( XmlUtil.getFirstElementText( project, "name" ), "project.name" );
+		description = properties.interpolate( XmlUtil.getFirstElementText( project, "description" ), "project.description" );
 
-		// <dependencies>
-		Element dependencies = XmlUtil.getFirstElement( project, "dependencies" );
-		if( dependencies != null )
-			// <dependency>
-			for( Element dependency : new XmlUtil.Elements( properties, "dependency" ) )
-				this.dependencies.add( new Dependency( dependency ) );
+		// <dependencies>, <dependency>
+		for( Element dependency : new XmlUtil.Elements( XmlUtil.getFirstElement( project, "dependencies" ), "dependency" ) )
+			this.dependencies.add( new Dependency( dependency, properties ) );
 	}
 
 	//
@@ -137,7 +129,7 @@ public class POM
 
 	public MavenModuleIdentifier getModuleIdentifier( MavenRepository repository )
 	{
-		return new MavenModuleIdentifier( repository, groupId != null ? groupId : parentGroupId, artifactId, version != null ? version : parentVersion );
+		return new MavenModuleIdentifier( repository, getGroupId() != null ? getGroupId() : getParentGroupId(), getArtifactId(), getVersion() != null ? getVersion() : getParentVersion() );
 	}
 
 	public Iterable<MavenModuleSpecification> getDependencyModuleSpecifications()
@@ -147,7 +139,6 @@ public class POM
 		{
 			if( dependency.isOmitted() )
 				continue;
-
 			moduleSpecifications.add( new MavenModuleSpecification( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), true ) );
 		}
 		return Collections.unmodifiableCollection( moduleSpecifications );
@@ -156,7 +147,7 @@ public class POM
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final Map<String, String> properties = new HashMap<String, String>();
+	private final Properties properties;
 
 	private final String parentGroupId;
 

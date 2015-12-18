@@ -16,6 +16,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -77,6 +80,59 @@ public abstract class XmlUtil
 	}
 
 	/**
+	 * Gets the document element only if it matches the specific tag.
+	 * 
+	 * @param document
+	 *        The document
+	 * @param tag
+	 *        The tag
+	 * @return The document element or null
+	 */
+	public static Element getElement( Document document, String tag )
+	{
+		Element element = document.getDocumentElement();
+		return ( ( element != null ) && tag.equals( element.getTagName() ) ) ? element : null;
+	}
+
+	/**
+	 * Gets the child elements.
+	 * 
+	 * @param element
+	 *        The element
+	 * @return The matching child elements
+	 */
+	public static Collection<Element> getChildElements( Element element )
+	{
+		return getChildElements( element, null );
+	}
+
+	/**
+	 * Gets the child elements only if they match the specific tag.
+	 * 
+	 * @param element
+	 *        The element
+	 * @param tag
+	 *        The tag or null to match all child elements
+	 * @return The matching child elements
+	 */
+	public static Collection<Element> getChildElements( Element element, String tag )
+	{
+		Collection<Element> elements = new ArrayList<Element>();
+		NodeList children = element.getChildNodes();
+		for( int i = 0, length = children.getLength(); i < length; i++ )
+		{
+			Node child = children.item( i );
+			if( child instanceof Element )
+			{
+				Element childElement = (Element) child;
+				if( ( tag == null ) || tag.equals( childElement.getTagName() ) )
+					elements.add( childElement );
+			}
+		}
+		return Collections.unmodifiableCollection( elements );
+	}
+
+	/**
 	 * Gets the first child element with a specific tag.
 	 * 
 	 * @param element
@@ -87,10 +143,18 @@ public abstract class XmlUtil
 	 */
 	public static Element getFirstElement( Element element, String tag )
 	{
-		NodeList children = element.getElementsByTagName( tag );
-		if( children.getLength() == 0 )
-			return null;
-		return (Element) children.item( 0 );
+		NodeList children = element.getChildNodes();
+		for( int i = 0, length = children.getLength(); i < length; i++ )
+		{
+			Node child = children.item( i );
+			if( child instanceof Element )
+			{
+				Element childElement = (Element) child;
+				if( ( tag == null ) || tag.equals( childElement.getTagName() ) )
+					return childElement;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -132,53 +196,23 @@ public abstract class XmlUtil
 	{
 		public Elements( Element element )
 		{
-			this( element, "*" );
+			this( element, null );
 		}
 
 		public Elements( Element element, String tag )
 		{
-			nodeList = element.getElementsByTagName( tag );
+			elements = element != null ? getChildElements( element, tag ) : null;
 		}
 
+		@SuppressWarnings("unchecked")
 		public Iterator<Element> iterator()
 		{
-			return new ElementsIterator( nodeList );
+			if( elements == null )
+				return Collections.EMPTY_LIST.iterator();
+			return elements.iterator();
 		}
 
-		private final NodeList nodeList;
-	}
-
-	/**
-	 * Iterator wrapper around a {@link NodeList} of {@link Element} instances.
-	 */
-	public static class ElementsIterator implements Iterator<Element>
-	{
-		public ElementsIterator( NodeList nodeList )
-		{
-			this.nodeList = nodeList;
-			length = nodeList.getLength();
-		}
-
-		public boolean hasNext()
-		{
-			return index < length;
-		}
-
-		public Element next()
-		{
-			return (Element) nodeList.item( index++ );
-		}
-
-		public void remove()
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		private final NodeList nodeList;
-
-		private final int length;
-
-		private int index = 0;
+		private final Collection<Element> elements;
 	}
 
 	/**

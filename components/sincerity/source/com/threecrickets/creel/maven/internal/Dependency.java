@@ -14,21 +14,18 @@ public class Dependency
 	// Construction
 	//
 
-	public Dependency( Element element )
+	public Dependency( Element element, Properties properties )
 	{
-		groupId = XmlUtil.getFirstElementText( element, "groupId" );
-		artifactId = XmlUtil.getFirstElementText( element, "artifactId" );
-		version = XmlUtil.getFirstElementText( element, "version" );
-		type = XmlUtil.getFirstElementText( element, "type" );
-		scope = XmlUtil.getFirstElementText( element, "scope" );
-		optional = "true".equals( XmlUtil.getFirstElementText( element, "optional" ) );
+		groupId = properties.interpolate( XmlUtil.getFirstElementText( element, "groupId" ) );
+		artifactId = properties.interpolate( XmlUtil.getFirstElementText( element, "artifactId" ) );
+		version = properties.interpolate( XmlUtil.getFirstElementText( element, "version" ) );
+		type = properties.interpolate( XmlUtil.getFirstElementText( element, "type" ) );
+		scope = properties.interpolate( XmlUtil.getFirstElementText( element, "scope" ) );
+		optional = "true".equals( properties.interpolate( XmlUtil.getFirstElementText( element, "optional" ) ) );
 
-		// <exclusions>
-		Element exclusions = XmlUtil.getFirstElement( element, "exclusions" );
-		if( exclusions != null )
-			// <exclusion>
-			for( Element exclusion : new XmlUtil.Elements( exclusions, "exclusion" ) )
-				this.exclusions.add( new Exclusion( exclusion ) );
+		// <exclusions>, <excluision>
+		for( Element exclusion : new XmlUtil.Elements( XmlUtil.getFirstElement( element, "exclusions" ), "exclusion" ) )
+			this.exclusions.add( new Exclusion( exclusion, properties ) );
 	}
 
 	//

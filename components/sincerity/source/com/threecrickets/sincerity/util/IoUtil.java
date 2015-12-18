@@ -26,9 +26,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -371,7 +371,7 @@ public abstract class IoUtil
 	{
 		try
 		{
-			byte[] fileDigest = IoUtil.getDigest( new BufferedInputStream( new FileInputStream( file ), BUFFER_SIZE ), algorithm );
+			byte[] fileDigest = IoUtil.getDigest( file, algorithm );
 			return Arrays.equals( fileDigest, digest );
 		}
 		catch( FileNotFoundException x )
@@ -381,7 +381,35 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Calculates a SHA-1 digest for a stream.
+	 * Calculates a digest for the content.
+	 * 
+	 * @param content
+	 *        The content
+	 * @param algorithm
+	 *        The algorithm
+	 * @return The digest
+	 * @throws IOException
+	 *         In case the algorithm is not found
+	 */
+	public static byte[] getDigest( byte[] content, String algorithm ) throws IOException
+	{
+		try
+		{
+			MessageDigest digest = MessageDigest.getInstance( algorithm );
+			digest.reset();
+			digest.update( content );
+			return digest.digest();
+		}
+		catch( NoSuchAlgorithmException x )
+		{
+			IOException io = new IOException();
+			io.initCause( x );
+			throw io;
+		}
+	}
+
+	/**
+	 * Calculates a digest for a stream.
 	 * <p>
 	 * Note that the stream is closed by this method!
 	 * 
@@ -397,7 +425,7 @@ public abstract class IoUtil
 	{
 		try
 		{
-			MessageDigest digest = MessageDigest.getInstance( "SHA-1" );
+			MessageDigest digest = MessageDigest.getInstance( algorithm );
 			digest.reset();
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int length = 0;
@@ -418,7 +446,7 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Calculates a SHA-1 digest for a file.
+	 * Calculates a digest for a file.
 	 * 
 	 * @param file
 	 *        The file
@@ -434,7 +462,7 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Calculates a SHA-1 digest for a URL.
+	 * Calculates a digest for a URL.
 	 * 
 	 * @param url
 	 *        The URL
@@ -473,6 +501,22 @@ public abstract class IoUtil
 	 */
 	public static byte[] readBytes( URL url ) throws IOException
 	{
+		if( "file".equalsIgnoreCase( url.getProtocol() ) )
+		{
+			// Use readBytes(File) if possible, because it is more efficient
+			// (because we know the buffer size in advance)
+			try
+			{
+				return readBytes( new File( url.toURI() ) );
+			}
+			catch( URISyntaxException x )
+			{
+				IOException io = new IOException();
+				io.initCause( x );
+				throw io;
+			}
+		}
+
 		ReadableByteChannel fromChannel = Channels.newChannel( url.openStream() );
 		try
 		{
@@ -488,6 +532,78 @@ public abstract class IoUtil
 	}
 
 	/**
+	 * Reads all bytes from a file. If you don't absolutely need an array of
+	 * bytes, use {@link #readBuffer(File)}, which is more efficient.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The bytes
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static byte[] readBytes( File file ) throws IOException
+	{
+		FileInputStream input = new FileInputStream( file );
+		try
+		{
+			FileChannel channel = input.getChannel();
+			try
+			{
+				byte[] bytes = new byte[(int) channel.size()];
+				channel.read( ByteBuffer.wrap( bytes ) );
+				return bytes;
+			}
+			finally
+			{
+				channel.close();
+			}
+		}
+		catch( FileNotFoundException x )
+		{
+			return null;
+		}
+		finally
+		{
+			input.close();
+		}
+	}
+
+	/**
+	 * Reads all bytes from a file as a memory-mapped buffer. This is more
+	 * efficient than {@link #readBytes(File)}.
+	 * 
+	 * @param file
+	 *        The file
+	 * @return The bytes
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static ByteBuffer readBuffer( File file ) throws IOException
+	{
+		FileInputStream input = new FileInputStream( file );
+		try
+		{
+			FileChannel channel = input.getChannel();
+			try
+			{
+				return channel.map( FileChannel.MapMode.READ_ONLY, 0, channel.size() );
+			}
+			finally
+			{
+				channel.close();
+			}
+		}
+		catch( FileNotFoundException x )
+		{
+			return null;
+		}
+		finally
+		{
+			input.close();
+		}
+	}
+
+	/**
 	 * Reads all text from a URL using UTF-8.
 	 * 
 	 * @param url
@@ -498,6 +614,22 @@ public abstract class IoUtil
 	 */
 	public static String readText( URL url ) throws IOException
 	{
+		if( "file".equalsIgnoreCase( url.getProtocol() ) )
+		{
+			// Use readText(File) if possible, because it is more efficient
+			// (because we know the buffer size in advance)
+			try
+			{
+				return readText( new File( url.toURI() ) );
+			}
+			catch( URISyntaxException x )
+			{
+				IOException io = new IOException();
+				io.initCause( x );
+				throw io;
+			}
+		}
+
 		return new String( readBytes( url ), StandardCharsets.UTF_8 );
 	}
 
@@ -514,28 +646,7 @@ public abstract class IoUtil
 	 */
 	public static String readText( File file ) throws IOException
 	{
-		FileInputStream input = new FileInputStream( file );
-		try
-		{
-			FileChannel channel = input.getChannel();
-			try
-			{
-				MappedByteBuffer buffer = channel.map( FileChannel.MapMode.READ_ONLY, 0, channel.size() );
-				return StandardCharsets.UTF_8.decode( buffer ).toString();
-			}
-			finally
-			{
-				channel.close();
-			}
-		}
-		catch( FileNotFoundException x )
-		{
-			return null;
-		}
-		finally
-		{
-			input.close();
-		}
+		return StandardCharsets.UTF_8.decode( readBuffer( file ) ).toString();
 	}
 
 	/**

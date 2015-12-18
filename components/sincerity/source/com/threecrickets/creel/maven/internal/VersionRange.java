@@ -41,6 +41,16 @@ public class VersionRange
 			return ( compareStart > 0 ) && ( compareEnd > 0 );
 	}
 
+	//
+	// Object
+	//
+
+	@Override
+	public String toString()
+	{
+		return ( includeStart ? "[" : "(" ) + ( start != null ? start : "" ) + ',' + ( end != null ? end : "" ) + ( includeEnd ? ']' : ')' );
+	}
+
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 

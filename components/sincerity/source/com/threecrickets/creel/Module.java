@@ -3,6 +3,7 @@ package com.threecrickets.creel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 
 /**
  * A module can have dependencies as well as supplicants.
@@ -86,8 +87,12 @@ public class Module
 	/**
 	 * Copies identifier, repository, and dependencies from another module.
 	 */
-	public void copyResolutionFrom()
+	public void copyResolutionFrom( Module module )
 	{
+		identifier = module.getIdentifier().clone();
+		dependencies.clear();
+		for( Module dependency : module.getDependencies() )
+			dependencies.add( dependency );
 	}
 
 	/**
@@ -98,6 +103,10 @@ public class Module
 	 */
 	public void merge( Module module )
 	{
+		if( module.isExplicit() )
+			setExplicit( true );
+		for( Module supplicant : module.getSupplicants() )
+			addSupplicant( supplicant );
 	}
 
 	public void replaceModule( Module oldModule, Module newModule, boolean recursive )
@@ -107,35 +116,41 @@ public class Module
 	public String toString( boolean longForm )
 	{
 		StringBuilder r = new StringBuilder(), prefix = new StringBuilder();
-		if( identifier != null )
+		if( getIdentifier() != null )
 		{
 			r.append( "id=" );
-			r.append( identifier );
+			r.append( getIdentifier() );
 		}
-		if( ( longForm || !( identifier == null ) ) && ( specification != null ) )
+		if( ( longForm || !( getIdentifier() == null ) ) && ( getSpecification() != null ) )
 		{
 			if( r.length() != 0 )
 				r.append( ", " );
 			r.append( "spec=" );
-			r.append( specification );
+			r.append( getSpecification() );
 		}
 		if( longForm )
 		{
-			prefix.append( this.explicit ? '*' : '+' ); // explicit?
-			prefix.append( this.identifier != null ? '!' : '?' ); // identified?
-			if( !dependencies.isEmpty() )
+			prefix.append( isExplicit() ? '*' : '+' ); // explicit?
+			prefix.append( getIdentifier() != null ? '!' : '?' ); // identified?
+			if( getDependencies().iterator().hasNext() )
 			{
 				if( r.length() != 0 )
 					r.append( ", " );
 				r.append( "dependencies=" );
-				r.append( dependencies.size() );
+				int size = 0;
+				for( Iterator<?> i = getDependencies().iterator(); i.hasNext(); )
+					size++;
+				r.append( size );
 			}
-			if( !supplicants.isEmpty() )
+			if( getSupplicants().iterator().hasNext() )
 			{
 				if( r.length() != 0 )
 					r.append( ", " );
 				r.append( "supplicants=" );
-				r.append( supplicants.size() );
+				int size = 0;
+				for( Iterator<?> i = getSupplicants().iterator(); i.hasNext(); )
+					size++;
+				r.append( size );
 			}
 		}
 		if( prefix.length() != 0 )

@@ -100,7 +100,7 @@ public class ConsoleEventHandler implements EventHandler
 
 	protected int getTerminalWidth()
 	{
-		return 80;
+		return Integer.MAX_VALUE;
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
@@ -153,7 +153,7 @@ public class ConsoleEventHandler implements EventHandler
 			output.append( progressEnd );
 		}
 
-		String message = event.getMessage();
+		CharSequence message = event.getMessage();
 		if( message != null )
 			output.append( message );
 

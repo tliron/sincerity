@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import com.threecrickets.creel.Module;
 import com.threecrickets.creel.ModuleIdentifier;
@@ -16,7 +17,9 @@ import com.threecrickets.creel.ModuleSpecification;
 import com.threecrickets.creel.Repository;
 import com.threecrickets.creel.Rule;
 import com.threecrickets.creel.event.Notifier;
+import com.threecrickets.creel.exception.IncompatiblePlatformException;
 import com.threecrickets.creel.internal.ConfigHelper;
+import com.threecrickets.creel.maven.internal.InvalidSignatureException;
 import com.threecrickets.creel.maven.internal.MetaData;
 import com.threecrickets.creel.maven.internal.POM;
 import com.threecrickets.creel.maven.internal.Signature;
@@ -44,6 +47,19 @@ import com.threecrickets.sincerity.util.IoUtil;
  */
 public class MavenRepository extends Repository
 {
+	//
+	// Static operations
+	//
+
+	public static MavenRepository cast( Object object )
+	{
+		if( object == null )
+			throw new NullPointerException();
+		if( !( object instanceof MavenRepository ) )
+			throw new IncompatiblePlatformException();
+		return (MavenRepository) object;
+	}
+
 	//
 	// Construction
 	//
@@ -76,6 +92,21 @@ public class MavenRepository extends Repository
 	// Attributes
 	//
 
+	public URL getUrl()
+	{
+		return url;
+	}
+
+	public boolean isCheckSignatures()
+	{
+		return checkSignatures;
+	}
+
+	public boolean isAllowMd5()
+	{
+		return allowMd5;
+	}
+
 	public File getFile( MavenModuleIdentifier moduleIdentifier, String extension, File directory )
 	{
 		File file = directory;
@@ -88,10 +119,9 @@ public class MavenRepository extends Repository
 
 	public URL getUrl( MavenModuleIdentifier moduleIdentifier, String extension )
 	{
-		StringBuilder url = new StringBuilder( this.url.toString() );
+		StringBuilder url = new StringBuilder( getUrl().toString() );
 
-		String[] parts = moduleIdentifier.getGroup().split( "." );
-		for( String part : parts )
+		for( String part : moduleIdentifier.getGroup().split( "\\." ) )
 		{
 			url.append( '/' );
 			url.append( part );
@@ -124,10 +154,9 @@ public class MavenRepository extends Repository
 
 	public URL getMetaDataUrl( String group, String name )
 	{
-		StringBuilder url = new StringBuilder( this.url.toString() );
+		StringBuilder url = new StringBuilder( getUrl().toString() );
 
-		String[] parts = group.split( "." );
-		for( String part : parts )
+		for( String part : group.split( "\\." ) )
 		{
 			url.append( '/' );
 			url.append( part );
@@ -151,16 +180,32 @@ public class MavenRepository extends Repository
 		}
 	}
 
-	public POM getPom( MavenModuleIdentifier moduleIdentifier )
+	public POM getPom( MavenModuleIdentifier moduleIdentifier, Notifier notifier )
 	{
+		if( notifier == null )
+			notifier = new Notifier();
+
 		// TODO: cache POMs
+		URL url = getUrl( moduleIdentifier, "pom" );
 		try
 		{
-			POM pom = new POM( getUrl( moduleIdentifier, "p)om" ) );
+			Signature signature = isCheckSignatures() ? new Signature( url, isAllowMd5() ) : null;
+			POM pom = new POM( url, signature );
+			if( !moduleIdentifier.equals( pom.getModuleIdentifier( this ) ) )
+			{
+				notifier.error( "Invalid POM: " + url );
+				return null;
+			}
 			return pom;
 		}
 		catch( FileNotFoundException x )
 		{
+			notifier.debug( "No POM: " + url );
+			return null;
+		}
+		catch( InvalidSignatureException x )
+		{
+			notifier.error( "Invalid signature for POM: " + url );
 			return null;
 		}
 		catch( IOException x )
@@ -169,16 +214,32 @@ public class MavenRepository extends Repository
 		}
 	}
 
-	public MetaData getMetaData( String group, String name )
+	public MetaData getMetaData( String group, String name, Notifier notifier )
 	{
+		if( notifier == null )
+			notifier = new Notifier();
+
 		// TODO: cache metadata!
+		URL url = getMetaDataUrl( group, name );
 		try
 		{
-			MetaData metadata = new MetaData( getMetaDataUrl( group, name ) );
+			Signature signature = isCheckSignatures() ? new Signature( url, isAllowMd5() ) : null;
+			MetaData metadata = new MetaData( url, signature );
+			if( !group.equals( metadata.getGroupId() ) || !name.equals( metadata.getArtifactId() ) )
+			{
+				notifier.error( "Invalid metadata: " + url );
+				return null;
+			}
 			return metadata;
 		}
 		catch( FileNotFoundException x )
 		{
+			notifier.debug( "No metadata: " + url );
+			return null;
+		}
+		catch( InvalidSignatureException x )
+		{
+			notifier.error( "Invalid signature for metadata: " + url );
 			return null;
 		}
 		catch( IOException x )
@@ -206,7 +267,10 @@ public class MavenRepository extends Repository
 		if( notifier == null )
 			notifier = new Notifier();
 
-		POM pom = getPom( mavenModuleIdentifier );
+		POM pom = getPom( mavenModuleIdentifier, notifier );
+		if( pom == null )
+			return null;
+
 		Module module = new Module( false, moduleIdentifier, null );
 		for( MavenModuleSpecification moduleSpecification : pom.getDependencyModuleSpecifications() )
 		{
@@ -214,7 +278,6 @@ public class MavenRepository extends Repository
 			dependencyModule.addSupplicant( module );
 			module.addDependency( dependencyModule );
 		}
-
 		return module;
 	}
 
@@ -225,19 +288,20 @@ public class MavenRepository extends Repository
 		if( notifier == null )
 			notifier = new Notifier();
 
-		Collection<ModuleIdentifier> potentialModuleIdentifiers = new ArrayList<ModuleIdentifier>();
+		Set<ModuleIdentifier> potentialModuleIdentifiers = new LinkedHashSet<ModuleIdentifier>();
 		for( SpecificationOption option : mavenModuleSpecification.getOptions() )
 		{
 			if( option.getParsedVersionSpecfication( false ).isTrivial() )
 			{
-				// When the version is trivial, we can skip the metadata
+				// When the version is trivial, we can skip the metadata and
+				// just check directly against the POM
 				MavenModuleIdentifier moduleIdentifier = option.toModuleIdentifier( false, this );
 				if( hasModule( moduleIdentifier ) )
 					potentialModuleIdentifiers.add( moduleIdentifier );
 			}
 			else
 			{
-				MetaData metadata = getMetaData( option.getGroup(), option.getName() );
+				MetaData metadata = getMetaData( option.getGroup(), option.getName(), notifier );
 				if( metadata != null )
 					for( MavenModuleIdentifier moduleIdentifier : metadata.getModuleIdentifiers( this ) )
 						potentialModuleIdentifiers.add( moduleIdentifier );
@@ -323,14 +387,35 @@ public class MavenRepository extends Repository
 	// Cloneable
 	//
 
+	@Override
+	public MavenRepository clone()
+	{
+		return new MavenRepository( getId(), isAll(), getParallelism(), getUrl(), isCheckSignatures(), isAllowMd5() );
+	}
+
 	//
 	// Object
 	//
 
 	@Override
+	public boolean equals( Object object )
+	{
+		if( !super.equals( object ) )
+			return false;
+		MavenRepository mavenRepository = (MavenRepository) object;
+		return getUrl().equals( mavenRepository.getUrl() ) && ( isCheckSignatures() == mavenRepository.isCheckSignatures() ) && ( isAllowMd5() == mavenRepository.isAllowMd5() );
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash( super.hashCode(), getUrl(), isCheckSignatures(), isAllowMd5() );
+	}
+
+	@Override
 	public String toString()
 	{
-		return "id=" + getId() + ", url=maven:" + url + ", checkSignatures=" + checkSignatures + ", allowMd5=" + allowMd5;
+		return "id=" + getId() + ", url=maven:" + getUrl() + ", checkSignatures=" + isCheckSignatures() + ", allowMd5=" + isAllowMd5();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

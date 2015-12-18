@@ -10,10 +10,10 @@ public class Exclusion
 	// Construction
 	//
 
-	public Exclusion( Element element )
+	public Exclusion( Element element, Properties properties )
 	{
-		groupId = XmlUtil.getFirstElementText( element, "groupId" );
-		artifactId = XmlUtil.getFirstElementText( element, "artifactId" );
+		groupId = properties.interpolate( XmlUtil.getFirstElementText( element, "groupId" ) );
+		artifactId = properties.interpolate( XmlUtil.getFirstElementText( element, "artifactId" ) );
 	}
 
 	//
