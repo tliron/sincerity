@@ -21,6 +21,7 @@ import com.threecrickets.creel.event.Notifier;
 import com.threecrickets.creel.internal.ConfigHelper;
 import com.threecrickets.creel.internal.Conflicts;
 import com.threecrickets.creel.internal.DaemonThreadFactory;
+import com.threecrickets.creel.internal.Downloader;
 import com.threecrickets.creel.internal.IdentificationContext;
 import com.threecrickets.creel.internal.Jobs;
 import com.threecrickets.creel.internal.Modules;
@@ -207,7 +208,8 @@ public class Manager extends Notifier
 
 	/**
 	 * Identifies a module, optionally identifying its dependencies recursively
-	 * (supporting fork/join parallelism).
+	 * (supporting efficient multithreaded parallelism that avoids repeating
+	 * work already done).
 	 * <p>
 	 * "Identification" means finding the best identifier available from all the
 	 * candidates in all the repositories that match the specification. A
@@ -227,70 +229,92 @@ public class Manager extends Notifier
 
 		applyRules( module, context );
 
-		boolean inJob = false;
-
-		if( module.getIdentifier() != null )
+		if( context.isExclude() )
 		{
-			// Already identified
+			// Mark to not identify this specification
+			unidentifiedModules.addBySpecification( module );
 		}
-		if( unidentifiedModules.get( module.getSpecification() ) != null )
+		else
 		{
-			// Already failed to identify
-		}
-		else if( !context.isExclude() )
-		{
-			// Check to see if we've already identified it
-			Module identifiedModule = identifiedModules.get( module.getSpecification() );
-			if( identifiedModule == null )
+			if( module.getIdentifier() != null )
 			{
-				inJob = identifyModuleJobs.begin( module.getSpecification(), executor, phaser, identifyModuleTask( module, recursive, phaser ) );
-				if( !inJob )
-				{
-					info( "Already identifying " + module.getSpecification() );
-					return;
-				}
-
-				String id = begin( "Identifying " + module.getSpecification() );
-
-				// Gather allowed module identifiers from all repositories
-				Set<ModuleIdentifier> uniqueModuleIdentifiers = new LinkedHashSet<ModuleIdentifier>();
-				for( Repository repository : context.getRepositories() )
-					for( ModuleIdentifier allowedModuleIdentifier : repository.getAllowedModuleIdentifiers( module.getSpecification(), this ) )
-						uniqueModuleIdentifiers.add( allowedModuleIdentifier );
-
-				// Pick the best module identifier
-				if( !uniqueModuleIdentifiers.isEmpty() )
-				{
-					LinkedList<ModuleIdentifier> moduleIdentifiers = new LinkedList<ModuleIdentifier>( uniqueModuleIdentifiers );
-					Collections.sort( moduleIdentifiers );
-
-					// Best module is last (newest)
-					ModuleIdentifier moduleIdentifier = moduleIdentifiers.getLast();
-					identifiedModule = moduleIdentifier.getRepository().getModule( moduleIdentifier, this );
-
-					if( identifiedModule != null )
-						end( id, "Identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
-					else
-						fail( id, "Could not get module " + moduleIdentifier + " from " + moduleIdentifier.getRepository().getId() + " repository" );
-				}
-				else
-					fail( id, "Could not identify " + module.getSpecification() );
+				// Nothing to do: already identified
+			}
+			else if( unidentifiedModules.get( module.getSpecification() ) != null )
+			{
+				// Nothing to do: already failed to identify this specification,
+				// no use trying again
 			}
 			else
 			{
-				info( "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
-				identifiedCacheHits.incrementAndGet();
+				// Check to see if we've already identified it
+				Module identifiedModule = identifiedModules.get( module.getSpecification() );
+				if( identifiedModule == null )
+				{
+					if( phaser != null )
+					{
+						boolean alreadyIdentifying = !identifyModuleJobs.beginIfNotBegun( module.getSpecification(), executor, phaser, identifyModuleTask( module, recursive, phaser ) );
+						if( alreadyIdentifying )
+						{
+							// Another thread is already in the process of
+							// identifying this specification, so we'll wait for
+							// them to finish
+							final String id = begin( "Waiting for identification of " + module.getSpecification() );
+							identifyModuleJobs.onEnd( module.getSpecification(), new Runnable()
+							{
+								public void run()
+								{
+									Module identifiedModule = identifiedModules.get( module.getSpecification() );
+									if( identifiedModule != null )
+										end( id, "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
+									else
+										fail( id, "Could not identify " + module.getSpecification() );
+								}
+							} );
+							return;
+						}
+					}
+
+					String id = begin( "Identifying " + module.getSpecification() );
+
+					// Gather allowed module identifiers from all repositories
+					Set<ModuleIdentifier> allowedModuleIdentifiers = new LinkedHashSet<ModuleIdentifier>();
+					for( Repository repository : context.getRepositories() )
+						for( ModuleIdentifier allowedModuleIdentifier : repository.getAllowedModuleIdentifiers( module.getSpecification(), this ) )
+							allowedModuleIdentifiers.add( allowedModuleIdentifier );
+
+					// Pick the best module identifier
+					if( !allowedModuleIdentifiers.isEmpty() )
+					{
+						LinkedList<ModuleIdentifier> moduleIdentifiers = new LinkedList<ModuleIdentifier>( allowedModuleIdentifiers );
+						Collections.sort( moduleIdentifiers );
+
+						// Best module is last (newest)
+						ModuleIdentifier moduleIdentifier = moduleIdentifiers.getLast();
+						identifiedModule = moduleIdentifier.getRepository().getModule( moduleIdentifier, this );
+
+						if( identifiedModule != null )
+							end( id, "Identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
+						else
+							fail( id, "Could not get module " + moduleIdentifier + " from " + moduleIdentifier.getRepository().getId() + " repository" );
+					}
+					else
+						fail( id, "Could not identify " + module.getSpecification() );
+				}
+				else
+				{
+					debug( "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
+					identifiedCacheHits.incrementAndGet();
+				}
+
+				if( identifiedModule != null )
+					module.copyIdentificationFrom( identifiedModule );
 			}
 
-			if( identifiedModule != null )
-				module.copyResolutionFrom( identifiedModule );
+			addModule( module );
 		}
 
-		if( !context.isExclude() )
-			addModule( module );
-
-		if( inJob )
-			identifyModuleJobs.end( module.getSpecification() );
+		identifyModuleJobs.end( module.getSpecification() );
 
 		if( context.isRecursive() )
 		{
@@ -365,6 +389,15 @@ public class Manager extends Notifier
 
 	public void install( File directory, boolean overwrite, boolean parallel )
 	{
+		String id = begin( "Installing" );
+
+		Downloader downloader = new Downloader( getExecutor(), this );
+		for( Module module : identifiedModules )
+			for( Artifact artifact : module.getIdentifier().getArtifacts( directory ) )
+				downloader.submit( artifact.getSourceUrl(), artifact.getFile(), null );
+		downloader.waitUntilDone();
+
+		end( id, "Installed " + 0 + " modules" );
 	}
 
 	public void applyRules( Module module, IdentificationContext context )

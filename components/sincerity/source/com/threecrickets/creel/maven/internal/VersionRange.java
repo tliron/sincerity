@@ -8,8 +8,8 @@ public class VersionRange
 
 	public VersionRange( String start, String end, boolean includeStart, boolean includeEnd )
 	{
-		this.start = ( ( start != null ) && !start.isEmpty() ) ? new Version( start ) : null;
-		this.end = ( ( end != null ) && !end.isEmpty() ) ? new Version( end ) : null;
+		this.start = new Version( start );
+		this.end = new Version( end );
 		this.includeStart = includeStart;
 		this.includeEnd = includeEnd;
 	}
@@ -23,19 +23,43 @@ public class VersionRange
 	}
 
 	//
+	// Attributes
+	//
+
+	public Version getStart()
+	{
+		return start;
+	}
+
+	public Version getEnd()
+	{
+		return end;
+	}
+
+	public boolean isIncludeStart()
+	{
+		return includeStart;
+	}
+
+	public boolean isIncludeEnd()
+	{
+		return includeEnd;
+	}
+
+	//
 	// Operations
 	//
 
 	public boolean allows( Version version )
 	{
-		int compareStart = start != null ? version.compareTo( start ) : 1;
-		int compareEnd = end != null ? end.compareTo( version ) : 1;
+		int compareStart = getStart() != null ? version.compareTo( getStart() ) : 1;
+		int compareEnd = getEnd() != null ? getEnd().compareTo( version ) : 1;
 
-		if( includeStart && includeEnd )
+		if( isIncludeStart() && isIncludeEnd() )
 			return ( compareStart >= 0 ) && ( compareEnd >= 0 );
-		else if( includeStart && !includeEnd )
+		else if( isIncludeStart() && !isIncludeEnd() )
 			return ( compareStart >= 0 ) && ( compareEnd > 0 );
-		else if( !includeStart && includeEnd )
+		else if( !isIncludeStart() && isIncludeEnd() )
 			return ( compareStart > 0 ) && ( compareEnd >= 0 );
 		else
 			return ( compareStart > 0 ) && ( compareEnd > 0 );
@@ -48,7 +72,7 @@ public class VersionRange
 	@Override
 	public String toString()
 	{
-		return ( includeStart ? "[" : "(" ) + ( start != null ? start : "" ) + ',' + ( end != null ? end : "" ) + ( includeEnd ? ']' : ')' );
+		return ( isIncludeStart() ? "[" : "(" ) + ( getStart() != null ? getStart() : "" ) + ',' + ( getEnd() != null ? getEnd() : "" ) + ( isIncludeEnd() ? ']' : ')' );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////

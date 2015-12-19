@@ -47,7 +47,19 @@ public class Version implements Comparable<Version>
 		version = version == null ? "" : version.trim();
 		text = version;
 
-		// TODO: regexp match to see if it's parseable
+		if( version.isEmpty() )
+		{
+			parsed = false;
+			parts = null;
+			extra = 0.0;
+			return;
+		}
+
+		boolean parsed = false;
+		int[] parts = null;
+		double extra = 0.0;
+
+		// TODO: regexp match to see if it's parseable?
 
 		// Main and postfix are usually separated by a dash
 		String main, postfix;
@@ -81,30 +93,67 @@ public class Version implements Comparable<Version>
 			}
 		}
 
-		// The main parts are separated by dots
-		String[] parts = main.split( "\\." );
-		int partsLength = parts.length;
-		this.parts = new int[partsLength];
-		for( int i = 0; i < partsLength; i++ )
-			this.parts[i] = Integer.parseInt( parts[i] );
-
-		if( postfix != null )
+		try
 		{
-			// The postfix is separated into text and then an integer
-			int postfixFirstDigit = 0;
-			int postfixLength = postfix.length();
-			while( ( postfixFirstDigit < postfixLength ) && !Character.isDigit( postfix.charAt( postfixFirstDigit ) ) )
-				postfixFirstDigit++;
-			String postfixText = postfixFirstDigit == postfixLength ? postfix : postfix.substring( 0, postfixFirstDigit );
-			int postfixInteger = postfixFirstDigit == postfixLength ? 0 : Integer.parseInt( postfix.substring( postfixFirstDigit ) );
+			// The main parts are separated by dots
+			String[] stringParts = main.split( "\\." );
+			int partsLength = stringParts.length;
+			parts = new int[partsLength];
+			for( int i = 0; i < partsLength; i++ )
+				parts[i] = Integer.parseInt( stringParts[i] );
 
-			// Convert postfix text and number into the extra value
-			Double postfixValue = POSTFIXES.get( postfixText.toLowerCase() );
-			double extra = postfixValue != null ? postfixValue : 0.0;
-			this.extra = extra + ( postfixInteger / 10.0 );
+			if( postfix != null )
+			{
+				// The postfix is separated into text and then an integer
+				int postfixFirstDigit = 0;
+				int postfixLength = postfix.length();
+				while( ( postfixFirstDigit < postfixLength ) && !Character.isDigit( postfix.charAt( postfixFirstDigit ) ) )
+					postfixFirstDigit++;
+				String postfixText = postfixFirstDigit == postfixLength ? postfix : postfix.substring( 0, postfixFirstDigit );
+				int postfixInteger = postfixFirstDigit == postfixLength ? 0 : Integer.parseInt( postfix.substring( postfixFirstDigit ) );
+
+				// Convert postfix text and number into the extra value
+				Double postfixValue = POSTFIXES.get( postfixText.toLowerCase() );
+				if( postfixValue != null )
+					extra = postfixValue;
+				extra += postfixInteger / 10.0;
+			}
+			else
+				extra = 0.0;
+
+			parsed = true;
 		}
-		else
-			extra = 0.0;
+		catch( NumberFormatException x )
+		{
+		}
+
+		this.parsed = parsed;
+		this.parts = parsed ? parts : null;
+		this.extra = extra;
+	}
+
+	//
+	// Attributes
+	//
+
+	public String getText()
+	{
+		return text;
+	}
+
+	public boolean isParsed()
+	{
+		return parsed;
+	}
+
+	public int[] getParts()
+	{
+		return parts;
+	}
+
+	public double getExtra()
+	{
+		return extra;
 	}
 
 	//
@@ -116,25 +165,25 @@ public class Version implements Comparable<Version>
 		if( version == null )
 			throw new NullPointerException();
 
-		int length1 = parts.length;
-		int length2 = version.parts.length;
-
 		// Non-parseable versions will revert to a lexigraphic comparison
-		if( ( length1 == 0 ) || ( length2 == 0 ) )
-			return text.compareTo( version.text );
+		if( !isParsed() || !version.isParsed() )
+			return getText().compareTo( version.getText() );
 
+		int length1 = getParts().length;
+		int length2 = version.getParts().length;
 		int length = length1 > length2 ? length1 : length2;
+
 		for( int p = 0; p < length; p++ )
 		{
-			int part1 = ( p < length1 ) ? parts[p] : 0;
-			int part2 = ( p < length2 ) ? version.parts[p] : 0;
+			int part1 = ( p < length1 ) ? getParts()[p] : 0;
+			int part2 = ( p < length2 ) ? version.getParts()[p] : 0;
 			if( part1 == part2 )
 				continue;
 			return part2 > part1 ? -1 : 1;
 		}
 
-		if( extra != version.extra )
-			return version.extra > extra ? -1 : 1;
+		if( getExtra() != version.getExtra() )
+			return version.getExtra() > getExtra() ? -1 : 1;
 
 		return 0;
 	}
@@ -160,32 +209,33 @@ public class Version implements Comparable<Version>
 	@Override
 	public String toString()
 	{
-		int length = parts.length;
-		if( length > 0 )
+		if( !isParsed() )
+			return getText();
+
+		int length = getParts().length;
+		StringBuilder r = new StringBuilder();
+		for( int i = 0; i < length; i++ )
 		{
-			StringBuilder r = new StringBuilder();
-			for( int i = 0; i < length; i++ )
-			{
-				r.append( parts[i] );
-				if( i < length - 1 )
-					r.append( '.' );
-			}
-			if( extra != 0.0 )
-			{
-				r.append( '+' );
-				r.append( extra );
-			}
-			return r.toString();
+			r.append( getParts()[i] );
+			if( i < length - 1 )
+				r.append( '.' );
 		}
-		return text;
+		if( extra != 0.0 )
+		{
+			r.append( '+' );
+			r.append( getExtra() );
+		}
+		return r.toString();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final String text;
+	private final boolean parsed;
 
 	private final int[] parts;
 
 	private final double extra;
+
+	private final String text;
 }

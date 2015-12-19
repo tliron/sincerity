@@ -1,9 +1,9 @@
 package com.threecrickets.creel;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A module can have dependencies as well as supplicants.
@@ -87,7 +87,7 @@ public class Module
 	/**
 	 * Copies identifier, repository, and dependencies from another module.
 	 */
-	public void copyResolutionFrom( Module module )
+	public void copyIdentificationFrom( Module module )
 	{
 		identifier = module.getIdentifier().clone();
 		dependencies.clear();
@@ -101,7 +101,7 @@ public class Module
 	 * 
 	 * @param module
 	 */
-	public void merge( Module module )
+	public void mergeSupplicants( Module module )
 	{
 		if( module.isExplicit() )
 			setExplicit( true );
@@ -176,11 +176,11 @@ public class Module
 
 	private boolean explicit;
 
-	private ModuleIdentifier identifier;
+	private volatile ModuleIdentifier identifier;
 
-	private ModuleSpecification specification;
+	private volatile ModuleSpecification specification;
 
-	private final Collection<Module> dependencies = new ArrayList<Module>();
+	private final Collection<Module> dependencies = new CopyOnWriteArrayList<Module>();
 
-	private final Collection<Module> supplicants = new ArrayList<Module>();
+	private final Collection<Module> supplicants = new CopyOnWriteArrayList<Module>();
 }

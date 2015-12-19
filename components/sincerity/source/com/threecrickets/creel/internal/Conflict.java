@@ -29,7 +29,7 @@ public class Conflict extends ArrayList<Module> implements com.threecrickets.cre
 
 		// Merge all supplicants into chosen module
 		for( Module module : this )
-			chosen.merge( module );
+			chosen.mergeSupplicants( module );
 	}
 
 	//

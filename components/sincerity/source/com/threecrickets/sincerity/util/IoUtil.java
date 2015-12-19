@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -201,7 +202,7 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Copies a stream.
+	 * Copies streams.
 	 * 
 	 * @param in
 	 *        The input stream
@@ -212,6 +213,27 @@ public abstract class IoUtil
 	 */
 	public static void copy( InputStream in, OutputStream out ) throws IOException
 	{
+		byte[] buffer = new byte[BUFFER_SIZE];
+		int length = 0;
+		while( ( length = in.read( buffer ) ) != -1 )
+			out.write( buffer, 0, length );
+	}
+
+	/**
+	 * Copies a stream to a file.
+	 * 
+	 * @param in
+	 *        The input stream
+	 * @param out
+	 *        The random-access file
+	 * @param start
+	 *        The start position in the file
+	 * @throws IOException
+	 *         In case of an I/O error
+	 */
+	public static void copy( InputStream in, RandomAccessFile out, int start ) throws IOException
+	{
+		out.seek( start );
 		byte[] buffer = new byte[BUFFER_SIZE];
 		int length = 0;
 		while( ( length = in.read( buffer ) ) != -1 )

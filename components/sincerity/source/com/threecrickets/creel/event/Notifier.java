@@ -102,6 +102,11 @@ public class Notifier
 		fireEvent( Event.Type.ERROR, null, message, null, null );
 	}
 
+	public void error( Throwable exception )
+	{
+		fireEvent( Event.Type.ERROR, null, exception.getMessage(), null, exception );
+	}
+
 	public void error( CharSequence message, Throwable exception )
 	{
 		fireEvent( Event.Type.ERROR, null, message, null, exception );

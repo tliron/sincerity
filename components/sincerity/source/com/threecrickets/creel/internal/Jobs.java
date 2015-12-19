@@ -1,7 +1,7 @@
 package com.threecrickets.creel.internal;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 
@@ -14,28 +14,32 @@ public class Jobs
 	// Operations
 	//
 
-	public void clear()
+	public synchronized void clear()
 	{
 		jobs.clear();
 	}
 
-	public boolean begin( Object token, ExecutorService executor, Phaser phaser, Runnable onEnd )
+	public synchronized boolean beginIfNotBegun( Object token, ExecutorService executor, Phaser phaser, Runnable onEnd )
 	{
-		Job newJob = new Job( executor );
-		Job existingJob = jobs.putIfAbsent( token.toString(), newJob );
-		if( existingJob != null )
+		Job job = jobs.get( token.toString() );
+		if( job == null )
+		{
+			// New job
+			jobs.put( token.toString(), new Job( executor ) );
+			return true;
+		}
+		else
 		{
 			// Another thread has already started this job, so let's wait until
 			// they're done
 			if( phaser != null )
 				phaser.register();
-			existingJob.onEnd( onEnd );
+			job.onEnd( onEnd );
 			return false;
 		}
-		return true;
 	}
 
-	public boolean end( Object token )
+	public synchronized boolean end( Object token )
 	{
 		Job job = jobs.remove( token.toString() );
 		if( job != null )
@@ -43,11 +47,23 @@ public class Jobs
 			job.end();
 			return true;
 		}
-		return false;
+		else
+			return false;
+	}
+
+	public synchronized void onEnd( Object token, Runnable onEnd )
+	{
+		Job job = jobs.get( token.toString() );
+		if( job != null )
+			// Do later
+			job.onEnd( onEnd );
+		else
+			// Do now
+			onEnd.run();
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private ConcurrentMap<String, Job> jobs = new ConcurrentHashMap<String, Job>();
+	private Map<String, Job> jobs = new HashMap<String, Job>();
 }

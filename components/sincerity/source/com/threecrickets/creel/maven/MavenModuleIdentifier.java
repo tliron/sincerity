@@ -1,7 +1,12 @@
 package com.threecrickets.creel.maven;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 
+import com.threecrickets.creel.Artifact;
 import com.threecrickets.creel.ModuleIdentifier;
 import com.threecrickets.creel.exception.IncompatibleIdentifierException;
 import com.threecrickets.creel.exception.IncompatiblePlatformException;
@@ -58,6 +63,18 @@ public class MavenModuleIdentifier extends ModuleIdentifier
 		if( parsedVersion == null )
 			parsedVersion = new Version( getVersion() );
 		return parsedVersion;
+	}
+
+	//
+	// ModuleIdentifier
+	//
+
+	public Iterable<Artifact> getArtifacts( File directory )
+	{
+		MavenRepository repository = (MavenRepository) getRepository();
+		Collection<Artifact> artifacts = new ArrayList<Artifact>();
+		artifacts.add( new Artifact( repository.getUrl( this, "jar" ), repository.getFile( this, "jar", directory ) ) );
+		return Collections.unmodifiableCollection( artifacts );
 	}
 
 	//

@@ -1,5 +1,6 @@
 package com.threecrickets.creel;
 
+import java.io.File;
 import java.util.Objects;
 
 /**
@@ -59,6 +60,8 @@ public abstract class ModuleIdentifier implements Comparable<ModuleIdentifier>, 
 	{
 		return repository;
 	}
+
+	public abstract Iterable<Artifact> getArtifacts( File directory );
 
 	//
 	// Cloneable

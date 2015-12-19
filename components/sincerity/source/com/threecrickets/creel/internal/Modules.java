@@ -69,7 +69,7 @@ public class Modules implements Iterable<Module>
 			for( Module aModule : modules )
 				if( module.getIdentifier().equals( aModule.getIdentifier() ) )
 				{
-					aModule.merge( module );
+					aModule.mergeSupplicants( module );
 					found = true;
 					break;
 				}
@@ -91,7 +91,7 @@ public class Modules implements Iterable<Module>
 			for( Module aModule : modules )
 				if( module.getSpecification().equals( aModule.getSpecification() ) )
 				{
-					aModule.merge( module );
+					aModule.mergeSupplicants( module );
 					found = true;
 					break;
 				}
