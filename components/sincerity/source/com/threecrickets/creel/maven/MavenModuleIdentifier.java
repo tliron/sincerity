@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel.maven;
 
 import java.io.File;
@@ -12,6 +23,9 @@ import com.threecrickets.creel.exception.IncompatibleIdentifierException;
 import com.threecrickets.creel.exception.IncompatiblePlatformException;
 import com.threecrickets.creel.maven.internal.Version;
 
+/**
+ * @author Tal Liron
+ */
 public class MavenModuleIdentifier extends ModuleIdentifier
 {
 	//

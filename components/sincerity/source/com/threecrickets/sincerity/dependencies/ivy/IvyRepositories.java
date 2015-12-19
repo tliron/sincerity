@@ -46,8 +46,6 @@ import com.threecrickets.sincerity.util.XmlUtil;
 /**
  * The Ivy configuration is usually stored in
  * "/configuration/sincerity/repositories.conf".
- * <p>
- * For low-level access to the Ivy resolvers, see {@link #getResolvers(String)}.
  * 
  * @author Tal Liron
  */

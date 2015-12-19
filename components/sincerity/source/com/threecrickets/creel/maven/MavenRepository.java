@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel.maven;
 
 import java.io.File;
@@ -10,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Phaser;
 
 import com.threecrickets.creel.Module;
 import com.threecrickets.creel.ModuleIdentifier;
@@ -18,13 +30,13 @@ import com.threecrickets.creel.Repository;
 import com.threecrickets.creel.Rule;
 import com.threecrickets.creel.event.Notifier;
 import com.threecrickets.creel.exception.IncompatiblePlatformException;
-import com.threecrickets.creel.internal.ConfigHelper;
 import com.threecrickets.creel.maven.internal.InvalidSignatureException;
 import com.threecrickets.creel.maven.internal.MetaData;
 import com.threecrickets.creel.maven.internal.POM;
 import com.threecrickets.creel.maven.internal.Signature;
 import com.threecrickets.creel.maven.internal.SpecificationOption;
-import com.threecrickets.sincerity.util.IoUtil;
+import com.threecrickets.creel.util.ConfigHelper;
+import com.threecrickets.creel.util.IoUtil;
 
 /**
  * Dependency management support for
@@ -257,7 +269,7 @@ public class MavenRepository extends Repository
 	{
 		MavenModuleIdentifier mavenModuleIdentifier = MavenModuleIdentifier.cast( moduleIdentifier );
 		URL url = getUrl( mavenModuleIdentifier, "pom" );
-		return IoUtil.isUrlValid( url );
+		return IoUtil.isValid( url );
 	}
 
 	@Override
@@ -312,66 +324,42 @@ public class MavenRepository extends Repository
 	}
 
 	@Override
-	public void installModule( ModuleIdentifier moduleIdentifier, File directory, boolean overwrite, Notifier notifier )
+	public void validateFile( ModuleIdentifier moduleIdentifier, File file, Notifier notifier )
 	{
 		MavenModuleIdentifier mavenModuleIdentifier = MavenModuleIdentifier.cast( moduleIdentifier );
+
+		if( !isCheckSignatures() )
+			return;
+
 		if( notifier == null )
 			notifier = new Notifier();
 
 		URL url = getUrl( mavenModuleIdentifier, "jar" );
-		File file = getFile( mavenModuleIdentifier, "jar", directory );
-
-		boolean downloading = overwrite || !file.exists();
-
-		String id;
-		if( downloading )
-			id = notifier.begin( "Downloading from " + url, 0.0 );
-		else
-			id = notifier.begin( "Validating " + file );
-
-		Signature signature;
 		try
 		{
-			signature = new Signature( url, allowMd5 );
+			Signature signature = new Signature( url, allowMd5 );
+			if( !signature.validate( file ) )
+			{
+				notifier.error( "Invalid signatire for file: " + file );
+				file.delete();
+				throw new RuntimeException();
+			}
 		}
 		catch( IOException x )
 		{
 			throw new RuntimeException( x );
 		}
+	}
 
-		if( downloading )
-		{
-			file.getParentFile().mkdirs();
-			try
-			{
-				IoUtil.copy( url, file );
-			}
-			catch( IOException x )
-			{
-				throw new RuntimeException( x );
-			}
-			for( int i = 0; i <= 100; i += 10 )
-			{
-				notifier.update( id, i / 100.0 );
-				// Sincerity.JVM.sleep(100) // :)
-			}
-			notifier.update( id, "Validating " + file );
-		}
+	@Override
+	public Runnable validateFileTask( final ModuleIdentifier moduleIdentifier, final File file, final Notifier notifier, final Phaser phaser )
+	{
+		MavenModuleIdentifier mavenModuleIdentifier = MavenModuleIdentifier.cast( moduleIdentifier );
 
-		// Sincerity.JVM.sleep(300) // :)
-		if( signature.equals( file ) )
-		{
-			if( downloading )
-				notifier.end( id, "Downloaded " + file );
-			else
-				notifier.end( id, "Validated " + file );
-		}
-		else
-		{
-			notifier.fail( id, "File does not match signature: " + file );
-			file.delete();
-			// throw ':('
-		}
+		if( !isCheckSignatures() )
+			return null;
+
+		return super.validateFileTask( mavenModuleIdentifier, file, notifier, phaser );
 	}
 
 	@Override

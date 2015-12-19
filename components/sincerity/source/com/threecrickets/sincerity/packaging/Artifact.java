@@ -16,9 +16,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 
+import com.threecrickets.creel.util.DigestUtil;
+import com.threecrickets.creel.util.IoUtil;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.exception.UnpackingException;
-import com.threecrickets.sincerity.util.IoUtil;
 
 /**
  * @author Tal Liron
@@ -87,7 +88,7 @@ public class Artifact implements Comparable<Artifact>
 		try
 		{
 			if( ( fileDigest == null ) && file.exists() )
-				fileDigest = IoUtil.getDigest( file, "SHA-1" );
+				fileDigest = DigestUtil.getDigest( file, "SHA-1" );
 			return fileDigest;
 		}
 		catch( IOException x )
@@ -120,7 +121,7 @@ public class Artifact implements Comparable<Artifact>
 		try
 		{
 			if( ( originDigest == null ) && ( originUrl != null ) )
-				originDigest = IoUtil.getDigest( originUrl, "SHA-1" );
+				originDigest = DigestUtil.getDigest( originUrl, "SHA-1" );
 			return originDigest;
 		}
 		catch( IOException x )
@@ -219,7 +220,7 @@ public class Artifact implements Comparable<Artifact>
 		// Unpack
 		try
 		{
-			IoUtil.copy( originUrl, file );
+			IoUtil.copy( originUrl, file, null );
 		}
 		catch( IOException x )
 		{

@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel.event;
 
 import java.io.PrintWriter;
@@ -5,6 +16,9 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * @author Tal Liron
+ */
 public class ConsoleEventHandler implements EventHandler
 {
 	//
@@ -79,14 +93,15 @@ public class ConsoleEventHandler implements EventHandler
 			}
 
 			// Print ongoing block after everything else
-			for( Event ongoingEvent : ongoingEvents )
-			{
-				controlSequence( ongoingGraphics + 'm' );
-				print( ongoingEvent );
-			}
+			if( ansi )
+				for( Event ongoingEvent : ongoingEvents )
+				{
+					controlSequence( ongoingGraphics + 'm' );
+					print( ongoingEvent );
+				}
 
 			// Erase to end of screen
-			this.controlSequence( "0J" );
+			controlSequence( "0J" );
 		}
 		finally
 		{

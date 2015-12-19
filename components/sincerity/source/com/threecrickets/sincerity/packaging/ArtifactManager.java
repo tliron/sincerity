@@ -22,9 +22,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+import com.threecrickets.creel.util.HexUtil;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.util.IoUtil;
-import com.threecrickets.sincerity.util.StringUtil;
 
 /**
  * This class manages a database of artifacts.
@@ -334,7 +334,7 @@ public class ArtifactManager
 			flags = Byte.valueOf( parsed[0] );
 
 			if( parsed.length >= 2 )
-				originalDigest = StringUtil.fromHex( parsed[1] );
+				originalDigest = HexUtil.fromHex( parsed[1] );
 			else
 				originalDigest = null;
 		}
@@ -361,7 +361,7 @@ public class ArtifactManager
 			if( originalDigest == null )
 				return Byte.toString( flags );
 			else
-				return Byte.toString( flags ) + "," + StringUtil.toHex( originalDigest );
+				return Byte.toString( flags ) + "," + HexUtil.toHex( originalDigest );
 		}
 
 		private static final byte INSTALLED = 1;

@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel.maven.internal;
 
 import java.io.IOException;
@@ -17,9 +28,12 @@ import org.xml.sax.SAXException;
 import com.threecrickets.creel.maven.MavenModuleIdentifier;
 import com.threecrickets.creel.maven.MavenModuleSpecification;
 import com.threecrickets.creel.maven.MavenRepository;
-import com.threecrickets.sincerity.util.IoUtil;
-import com.threecrickets.sincerity.util.XmlUtil;
+import com.threecrickets.creel.util.IoUtil;
+import com.threecrickets.creel.util.XmlUtil;
 
+/**
+ * @author Tal Liron
+ */
 public class POM
 {
 	//
@@ -31,7 +45,7 @@ public class POM
 		Document document;
 		try
 		{
-			byte[] bytes = IoUtil.readBytes( url );
+			byte[] bytes = IoUtil.readBytes( url, null );
 			if( ( signature != null ) && !signature.validate( bytes ) )
 				throw new InvalidSignatureException();
 			String text = new String( bytes, StandardCharsets.UTF_8 );

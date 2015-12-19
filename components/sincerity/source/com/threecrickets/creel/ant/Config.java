@@ -9,45 +9,29 @@
  * at http://threecrickets.com/
  */
 
-package com.threecrickets.creel;
+package com.threecrickets.creel.ant;
 
-import java.io.File;
-import java.net.URL;
+import java.util.HashMap;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DynamicAttribute;
 
 /**
  * @author Tal Liron
  */
-public class Artifact
+public class Config extends HashMap<String, String> implements DynamicAttribute
 {
 	//
-	// Construction
+	// DynamicAttribute
 	//
 
-	public Artifact( URL sourceUrl, File file )
+	public void setDynamicAttribute( String name, String value ) throws BuildException
 	{
-		super();
-		this.sourceUrl = sourceUrl;
-		this.file = file;
-	}
-
-	//
-	// Attributes
-	//
-
-	public URL getSourceUrl()
-	{
-		return sourceUrl;
-	}
-
-	public File getFile()
-	{
-		return file;
+		put( name, value );
 	}
 
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private final URL sourceUrl;
-
-	private final File file;
+	private static final long serialVersionUID = 1L;
 }

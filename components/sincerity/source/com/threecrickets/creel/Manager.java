@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel;
 
 import java.io.File;
@@ -16,15 +27,15 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.threecrickets.creel.downloader.Downloader;
 import com.threecrickets.creel.event.EventHandlers;
 import com.threecrickets.creel.event.Notifier;
-import com.threecrickets.creel.internal.ConfigHelper;
 import com.threecrickets.creel.internal.Conflicts;
 import com.threecrickets.creel.internal.DaemonThreadFactory;
-import com.threecrickets.creel.internal.Downloader;
 import com.threecrickets.creel.internal.IdentificationContext;
-import com.threecrickets.creel.internal.Jobs;
 import com.threecrickets.creel.internal.Modules;
+import com.threecrickets.creel.util.ConfigHelper;
+import com.threecrickets.creel.util.Jobs;
 
 /**
  * Handles identifying and installing modules.
@@ -359,7 +370,7 @@ public class Manager extends Notifier
 		};
 	}
 
-	public Future<?> identifyModuleFuture( final Module module, final boolean recursive, final Phaser phaser )
+	public Future<?> identifyModuleFuture( Module module, boolean recursive, Phaser phaser )
 	{
 		phaser.register();
 		return executor.submit( identifyModuleTask( module, recursive, phaser ) );
@@ -373,8 +384,8 @@ public class Manager extends Notifier
 	public void resolveConflicts()
 	{
 		findConflicts();
-		conflicts.resolve( conflictPolicy, this );
-		for( Conflict conflict : conflicts )
+		conflicts.resolve( getConflictPolicy(), this );
+		for( Conflict conflict : getConflicts() )
 			for( Module reject : conflict.getRejects() )
 			{
 				identifiedModules.remove( reject.getIdentifier() );
@@ -382,22 +393,33 @@ public class Manager extends Notifier
 			}
 	}
 
-	public void install( String directory, boolean overwrite, boolean parallel )
+	public Iterable<Artifact> install( String directory, boolean overwrite, boolean parallel )
 	{
-		install( new File( directory ), overwrite, parallel );
+		return install( new File( directory ), overwrite, parallel );
 	}
 
-	public void install( File directory, boolean overwrite, boolean parallel )
+	public Iterable<Artifact> install( File directory, boolean overwrite, boolean parallel )
 	{
+		Collection<Artifact> artifacts = new ArrayList<Artifact>();
+
 		String id = begin( "Installing" );
 
 		Downloader downloader = new Downloader( getExecutor(), this );
+		downloader.setDelay( 100 );
 		for( Module module : identifiedModules )
 			for( Artifact artifact : module.getIdentifier().getArtifacts( directory ) )
-				downloader.submit( artifact.getSourceUrl(), artifact.getFile(), null );
+			{
+				if( overwrite || !artifact.getFile().exists() )
+					downloader.submit( artifact.getSourceUrl(), artifact.getFile(), module.getIdentifier().getRepository().validateFileTask( module.getIdentifier(), artifact.getFile(), this, downloader.getPhaser() ) );
+				else
+					module.getIdentifier().getRepository().validateFile( module.getIdentifier(), artifact.getFile(), this );
+				artifacts.add( artifact );
+			}
 		downloader.waitUntilDone();
 
-		end( id, "Installed " + 0 + " modules" );
+		end( id, "Installed " + downloader.getCount() + " artifacts" );
+
+		return Collections.unmodifiableCollection( artifacts );
 	}
 
 	public void applyRules( Module module, IdentificationContext context )

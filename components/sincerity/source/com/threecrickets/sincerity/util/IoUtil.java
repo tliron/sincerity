@@ -11,11 +11,8 @@
 
 package com.threecrickets.sincerity.util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,20 +20,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,6 +42,7 @@ import org.apache.commons.vfs.provider.tar.Tbz2FileProvider;
 import org.apache.commons.vfs.provider.tar.TgzFileProvider;
 import org.apache.commons.vfs.provider.zip.ZipFileProvider;
 
+import com.threecrickets.creel.util.DigestUtil;
 import com.threecrickets.jvm.json.Json;
 import com.threecrickets.jvm.json.JsonSyntaxError;
 
@@ -202,100 +189,6 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * Copies streams.
-	 * 
-	 * @param in
-	 *        The input stream
-	 * @param out
-	 *        The output stream
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static void copy( InputStream in, OutputStream out ) throws IOException
-	{
-		byte[] buffer = new byte[BUFFER_SIZE];
-		int length = 0;
-		while( ( length = in.read( buffer ) ) != -1 )
-			out.write( buffer, 0, length );
-	}
-
-	/**
-	 * Copies a stream to a file.
-	 * 
-	 * @param in
-	 *        The input stream
-	 * @param out
-	 *        The random-access file
-	 * @param start
-	 *        The start position in the file
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static void copy( InputStream in, RandomAccessFile out, int start ) throws IOException
-	{
-		out.seek( start );
-		byte[] buffer = new byte[BUFFER_SIZE];
-		int length = 0;
-		while( ( length = in.read( buffer ) ) != -1 )
-			out.write( buffer, 0, length );
-	}
-
-	/**
-	 * Copies a channel.
-	 * 
-	 * @param in
-	 *        The input channel
-	 * @param out
-	 *        The output channel
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static void copy( ReadableByteChannel in, WritableByteChannel out ) throws IOException
-	{
-		ByteBuffer buffer = ByteBuffer.allocate( BUFFER_SIZE );
-		while( in.read( buffer ) != -1 )
-		{
-			buffer.flip();
-			while( buffer.hasRemaining() )
-				out.write( buffer );
-			buffer.clear();
-		}
-	}
-
-	/**
-	 * Copies a stream from a URL to a file, creating necessary parent
-	 * directories.
-	 * 
-	 * @param url
-	 *        The origin URL
-	 * @param file
-	 *        The target file
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static void copy( URL url, File file ) throws IOException
-	{
-		InputStream in = new BufferedInputStream( url.openStream(), BUFFER_SIZE );
-		try
-		{
-			file.getParentFile().mkdirs();
-			OutputStream out = new BufferedOutputStream( new FileOutputStream( file ), BUFFER_SIZE );
-			try
-			{
-				copy( in, out );
-			}
-			finally
-			{
-				out.close();
-			}
-		}
-		finally
-		{
-			in.close();
-		}
-	}
-
-	/**
 	 * Deletes an empty directory, including all parent directories that are
 	 * also empty, stopping at the first non-empty parent.
 	 * 
@@ -356,26 +249,6 @@ public abstract class IoUtil
 	}
 
 	/**
-	 * True if the URL points to a reachable resource.
-	 * 
-	 * @param url
-	 *        The URL
-	 * @return True if valid
-	 */
-	public static boolean isUrlValid( URL url )
-	{
-		try
-		{
-			url.openStream().close();
-			return true;
-		}
-		catch( IOException x )
-		{
-			return false;
-		}
-	}
-
-	/**
 	 * True if the file has a specific digest.
 	 * 
 	 * @param file
@@ -387,116 +260,19 @@ public abstract class IoUtil
 	 * @return True if the digests are equal
 	 * @throws IOException
 	 *         In case of an I/O error
-	 * @see #getDigest(InputStream)
+	 * @see DigestUtil
 	 */
 	public static boolean isSameContent( File file, byte[] digest, String algorithm ) throws IOException
 	{
 		try
 		{
-			byte[] fileDigest = IoUtil.getDigest( file, algorithm );
+			byte[] fileDigest = DigestUtil.getDigest( file, algorithm );
 			return Arrays.equals( fileDigest, digest );
 		}
 		catch( FileNotFoundException x )
 		{
 			return false;
 		}
-	}
-
-	/**
-	 * Calculates a digest for the content.
-	 * 
-	 * @param content
-	 *        The content
-	 * @param algorithm
-	 *        The algorithm
-	 * @return The digest
-	 * @throws IOException
-	 *         In case the algorithm is not found
-	 */
-	public static byte[] getDigest( byte[] content, String algorithm ) throws IOException
-	{
-		try
-		{
-			MessageDigest digest = MessageDigest.getInstance( algorithm );
-			digest.reset();
-			digest.update( content );
-			return digest.digest();
-		}
-		catch( NoSuchAlgorithmException x )
-		{
-			IOException io = new IOException();
-			io.initCause( x );
-			throw io;
-		}
-	}
-
-	/**
-	 * Calculates a digest for a stream.
-	 * <p>
-	 * Note that the stream is closed by this method!
-	 * 
-	 * @param stream
-	 *        The stream
-	 * @param algorithm
-	 *        The algorithm
-	 * @return The digest
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static byte[] getDigest( InputStream stream, String algorithm ) throws IOException
-	{
-		try
-		{
-			MessageDigest digest = MessageDigest.getInstance( algorithm );
-			digest.reset();
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int length = 0;
-			while( ( length = stream.read( buffer ) ) != -1 )
-				digest.update( buffer, 0, length );
-			return digest.digest();
-		}
-		catch( NoSuchAlgorithmException x )
-		{
-			IOException io = new IOException();
-			io.initCause( x );
-			throw io;
-		}
-		finally
-		{
-			stream.close();
-		}
-	}
-
-	/**
-	 * Calculates a digest for a file.
-	 * 
-	 * @param file
-	 *        The file
-	 * @param algorithm
-	 *        The algorithm
-	 * @return The digest
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static byte[] getDigest( File file, String algorithm ) throws IOException
-	{
-		return getDigest( new BufferedInputStream( new FileInputStream( file ), BUFFER_SIZE ), algorithm );
-	}
-
-	/**
-	 * Calculates a digest for a URL.
-	 * 
-	 * @param url
-	 *        The URL
-	 * @param algorithm
-	 *        The algorithm
-	 * @return The digest
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static byte[] getDigest( URL url, String algorithm ) throws IOException
-	{
-		return getDigest( new BufferedInputStream( url.openStream(), BUFFER_SIZE ), algorithm );
 	}
 
 	/**
@@ -510,165 +286,6 @@ public abstract class IoUtil
 	public static String[] separateExtensionFromFilename( String filename )
 	{
 		return filename.split( "\\.(?=[^\\.]+$)", 2 );
-	}
-
-	/**
-	 * Reads all bytes from a URL.
-	 * 
-	 * @param url
-	 *        The URL
-	 * @return The bytes
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static byte[] readBytes( URL url ) throws IOException
-	{
-		if( "file".equalsIgnoreCase( url.getProtocol() ) )
-		{
-			// Use readBytes(File) if possible, because it is more efficient
-			// (because we know the buffer size in advance)
-			try
-			{
-				return readBytes( new File( url.toURI() ) );
-			}
-			catch( URISyntaxException x )
-			{
-				IOException io = new IOException();
-				io.initCause( x );
-				throw io;
-			}
-		}
-
-		ReadableByteChannel fromChannel = Channels.newChannel( url.openStream() );
-		try
-		{
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream( BUFFER_SIZE );
-			WritableByteChannel toChannel = Channels.newChannel( buffer );
-			copy( fromChannel, toChannel );
-			return buffer.toByteArray();
-		}
-		finally
-		{
-			fromChannel.close();
-		}
-	}
-
-	/**
-	 * Reads all bytes from a file. If you don't absolutely need an array of
-	 * bytes, use {@link #readBuffer(File)}, which is more efficient.
-	 * 
-	 * @param file
-	 *        The file
-	 * @return The bytes
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static byte[] readBytes( File file ) throws IOException
-	{
-		FileInputStream input = new FileInputStream( file );
-		try
-		{
-			FileChannel channel = input.getChannel();
-			try
-			{
-				byte[] bytes = new byte[(int) channel.size()];
-				channel.read( ByteBuffer.wrap( bytes ) );
-				return bytes;
-			}
-			finally
-			{
-				channel.close();
-			}
-		}
-		catch( FileNotFoundException x )
-		{
-			return null;
-		}
-		finally
-		{
-			input.close();
-		}
-	}
-
-	/**
-	 * Reads all bytes from a file as a memory-mapped buffer. This is more
-	 * efficient than {@link #readBytes(File)}.
-	 * 
-	 * @param file
-	 *        The file
-	 * @return The bytes
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static ByteBuffer readBuffer( File file ) throws IOException
-	{
-		FileInputStream input = new FileInputStream( file );
-		try
-		{
-			FileChannel channel = input.getChannel();
-			try
-			{
-				return channel.map( FileChannel.MapMode.READ_ONLY, 0, channel.size() );
-			}
-			finally
-			{
-				channel.close();
-			}
-		}
-		catch( FileNotFoundException x )
-		{
-			return null;
-		}
-		finally
-		{
-			input.close();
-		}
-	}
-
-	/**
-	 * Reads all text from a URL using UTF-8.
-	 * 
-	 * @param url
-	 *        The URL
-	 * @return THe content
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static String readText( URL url ) throws IOException
-	{
-		if( "file".equalsIgnoreCase( url.getProtocol() ) )
-		{
-			// Use readText(File) if possible, because it is more efficient
-			// (because we know the buffer size in advance)
-			try
-			{
-				return readText( new File( url.toURI() ) );
-			}
-			catch( URISyntaxException x )
-			{
-				IOException io = new IOException();
-				io.initCause( x );
-				throw io;
-			}
-		}
-
-		return new String( readBytes( url ), StandardCharsets.UTF_8 );
-	}
-
-	/**
-	 * Reads all text from a file using UTF-8.
-	 * <p>
-	 * Note that this method returns null if the file doesn't exist.
-	 * 
-	 * @param file
-	 *        The file
-	 * @return The file's content
-	 * @throws IOException
-	 *         In case of an I/O error
-	 */
-	public static String readText( File file ) throws IOException
-	{
-		return StandardCharsets.UTF_8.decode( readBuffer( file ) ).toString();
 	}
 
 	/**
@@ -747,7 +364,7 @@ public abstract class IoUtil
 	 */
 	public static Object readJson( File file ) throws IOException, JsonSyntaxError
 	{
-		String content = readText( file );
+		String content = com.threecrickets.creel.util.IoUtil.readText( file );
 		return content != null ? Json.from( content ) : null;
 	}
 

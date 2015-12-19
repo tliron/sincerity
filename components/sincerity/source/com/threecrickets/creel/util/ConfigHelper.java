@@ -1,13 +1,25 @@
-package com.threecrickets.creel.internal;
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+package com.threecrickets.creel.util;
+
 import java.util.Map;
 
 import com.threecrickets.creel.Manager;
 import com.threecrickets.creel.ModuleSpecification;
 import com.threecrickets.creel.Repository;
 
+/**
+ * @author Tal Liron
+ */
 public class ConfigHelper
 {
 	//
@@ -28,46 +40,7 @@ public class ConfigHelper
 	{
 		String packageName = Manager.class.getPackage().getName() + "." + type;
 		String className = type.substring( 0, 1 ).toUpperCase() + type.substring( 1 ) + suffix;
-		return newInstance( packageName + "." + className, config );
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T newInstance( String className, Map<String, ?> config )
-	{
-		try
-		{
-			Class<T> theClass = (Class<T>) Class.forName( className );
-			Constructor<T> constructor = theClass.getConstructor( Map.class );
-			return constructor.newInstance( config );
-		}
-		catch( ClassNotFoundException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( NoSuchMethodException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( SecurityException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( InstantiationException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( IllegalAccessException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( IllegalArgumentException x )
-		{
-			throw new RuntimeException( x );
-		}
-		catch( InvocationTargetException x )
-		{
-			throw new RuntimeException( x );
-		}
+		return ClassUtil.newInstance( packageName + "." + className, config );
 	}
 
 	//

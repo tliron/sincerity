@@ -1,3 +1,14 @@
+/**
+ * Copyright 2015-2016 Three Crickets LLC.
+ * <p>
+ * The contents of this file are subject to the terms of the LGPL version 3.0:
+ * http://www.gnu.org/copyleft/lesser.html
+ * <p>
+ * Alternatively, you can obtain a royalty free commercial license with less
+ * limitations, transferable or non-transferable, directly from Three Crickets
+ * at http://threecrickets.com/
+ */
+
 package com.threecrickets.creel;
 
 import java.io.File;
@@ -5,11 +16,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
 
 import com.threecrickets.creel.event.Notifier;
-import com.threecrickets.creel.internal.ConfigHelper;
 import com.threecrickets.creel.internal.DaemonThreadFactory;
+import com.threecrickets.creel.util.ConfigHelper;
 
 /**
  * Base class for repositories.
@@ -31,7 +42,6 @@ import com.threecrickets.creel.internal.DaemonThreadFactory;
  * &#64;Override
  * public int hashCode() {
  * 	return Objects.hash(super.hashCode(), ...);
- * }
  * </pre>
  * 
  * Note that for the equals() override to work this way, we had to implement
@@ -112,24 +122,26 @@ public abstract class Repository implements Cloneable
 	// Operations
 	//
 
-	public abstract void installModule( ModuleIdentifier moduleIdentifier, File directory, boolean overwrite, Notifier notifier );
+	public abstract void validateFile( ModuleIdentifier moduleIdentifier, File file, Notifier notifier );
 
-	public Future<?> installModuleFuture( final ModuleIdentifier moduleIdentifier, final File directory, final boolean overwrite, final Notifier notifier )
+	public Runnable validateFileTask( final ModuleIdentifier moduleIdentifier, final File file, final Notifier notifier, final Phaser phaser )
 	{
-		return executor.submit( new Runnable()
+		return new Runnable()
 		{
 			public void run()
 			{
 				try
 				{
-					installModule( moduleIdentifier, directory, overwrite, notifier );
+					validateFile( moduleIdentifier, file, notifier );
 				}
 				catch( Throwable x )
 				{
-					notifier.error( "Install error for " + moduleIdentifier.toString() + ": " + x.getMessage(), x );
+					notifier.error( "Validation error for " + moduleIdentifier.toString() + ": " + x.getMessage(), x );
 				}
+				if( phaser != null )
+					phaser.arriveAndDeregister();
 			}
-		} );
+		};
 	}
 
 	public abstract String applyModuleRule( Module module, Rule rule, Notifier notifier );
