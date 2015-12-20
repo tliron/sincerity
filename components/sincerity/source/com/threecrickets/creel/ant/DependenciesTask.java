@@ -124,7 +124,6 @@ public class DependenciesTask extends Task
 	public void execute()
 	{
 		Manager manager = new Manager();
-
 		if( conflictPolicy != null )
 		{
 			if( "newest".equalsIgnoreCase( conflictPolicy ) )

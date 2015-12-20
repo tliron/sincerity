@@ -76,9 +76,9 @@ public class MavenRepository extends Repository
 	// Construction
 	//
 
-	public MavenRepository( String id, boolean all, int parallelism, URL url, boolean checkSignatures, boolean allowMd5 )
+	public MavenRepository( String id, boolean all, URL url, boolean checkSignatures, boolean allowMd5 )
 	{
-		super( id, all, parallelism );
+		super( id, all );
 		this.url = url;
 		this.checkSignatures = checkSignatures;
 		this.allowMd5 = allowMd5;
@@ -352,7 +352,7 @@ public class MavenRepository extends Repository
 	}
 
 	@Override
-	public Runnable validateFileTask( final ModuleIdentifier moduleIdentifier, final File file, final Notifier notifier, final Phaser phaser )
+	public ValidateFile validateFileTask( final ModuleIdentifier moduleIdentifier, final File file, final Notifier notifier, final Phaser phaser )
 	{
 		MavenModuleIdentifier mavenModuleIdentifier = MavenModuleIdentifier.cast( moduleIdentifier );
 
@@ -378,7 +378,7 @@ public class MavenRepository extends Repository
 	@Override
 	public MavenRepository clone()
 	{
-		return new MavenRepository( getId(), isAll(), getParallelism(), getUrl(), isCheckSignatures(), isAllowMd5() );
+		return new MavenRepository( getId(), isAll(), getUrl(), isCheckSignatures(), isAllowMd5() );
 	}
 
 	//

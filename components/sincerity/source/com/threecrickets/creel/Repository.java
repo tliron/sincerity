@@ -14,12 +14,9 @@ package com.threecrickets.creel;
 import java.io.File;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 
 import com.threecrickets.creel.event.Notifier;
-import com.threecrickets.creel.internal.DaemonThreadFactory;
 import com.threecrickets.creel.util.ConfigHelper;
 
 /**
@@ -61,15 +58,50 @@ import com.threecrickets.creel.util.ConfigHelper;
 public abstract class Repository implements Cloneable
 {
 	//
+	// Classes
+	//
+
+	public class ValidateFile implements Runnable
+	{
+		public ValidateFile( ModuleIdentifier moduleIdentifier, File file, Notifier notifier, Phaser phaser )
+		{
+			this.moduleIdentifier = moduleIdentifier;
+			this.file = file;
+			this.notifier = notifier;
+			this.phaser = phaser;
+		}
+
+		public void run()
+		{
+			try
+			{
+				validateFile( moduleIdentifier, file, notifier );
+			}
+			catch( Throwable x )
+			{
+				notifier.error( "Validation error for " + moduleIdentifier.toString() + ": " + x.getMessage(), x );
+			}
+			if( phaser != null )
+				phaser.arriveAndDeregister();
+		}
+
+		final ModuleIdentifier moduleIdentifier;
+
+		final File file;
+
+		final Notifier notifier;
+
+		final Phaser phaser;
+	}
+
+	//
 	// Construction
 	//
 
-	public Repository( String id, boolean all, int parallelism )
+	public Repository( String id, boolean all )
 	{
 		this.id = id;
 		this.all = all;
-		this.parallelism = parallelism;
-		executor = Executors.newFixedThreadPool( parallelism );
 	}
 
 	public Repository( Map<String, ?> config )
@@ -77,8 +109,6 @@ public abstract class Repository implements Cloneable
 		ConfigHelper configHelper = new ConfigHelper( config );
 		id = configHelper.getString( "id" );
 		all = configHelper.getBoolean( "all", true );
-		parallelism = configHelper.getInt( "parallelism", 5 );
-		executor = Executors.newFixedThreadPool( parallelism, DaemonThreadFactory.INSTANCE );
 	}
 
 	//
@@ -93,16 +123,6 @@ public abstract class Repository implements Cloneable
 	public boolean isAll()
 	{
 		return all;
-	}
-
-	public int getParallelism()
-	{
-		return parallelism;
-	}
-
-	public ExecutorService getExecutor()
-	{
-		return executor;
 	}
 
 	public abstract boolean hasModule( ModuleIdentifier moduleIdentifier );
@@ -124,24 +144,9 @@ public abstract class Repository implements Cloneable
 
 	public abstract void validateFile( ModuleIdentifier moduleIdentifier, File file, Notifier notifier );
 
-	public Runnable validateFileTask( final ModuleIdentifier moduleIdentifier, final File file, final Notifier notifier, final Phaser phaser )
+	public ValidateFile validateFileTask( ModuleIdentifier moduleIdentifier, File file, Notifier notifier, Phaser phaser )
 	{
-		return new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					validateFile( moduleIdentifier, file, notifier );
-				}
-				catch( Throwable x )
-				{
-					notifier.error( "Validation error for " + moduleIdentifier.toString() + ": " + x.getMessage(), x );
-				}
-				if( phaser != null )
-					phaser.arriveAndDeregister();
-			}
-		};
+		return new ValidateFile( moduleIdentifier, file, notifier, phaser );
 	}
 
 	public abstract String applyModuleRule( Module module, Rule rule, Notifier notifier );
@@ -184,8 +189,4 @@ public abstract class Repository implements Cloneable
 	private final String id;
 
 	private final boolean all;
-
-	private final int parallelism;
-
-	private final ExecutorService executor;
 }

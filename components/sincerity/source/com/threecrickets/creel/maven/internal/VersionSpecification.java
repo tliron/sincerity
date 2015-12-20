@@ -101,7 +101,8 @@ public class VersionSpecification
 
 		for( VersionRange range : ranges )
 		{
-			// System.out.println(range + " " + version + " > " + range.allows(
+			// System.out.println(range.toString() + ' ' + version + " > " +
+			// range.allows(
 			// version ));
 			if( range.allows( version ) )
 				// Logical or: it takes just one positive to be positive

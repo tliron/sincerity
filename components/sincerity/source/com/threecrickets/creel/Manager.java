@@ -15,27 +15,25 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.threecrickets.creel.downloader.Downloader;
+import com.threecrickets.creel.downloader.internal.ConcurrentIdentificationContext;
 import com.threecrickets.creel.event.EventHandlers;
 import com.threecrickets.creel.event.Notifier;
+import com.threecrickets.creel.exception.UnsupportedPlatformException;
 import com.threecrickets.creel.internal.Conflicts;
-import com.threecrickets.creel.internal.DaemonThreadFactory;
 import com.threecrickets.creel.internal.IdentificationContext;
 import com.threecrickets.creel.internal.Modules;
+import com.threecrickets.creel.util.ClassUtil;
 import com.threecrickets.creel.util.ConfigHelper;
-import com.threecrickets.creel.util.Jobs;
 
 /**
  * Handles identifying and installing modules.
@@ -44,10 +42,69 @@ import com.threecrickets.creel.util.Jobs;
  */
 public class Manager extends Notifier
 {
+	//
+	// Enums
+	//
+
 	public enum ConflictPolicy
 	{
 		NEWEST, OLDEST
 	};
+
+	//
+	// Classes
+	//
+
+	public class IdentifyModule implements Runnable
+	{
+		public IdentifyModule( Module module, boolean recursive, ConcurrentIdentificationContext concurrentContext )
+		{
+			this.module = module;
+			this.recursive = recursive;
+			this.concurrentContext = concurrentContext;
+		}
+
+		public void run()
+		{
+			try
+			{
+				identifyModule( module, recursive, concurrentContext );
+			}
+			catch( Throwable x )
+			{
+				error( "Identification error for " + module.getSpecification() + ": " + x.getMessage(), x );
+			}
+			concurrentContext.identified();
+		}
+
+		private final Module module;
+
+		private final boolean recursive;
+
+		private final ConcurrentIdentificationContext concurrentContext;
+	}
+
+	public class IdentifiedModule implements Runnable
+	{
+		public IdentifiedModule( Module module, String id )
+		{
+			this.module = module;
+			this.id = id;
+		}
+
+		public void run()
+		{
+			Module identifiedModule = identifiedModules.get( module.getSpecification() );
+			if( identifiedModule != null )
+				end( id, "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
+			else
+				fail( id, "Could not identify " + module.getSpecification() );
+		}
+
+		private final Module module;
+
+		private final String id;
+	}
 
 	//
 	// Construction
@@ -56,6 +113,7 @@ public class Manager extends Notifier
 	public Manager()
 	{
 		super( new EventHandlers() );
+		setPlatform( "maven", "com.threecrickets.creel.maven" );
 	}
 
 	//
@@ -76,8 +134,8 @@ public class Manager extends Notifier
 		for( Map<String, ?> config : moduleSpecificationConfigs )
 		{
 			ConfigHelper configHelper = new ConfigHelper( config );
-			String type = configHelper.getString( "type", defaultPlatform );
-			ModuleSpecification moduleSpecification = ConfigHelper.newModuleSpecification( type, config );
+			String platform = configHelper.getString( "platform", defaultPlatform );
+			ModuleSpecification moduleSpecification = newModuleSpecification( platform, config );
 			Module module = new Module( true, null, moduleSpecification );
 			explicitModules.add( module );
 		}
@@ -97,10 +155,20 @@ public class Manager extends Notifier
 		for( Map<String, ?> config : repositoryConfigs )
 		{
 			ConfigHelper configHelper = new ConfigHelper( config );
-			String type = configHelper.getString( "type", defaultPlatform );
-			Repository repository = ConfigHelper.newRepository( type, config );
+			String platform = configHelper.getString( "platform", defaultPlatform );
+			Repository repository = newRepository( platform, config );
 			repositories.add( repository );
 		}
+	}
+
+	public Map<String, String> getPlatforms()
+	{
+		return Collections.unmodifiableMap( platforms );
+	}
+
+	public void setPlatform( String name, String packageName )
+	{
+		platforms.put( name, packageName );
 	}
 
 	public String getDefaultPlatform()
@@ -153,11 +221,6 @@ public class Manager extends Notifier
 		return conflicts;
 	}
 
-	public ExecutorService getExecutor()
-	{
-		return executor;
-	}
-
 	public int getIdentifiedCacheHits()
 	{
 		return identifiedCacheHits.get();
@@ -190,6 +253,16 @@ public class Manager extends Notifier
 	// Operations
 	//
 
+	public Repository newRepository( String platform, Map<String, ?> config )
+	{
+		return newInstance( platform, Repository.class.getSimpleName(), config );
+	}
+
+	public ModuleSpecification newModuleSpecification( String platform, Map<String, ?> config )
+	{
+		return newInstance( platform, ModuleSpecification.class.getSimpleName(), config );
+	}
+
 	/**
 	 * Goes over explicitModules and identifies them recursively. This is done
 	 * using fork/join parallelism for better efficiency.
@@ -201,11 +274,16 @@ public class Manager extends Notifier
 	{
 		String id = begin( "Identifying" );
 
-		identifyModuleJobs.clear();
-		Phaser phaser = new Phaser( 1 );
-		for( Module explicitModule : getExplicitModules() )
-			identifyModuleFuture( explicitModule, true, phaser );
-		phaser.arriveAndAwaitAdvance();
+		ConcurrentIdentificationContext concurrentContext = new ConcurrentIdentificationContext( 10 );
+		try
+		{
+			for( Module explicitModule : getExplicitModules() )
+				concurrentContext.identifyModule( new IdentifyModule( explicitModule, true, concurrentContext ) );
+		}
+		finally
+		{
+			concurrentContext.close();
+		}
 
 		int count = identifiedModules.size();
 
@@ -232,9 +310,9 @@ public class Manager extends Notifier
 	 * 
 	 * @param module
 	 * @param recursive
-	 * @param phaser
+	 * @param concurrentContext
 	 */
-	public void identifyModule( final Module module, final boolean recursive, final Phaser phaser )
+	public void identifyModule( final Module module, final boolean recursive, final ConcurrentIdentificationContext concurrentContext )
 	{
 		IdentificationContext context = new IdentificationContext( getRepositories(), recursive );
 
@@ -262,26 +340,16 @@ public class Manager extends Notifier
 				Module identifiedModule = identifiedModules.get( module.getSpecification() );
 				if( identifiedModule == null )
 				{
-					if( phaser != null )
+					if( concurrentContext != null )
 					{
-						boolean alreadyIdentifying = !identifyModuleJobs.beginIfNotBegun( module.getSpecification(), executor, phaser, identifyModuleTask( module, recursive, phaser ) );
+						boolean alreadyIdentifying = !concurrentContext.beginIdentifyingIfNotIdentifying( module, new IdentifyModule( module, recursive, concurrentContext ) );
 						if( alreadyIdentifying )
 						{
 							// Another thread is already in the process of
 							// identifying this specification, so we'll wait for
 							// them to finish
 							final String id = begin( "Waiting for identification of " + module.getSpecification() );
-							identifyModuleJobs.onEnd( module.getSpecification(), new Runnable()
-							{
-								public void run()
-								{
-									Module identifiedModule = identifiedModules.get( module.getSpecification() );
-									if( identifiedModule != null )
-										end( id, "Already identified " + identifiedModule.getIdentifier() + " in " + identifiedModule.getIdentifier().getRepository().getId() + " repository" );
-									else
-										fail( id, "Could not identify " + module.getSpecification() );
-								}
-							} );
+							concurrentContext.onIdentified( module, new IdentifiedModule( module, id ) );
 							return;
 						}
 					}
@@ -325,20 +393,19 @@ public class Manager extends Notifier
 			addModule( module );
 		}
 
-		identifyModuleJobs.end( module.getSpecification() );
+		if( concurrentContext != null )
+			concurrentContext.notifyIdentified( module );
 
 		if( context.isRecursive() )
 		{
 			// Identify dependencies recursively
-			if( phaser != null )
+			if( concurrentContext != null )
 			{
-				// Future
 				for( Module dependency : module.getDependencies() )
-					identifyModuleFuture( dependency, true, phaser );
+					concurrentContext.identifyModule( new IdentifyModule( dependency, true, concurrentContext ) );
 			}
 			else
 			{
-				// Do now
 				for( Module dependency : module.getDependencies() )
 					identifyModule( dependency, true, null );
 			}
@@ -349,31 +416,6 @@ public class Manager extends Notifier
 			for( Module dependency : module.getDependencies() )
 				addModule( dependency );
 		}
-	}
-
-	public Runnable identifyModuleTask( final Module module, final boolean recursive, final Phaser phaser )
-	{
-		return new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					identifyModule( module, recursive, phaser );
-				}
-				catch( Throwable x )
-				{
-					error( "Identification error for " + module.getSpecification() + ": " + x.getMessage(), x );
-				}
-				phaser.arriveAndDeregister();
-			}
-		};
-	}
-
-	public Future<?> identifyModuleFuture( Module module, boolean recursive, Phaser phaser )
-	{
-		phaser.register();
-		return executor.submit( identifyModuleTask( module, recursive, phaser ) );
 	}
 
 	public void findConflicts()
@@ -404,18 +446,26 @@ public class Manager extends Notifier
 
 		String id = begin( "Installing" );
 
-		Downloader downloader = new Downloader( getExecutor(), this );
-		downloader.setDelay( 100 );
-		for( Module module : identifiedModules )
-			for( Artifact artifact : module.getIdentifier().getArtifacts( directory ) )
-			{
-				if( overwrite || !artifact.getFile().exists() )
-					downloader.submit( artifact.getSourceUrl(), artifact.getFile(), module.getIdentifier().getRepository().validateFileTask( module.getIdentifier(), artifact.getFile(), this, downloader.getPhaser() ) );
-				else
-					module.getIdentifier().getRepository().validateFile( module.getIdentifier(), artifact.getFile(), this );
-				artifacts.add( artifact );
-			}
-		downloader.waitUntilDone();
+		Downloader downloader = new Downloader( 4, 4, this );
+		try
+		{
+			downloader.setDelay( 100 );
+			for( Module module : identifiedModules )
+				for( Artifact artifact : module.getIdentifier().getArtifacts( directory ) )
+				{
+					if( overwrite || !artifact.getFile().exists() )
+						downloader.submit( artifact.getSourceUrl(), artifact.getFile(),
+							module.getIdentifier().getRepository().validateFileTask( module.getIdentifier(), artifact.getFile(), this, downloader.getPhaser() ) );
+					else
+						module.getIdentifier().getRepository().validateFile( module.getIdentifier(), artifact.getFile(), this );
+					artifacts.add( artifact );
+				}
+			downloader.waitUntilDone();
+		}
+		finally
+		{
+			downloader.close();
+		}
 
 		end( id, "Installed " + downloader.getCount() + " artifacts" );
 
@@ -429,9 +479,7 @@ public class Manager extends Notifier
 	// //////////////////////////////////////////////////////////////////////////
 	// Private
 
-	private String defaultPlatform = "maven";
-
-	private ConflictPolicy conflictPolicy = ConflictPolicy.NEWEST;
+	private final Map<String, String> platforms = new HashMap<String, String>();
 
 	private final List<Module> explicitModules = new ArrayList<Module>();
 
@@ -447,7 +495,17 @@ public class Manager extends Notifier
 
 	private final AtomicInteger identifiedCacheHits = new AtomicInteger();
 
-	private final Jobs identifyModuleJobs = new Jobs();
+	private String defaultPlatform = "maven";
 
-	private final ExecutorService executor = Executors.newFixedThreadPool( 10, DaemonThreadFactory.INSTANCE );
+	private ConflictPolicy conflictPolicy = ConflictPolicy.NEWEST;
+
+	private <T> T newInstance( String platform, String baseClassName, Map<String, ?> config )
+	{
+		String packageName = platforms.get( platform );
+		if( packageName == null )
+			throw new UnsupportedPlatformException();
+		String className = platform.substring( 0, 1 ).toUpperCase() + platform.substring( 1 ) + baseClassName;
+		className = packageName + '.' + className;
+		return ClassUtil.newInstance( className, config );
+	}
 }

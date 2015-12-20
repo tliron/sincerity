@@ -14,7 +14,6 @@ package com.threecrickets.creel.event;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Tal Liron
@@ -35,78 +34,71 @@ public class ConsoleEventHandler implements EventHandler
 	// EventHandler
 	//
 
-	public boolean handleEvent( Event event )
+	public synchronized boolean handleEvent( Event event )
 	{
-		lock.lock();
-		try
+		// Move up before the ongoing block we printed last time
+		int ongoingEventsHeight = ongoingEvents.size();
+		if( ongoingEventsHeight > 0 )
+			controlSequence( "" + ongoingEventsHeight + 'A' );
+
+		Event.Type type = event.getType();
+		if( type == Event.Type.BEGIN )
 		{
-			// Move up before the ongoing block we printed last time
-			int ongoingEventsHeight = ongoingEvents.size();
-			if( ongoingEventsHeight > 0 )
-				controlSequence( "" + ongoingEventsHeight + 'A' );
-
-			Event.Type type = event.getType();
-			if( type == Event.Type.BEGIN )
-			{
-				// Add ongoing event
-				if( event.getId() != null )
-					ongoingEvents.add( event );
-			}
-			else if( ( type == Event.Type.END ) || ( type == Event.Type.FAIL ) )
-			{
-				// Remove ongoing event
-				String id = event.getId();
-				for( Event ongoingEvent : ongoingEvents )
-				{
-					if( ongoingEvent.getId().equals( id ) )
-					{
-						ongoingEvents.remove( ongoingEvent );
-						break;
-					}
-				}
-				// This line will take the place of the line we removed
-				controlSequence( ( type == Event.Type.FAIL ? failGraphics : endGraphics ) + 'm' );
-				print( event );
-			}
-			else if( type == Event.Type.UPDATE )
-			{
-				// Update ongoing event
-				String id = event.getId();
-				for( Event ongoingEvent : ongoingEvents )
-				{
-					if( ongoingEvent.getId().equals( id ) )
-					{
-						ongoingEvent.update( event );
-						break;
-					}
-				}
-			}
-			else if( type == Event.Type.ERROR )
-			{
-				controlSequence( errorGraphics + 'm' );
-				print( event );
-			}
-			else
-			{
-				controlSequence( defaultGraphics + 'm' );
-				print( event );
-			}
-
-			// Print ongoing block after everything else
-			if( ansi )
-				for( Event ongoingEvent : ongoingEvents )
-				{
-					controlSequence( ongoingGraphics + 'm' );
-					print( ongoingEvent );
-				}
-
-			// Erase to end of screen
-			controlSequence( "0J" );
+			// Add ongoing event
+			if( event.getId() != null )
+				ongoingEvents.add( event );
 		}
-		finally
+		else if( ( type == Event.Type.END ) || ( type == Event.Type.FAIL ) )
 		{
-			lock.unlock();
+			// Remove ongoing event
+			String id = event.getId();
+			for( Event ongoingEvent : ongoingEvents )
+			{
+				if( ongoingEvent.getId().equals( id ) )
+				{
+					ongoingEvents.remove( ongoingEvent );
+					break;
+				}
+			}
+			// This line will take the place of the line we removed
+			controlSequence( ( type == Event.Type.FAIL ? failGraphics : endGraphics ) + 'm' );
+			print( event );
 		}
+		else if( type == Event.Type.UPDATE )
+		{
+			// Update ongoing event
+			String id = event.getId();
+			for( Event ongoingEvent : ongoingEvents )
+			{
+				if( ongoingEvent.getId().equals( id ) )
+				{
+					ongoingEvent.update( event );
+					break;
+				}
+			}
+		}
+		else if( type == Event.Type.ERROR )
+		{
+			controlSequence( errorGraphics + 'm' );
+			print( event );
+		}
+		else
+		{
+			controlSequence( defaultGraphics + 'm' );
+			print( event );
+		}
+
+		// Print ongoing block after everything else
+		if( ansi )
+			for( Event ongoingEvent : ongoingEvents )
+			{
+				controlSequence( ongoingGraphics + 'm' );
+				print( ongoingEvent );
+			}
+
+		// Erase to end of screen
+		controlSequence( "0J" );
+
 		return false;
 	}
 
@@ -129,8 +121,6 @@ public class ConsoleEventHandler implements EventHandler
 	private final PrintWriter out;
 
 	private final boolean ansi;
-
-	private final ReentrantLock lock = new ReentrantLock();
 
 	private Collection<Event> ongoingEvents = new CopyOnWriteArrayList<Event>();
 

@@ -200,6 +200,7 @@
 				<attribute name="Implementation-Title" value="${component.group}:${component.artifact}" />
 				<attribute name="Implementation-Version" value="${component.version}${component.version.postfix}" />
 				<attribute name="Implementation-Vendor" value="Three Crickets" />
+				<attribute name="Main-Class" value="com.threecrickets.creel.Creel" />
 			</manifest>
 		</jar>
 		<jar destfile="${distribution.content}/bootstrap.jar" basedir="${cache.classes}" includes="com/threecrickets/bootstrap/*">

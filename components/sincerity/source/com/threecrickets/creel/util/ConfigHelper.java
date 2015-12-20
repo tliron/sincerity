@@ -13,36 +13,11 @@ package com.threecrickets.creel.util;
 
 import java.util.Map;
 
-import com.threecrickets.creel.Manager;
-import com.threecrickets.creel.ModuleSpecification;
-import com.threecrickets.creel.Repository;
-
 /**
  * @author Tal Liron
  */
 public class ConfigHelper
 {
-	//
-	// Static operations
-	//
-
-	public static Repository newRepository( String type, Map<String, ?> config )
-	{
-		return newInstance( type, "Repository", config );
-	}
-
-	public static ModuleSpecification newModuleSpecification( String type, Map<String, ?> config )
-	{
-		return newInstance( type, "ModuleSpecification", config );
-	}
-
-	public static <T> T newInstance( String type, String suffix, Map<String, ?> config )
-	{
-		String packageName = Manager.class.getPackage().getName() + "." + type;
-		String className = type.substring( 0, 1 ).toUpperCase() + type.substring( 1 ) + suffix;
-		return ClassUtil.newInstance( packageName + "." + className, config );
-	}
-
 	//
 	// Construction
 	//

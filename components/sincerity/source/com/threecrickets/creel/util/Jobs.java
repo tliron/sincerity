@@ -27,11 +27,6 @@ public class Jobs
 	// Operations
 	//
 
-	public synchronized void clear()
-	{
-		jobs.clear();
-	}
-
 	public synchronized boolean beginIfNotBegun( Object token, ExecutorService executor, Phaser phaser, Runnable onEnd )
 	{
 		Job job = jobs.get( token.toString() );
@@ -52,7 +47,7 @@ public class Jobs
 		}
 	}
 
-	public synchronized boolean end( Object token )
+	public synchronized boolean notifyEnd( Object token )
 	{
 		Job job = jobs.remove( token.toString() );
 		if( job != null )

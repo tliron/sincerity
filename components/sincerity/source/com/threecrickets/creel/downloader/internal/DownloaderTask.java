@@ -52,7 +52,8 @@ public abstract class DownloaderTask implements Runnable
 		if( getValidator() != null )
 		{
 			getDownloader().getPhaser().register();
-			getDownloader().getExecutor().submit( getValidator() );
+			// TODO: submit it?
+			getValidator().run();
 		}
 		getDownloader().incrementCount();
 		getDownloader().getPhaser().arriveAndDeregister();

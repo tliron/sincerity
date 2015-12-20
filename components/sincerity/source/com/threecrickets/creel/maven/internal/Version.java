@@ -209,7 +209,7 @@ public class Version implements Comparable<Version>
 			sign = '>';
 		else
 			sign = '=';
-		System.out.println( this + " " + sign + " " + version );
+		System.out.println( this.toString() + ' ' + sign + ' ' + version );
 		return compare;
 	}
 
