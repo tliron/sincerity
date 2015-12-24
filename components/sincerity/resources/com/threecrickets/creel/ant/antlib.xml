@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<antlib>
-	<typedef name="dependencies" classname="com.threecrickets.creel.ant.DependenciesTask" />
-</antlib>

@@ -60,5 +60,5 @@ function creel(command) {
 	manager.setRepositories(repositories)
 	
 	manager.identify()
-	manager.install('zzz/jars', true, true)
+	manager.install('zzz/jars', true, false)
 }

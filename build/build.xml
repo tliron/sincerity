@@ -135,6 +135,7 @@
 
 			<link href="${documentation.jvm}" />
 			<!-- Apache Commons VFS 1.0 has no online javadocs -->
+			<!-- Apache Ant has no online javadocs -->
 			<link href="http://jsoup.org/apidocs/" />
 			<link href="http://threecrickets.com/api/java/scripturian/" />
 			<link href="http://www.mozilla.org/rhino/apidocs/" />
