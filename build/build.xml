@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="Sincerity" default="build"
-	xmlns:ivy="antlib:org.apache.ivy.ant"
+	xmlns:creel="antlib:com.threecrickets.creel.ant"
 	xmlns:jdeb='antlib:org.vafer.jdeb.ant'
 	xmlns:redline='antlib:org.redline_rpm.ant'>
 
@@ -33,8 +33,7 @@
 	<property name="distribution" value="${root}/build/distribution" />
 	<property name="distribution.content" value="${distribution}/content" />
 	<property name="distribution.libraries" value="${distribution.content}/libraries" />
-	<property name="distribution.jars" value="${distribution.libraries}/jars/${component.group}/${component.artifact}/${component.version}${component.version.postfix}" />
-	<property name="distribution.jars.pattern" value="${distribution.libraries}/jars/[organisation]/[module]/[revision](/[branch])/[artifact](.[ext])" />
+	<property name="distribution.jars" value="${distribution.libraries}/jars" />
 	<property name="distribution.reference" value="${distribution.content}/reference" />
 	<property name="distribution.api" value="${distribution.reference}/api/${component.group}/${component.artifact}/${component.version}${component.version.postfix}" />
 	<property name="distribution.manual" value="${distribution.reference}/manuals/${component.group}/${component.artifact}/${component.version}${component.version.postfix}" />
@@ -43,7 +42,7 @@
 	<property name="distribution.eclipsePlugin" value="${distribution}/eclipse-plugin" />
 	<property name="distribution.agent" value="${distribution}/firewall-friendly-agent" />
 
-	<taskdef uri="antlib:org.apache.ivy.ant" resource="org/apache/ivy/ant/antlib.xml" classpath="${dependencies.jars}/org.apache.ivy/ivy/${ivy.version}/ivy.jar" />
+	<taskdef resource="com/threecrickets/creel/ant/antlib.xml" uri="antlib:com.threecrickets.creel.ant" classpath="${dependencies}/libraries/jars/com.threecrickets.creel/creel/${creel.version}/creel.jar" />
 	<taskdef uri="antlib:org.vafer.jdeb.ant" resource="org/vafer/jdeb/ant/antlib.xml">
 		<classpath>
 			<pathelement location="${dependencies.jars}/org.vafer.jdeb/jdeb/${jdeb.version}/jdeb.jar" />
@@ -73,15 +72,34 @@
 		</sequential>
 	</macrodef>
 	
-	<target name="ivy" description="Settings for Ivy">
-		<ivy:settings file="${root}/build/ivy/settings.xml" />
-	</target>
-
-	<target name="dependencies" depends="ivy" description="Resolve dependencies">
-		<ivy:resolve file="${root}/build/ivy/${component}.xml" type="jar" log="download-only" resolveId="${component}" />
-		<ivy:cachepath pathid="dependencies-ivy" type="jar" resolveId="${component}" conf="compile" />
+	<target name="dependencies" description="Resolve dependencies">
+		<creel:run ref="dependencies-creel" libraryDir="${cache.jars}" state="${cache.jars}/.creel">
+			<module group="com.threecrickets.scripturian" name="scripturian" version="1.1+" />
+			<module group="com.threecrickets.jvm" name="json-jvm" version="2.0+" />
+			<module group="com.threecrickets.creel" name="creel" version="0.9+" />
+			<module group="org.apache.commons" name="commons-vfs" version="1.0+" />
+			<module group="org.apache.commons" name="commons-logging" version="1.1+" />
+			<module group="org.apache.ivy" name="ivy" version="2.4.0+" />
+			<module group="org.jsoup" name="jsoup" version="1.8+" />
+			<!-- <module group="org.junit" name="junit" version="4.12+" /> -->
+			<module group="org.mozilla" name="rhino" version="1.7+" />
+			<module group="jline" name="jline" version="2.13+" />
+			
+			<!-- For compilation only -->
+			<module group="org.apache.ant" name="ant" version="1.8+" /> <!-- Note: When invoking Ant through the Maven Ant plugin we cannot use the includeAntRuntime attributes in the javac task -->
+			<module group="org.apache.logging.log4j" name="log4j-api" version="2.0+" />
+			<module group="org.apache.logging.log4j" name="log4j-core" version="2.0+" />
+			<module group="org.mongodb" name="mongodb-driver" version="3.1+" />
+			<module group="org.mongodb" name="mongodb-driver-core" version="3.1+" />
+			<module group="org.mongodb" name="bson" version="3.1+" />
+			
+			<rule type="excludeDependencies" group="org.apache.ant" />
+			<rule type="excludeDependencies" group="org.apache.logging.log4j" />
+			<rule type="excludeDependencies" group="org.mongodb" />
+			<repository id="repo" url="${dependencies.repo}" />
+		</creel:run>
 		<path id="dependencies">
-			<path refid="dependencies-ivy" />
+			<path refid="dependencies-creel" />
 			<fileset dir="${dependencies.jars}" includes="**/*.jar" />
 		</path>
 	</target>
@@ -196,7 +214,7 @@
 
 	<target name="libraries" depends="classes, version" description="Create jars">
 		<mkdir dir="${distribution.jars}" />
-		<jar destfile="${distribution.jars}/${component.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*">
+		<jar destfile="${distribution.jars}/${component.group}/${component.artifact}/${component.version}${component.version.postfix}/${component.artifact}.jar" basedir="${cache.classes}" excludes="com/threecrickets/bootstrap/*">
 			<manifest>
 				<attribute name="Implementation-Title" value="${component.group}:${component.artifact}" />
 				<attribute name="Implementation-Version" value="${component.version}${component.version.postfix}" />
@@ -220,7 +238,15 @@
 	</target>
 
 	<target name="distribution-minimal" depends="libraries" description="Assemble distribution">
-		<ivy:retrieve type="jar" pattern="${distribution.jars.pattern}" log="quiet" resolveId="${component}" conf="distribution" />
+		<copy todir="${distribution.jars}">
+			<fileset dir="${cache.jars}">
+				<!-- Don't include compile-only jars -->
+				<exclude name="com.threecrickets.creel/**" />
+				<exclude name="org.apache.ant/**" />
+				<exclude name="org.apache.logging.log4j/**" />
+				<exclude name="org.mongodb/**" />
+			</fileset>
+		</copy>
 		<copy todir="${distribution.source}">
 			<fileset dir="${component.source}" />
 		</copy>
