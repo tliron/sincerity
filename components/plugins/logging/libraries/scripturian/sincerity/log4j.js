@@ -504,6 +504,7 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		/**
 		 * @param config
 		 * @param {String} config.pattern
+		 * @param config.patternSelector TODO
 		 * @param {String} [config.charset]
 		 * @param {Boolean} [config.alwaysWriteExceptions=true]
 		 * @param {Boolean} [config.noConsoleNoAnsi=false]
@@ -516,11 +517,12 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 			config = Sincerity.Objects.clone(config)
 			return org.apache.logging.log4j.core.layout.PatternLayout.createLayout(
 				config.pattern || null, // pattern
+				config.patternSelector || null, // patternSelector
 				Public.configuration, // config
 				config.replace || null, // replace TODO
 				config.charset || null, // charset
-				Sincerity.Objects.exists(config.alwaysWriteExceptions) ? config.alwaysWriteExceptions : true, // alwaysWriteException
-				Sincerity.Objects.exists(config.noConsoleNoAnsi) ? config.noConsoleNoAnsi : false, // noConsoleAni
+				Sincerity.Objects.ensure(config.alwaysWriteExceptions, true), // alwaysWriteException
+				Sincerity.Objects.ensure(config.noConsoleNoAnsi, false), // noConsoleAni
 				config.header || null, // header
 				config.footer || null // footer
 			)
@@ -532,6 +534,8 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 		 * @param {String} config.max
 		 * @param {String} [config.fileIndex='max'] 'max' or 'min' (fixed window)
 		 * @param {String} [config.compressionLevel]
+		 * @param [config.customActions] TODO
+		 * @param {Boolean} [config.stopCustomActionsOnError=true]
 		 * @returns {<a href="http://logging.apache.org/log4j/2.x/log4j-core/apidocs/index.html?org/apache/logging/log4j/core/appender/rolling/DefaultRolloverStrategy.html">org.apache.logging.log4j.core.appender.rolling.DefaultRolloverStrategy</a>}
 		 */
 		Public.defaultRolloverStrategy = function(config) {
@@ -540,6 +544,8 @@ Sincerity.Log4j = Sincerity.Log4j || function() {
 				Sincerity.Objects.exists(config.min) ? String(config.min) : null, // min
 				config.fileIndex || null, // fileIndex='max'
 				config.compressionLevel || null, // compressionLevel
+				config.customActions || null, // customActions
+				Sincerity.Objects.ensure(config.stopCustomActionsOnError, true), // stopCustomActionsOnError
 				Public.configuration // config
 			)
 		}
