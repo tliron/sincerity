@@ -22,7 +22,7 @@ try {
 	
 	// Have Restlet use the SLF4J facade (we'd get here only if the logging plugin is installed)
 	var FACADE_CLASS_NAME = 'org.restlet.ext.slf4j.Slf4jLoggerFacade'
-	var restletVersion = sincerity.container.dependencies.resolvedDependencies.getVersion('org.restlet.jse', 'restlet')
+	var restletVersion = org.restlet.engine.Engine.VERSION
 	if (null === Sincerity.Container.ensureClass(FACADE_CLASS_NAME, ['org.restlet.jse', 'restlet-slf4j', restletVersion])) {
 		start = false
 	}
