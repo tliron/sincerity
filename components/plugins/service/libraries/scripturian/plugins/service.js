@@ -179,6 +179,7 @@ function service(command) {
 		// JVM switches
 		var jvmDir = command.sincerity.container.getConfigurationFile('service', 'jvm')
 		var index = 1
+		configuration.wrapper.java['additional.' + index++] = '-Dfile.encoding=' + java.nio.charset.Charset.defaultCharset() // pass our current charset
 		configuration.wrapper.java['additional.' + index++] = '-Dsincerity.home=' + command.sincerity.home
 		configuration.wrapper.java['additional.' + index++] = '-Dsincerity.container=' + command.sincerity.container.root
 		if (jvmDir.directory) {
