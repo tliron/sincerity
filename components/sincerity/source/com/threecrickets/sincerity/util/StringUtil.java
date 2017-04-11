@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -14,6 +14,11 @@ package com.threecrickets.sincerity.util;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.List;
+
+import com.threecrickets.scripturian.exception.ExecutionException;
+import com.threecrickets.scripturian.exception.ParsingException;
+import com.threecrickets.scripturian.exception.StackFrame;
 
 /**
  * String utilities.
@@ -122,12 +127,31 @@ public abstract class StringUtil
 	private static void createHumanReadableStackTrace( Throwable x, StringWriter writer )
 	{
 		PrintWriter printer = new PrintWriter( writer );
+
 		while( x != null )
 		{
 			printer.println( x );
-			StackTraceElement[] trace = x.getStackTrace();
-			for( int i = 0; i < trace.length; i++ )
-				printer.println( "\tat " + trace[i] );
+
+			List<StackFrame> scripturianStack = null;
+			if( x instanceof ExecutionException )
+				scripturianStack = ( (ExecutionException) x ).getStack();
+			else if( x instanceof ParsingException )
+				scripturianStack = ( (ParsingException) x ).getStack();
+
+			if( scripturianStack != null )
+				for( StackFrame stackFrame : scripturianStack )
+				{
+					printer.print( "\tat " + stackFrame.getDocumentName() );
+					if( stackFrame.getLineNumber() >= 0 )
+						printer.print( " @ " + stackFrame.getLineNumber() );
+					if( stackFrame.getColumnNumber() >= 0 )
+						printer.print( "," + stackFrame.getColumnNumber() );
+					printer.println();
+				}
+
+			StackTraceElement[] jvmStack = x.getStackTrace();
+			for( int i = 0; i < jvmStack.length; i++ )
+				printer.println( "\tat " + jvmStack[i] );
 
 			x = x.getCause();
 			if( x != null )

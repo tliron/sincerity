@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -102,7 +102,10 @@ public class Plugins extends AbstractMap<String, Plugin1>
 					}
 					catch( Exception x )
 					{
-						container.getSincerity().dumpStackTrace( x );
+						if( sincerity.getVerbosity() >= 2 )
+							sincerity.dumpStackTrace( x );
+						else
+							sincerity.getErr().println( "Error: " + x.getMessage() );
 					}
 				}
 			}
@@ -132,7 +135,10 @@ public class Plugins extends AbstractMap<String, Plugin1>
 				}
 				catch( Exception x )
 				{
-					sincerity.dumpStackTrace( x );
+					if( sincerity.getVerbosity() >= 2 )
+						sincerity.dumpStackTrace( x );
+					else
+						sincerity.getErr().println( "Error: " + x.getMessage() );
 				}
 			}
 		}

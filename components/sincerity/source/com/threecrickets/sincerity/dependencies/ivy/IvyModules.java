@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -154,8 +154,6 @@ public class IvyModules extends Modules<IvyModule>
 	 */
 	protected IvyModules( IvyDependencies dependencies ) throws SincerityException
 	{
-		super();
-
 		File resolutionReport = dependencies.getResolutionReportFile();
 		if( !resolutionReport.exists() )
 			return;

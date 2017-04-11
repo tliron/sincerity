@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -159,7 +159,7 @@ public class ScripturianShell implements Shell
 				if( x.getCause() instanceof ScripturianException )
 					throw (ScripturianException) x.getCause();
 				else
-					throw new ScripturianException( x.getCause() );
+					throw new ScripturianException( "Execution error in: " + documentName, x );
 			}
 			catch( IOException x )
 			{
@@ -212,7 +212,7 @@ public class ScripturianShell implements Shell
 			if( x.getCause() instanceof ScripturianException )
 				throw (ScripturianException) x.getCause();
 			else
-				throw new ScripturianException( x.getCause() );
+				throw new ScripturianException( "Execution error in: " + documentName, x );
 		}
 		catch( IOException x )
 		{

@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -42,12 +41,10 @@ import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.NativeUtil;
 import com.threecrickets.sincerity.util.Pipe;
 import com.threecrickets.sincerity.util.StringUtil;
+import com.threecrickets.sincerity.util.TerminalUtil;
 
-import jline.DefaultTerminal2;
 import jline.Terminal;
-import jline.Terminal2;
 import jline.TerminalFactory;
-import jline.internal.Configuration;
 
 /**
  * This is the highest level instance for the Sincerity runtime.
@@ -136,6 +133,8 @@ public class Sincerity implements Runnable
 				Bootstrap.getAttributes().put( STARTED_ATTRIBUTE, true );
 
 			sincerity.run();
+
+			TerminalUtil.reset();
 		}
 		catch( SincerityException x )
 		{
@@ -341,22 +340,7 @@ public class Sincerity implements Runnable
 		PrintWriter out = (PrintWriter) Bootstrap.getAttributes().get( OUT_ATTRIBUTE );
 		if( out == null )
 		{
-			try
-			{
-				// Using JLine
-				Terminal terminal = TerminalFactory.get();
-				if( !( terminal instanceof Terminal2 ) )
-					terminal = new DefaultTerminal2( terminal );
-				String encoding = terminal.getOutputEncoding();
-				if( encoding == null )
-					encoding = Configuration.getEncoding();
-				out = new PrintWriter( new OutputStreamWriter( terminal.wrapOutIfNeeded( System.out ), encoding ), true );
-			}
-			catch( IOException x )
-			{
-				out = new PrintWriter( new OutputStreamWriter( System.out ), true );
-			}
-
+			out = TerminalUtil.createPrintWriter();
 			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( OUT_ATTRIBUTE, out );
 			if( existing != null )
 				out = existing;
@@ -371,11 +355,17 @@ public class Sincerity implements Runnable
 	 * Will be wrapped in a {@link PrintWriter} if it's not already one.
 	 * 
 	 * @param out
-	 *        The writer
+	 *        The writer or null to reset
 	 * @see #getOut()
 	 */
 	public void setOut( Writer out )
 	{
+		if( out == null )
+		{
+			Bootstrap.getAttributes().remove( OUT_ATTRIBUTE );
+			return;
+		}
+
 		if( !( out instanceof PrintWriter ) )
 			out = new PrintWriter( out, true );
 		Bootstrap.getAttributes().put( OUT_ATTRIBUTE, out );
@@ -390,7 +380,7 @@ public class Sincerity implements Runnable
 		PrintWriter err = (PrintWriter) Bootstrap.getAttributes().get( ERR_ATTRIBUTE );
 		if( err == null )
 		{
-			err = new PrintWriter( new OutputStreamWriter( System.err ), true );
+			err = TerminalUtil.createPrintWriter( System.err );
 			PrintWriter existing = (PrintWriter) Bootstrap.getAttributes().putIfAbsent( ERR_ATTRIBUTE, err );
 			if( existing != null )
 				err = existing;
@@ -405,10 +395,16 @@ public class Sincerity implements Runnable
 	 * Will be wrapped in a {@link PrintWriter} if it's not already one.
 	 * 
 	 * @param err
-	 *        The writer
+	 *        The writer or null to reset
 	 */
 	public void setErr( Writer err )
 	{
+		if( err == null )
+		{
+			Bootstrap.getAttributes().remove( ERR_ATTRIBUTE );
+			return;
+		}
+
 		if( !( err instanceof PrintWriter ) )
 			err = new PrintWriter( err, true );
 		Bootstrap.getAttributes().put( ERR_ATTRIBUTE, err );

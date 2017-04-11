@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -172,7 +172,7 @@ public class DependenciesPlugin implements Plugin1
 
 			if( !dependencies.addExplicitDependency( group, name, version, force, !only ) )
 				if( sincerity.getVerbosity() >= 2 )
-					err.println( "Dependency already in container: " + group + ":" + name + " v" + version );
+					err.println( "Dependency already in container: " + group + ":" + name + ( version != null ? " v" + version : "" ) );
 		}
 		else if( "revise".equals( commandName ) )
 		{
@@ -193,7 +193,7 @@ public class DependenciesPlugin implements Plugin1
 
 			if( !dependencies.reviseExplicitDependency( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
-					err.println( "Dependency not revised: " + group + ":" + name + " v" + version );
+					err.println( "Dependency not revised: " + group + ":" + name + ( version != null ? " v" + version : "" ) );
 		}
 		else if( "remove".equals( commandName ) )
 		{
@@ -248,7 +248,7 @@ public class DependenciesPlugin implements Plugin1
 
 			if( !dependencies.overrideDependency( group, name, version ) )
 				if( sincerity.getVerbosity() >= 1 )
-					err.println( "Dependency not overridden: " + group + ":" + name + " v" + version );
+					err.println( "Dependency not overridden: " + group + ":" + name + ( version != null ? " v" + version : "" ) );
 		}
 		else if( "freeze".equals( commandName ) )
 		{

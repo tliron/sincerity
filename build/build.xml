@@ -76,7 +76,7 @@
 		<creel:run ref="dependencies-creel" libraryDir="${cache.jars}" state="${cache.jars}/.creel">
 			<module group="com.threecrickets.scripturian" name="scripturian" version="1.1+" />
 			<module group="com.threecrickets.jvm" name="json-jvm" version="2.0+" />
-			<module group="com.threecrickets.creel" name="creel" version="0.9+" />
+			<module group="com.threecrickets.creel" name="creel" version="1.0.1+" />
 			<module group="org.apache.commons" name="commons-vfs" version="1.0+" />
 			<module group="org.apache.commons" name="commons-logging" version="1.1+" />
 			<module group="org.apache.ivy" name="ivy" version="2.4.0+" />
@@ -241,7 +241,6 @@
 		<copy todir="${distribution.jars}">
 			<fileset dir="${cache.jars}">
 				<!-- Don't include compile-only jars -->
-				<exclude name="com.threecrickets.creel/**" />
 				<exclude name="org.apache.ant/**" />
 				<exclude name="org.apache.logging.log4j/**" />
 				<exclude name="org.mongodb/**" />

@@ -93,7 +93,7 @@ Main text written by Tal Liron
 \begin_layout Standard
 \noindent
 \align center
-Copyright 2011-2016 by Three Crickets LLC.
+Copyright 2011-2017 by Three Crickets LLC.
 \begin_inset Newline newline
 \end_inset
 
@@ -3741,12 +3741,30 @@ Running in Docker
 \begin_layout Standard
 Because Sincerity puts your entire container in one root directory, it's
  trivial to run your Sincerity container in a Docker image.
- In this example, we'll create a container with the Prudence example application
-, and then run it inside the ready-made 
+ In this example, we'll create a container with the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Prudence example application"
+target "http://threecrickets.com/prudence/"
+
+\end_inset
+
+ and the 
+\bar under
+Standalone Plugin (page 
+\begin_inset CommandInset ref
+LatexCommand pageref
+reference "standalone"
+
+\end_inset
+
+)
+\bar default
+ and then run it inside the public 
 \begin_inset Quotes eld
 \end_inset
 
-java
+openjdk
 \begin_inset Quotes erd
 \end_inset
 
@@ -3760,7 +3778,8 @@ status open
 
 \begin_layout Plain Layout
 
-sincerity create /path/to/mycontainer : add prudence.example : install
+sincerity create /path/to/mycontainer : add prudence.example : add sincerity.stand
+alone : install
 \end_layout
 
 \begin_layout Plain Layout
@@ -3769,7 +3788,7 @@ sincerity create /path/to/mycontainer : add prudence.example : install
 
 \begin_layout Plain Layout
 
-sudo docker run --rm -it 
+docker run --rm -it 
 \backslash
 
 \end_layout
@@ -3790,7 +3809,7 @@ sudo docker run --rm -it
 
 \begin_layout Plain Layout
 
-java:8u45-jre 
+oracle/openjdk:8 
 \backslash
 
 \end_layout
@@ -3810,7 +3829,7 @@ If you haven't used the
 \begin_inset Quotes eld
 \end_inset
 
-java:8u45-jre
+oracle/openjdk:8
 \begin_inset Quotes erd
 \end_inset
 
@@ -3862,8 +3881,8 @@ normally
 What good is this? Well, for one, it allows you to easily test your Sincerity
  container in various versions of the JVM without having to install them
  on your main operating system.
- But also, Docker can offer tighter security more easily than just, for
- example, running your Sincerity container under a custom user.
+ But also, Docker makes it easier to deploy and distribute your entire applicati
+on as a single Docker image.
 \end_layout
 
 \begin_layout Subsubsection
@@ -3876,7 +3895,7 @@ Once you've tested your Sincerity container in Docker, it's time to package
 \end_layout
 
 \begin_layout Standard
-First, create a 
+First, let's create a 
 \begin_inset Quotes eld
 \end_inset
 
@@ -3884,7 +3903,7 @@ Dockerfile
 \begin_inset Quotes erd
 \end_inset
 
- in your container's directory.
+ in the container's directory.
  For our example:
 \end_layout
 
@@ -3895,7 +3914,7 @@ status open
 
 \begin_layout Plain Layout
 
-FROM java:8u45-jre
+FROM oracle/openjdk:8
 \end_layout
 
 \begin_layout Plain Layout
@@ -3976,7 +3995,7 @@ status open
 
 \begin_layout Plain Layout
 
-sudo docker build -t threecrickets:mycontainer .
+docker build -t threecrickets:mycontainer .
 \end_layout
 
 \end_inset
@@ -3985,8 +4004,8 @@ sudo docker build -t threecrickets:mycontainer .
 \end_layout
 
 \begin_layout Standard
-That's it! It was very fast, because Docker uses a transaction system: our
- new package is only a small diff over the original image.
+That's it! It was very fast, because Docker uses a transactional system:
+ our new package is only a small diff over the original image.
  Running it is very similar to before:
 \end_layout
 
@@ -3997,7 +4016,7 @@ status open
 
 \begin_layout Plain Layout
 
-sudo docker run -it -p 8080:8080 threecrickets:mycontainer
+docker run -it -p 8080:8080 threecrickets:mycontainer
 \end_layout
 
 \end_inset
@@ -4053,7 +4072,7 @@ status open
 
 \begin_layout Plain Layout
 
-sudo docker save threecrickets:mycontainer | bzip2 > mycontainer.tar.bz2
+docker save threecrickets:mycontainer | bzip2 > mycontainer.tar.bz2
 \end_layout
 
 \end_inset
@@ -4086,17 +4105,13 @@ Note that because the image is self-contained, the environment loading it
 \begin_inset Quotes eld
 \end_inset
 
-java:8u45-jre
+oracle/openjdk:8
 \begin_inset Quotes erd
 \end_inset
 
  came from (it essentially includes the JVM).
  However, because all transactions have GUIDs, it would be identical to
- having retrieved 
-\begin_inset Quotes eld
-\end_inset
-
-java:8u45-jre
+ having retrieved oracle/openjdk:8
 \begin_inset Quotes erd
 \end_inset
 
@@ -4105,7 +4120,7 @@ java:8u45-jre
 \begin_inset Quotes eld
 \end_inset
 
-java:8u45-jre
+oracle/openjdk:8
 \begin_inset Quotes erd
 \end_inset
 
@@ -4149,7 +4164,7 @@ status open
 
 \begin_layout Plain Layout
 
-sudo docker images
+docker images
 \end_layout
 
 \begin_layout Plain Layout
@@ -4159,7 +4174,7 @@ sudo docker images
 
 \begin_layout Plain Layout
 
-sudo docker tag ...
+docker tag ...
  threecrickets:mycontainer
 \end_layout
 
@@ -4169,8 +4184,15 @@ sudo docker tag ...
 \end_layout
 
 \begin_layout Standard
-See the Docker documentation for more information about how to work with
- repositories.
+See the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Docker documentation"
+target "https://docs.docker.com/"
+
+\end_inset
+
+ for more information about how to work with repositories.
 \end_layout
 
 \begin_layout Section
@@ -10439,15 +10461,10 @@ status open
 \begin_layout Standard
 It may furthermore be useful to run your Sincerity service as an operating
  system service.
- On Unix-like systems, you can use a 
-\begin_inset Quotes eld
-\end_inset
+\end_layout
 
-system init script.
-\begin_inset Quotes erd
-\end_inset
-
- Below is a script template you may use, meant for the 
+\begin_layout Standard
+Here are two examples for installing the 
 \bar under
 Restlet skeleton (page 
 \begin_inset CommandInset ref
@@ -10458,24 +10475,152 @@ reference "restlet"
 
 )
 \bar default
-.
- It adds a special 
+ as a service.
+ First, here's a 
+\begin_inset CommandInset href
+LatexCommand href
+name "systemd"
+target "https://www.freedesktop.org/wiki/Software/systemd/"
+
+\end_inset
+
+ script for Linux.
+ Let's name it 
 \begin_inset Quotes eld
 \end_inset
 
-###
+/etc/systemd/system/restlet.service
 \begin_inset Quotes erd
 \end_inset
 
- comment block used by Linux's 
-\begin_inset CommandInset href
-LatexCommand href
-name "Standard Base (LSB) specification"
-target "http://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/initscrcomconv.html"
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+[Unit]
+\end_layout
+
+\begin_layout Plain Layout
+
+Description=Restlet
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+[Service]
+\end_layout
+
+\begin_layout Plain Layout
+
+WorkingDirectory=/path/to/container
+\end_layout
+
+\begin_layout Plain Layout
+
+ExecStart=/path/to/sincerity/sincerity use /path/to/container : service
+ restlet start
+\end_layout
+
+\begin_layout Plain Layout
+
+ExecStop=/path/to/sincerity/sincerity use /path/to/container : service restlet
+ stop
+\end_layout
+
+\begin_layout Plain Layout
+
+Type=forking
+\end_layout
+
+\begin_layout Plain Layout
+
+User=myuser
+\end_layout
+
+\begin_layout Plain Layout
+
+RestartSec=10s
+\end_layout
+
+\begin_layout Plain Layout
+
+Restart=always
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+[Install]
+\end_layout
+
+\begin_layout Plain Layout
+
+WantedBy=multi-user.target
+\end_layout
 
 \end_inset
 
-.
+
+\end_layout
+
+\begin_layout Standard
+Note the important 
+\begin_inset Quotes eld
+\end_inset
+
+Type=forking
+\begin_inset Quotes erd
+\end_inset
+
+ setting, which makes sure to include the wrapper process 
+\emph on
+as well as
+\emph default
+ the forked JVM process.
+ You can then start your service with 
+\begin_inset Quotes eld
+\end_inset
+
+sudo systemctl start restlet
+\begin_inset Quotes erd
+\end_inset
+
+ (or 
+\begin_inset Quotes eld
+\end_inset
+
+sudo service restlet start
+\begin_inset Quotes erd
+\end_inset
+
+ on some systems).
+ It should automatically install due to the 
+\begin_inset Quotes eld
+\end_inset
+
+[Install]
+\begin_inset Quotes erd
+\end_inset
+
+ section in the configuration.
+\end_layout
+
+\begin_layout Standard
+For the second example, here's a System V init script for other Unix-like
+ systems.
  Let's name it 
 \begin_inset Quotes eld
 \end_inset
@@ -10533,12 +10678,13 @@ status open
 
 \begin_layout Plain Layout
 
-# Short-Description: starts the Restlet component
+# Short-Description: Starts the Restlet component
 \end_layout
 
 \begin_layout Plain Layout
 
-# Description:       starts the Restlet component using start-stop-daemon
+# Description:       Starts the Restlet component using Sincerity and its
+ service plugin
 \end_layout
 
 \begin_layout Plain Layout
@@ -10599,19 +10745,6 @@ exit 0
 \end_layout
 
 \begin_layout Standard
-For consistency, make sure to change the 
-\begin_inset Quotes eld
-\end_inset
-
-Provides:
-\begin_inset Quotes erd
-\end_inset
-
- entry to match the name of the file.
- 
-\end_layout
-
-\begin_layout Standard
 You can start/stop this service by running the above script directly, for
  example: 
 \begin_inset Quotes eld
@@ -10621,16 +10754,7 @@ sudo /etc/init.d/restlet start
 \begin_inset Quotes erd
 \end_inset
 
-.
- On some operating systems, you may also use your 
-\begin_inset Quotes eld
-\end_inset
-
-service
-\begin_inset Quotes erd
-\end_inset
-
- command, for example: 
+ (or 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10638,25 +10762,57 @@ sudo service restlet start
 \begin_inset Quotes erd
 \end_inset
 
-.
+ on some systems).
 \end_layout
 
 \begin_layout Standard
-Make sure to edit the variables to point to the paths on your system.
- Note that the 
+Note that we've also added a special 
 \begin_inset Quotes eld
 \end_inset
 
-OWNER
+###
 \begin_inset Quotes erd
 \end_inset
 
- user will be used to run your service, and that for security reasons you
- are strongly advised 
+ comment block as defined by Linux's 
+\begin_inset CommandInset href
+LatexCommand href
+name "Standard Base (LSB) specification"
+target "http://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/initscrcomconv.html"
+
+\end_inset
+
+ (see also 
+\begin_inset Quotes eld
+\end_inset
+
+man insserv
+\begin_inset Quotes erd
+\end_inset
+
+).
+ This is an embedded configuration for use by Linux 
 \emph on
-not
+without
 \emph default
- to use 
+ systemd.
+ To process this file and the block, effectively installing the service
+ into the operating system, run 
+\begin_inset Quotes eld
+\end_inset
+
+sudo update-rc.d restlet defaults
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This should work with Ubuntu Upstart installations as well as other LSB-complia
+nt systems.
+\end_layout
+
+\begin_layout Standard
+Note that for both examples we assume running with a special user, rather
+ than the default 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10664,9 +10820,10 @@ root
 \begin_inset Quotes erd
 \end_inset
 
-: it is best to create a special user for your service, and to set its permissio
-ns according to only what it needs: read access to Sincerity and the container,
- and write access to the container's 
+.
+ It's best to create a special user and to set its permissions according
+ to only what it needs: read access to Sincerity and the container, and
+ write access to the container's 
 \begin_inset Quotes eld
 \end_inset
 
@@ -10682,49 +10839,7 @@ ns according to only what it needs: read access to Sincerity and the container,
 \begin_inset Quotes erd
 \end_inset
 
- and other relevant directories.
-\end_layout
-
-\begin_layout Standard
-To make your service start automatically when the system starts depends
- on your operating system.
- The above script should work on most Linux-based operating systems due
- to the 
-\begin_inset Quotes eld
-\end_inset
-
-###
-\begin_inset Quotes erd
-\end_inset
-
- comment block.
- To process this file and the block, effectively installing the service
- into the operating system, run 
-\begin_inset Quotes eld
-\end_inset
-
-sudo update-rc.d restlet defaults
-\begin_inset Quotes erd
-\end_inset
-
-.
- That command uses 
-\begin_inset Quotes eld
-\end_inset
-
-insserv
-\begin_inset Quotes erd
-\end_inset
-
- internally, so run 
-\begin_inset Quotes eld
-\end_inset
-
-man insserv
-\begin_inset Quotes erd
-\end_inset
-
- to get documentation for the comment block format.
+, and other relevant directories.
 \end_layout
 
 \begin_layout Subsubsection*

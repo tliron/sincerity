@@ -1,5 +1,5 @@
 /**
- * Copyright 2011-2016 Three Crickets LLC.
+ * Copyright 2011-2017 Three Crickets LLC.
  * <p>
  * The contents of this file are subject to the terms of the LGPL version 3.0:
  * http://www.gnu.org/copyleft/lesser.html
@@ -13,15 +13,19 @@ package com.threecrickets.sincerity.dependencies;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.threecrickets.bootstrap.Bootstrap;
 import com.threecrickets.sincerity.Container;
 import com.threecrickets.sincerity.exception.SincerityException;
 import com.threecrickets.sincerity.packaging.Artifact;
 import com.threecrickets.sincerity.packaging.ArtifactManager;
 import com.threecrickets.sincerity.packaging.Packages;
+import com.threecrickets.sincerity.util.IoUtil;
 import com.threecrickets.sincerity.util.StringUtil;
 
 /**
@@ -197,7 +201,60 @@ public abstract class Dependencies<M extends Module>
 	 *         In case of an error
 	 * @see #getClasspath(boolean)
 	 */
-	public abstract List<File> getClasspaths( boolean includeSystem ) throws SincerityException;
+	public List<File> getClasspaths( boolean includeSystem ) throws SincerityException
+	{
+		Container<?, ?> container = getContainer();
+		ArrayList<File> classpaths = new ArrayList<File>();
+
+		if( includeSystem )
+		{
+			// Add JVM classpath
+			String system = System.getProperty( "java.class.path" );
+			if( system != null )
+			{
+				for( String path : system.split( File.pathSeparator ) )
+				{
+					File file = new File( path );
+					if( !classpaths.contains( file ) )
+						classpaths.add( file );
+				}
+			}
+
+			// Add master bootstrap
+			for( URL url : Bootstrap.getMasterBootstrap().getURLs() )
+			{
+				if( "file".equals( url.getProtocol() ) )
+				{
+					try
+					{
+						File file = new File( url.toURI() );
+						if( !classpaths.contains( file ) )
+							classpaths.add( file );
+					}
+					catch( URISyntaxException x )
+					{
+					}
+				}
+			}
+		}
+
+		// Classes directory
+		File classesDir = container.getLibrariesFile( "classes" );
+
+		// Note: if the directory doesn't exist when the class loader is first
+		// initialized, then it won't be able to pick up class files added to it
+		// later; so, we want to make sure it's there
+		if( !classesDir.isDirectory() )
+			classesDir.mkdirs();
+
+		if( !classpaths.contains( classesDir ) )
+			classpaths.add( classesDir );
+
+		// Jar directory
+		IoUtil.listRecursiveEndsWith( container.getLibrariesFile( "jars" ), ".jar", classpaths );
+
+		return classpaths;
+	}
 
 	//
 	// Operations

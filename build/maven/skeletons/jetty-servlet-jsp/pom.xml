@@ -57,12 +57,12 @@
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>apache-jsp</artifactId>
-			<version>[9.3,9.4)</version>
+			<version>[9.4,9.5)</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-annotations</artifactId>
-			<version>[9.3,9.4)</version>
+			<version>[9.4,9.5)</version>
 		</dependency>
 		<!-- Apache JSTL implementation (Taglibs) -->
 		<dependency>
